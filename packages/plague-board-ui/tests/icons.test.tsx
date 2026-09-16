@@ -2,37 +2,77 @@ import { render, screen } from '@testing-library/react';
 import type { ComponentType } from 'react';
 import { describe, expect, it } from 'vitest';
 
-import { BiohazardIcon, type IconProps, PoisonIcon, SkullIcon, VirusIcon } from '../src';
+import {
+  BiohazardIcon,
+  CodeIcon,
+  type IconProps,
+  PoisonIcon,
+  RobotIcon,
+  SkullIcon,
+  SparklesIcon,
+  VirusIcon,
+} from '../src';
 
 // Si importa dal punto d'ingresso pubblico e non dai file: quello che non passa da `src/index.ts`
 // non esiste per chi installa, quindi un'icona dimenticata lì dev'essere un test rosso.
-const icons: ReadonlyArray<readonly [string, ComponentType<IconProps>]> = [
-  ['PoisonIcon', PoisonIcon],
-  ['SkullIcon', SkullIcon],
-  ['BiohazardIcon', BiohazardIcon],
-  ['VirusIcon', VirusIcon],
+//
+// `paint` non è un dettaglio del disegno: un'icona a tratto porta il colore su `stroke` e ha
+// `fill="none"`, e chi le scambia ottiene una macchia nera o un'icona invisibile.
+interface IconEntry {
+  readonly name: string;
+  readonly Icon: ComponentType<IconProps>;
+  readonly paint: 'fill' | 'stroke';
+}
+
+const icons: readonly IconEntry[] = [
+  { name: 'PoisonIcon', Icon: PoisonIcon, paint: 'fill' },
+  { name: 'SkullIcon', Icon: SkullIcon, paint: 'fill' },
+  { name: 'BiohazardIcon', Icon: BiohazardIcon, paint: 'fill' },
+  { name: 'VirusIcon', Icon: VirusIcon, paint: 'fill' },
+  { name: 'RobotIcon', Icon: RobotIcon, paint: 'fill' },
+  { name: 'CodeIcon', Icon: CodeIcon, paint: 'stroke' },
+  { name: 'SparklesIcon', Icon: SparklesIcon, paint: 'stroke' },
 ];
 
-describe.each(icons)('%s', (_name, Icon) => {
-  it('senza prop si rende a 24px e col colore del testo', () => {
+describe.each(icons)('$name', ({ Icon, paint }) => {
+  it('senza prop si rende a 24px', () => {
     const { container } = render(<Icon />);
 
     const svg = container.querySelector('svg');
     expect(svg).toHaveAttribute('width', '24');
     expect(svg).toHaveAttribute('height', '24');
-    expect(svg).toHaveAttribute('fill', 'currentColor');
   });
 
-  it('accetta taglia, classe e colore', () => {
-    // `#00ff0040` è la forma vera con cui il fondale della peste le usa: esadecimale a otto cifre,
-    // cioè col canale alfa dentro il colore invece che in una classe di opacità.
-    const { container } = render(<Icon size={56} className="opacity-40" color="#00ff0040" />);
+  it('accetta taglia e classe', () => {
+    const { container } = render(<Icon size={56} className="opacity-40" />);
 
     const svg = container.querySelector('svg');
     expect(svg).toHaveAttribute('width', '56');
     expect(svg).toHaveAttribute('height', '56');
     expect(svg).toHaveClass('opacity-40');
-    expect(svg).toHaveAttribute('fill', '#00ff0040');
+  });
+
+  it('porta il colore dove il suo disegno lo vuole', () => {
+    // `#00ff0040` è la forma vera con cui il fondale della peste le usa: esadecimale a otto cifre,
+    // cioè col canale alfa dentro il colore invece che in una classe di opacità.
+    const { container } = render(<Icon color="#00ff0040" />);
+
+    const svg = container.querySelector('svg');
+    if (paint === 'fill') {
+      expect(svg).toHaveAttribute('fill', '#00ff0040');
+      expect(svg).not.toHaveAttribute('stroke');
+    } else {
+      expect(svg).toHaveAttribute('fill', 'none');
+      expect(svg).toHaveAttribute('stroke', '#00ff0040');
+    }
+  });
+
+  it('senza colore prende quello del testo', () => {
+    const { container } = render(<Icon />);
+
+    const svg = container.querySelector('svg');
+    const painted = paint === 'fill' ? 'fill' : 'stroke';
+    expect(svg).toHaveAttribute(painted, 'currentColor');
   });
 
   it('disegna un tracciato', () => {
@@ -60,13 +100,13 @@ describe.each(icons)('%s', (_name, Icon) => {
   });
 });
 
-it('le quattro icone sono quattro disegni diversi', () => {
-  const paths = icons.map(([, Icon]) => {
+it('ogni icona è un disegno diverso dalle altre', () => {
+  const drawings = icons.map(({ Icon }) => {
     const { container } = render(<Icon />);
-    return container.querySelector('svg path')?.getAttribute('d');
+    return [...container.querySelectorAll('svg path')].map((path) => path.getAttribute('d')).join();
   });
 
-  // Quattro file quasi identici sono il posto dove un copia e incolla lascia due volte lo stesso
+  // File quasi identici sono il posto dove un copia e incolla lascia due volte lo stesso
   // tracciato: il teschio che si rende come il virus è un difetto che nessun altro caso vede.
-  expect(new Set(paths).size).toBe(icons.length);
+  expect(new Set(drawings).size).toBe(icons.length);
 });

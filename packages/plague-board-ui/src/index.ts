@@ -9,7 +9,10 @@
 // Le icone. `IconProps` è pubblico perché è il contratto che deve rispettare chi sostituisce
 // l'icona predefinita di un componente con la propria.
 export { BiohazardIcon } from './icons/BiohazardIcon';
+export { CodeIcon } from './icons/CodeIcon';
 export { PoisonIcon } from './icons/PoisonIcon';
+export { RobotIcon } from './icons/RobotIcon';
 export { SkullIcon } from './icons/SkullIcon';
+export { SparklesIcon } from './icons/SparklesIcon';
 export { VirusIcon } from './icons/VirusIcon';
 export type { IconProps } from './icons/types';

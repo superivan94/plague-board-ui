@@ -1,5 +1,13 @@
 import { Button } from '@heroui/react';
-import { BiohazardIcon, PoisonIcon, SkullIcon, VirusIcon } from 'plague-board-ui';
+import {
+  BiohazardIcon,
+  CodeIcon,
+  PoisonIcon,
+  RobotIcon,
+  SkullIcon,
+  SparklesIcon,
+  VirusIcon,
+} from 'plague-board-ui';
 
 // ⚠️ Questa pagina è provvisoria e lo resta fino al punto 3, dove diventa l'indice delle storie.
 // Finché le storie non ci sono, i componenti si guardano qui: senza un posto dove renderli, il
@@ -42,10 +50,36 @@ export default function Home() {
         {/* Senza `color` l'icona prende il colore del testo: è il caso che ne permette la
             sostituzione dentro un comando senza sapere in che tema si troverà. */}
         <div className="flex items-center gap-6 rounded-lg bg-white p-4 text-plague-700">
-          <span className="w-10 text-sm">tema chiaro</span>
+          <span className="w-20 text-sm">tema chiaro</span>
           {icons.map(({ name, Icon }) => (
             <Icon key={name} size={24} />
           ))}
+        </div>
+      </section>
+
+      <section className="flex flex-col gap-4">
+        <h2 className="text-lg font-medium">I segni della firma</h2>
+
+        {/* Le stesse misure della firma di RattInventario, dove le icone stanno a 20px accanto al
+            nome dell'autore. `CodeIcon` e `RobotIcon` vanno confrontate col piede del sito vero:
+            di là sono glifi di Material Symbols, qui sono ridisegnate. */}
+        <div className="flex items-center gap-6">
+          <span className="flex items-center gap-1 text-green-400">
+            <CodeIcon size={20} /> Superivan94
+          </span>
+          <span className="flex items-center gap-1 text-blue-400">
+            <RobotIcon size={20} /> AI-Dev
+          </span>
+          <span className="flex items-center gap-1 text-plague-400">
+            <SparklesIcon size={20} /> suggerito
+          </span>
+        </div>
+
+        <div className="flex items-center gap-6">
+          <span className="w-20 text-sm text-default-500">48px</span>
+          <CodeIcon size={48} />
+          <RobotIcon size={48} />
+          <SparklesIcon size={48} />
         </div>
       </section>
     </main>
