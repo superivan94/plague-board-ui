@@ -81,6 +81,16 @@ npm run playground     # il dev server, sulla 3100
   dichiara solo una variabile — in RattInventario i token stanno in `:root` e infatti
   `animate-scale-bounce` **non esiste affatto**: la classe non è mai stata generata e quel rimbalzo
   non è mai partito.
+- ⚠️ **Un token che cambia col tema vuole `@theme inline`, non `@theme`.** Con `inline` l'utility
+  generata punta **alla variabile**; senza, Tailwind incolla il valore del tema chiaro dentro la
+  classe e il blocco `.dark` non serve a niente. ⚠️ E i selettori del tema sono **classi
+  qualunque** (`.light` / `.dark`, più `[data-theme]`), mai `:root.dark`: il playground mostra i
+  due temi **affiancati nella stessa pagina**, cioè su due contenitori. I due blocchi hanno la
+  stessa specificità, quindi lo scuro va scritto **sotto**.
+- ⚠️ **HeroUI 3 riconosce anche `.light`, non solo `.dark`.** La sua documentazione nomina il
+  secondo e dice che il chiaro è il valore predefinito; che una `.light` **dentro** una pagina
+  scura riporti `bg-background` al chiaro è misurato qui, non letto — è la riga di `bg-background`
+  nello scenario dei due temi di [`COLLAUDI.md`](COLLAUDI.md).
 - ⚠️ **`'use client'` sopravvive a `tsc`**, e sopravvive alla **riga 1**, prima dell'import di
   `react/jsx-runtime` che il trasformatore JSX inietta. È ciò che regge la decisione «la build è
   `tsc` e basta». Misurato il 2026-09-16 con una sonda compilata e cancellata.

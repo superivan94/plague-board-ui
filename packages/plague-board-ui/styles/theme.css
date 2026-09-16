@@ -5,15 +5,20 @@
  * `bg-brand` e `text-brand` sono riscritte a mano più sotto, mentre `animate-scale-bounce` non
  * esiste affatto: la classe non è mai stata generata e il rimbalzo non è mai partito.
  *
- * ⚠️ Qui i colori sono STATICI, e per ora è voluto. Un colore diventa consapevole del tema solo
- * quando si sa che cosa deve fare in tutti e due, e in RattInventario il tema chiaro non è mai
- * stato implementato: la risposta oggi non esiste per la maggior parte di questi valori. A dirla
- * sarà il playground, che li mette affiancati nei due temi — quello che stona si promuove allora.
- *
- * I valori sono MISURATI sul progetto vivo, non scelti: i quattro verdi vengono dai bordi di
- * `plague-animations.css`, il verde tossico dalle icone (dove compare quasi sempre con
- * trasparenza), il ciano dalle variabili `--color-brand*` di `globals.css`.
+ * I valori sono MISURATI sul progetto vivo, non scelti, e il contrasto di ognuno contro i due
+ * fondi del tema è stato calcolato prima di decidere che cosa cambia e che cosa no.
  */
+
+/* ─────────────────────────────────────────────────────────────────────────────
+ * I colori statici: valgono uguali nei due temi, e questa è una scelta.
+ *
+ * ⚠️ Un colore diventa consapevole del tema solo quando si sa che cosa deve fare in tutti e due.
+ * Per una tinta di marca la risposta è «lo stesso», perché il ciano dei Ludoratti non è più o meno
+ * ciano su fondo bianco. Per le superfici della peste la risposta è la stessa per un motivo più
+ * forte: **la peste è scura per natura**. Un pannello appestato che diventa bianco in tema chiaro
+ * smette di essere un pannello appestato — quello che deve adattarsi è la cornice intorno, che è
+ * di HeroUI, non il fondale.
+ * ───────────────────────────────────────────────────────────────────────────── */
 
 @theme {
   /* Il marchio: ciano. È il colore dell'applicazione, non della peste. */
@@ -21,12 +26,77 @@
   --color-brand-light: #5ddef4;
   --color-brand-dark: #007c91;
 
-  /* La peste: la scala verde degli accenti e dei bordi. */
+  /* La peste: la scala verde degli accenti e dei bordi. Sono i quattro verdi di `plague-pulse`,
+   * cioè i green-400/500/600/700 di Tailwind — di là ci sono arrivati a mano, qui hanno un nome. */
   --color-plague-400: #4ade80;
   --color-plague-500: #22c55e;
   --color-plague-600: #16a34a;
   --color-plague-700: #15803d;
 
-  /* Il verde tossico delle icone. Pieno è acido: si usa quasi sempre con trasparenza. */
+  /* Il verde tossico delle icone.
+   * ⚠️ Non ha un equivalente in tema chiaro, e non è una dimenticanza: contro il bianco fa **1,37**
+   * di contrasto, cioè è invisibile. È una luce, non un inchiostro — serve a far brillare qualcosa
+   * su un fondo scuro, e si usa con l'opacità: `text-toxic/40`, non `#00ff0040` scritto a mano
+   * come di là. */
   --color-toxic: #00ff00;
+
+  /* Il grigio dei Ludoratti: **neutro**, senza la punta di blu di quello di Tailwind.
+   *
+   * ⚠️ Di là questa scala **sovrascrive** `--color-gray-*`, quindi `bg-gray-800` là vale `#1e1e1e`
+   * e non il `#1f2937` di Tailwind: un'app che installasse la libreria si vedrebbe cambiare tutti
+   * i grigi sotto i piedi. Qui ha un nome suo, e `gray-*` resta di chi ci lavora.
+   *
+   * ⚠️ Manca il 300, ed è voluto: di là `text-gray-300` è usato **49 volte** ma non è mai
+   * dichiarato, quindi cade sul grigio bluastro di Tailwind e sta accanto a un 400 neutro. I sei
+   * passi qui sotto sono quelli davvero misurati; il 300 si aggiunge quando un componente lo
+   * chiede, non adesso. */
+  --color-ash-200: #e5e5e5;
+  --color-ash-400: #a0a0a0;
+  --color-ash-600: #404040;
+  --color-ash-700: #2d2d2d;
+  --color-ash-800: #1e1e1e;
+  --color-ash-900: #121212;
+}
+
+/* ─────────────────────────────────────────────────────────────────────────────
+ * I due soli colori che il tema cambia, e il motivo è misurato.
+ *
+ * Un verde o un ciano **scritti come testo** non possono restare gli stessi: contro il bianco,
+ * `plague-400` fa 1,74 di contrasto e il marchio 2,74 — sotto ogni soglia leggibile. Contro il
+ * nero sono invece 11,36 e 7,23. La tinta giusta quindi scende di tono in tema chiaro e risale in
+ * tema scuro, e siccome ogni componente che scrive in verde ha lo stesso problema, la scelta sta
+ * qui una volta sola.
+ *
+ * ⚠️ `@theme inline` e non `@theme`: con `inline` l'utility generata punta **alla variabile**
+ * invece che al valore, quindi ridichiarare la variabile più sotto cambia davvero il colore. Senza
+ * `inline`, Tailwind incollerebbe il valore del tema chiaro dentro la classe e il blocco `.dark`
+ * non servirebbe a niente.
+ * ───────────────────────────────────────────────────────────────────────────── */
+
+@theme inline {
+  /* Il verde con cui si SCRIVE — non quello con cui si riempie. */
+  --color-plague-ink: var(--pb-plague-ink);
+  /* Il ciano del marchio con cui si scrive, stessa storia. */
+  --color-brand-ink: var(--pb-brand-ink);
+}
+
+/* ⚠️ I due blocchi si scrivono in quest'ordine e con questi selettori apposta.
+ *
+ * Hanno la **stessa specificità**, quindi a decidere è la posizione: lo scuro sta sotto e vince
+ * quando `.dark` è acceso. E sono classi qualunque, non `:root.dark`, perché il tema dev'essere
+ * commutabile **su un contenitore**: il playground mostra ogni componente nei due temi
+ * affiancati, cioè due isole nella stessa pagina, e con `:root.dark` sarebbe impossibile.
+ * `[data-theme]` c'è perché è il secondo aggancio che HeroUI 3 riconosce. */
+
+:root,
+.light,
+[data-theme='light'] {
+  --pb-plague-ink: #15803d; /* plague-700 — 5,02 sul bianco */
+  --pb-brand-ink: #007c91; /* brand-dark — 4,89 sul bianco */
+}
+
+.dark,
+[data-theme='dark'] {
+  --pb-plague-ink: #4ade80; /* plague-400 — 11,36 sul nero, ed è il verde del testo di là */
+  --pb-brand-ink: #00acc1; /* brand — 7,23 sul nero */
 }

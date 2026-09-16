@@ -19,19 +19,76 @@ const icons = [
   { name: 'VirusIcon', Icon: VirusIcon },
 ];
 
+const staticSwatches = [
+  ['brand', 'bg-brand'],
+  ['brand-light', 'bg-brand-light'],
+  ['brand-dark', 'bg-brand-dark'],
+  ['plague-400', 'bg-plague-400'],
+  ['plague-500', 'bg-plague-500'],
+  ['plague-600', 'bg-plague-600'],
+  ['plague-700', 'bg-plague-700'],
+  ['toxic', 'bg-toxic'],
+  ['ash-200', 'bg-ash-200'],
+  ['ash-400', 'bg-ash-400'],
+  ['ash-600', 'bg-ash-600'],
+  ['ash-700', 'bg-ash-700'],
+  ['ash-800', 'bg-ash-800'],
+  ['ash-900', 'bg-ash-900'],
+];
+
+/** I due token che il tema cambia, resi nello stesso modo dentro le due isole. */
+function InkSample({ label }: { label: string }) {
+  return (
+    <div className="flex flex-col gap-1 rounded-lg bg-background p-4 text-foreground">
+      <span className="text-xs opacity-60">{label}</span>
+      <span data-ink="plague" className="text-plague-ink">
+        Il verde con cui si scrive
+      </span>
+      <span data-ink="brand" className="text-brand-ink">
+        Il ciano del marchio
+      </span>
+    </div>
+  );
+}
+
 export default function Home() {
   return (
-    <main className="mx-auto flex min-h-dvh max-w-2xl flex-col justify-center gap-8 px-4 py-16">
+    <main className="mx-auto flex min-h-dvh max-w-2xl flex-col gap-8 px-4 py-16">
       <h1 className="text-2xl font-semibold">plague-board-ui</h1>
 
-      <div className="flex flex-wrap items-center gap-3">
-        <Button>Un bottone di HeroUI</Button>
-        <span className="rounded-md bg-plague-600 px-3 py-1 text-sm text-white">
-          verde della peste
-        </span>
-        <span className="rounded-md bg-brand px-3 py-1 text-sm text-white">ciano del marchio</span>
-        <span className="text-toxic">verde tossico</span>
-      </div>
+      <section className="flex flex-col gap-4">
+        <h2 className="text-lg font-medium">La tavolozza, statica</h2>
+
+        <div className="grid grid-cols-2 gap-2 sm:grid-cols-4">
+          {staticSwatches.map(([name, className]) => (
+            <div key={name} className="flex items-center gap-2">
+              <span className={`size-8 rounded border border-ash-600 ${className}`} />
+              <span className="text-xs text-default-500">{name}</span>
+            </div>
+          ))}
+        </div>
+
+        <div className="flex flex-wrap items-center gap-3">
+          <Button>Un bottone di HeroUI</Button>
+          <span className="text-toxic/40">toxic al 40%</span>
+          <span className="text-toxic">toxic pieno</span>
+        </div>
+      </section>
+
+      <section className="flex flex-col gap-4">
+        <h2 className="text-lg font-medium">I due colori che il tema cambia</h2>
+
+        {/* Le due isole nella stessa pagina: è il motivo per cui i selettori del tema sono classi
+            qualunque e non `:root.dark`. Il playground del punto 3 farà così per ogni componente. */}
+        <div className="grid gap-3 sm:grid-cols-2">
+          <div className="light">
+            <InkSample label="tema chiaro" />
+          </div>
+          <div className="dark">
+            <InkSample label="tema scuro" />
+          </div>
+        </div>
+      </section>
 
       <section className="flex flex-col gap-4">
         <h2 className="text-lg font-medium">Le quattro icone della peste</h2>
@@ -40,7 +97,7 @@ export default function Home() {
             a un testo, 16 ai lati del livello tossico. */}
         {[56, 24, 16].map((size) => (
           <div key={size} className="flex items-center gap-6">
-            <span className="w-10 text-sm text-default-500">{size}px</span>
+            <span className="w-20 text-sm text-default-500">{size}px</span>
             {icons.map(({ name, Icon }) => (
               <Icon key={name} size={size} color="#22c55e" />
             ))}
@@ -48,9 +105,13 @@ export default function Home() {
         ))}
 
         {/* Senza `color` l'icona prende il colore del testo: è il caso che ne permette la
-            sostituzione dentro un comando senza sapere in che tema si troverà. */}
-        <div className="flex items-center gap-6 rounded-lg bg-white p-4 text-plague-700">
-          <span className="w-20 text-sm">tema chiaro</span>
+            sostituzione dentro un comando senza sapere in che tema si troverà.
+            ⚠️ La classe `light` qui non è decorazione: senza, `text-plague-ink` continua a valere
+            il verde del tema scuro — la pagina ha `dark` sull'`<html>` — e su questo fondo bianco
+            farebbe 1,74 di contrasto. È il difetto che il token esiste per impedire, ed è bastato
+            dimenticarsi una classe per rifarlo. */}
+        <div className="light flex items-center gap-6 rounded-lg bg-white p-4 text-plague-ink">
+          <span className="w-20 text-sm">su fondo chiaro</span>
           {icons.map(({ name, Icon }) => (
             <Icon key={name} size={24} />
           ))}
@@ -64,10 +125,10 @@ export default function Home() {
             nome dell'autore. `CodeIcon` e `RobotIcon` vanno confrontate col piede del sito vero:
             di là sono glifi di Material Symbols, qui sono ridisegnate. */}
         <div className="flex items-center gap-6">
-          <span className="flex items-center gap-1 text-green-400">
+          <span className="flex items-center gap-1 text-plague-ink">
             <CodeIcon size={20} /> Superivan94
           </span>
-          <span className="flex items-center gap-1 text-blue-400">
+          <span className="flex items-center gap-1 text-brand-ink">
             <RobotIcon size={20} /> AI-Dev
           </span>
           <span className="flex items-center gap-1 text-plague-400">

@@ -47,6 +47,47 @@ biologico** come un cerchio con tre satelliti — non come il trifoglio del simb
 
 ---
 
+### I due temi convivono nella stessa pagina — 2026-09-16
+
+**Esegue:** agente — è tutto nel playground.
+**Ultima esecuzione:** agente, 2026-09-16 — **funziona nelle due direzioni**.
+
+**Preparazione:** `npm run playground`, poi `http://localhost:3100`, sezione «I due colori che il
+tema cambia». ⚠️ La pagina ha `dark` sull'`<html>`: l'isola chiara è quindi un `.light` **dentro**
+un contesto scuro, che è il caso difficile.
+
+```js
+[...document.querySelectorAll('[data-ink]')].map(el => ({
+  isola: el.closest('.light,.dark')?.className,
+  colore: getComputedStyle(el).color,
+}))
+```
+
+| Azione | Atteso | Ottenuto |
+|---|---|---|
+| `text-plague-ink` dentro `.light` | `plague-700`, `rgb(21, 128, 61)` | `rgb(21, 128, 61)` |
+| `text-brand-ink` dentro `.light` | `brand-dark`, `rgb(0, 124, 145)` | `rgb(0, 124, 145)` |
+| `text-plague-ink` dentro `.dark` | `plague-400`, `rgb(74, 222, 128)` | `rgb(74, 222, 128)` |
+| `text-brand-ink` dentro `.dark` | `brand`, `rgb(0, 172, 193)` | `rgb(0, 172, 193)` |
+| `bg-background` di HeroUI dentro `.light` | torna chiaro, dentro una pagina scura | `lab(96.54 …)`, cioè quasi bianco |
+| Un'icona senza `color` dentro `.light` | eredita: `fill` = `rgb(21, 128, 61)` | `rgb(21, 128, 61)` |
+
+**Che cosa protegge:** il meccanismo dei due temi, che è fatto di tre cose che devono valere
+insieme — `@theme inline` (senza, Tailwind incolla il valore del tema chiaro dentro la classe e il
+blocco `.dark` non serve a niente), i selettori come **classi qualunque** invece di `:root.dark`
+(senza, due temi nella stessa pagina sono impossibili), e l'ordine dei due blocchi, che hanno la
+stessa specificità.
+
+⚠️ **E ha già trovato qualcosa**: il riquadro bianco delle icone non aveva la classe `light`,
+quindi `text-plague-ink` ci valeva il verde del tema scuro — **1,74** di contrasto sul bianco,
+cioè il difetto esatto che quel token esiste per impedire. È bastato dimenticare una classe.
+
+⚠️ **Che HeroUI 3 riconosca anche `.light`, e non solo `.dark`, è una cosa misurata qui**: la sua
+documentazione nomina `.dark` e `[data-theme="dark"]`, e il resto è il valore predefinito. Se un
+giorno smettesse di funzionare, la riga di `bg-background` in tabella è quella che diventa rossa.
+
+---
+
 ### I due segni della firma, ridisegnati, contro i glifi di Material Symbols — mai eseguito
 
 **Esegue:** **l'utente** — la firma «By: Superivan94 · AI-Dev» sta nel piede di
