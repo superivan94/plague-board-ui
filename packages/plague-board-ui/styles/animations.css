@@ -1,0 +1,9 @@
+/* Le animazioni dei Ludoratti, tutte qui.
+ *
+ * ⚠️ In RattInventario vivono in CINQUE posti — un foglio di stile, il `globals.css`, e tre
+ * `<style>` incorporati dentro i componenti — più due copie morte che hanno già divergato dalla
+ * viva. Il motivo per cui questo file esiste è che sia l'unico.
+ *
+ * Le regole arrivano col componente che le usa: un `@keyframes` senza il suo componente è un
+ * pezzo di CSS che nessuno cancellerà mai più.
+ */

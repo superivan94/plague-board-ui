@@ -1,0 +1,12 @@
+/* ⚠️ HeroUI 3 è a CSS, non più a plugin di Tailwind: `@heroui/styles` porta dentro Tailwind, la
+ * base, i componenti e il tema, in questo ordine di layer. Chi arriva dalla 2 cerca
+ * `@plugin "hero.ts"` e non lo trova più. */
+@import "@heroui/styles";
+
+@import "plague-board-ui/theme.css";
+@import "plague-board-ui/animations.css";
+
+/* Tailwind non guarda dentro le dipendenze: senza questa riga le classi usate dai componenti della
+ * libreria non generano nessuna utility. Qui il percorso è quello del workspace — in
+ * un'applicazione vera è `node_modules/plague-board-ui/dist`, come dice il README. */
+@source "../../packages/plague-board-ui/dist";

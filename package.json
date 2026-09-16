@@ -1,0 +1,25 @@
+{
+  "name": "plague-board-ui-workspace",
+  "version": "0.0.0",
+  "private": true,
+  "description": "Workspace di plague-board-ui: la libreria e il suo playground",
+  "type": "module",
+  "workspaces": [
+    "packages/*",
+    "playground"
+  ],
+  "scripts": {
+    "build": "npm run build --workspace plague-board-ui",
+    "test": "npm run test --workspace plague-board-ui",
+    "typecheck": "npm run typecheck --workspaces --if-present",
+    "lint": "npm run lint --workspaces --if-present",
+    "playground": "npm run dev --workspace playground"
+  },
+  "overrides": {
+    "vitest": "4.1.11"
+  },
+  "engines": {
+    "node": ">=20"
+  },
+  "license": "PolyForm-Noncommercial-1.0.0"
+}
