@@ -1,12 +1,7 @@
 import { Button } from '@heroui/react';
-import {
-  BiohazardIcon,
-  PoisonIcon,
-  PulseDot,
-  SkullIcon,
-  TechLabel,
-  VirusIcon,
-} from 'plague-board-ui';
+import { PoisonIcon, SkullIcon, TechLabel, VirusIcon } from 'plague-board-ui';
+
+import { MARK_CANDIDATES, MARK_KEYFRAMES } from './marks';
 
 // ⚠️ Questa pagina è un RIFERIMENTO, non un'implementazione: è la direzione `B · Laboratorio`
 // decisa il 2026-09-16, disegnata a mano per avere davanti il bersaglio mentre si costruiscono i
@@ -17,20 +12,6 @@ import {
 // il `gray-950` di `ludoratti.it`.
 
 const KEYFRAMES = `
-/* La goccia appesa: sta, si gonfia, si stacca, e se ne forma un'altra. */
-@keyframes mark-hang {
-  0%, 55%   { transform: translateY(0) scaleY(1);      opacity: 1; }
-  67%       { transform: translateY(0) scaleY(1.3);    opacity: 1; }
-  82%       { transform: translateY(16px) scaleY(1.7); opacity: 0; }
-  83%       { transform: translateY(0) scaleY(0.5);    opacity: 0; }
-  93%, 100% { transform: translateY(0) scaleY(1);      opacity: 1; }
-}
-/* La bolla dentro la pozione: sale dal fondo e scoppia in superficie. */
-@keyframes mark-bubble {
-  0%       { transform: translateY(2px);  opacity: 0; }
-  25%, 70% { opacity: 1; }
-  100%     { transform: translateY(-4px); opacity: 0; }
-}
 @keyframes pb-float { 0%,100% { transform: translateY(0); } 50% { transform: translateY(-14px); } }
 @keyframes pb-drip {
   0%   { transform: translateY(-16px) scaleY(1); opacity: 0; }
@@ -58,103 +39,6 @@ function DiceIcon({ size = 24 }: { size?: number }) {
   );
 }
 
-/** La goccia appesa al filo della barra: il candidato consigliato. */
-function HangingDrop() {
-  return (
-    <svg
-      width="7"
-      height="14"
-      viewBox="0 0 8 20"
-      fill="currentColor"
-      aria-hidden="true"
-      className="shrink-0 text-brand"
-      style={{ animation: 'mark-hang 6s ease-in infinite', transformOrigin: 'top center' }}
-    >
-      <path d="M4 20C4 20 8 13.68 8 8.82C8 3.96 4 0 4 0C4 0 0 3.96 0 8.82C0 13.68 4 20 4 20Z" />
-    </svg>
-  );
-}
-
-/** Il contagio che ondeggia: l'emblema della famiglia, in piccolo. */
-function SwayingBiohazard() {
-  return <BiohazardIcon size={13} className="animate-biohazard-sway shrink-0 text-brand" />;
-}
-
-/**
- * La pozione: una boccetta col tappo, il liquido sul fondo e una bolla che sale.
- *
- * ⚠️ Il vetro è a tratto, il liquido è pieno: a 12px il segno che si legge per primo è **la macchia
- * verde in basso**, e il contorno serve solo a dirle che forma ha. Invertendo i due — vetro pieno
- * e liquido a tratto — a questa misura si vedrebbe una patacca.
- *
- * ⚠️ Ed è **12px e non 10**, guardandola a grandezza vera: una boccetta è alta e stretta, e alla
- * misura del pallino il collo e il tappo sparivano, lasciando solo la macchia.
- */
-function Potion({ size = 12 }: { size?: number }) {
-  const liquid = 'M1.76 14.3A5.4 5.4 0 0 0 12.24 14.3Z';
-
-  return (
-    <svg
-      width={size}
-      height={(size / 14) * 20}
-      viewBox="0 0 14 20"
-      aria-hidden="true"
-      className="shrink-0 text-brand"
-    >
-      {/* Il tappo, pieno: è il dettaglio che fa leggere «boccetta» invece di «cerchio». */}
-      <rect x="4.6" y="0.5" width="4.8" height="2.2" rx="0.9" fill="currentColor" opacity="0.65" />
-      {/* Il collo e il corpo, a tratto. */}
-      <path
-        d="M5.7 2.7v3.6M8.3 2.7v3.6"
-        stroke="currentColor"
-        strokeWidth="1.1"
-        opacity="0.7"
-        fill="none"
-      />
-      <circle cx="7" cy="13" r="5.4" fill="none" stroke="currentColor" strokeWidth="1.1" opacity="0.7" />
-      <path d={liquid} fill="currentColor" />
-      {/* La bolla che sale e scoppia in superficie: dice «viva» senza mai sparire del tutto. */}
-      <circle
-        cx="5.6"
-        cy="16.4"
-        r="0.85"
-        fill="#030712"
-        style={{ animation: 'mark-bubble 2.4s ease-in-out infinite' }}
-      />
-    </svg>
-  );
-}
-
-const markCandidates = [
-  {
-    id: 'dot',
-    title: 'Il pallino, com’è adesso',
-    note: 'onesto e illeggibile come marchio: è il segno di stato di qualunque cruscotto.',
-    Mark: () => <PulseDot size={8} />,
-  },
-  {
-    id: 'drop',
-    title: 'La goccia che si stacca',
-    note:
-      'sta appesa, si gonfia, cade, e se ne forma un’altra. È già nostra — su ludoratti.it le gocce colano lungo tutta la pagina — e lega la barra a quello che succede sotto.',
-    Mark: HangingDrop,
-  },
-  {
-    id: 'potion',
-    title: 'La pozione che ribolle',
-    note:
-      'una boccetta col liquido sul fondo e una bolla che sale e scoppia. Non sparisce mai — la bolla basta a dire «viva» — e sta esattamente nella direzione Laboratorio.',
-    Mark: () => <Potion />,
-  },
-  {
-    id: 'biohazard',
-    title: 'Il contagio che ondeggia',
-    note:
-      'l’emblema della famiglia, a 13px e con l’oscillazione lenta. Si riconosce, ma ha già un mestiere: dice «roba della peste», non «acceso».',
-    Mark: SwayingBiohazard,
-  },
-];
-
 const lexicon = [
   ['Accedi', 'Entra nella tana'],
   ['I tuoi manuali', 'I manuali della diffusione'],
@@ -167,7 +51,7 @@ const lexicon = [
 export default function StyleReference() {
   return (
     <main className="mx-auto flex min-h-dvh max-w-3xl flex-col gap-10 px-4 py-12">
-      <style>{KEYFRAMES}</style>
+      <style>{KEYFRAMES + MARK_KEYFRAMES}</style>
 
       <header className="flex flex-col gap-2">
         <h1 className="text-2xl font-semibold">La direzione, come riferimento</h1>
@@ -257,12 +141,13 @@ export default function StyleReference() {
         <h2 className="text-lg font-medium">Il segno della barra</h2>
         <p className="max-w-2xl text-sm text-default-500">
           Sta a sinistra del marchio e vuol dire «acceso, raggiungibile». Il pallino fa il suo
-          lavoro ma non è di nessuno: ce l&apos;hanno tutti. Qui sono a grandezza vera —{' '}
-          <strong>si giudicano a 10px, non ingranditi</strong>.
+          lavoro ma non è di nessuno: ce l&apos;hanno tutti. Qui sono{' '}
+          <strong>a grandezza vera</strong>, ognuno alla misura minima a cui il suo disegno regge —
+          il pallino 8, la pozione 12, il marchio 20: un segno ingrandito mente.
         </p>
 
         <div className="flex flex-col divide-y divide-gray-800 overflow-hidden rounded-lg border border-gray-700">
-          {markCandidates.map(({ id, title, note, Mark }) => (
+          {MARK_CANDIDATES.map(({ id, title, note, Mark }) => (
             <div key={id} className="flex flex-wrap items-center gap-x-6 gap-y-2 p-4">
               <span className="flex w-56 shrink-0 items-center gap-2 rounded bg-gray-950/70 px-3 py-2">
                 <Mark />

@@ -46,8 +46,13 @@ export function IconBase({
       width={size}
       height={size}
       viewBox={viewBox}
-      fill={stroked ? 'none' : color}
-      stroke={stroked ? color : undefined}
+      // ⚠️ Il colore arriva ai tracciati **attraverso `currentColor`**, non scritto dentro `fill`.
+      // Costa una riga di `style` in più e serve ai disegni a paint misto — il marchio del ratto è
+      // a tratto ma ha le orecchie piene: se il colore stesse nell'attributo `fill` dell'`<svg>`,
+      // un figlio che vuole riempirsi non avrebbe modo di leggerlo.
+      fill={stroked ? 'none' : 'currentColor'}
+      stroke={stroked ? 'currentColor' : undefined}
+      style={color === 'currentColor' ? undefined : { color }}
       // Il tratto è a 2 su una griglia da 24 e con gli angoli tondi: è la proporzione con cui sono
       // disegnate le icone a tratto che arrivano da RattInventario, e mischiarne due si vede.
       strokeWidth={stroked ? 2 : undefined}

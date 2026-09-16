@@ -16,6 +16,7 @@ export { TechLabel, type TechLabelProps } from './brand/TechLabel';
 export { BiohazardIcon } from './icons/BiohazardIcon';
 export { CodeIcon } from './icons/CodeIcon';
 export { PoisonIcon } from './icons/PoisonIcon';
+export { RatIcon } from './icons/RatIcon';
 export { RobotIcon } from './icons/RobotIcon';
 export { SkullIcon } from './icons/SkullIcon';
 export { SparklesIcon } from './icons/SparklesIcon';

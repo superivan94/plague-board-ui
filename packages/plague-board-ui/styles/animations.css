@@ -215,6 +215,30 @@
   }
 }
 
+/* Il battito del marchio: due colpi e poi una pausa lunga, come un cuore.
+ *
+ * ⚠️ È fatto per il segno del ratto, e il motivo è nel disegno: quel marchio a prima vista è un
+ * cuore, poi due figure che si abbracciano, e solo alla fine — per via delle orecchie — il muso di
+ * un ratto. Un marchio a forma di cuore che batte dice «vivo» meglio di qualunque pallino, e lo
+ * dice raccontando la prima delle sue tre letture.
+ *
+ * ⚠️ L'ampiezza è piccola apposta: sta in una barra, sopra una pagina che si legge. Un battito
+ * vistoso in cima allo schermo si smette di vedere dopo un minuto e si comincia a subire. */
+@keyframes pb-heartbeat {
+  0%,
+  16%,
+  32%,
+  100% {
+    transform: scale(1);
+  }
+  8% {
+    transform: scale(1.12);
+  }
+  24% {
+    transform: scale(1.07);
+  }
+}
+
 /* ─────────────────────────────────────────────────────────────────────────────
  * Le utility. `@theme` le GENERA — è la differenza con `:root`, che dichiara e basta.
  * ───────────────────────────────────────────────────────────────────────────── */
@@ -232,6 +256,7 @@
   --animate-drip: pb-drip 8s ease-in infinite;
   --animate-glitch: pb-glitch 2.5s infinite reverse;
   --animate-reveal: pb-reveal 5s infinite;
+  --animate-heartbeat: pb-heartbeat 3.2s ease-in-out infinite;
 }
 
 /* ─────────────────────────────────────────────────────────────────────────────

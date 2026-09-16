@@ -7,6 +7,7 @@ import {
   CodeIcon,
   type IconProps,
   PoisonIcon,
+  RatIcon,
   RobotIcon,
   SkullIcon,
   SparklesIcon,
@@ -32,7 +33,18 @@ const icons: readonly IconEntry[] = [
   { name: 'RobotIcon', Icon: RobotIcon, paint: 'fill' },
   { name: 'CodeIcon', Icon: CodeIcon, paint: 'stroke' },
   { name: 'SparklesIcon', Icon: SparklesIcon, paint: 'stroke' },
+  { name: 'RatIcon', Icon: RatIcon, paint: 'stroke' },
 ];
+
+it('il marchio del ratto si tinge tutto, tratto e orecchie insieme', () => {
+  const { container } = render(<RatIcon color="#a3e635" />);
+
+  // ⚠️ È l'unico disegno a paint misto: le curve sono a tratto, le orecchie sono piene. Con il
+  // colore scritto dentro `fill` sull'`<svg>` — com'era prima — le orecchie non avrebbero avuto
+  // modo di leggerlo, e il ratto sarebbe uscito verde senza orecchie.
+  expect(container.querySelector('svg')).toHaveStyle({ color: '#a3e635' });
+  expect(container.querySelectorAll('circle[fill="currentColor"]')).toHaveLength(2);
+});
 
 describe.each(icons)('$name', ({ Icon, paint }) => {
   it('senza prop si rende a 24px', () => {
@@ -57,22 +69,27 @@ describe.each(icons)('$name', ({ Icon, paint }) => {
     // cioè col canale alfa dentro il colore invece che in una classe di opacità.
     const { container } = render(<Icon color="#00ff0040" />);
 
+    // ⚠️ Il colore sta nella proprietà CSS `color`, e i tracciati lo prendono da `currentColor`:
+    // è quello che permette a un disegno a paint misto — tratto fuori, pieno dentro — di tingersi
+    // tutto insieme. L'attributo dice **quale** delle due proprietà dipinge, non con che colore.
     const svg = container.querySelector('svg');
+    expect(svg).toHaveStyle({ color: '#00ff0040' });
+
     if (paint === 'fill') {
-      expect(svg).toHaveAttribute('fill', '#00ff0040');
+      expect(svg).toHaveAttribute('fill', 'currentColor');
       expect(svg).not.toHaveAttribute('stroke');
     } else {
       expect(svg).toHaveAttribute('fill', 'none');
-      expect(svg).toHaveAttribute('stroke', '#00ff0040');
+      expect(svg).toHaveAttribute('stroke', 'currentColor');
     }
   });
 
-  it('senza colore prende quello del testo', () => {
+  it('senza colore non impone niente, e il testo intorno decide', () => {
     const { container } = render(<Icon />);
 
-    const svg = container.querySelector('svg');
-    const painted = paint === 'fill' ? 'fill' : 'stroke';
-    expect(svg).toHaveAttribute(painted, 'currentColor');
+    // Nessuno `style`: l'icona eredita il `color` di chi la contiene, che è il caso normale e
+    // quello che ne permette la sostituzione dentro un comando.
+    expect(container.querySelector('svg')).not.toHaveAttribute('style');
   });
 
   it('disegna un tracciato', () => {
