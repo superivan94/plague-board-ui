@@ -25,6 +25,12 @@ const KEYFRAMES = `
   83%       { transform: translateY(0) scaleY(0.5);    opacity: 0; }
   93%, 100% { transform: translateY(0) scaleY(1);      opacity: 1; }
 }
+/* La bolla dentro la pozione: sale dal fondo e scoppia in superficie. */
+@keyframes mark-bubble {
+  0%       { transform: translateY(2px);  opacity: 0; }
+  25%, 70% { opacity: 1; }
+  100%     { transform: translateY(-4px); opacity: 0; }
+}
 @keyframes pb-float { 0%,100% { transform: translateY(0); } 50% { transform: translateY(-14px); } }
 @keyframes pb-drip {
   0%   { transform: translateY(-16px) scaleY(1); opacity: 0; }
@@ -74,6 +80,51 @@ function SwayingBiohazard() {
   return <BiohazardIcon size={13} className="animate-biohazard-sway shrink-0 text-brand" />;
 }
 
+/**
+ * La pozione: una boccetta col tappo, il liquido sul fondo e una bolla che sale.
+ *
+ * ⚠️ Il vetro è a tratto, il liquido è pieno: a 12px il segno che si legge per primo è **la macchia
+ * verde in basso**, e il contorno serve solo a dirle che forma ha. Invertendo i due — vetro pieno
+ * e liquido a tratto — a questa misura si vedrebbe una patacca.
+ *
+ * ⚠️ Ed è **12px e non 10**, guardandola a grandezza vera: una boccetta è alta e stretta, e alla
+ * misura del pallino il collo e il tappo sparivano, lasciando solo la macchia.
+ */
+function Potion({ size = 12 }: { size?: number }) {
+  const liquid = 'M1.76 14.3A5.4 5.4 0 0 0 12.24 14.3Z';
+
+  return (
+    <svg
+      width={size}
+      height={(size / 14) * 20}
+      viewBox="0 0 14 20"
+      aria-hidden="true"
+      className="shrink-0 text-brand"
+    >
+      {/* Il tappo, pieno: è il dettaglio che fa leggere «boccetta» invece di «cerchio». */}
+      <rect x="4.6" y="0.5" width="4.8" height="2.2" rx="0.9" fill="currentColor" opacity="0.65" />
+      {/* Il collo e il corpo, a tratto. */}
+      <path
+        d="M5.7 2.7v3.6M8.3 2.7v3.6"
+        stroke="currentColor"
+        strokeWidth="1.1"
+        opacity="0.7"
+        fill="none"
+      />
+      <circle cx="7" cy="13" r="5.4" fill="none" stroke="currentColor" strokeWidth="1.1" opacity="0.7" />
+      <path d={liquid} fill="currentColor" />
+      {/* La bolla che sale e scoppia in superficie: dice «viva» senza mai sparire del tutto. */}
+      <circle
+        cx="5.6"
+        cy="16.4"
+        r="0.85"
+        fill="#030712"
+        style={{ animation: 'mark-bubble 2.4s ease-in-out infinite' }}
+      />
+    </svg>
+  );
+}
+
 const markCandidates = [
   {
     id: 'dot',
@@ -87,6 +138,13 @@ const markCandidates = [
     note:
       'sta appesa, si gonfia, cade, e se ne forma un’altra. È già nostra — su ludoratti.it le gocce colano lungo tutta la pagina — e lega la barra a quello che succede sotto.',
     Mark: HangingDrop,
+  },
+  {
+    id: 'potion',
+    title: 'La pozione che ribolle',
+    note:
+      'una boccetta col liquido sul fondo e una bolla che sale e scoppia. Non sparisce mai — la bolla basta a dire «viva» — e sta esattamente nella direzione Laboratorio.',
+    Mark: () => <Potion />,
   },
   {
     id: 'biohazard',
