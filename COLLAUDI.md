@@ -66,9 +66,9 @@ un contesto scuro, che è il caso difficile.
 | Azione | Atteso | Ottenuto |
 |---|---|---|
 | `text-plague-ink` dentro `.light` | `plague-700`, `rgb(21, 128, 61)` | `rgb(21, 128, 61)` |
-| `text-brand-ink` dentro `.light` | `brand-dark`, `rgb(0, 124, 145)` | `rgb(0, 124, 145)` |
+| `text-brand-ink` dentro `.light` | `brand-dark`, `rgb(77, 124, 15)` | `rgb(77, 124, 15)` |
 | `text-plague-ink` dentro `.dark` | `plague-400`, `rgb(74, 222, 128)` | `rgb(74, 222, 128)` |
-| `text-brand-ink` dentro `.dark` | `brand`, `rgb(0, 172, 193)` | `rgb(0, 172, 193)` |
+| `text-brand-ink` dentro `.dark` | `brand`, `rgb(163, 230, 53)` | `rgb(163, 230, 53)` |
 | `bg-background` di HeroUI dentro `.light` | torna chiaro, dentro una pagina scura | `lab(96.54 …)`, cioè quasi bianco |
 | Un'icona senza `color` dentro `.light` | eredita: `fill` = `rgb(21, 128, 61)` | `rgb(21, 128, 61)` |
 
@@ -85,6 +85,31 @@ cioè il difetto esatto che quel token esiste per impedire. È bastato dimentica
 ⚠️ **Che HeroUI 3 riconosca anche `.light`, e non solo `.dark`, è una cosa misurata qui**: la sua
 documentazione nomina `.dark` e `[data-theme="dark"]`, e il resto è il valore predefinito. Se un
 giorno smettesse di funzionare, la riga di `bg-background` in tabella è quella che diventa rossa.
+
+---
+
+### HeroUI è vestito senza toccare un componente — 2026-09-16
+
+**Esegue:** agente.
+**Ultima esecuzione:** agente, 2026-09-16 — **il pulsante è dei Ludoratti senza una riga sua**.
+
+**Preparazione:** `npm run playground`, poi `http://localhost:3100/stile`. Il pulsante «Entra nella
+tana» è un `<Button variant="primary">` di HeroUI **senza nessuno stile addosso**: il solo
+`theme.css` della libreria deve bastare a vestirlo.
+
+| Azione | Atteso | Ottenuto |
+|---|---|---|
+| Sfondo del pulsante | il lime del marchio, `rgb(163, 230, 53)` | `rgb(163, 230, 53)` |
+| Etichetta del pulsante | quasi nero, `rgb(23, 23, 23)` — contrasto **11,89** | `rgb(23, 23, 23)` |
+
+**Che cosa protegge:** la decisione che regge tutta la libreria — **si veste, non si riscrive**.
+HeroUI 3 dichiara le sue utility con `@theme inline` sopra a variabili grezze (`--accent`,
+`--accent-foreground`, `--success`), quindi vestirlo è ridichiarare quelle. ⚠️ Le nostre righe
+stanno **fuori da ogni layer**: il tema di HeroUI è dentro `@layer base`, e una dichiarazione
+senza layer vince comunque, senza dipendere dall'ordine degli import.
+
+⚠️ **E l'etichetta scura non è un gusto**: col bianco sopra il lime fa **1,51**. In RattInventario
+il pulsante primario è `bg-brand text-white` in 22 punti e fa 2,74 — qui non si ripete.
 
 ---
 

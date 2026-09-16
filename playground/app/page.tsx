@@ -28,12 +28,12 @@ const staticSwatches = [
   ['plague-600', 'bg-plague-600'],
   ['plague-700', 'bg-plague-700'],
   ['toxic', 'bg-toxic'],
-  ['ash-200', 'bg-ash-200'],
-  ['ash-400', 'bg-ash-400'],
-  ['ash-600', 'bg-ash-600'],
-  ['ash-700', 'bg-ash-700'],
-  ['ash-800', 'bg-ash-800'],
-  ['ash-900', 'bg-ash-900'],
+  ['gray-200', 'bg-gray-200'],
+  ['gray-400', 'bg-gray-400'],
+  ['gray-600', 'bg-gray-600'],
+  ['gray-700', 'bg-gray-700'],
+  ['gray-800', 'bg-gray-800'],
+  ['gray-900', 'bg-gray-900'],
 ];
 
 /** I due token che il tema cambia, resi nello stesso modo dentro le due isole. */
@@ -45,7 +45,7 @@ function InkSample({ label }: { label: string }) {
         Il verde con cui si scrive
       </span>
       <span data-ink="brand" className="text-brand-ink">
-        Il ciano del marchio
+        Il verde del marchio
       </span>
     </div>
   );
@@ -62,7 +62,7 @@ export default function Home() {
         <div className="grid grid-cols-2 gap-2 sm:grid-cols-4">
           {staticSwatches.map(([name, className]) => (
             <div key={name} className="flex items-center gap-2">
-              <span className={`size-8 rounded border border-ash-600 ${className}`} />
+              <span className={`size-8 rounded border border-gray-600 ${className}`} />
               <span className="text-xs text-default-500">{name}</span>
             </div>
           ))}

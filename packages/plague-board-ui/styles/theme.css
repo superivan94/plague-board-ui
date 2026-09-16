@@ -5,29 +5,35 @@
  * `bg-brand` e `text-brand` sono riscritte a mano più sotto, mentre `animate-scale-bounce` non
  * esiste affatto: la classe non è mai stata generata e il rimbalzo non è mai partito.
  *
- * I valori sono MISURATI sul progetto vivo, non scelti, e il contrasto di ognuno contro i due
- * fondi del tema è stato calcolato prima di decidere che cosa cambia e che cosa no.
+ * I valori sono MISURATI sulle due fonti vive — `ludoratti.it` e `rattinventario.ludoratti.it` —
+ * e il contrasto di ognuno contro i due fondi del tema è stato calcolato prima di decidere che
+ * cosa cambia col tema e che cosa no.
+ *
+ * ⚠️ **Le due fonti non andavano d'accordo, e la scelta è stata fatta il 2026-09-16.** L'una è la
+ * pagina del marchio, l'altra è un'applicazione che quel marchio lo indossa: quando divergono
+ * vince la prima. Da lì viene il verde, da lì viene il nero.
  */
 
 /* ─────────────────────────────────────────────────────────────────────────────
- * I colori statici: valgono uguali nei due temi, e questa è una scelta.
+ * I colori statici. Due verdi, e non è un doppione: hanno due mestieri.
  *
- * ⚠️ Un colore diventa consapevole del tema solo quando si sa che cosa deve fare in tutti e due.
- * Per una tinta di marca la risposta è «lo stesso», perché il ciano dei Ludoratti non è più o meno
- * ciano su fondo bianco. Per le superfici della peste la risposta è la stessa per un motivo più
- * forte: **la peste è scura per natura**. Un pannello appestato che diventa bianco in tema chiaro
- * smette di essere un pannello appestato — quello che deve adattarsi è la cornice intorno, che è
- * di HeroUI, non il fondale.
+ * `brand` è il verde della **corporazione** — il logo, il nome, i bordi delle schede, il pallino
+ * che pulsa accanto a un titolo. `plague` è il verde della **malattia** — le icone, i bordi che
+ * pulsano, il livello tossico. Il primo dice chi siamo, il secondo di che cosa parliamo, e su
+ * `ludoratti.it` convivono già così.
  * ───────────────────────────────────────────────────────────────────────────── */
 
 @theme {
-  /* Il marchio: ciano. È il colore dell'applicazione, non della peste. */
-  --color-brand: #00acc1;
-  --color-brand-light: #5ddef4;
-  --color-brand-dark: #007c91;
+  /* Il marchio: il verde acido di `ludoratti.it`, misurato sul sito (`rgb(163, 230, 53)`).
+   * ⚠️ Fino al 2026-09-16 qui c'era il ciano `#00acc1`. Non era il colore del marchio: era
+   * l'accento di **RattInventario**, e la pagina della corporazione non lo usa in nessun punto.
+   * È uscito perché l'accento di un'applicazione lo sceglie l'applicazione. */
+  --color-brand: #a3e635;
+  --color-brand-light: #bef264;
+  --color-brand-dark: #4d7c0f;
 
-  /* La peste: la scala verde degli accenti e dei bordi. Sono i quattro verdi di `plague-pulse`,
-   * cioè i green-400/500/600/700 di Tailwind — di là ci sono arrivati a mano, qui hanno un nome. */
+  /* La peste: la scala verde degli accenti e dei bordi di RattInventario. Sono i quattro verdi di
+   * `plague-pulse` — di là ci sono arrivati a mano, qui hanno un nome. */
   --color-plague-400: #4ade80;
   --color-plague-500: #22c55e;
   --color-plague-600: #16a34a;
@@ -39,33 +45,27 @@
    * su un fondo scuro, e si usa con l'opacità: `text-toxic/40`, non `#00ff0040` scritto a mano
    * come di là. */
   --color-toxic: #00ff00;
-
-  /* Il grigio dei Ludoratti: **neutro**, senza la punta di blu di quello di Tailwind.
-   *
-   * ⚠️ Di là questa scala **sovrascrive** `--color-gray-*`, quindi `bg-gray-800` là vale `#1e1e1e`
-   * e non il `#1f2937` di Tailwind: un'app che installasse la libreria si vedrebbe cambiare tutti
-   * i grigi sotto i piedi. Qui ha un nome suo, e `gray-*` resta di chi ci lavora.
-   *
-   * ⚠️ Manca il 300, ed è voluto: di là `text-gray-300` è usato **49 volte** ma non è mai
-   * dichiarato, quindi cade sul grigio bluastro di Tailwind e sta accanto a un 400 neutro. I sei
-   * passi qui sotto sono quelli davvero misurati; il 300 si aggiunge quando un componente lo
-   * chiede, non adesso. */
-  --color-ash-200: #e5e5e5;
-  --color-ash-400: #a0a0a0;
-  --color-ash-600: #404040;
-  --color-ash-700: #2d2d2d;
-  --color-ash-800: #1e1e1e;
-  --color-ash-900: #121212;
 }
+
+/* ⚠️ **Il grigio dei Ludoratti non sta qui, ed è una scelta: è quello di Tailwind.**
+ *
+ * `ludoratti.it` posa su `#030712` e le sue schede su `#111827`, che sono esattamente `gray-950` e
+ * `gray-900` — il manifest dichiara lo stesso `#030712` come `theme-color`. Dichiararli di nuovo
+ * vorrebbe dire **sovrascrivere** la scala di chi installa la libreria, che è il difetto che
+ * RattInventario ha davvero: là `--color-gray-*` è ridefinito, quindi `bg-gray-800` vale `#1e1e1e`
+ * invece del `#1f2937` di Tailwind, e nessuno se lo aspetta.
+ *
+ * Una scala `ash` neutra è esistita qui per due commit, col nero di RattInventario. È uscita
+ * quando la fonte del nero è diventata la pagina del marchio: un token che vale quanto uno
+ * predefinito è un token da togliere. */
 
 /* ─────────────────────────────────────────────────────────────────────────────
  * I due soli colori che il tema cambia, e il motivo è misurato.
  *
- * Un verde o un ciano **scritti come testo** non possono restare gli stessi: contro il bianco,
- * `plague-400` fa 1,74 di contrasto e il marchio 2,74 — sotto ogni soglia leggibile. Contro il
- * nero sono invece 11,36 e 7,23. La tinta giusta quindi scende di tono in tema chiaro e risale in
- * tema scuro, e siccome ogni componente che scrive in verde ha lo stesso problema, la scelta sta
- * qui una volta sola.
+ * Un verde **scritto come testo** non può restare lo stesso: contro il bianco il lime fa 1,51 di
+ * contrasto e il verde della peste 1,74 — sotto ogni soglia leggibile. Contro il nero fanno 13,35
+ * e 11,55. La tinta quindi scende di tono in tema chiaro e risale in tema scuro, e siccome ogni
+ * componente che scrive in verde ha lo stesso problema, la scelta sta qui una volta sola.
  *
  * ⚠️ `@theme inline` e non `@theme`: con `inline` l'utility generata punta **alla variabile**
  * invece che al valore, quindi ridichiarare la variabile più sotto cambia davvero il colore. Senza
@@ -74,10 +74,10 @@
  * ───────────────────────────────────────────────────────────────────────────── */
 
 @theme inline {
-  /* Il verde con cui si SCRIVE — non quello con cui si riempie. */
-  --color-plague-ink: var(--pb-plague-ink);
-  /* Il ciano del marchio con cui si scrive, stessa storia. */
+  /* Il verde del marchio con cui si SCRIVE — non quello con cui si riempie. */
   --color-brand-ink: var(--pb-brand-ink);
+  /* Il verde della peste con cui si scrive, stessa storia. */
+  --color-plague-ink: var(--pb-plague-ink);
 }
 
 /* ⚠️ I due blocchi si scrivono in quest'ordine e con questi selettori apposta.
@@ -86,17 +86,48 @@
  * quando `.dark` è acceso. E sono classi qualunque, non `:root.dark`, perché il tema dev'essere
  * commutabile **su un contenitore**: il playground mostra ogni componente nei due temi
  * affiancati, cioè due isole nella stessa pagina, e con `:root.dark` sarebbe impossibile.
- * `[data-theme]` c'è perché è il secondo aggancio che HeroUI 3 riconosce. */
+ * `[data-theme]` c'è perché è il secondo aggancio che HeroUI 3 riconosce — e `.light` è il primo,
+ * dichiarato dal suo `themes/default/variables.css`. */
 
 :root,
 .light,
 [data-theme='light'] {
+  --pb-brand-ink: #4d7c0f; /* lime-700 — 4,99 sul bianco */
   --pb-plague-ink: #15803d; /* plague-700 — 5,02 sul bianco */
-  --pb-brand-ink: #007c91; /* brand-dark — 4,89 sul bianco */
 }
 
 .dark,
 [data-theme='dark'] {
-  --pb-plague-ink: #4ade80; /* plague-400 — 11,36 sul nero, ed è il verde del testo di là */
-  --pb-brand-ink: #00acc1; /* brand — 7,23 sul nero */
+  --pb-brand-ink: #a3e635; /* il lime del marchio — 13,35 sul nero */
+  --pb-plague-ink: #4ade80; /* plague-400 — 11,55 sul nero, ed è il verde del testo di là */
+}
+
+/* ─────────────────────────────────────────────────────────────────────────────
+ * La vestizione di HeroUI.
+ *
+ * HeroUI 3 dichiara le sue utility con `@theme inline` sopra a variabili grezze — `--accent`,
+ * `--success`, `--focus` — che il suo tema definisce in `@layer base`. Vestirlo quindi non vuol
+ * dire riscrivere un componente: vuol dire ridichiarare quelle variabili. Queste righe stanno
+ * **fuori da ogni layer** apposta, così vincono senza dipendere dall'ordine degli import.
+ *
+ * ⚠️ Si tocca il minimo che si sa: l'accento e il verde di conferma. I grigi di HeroUI restano
+ * suoi — decisione dell'utente, 2026-09-16 — e il resto si guarda quando i componenti ci sono.
+ * ───────────────────────────────────────────────────────────────────────────── */
+
+:root,
+:host {
+  /* L'accento primario: il lime del marchio.
+   * ⚠️ **Etichetta scura, non bianca.** Il lime è un colore chiaro: col bianco sopra fa **1,51**,
+   * col quasi-nero **11,89**. In RattInventario il pulsante primario è `bg-brand text-white` in 22
+   * punti e fa 2,74 — qui non si ripete. */
+  --accent: #a3e635;
+  --accent-hover: #84cc16;
+  --accent-foreground: #171717;
+
+  /* Il verde di conferma diventa quello della peste, col bianco sopra: 5,02.
+   * È già così di là, ed è l'unico caso in cui il verde acceso e quello scuro si scambiano i
+   * ruoli — qui il riempimento è scuro perché l'etichetta è chiara. */
+  --success: #15803d;
+  --success-hover: #16a34a;
+  --success-foreground: #ffffff;
 }
