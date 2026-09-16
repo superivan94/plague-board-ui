@@ -77,6 +77,16 @@ npm run playground     # il dev server, sulla 3100
   **composti** (`Card.Header` invece di `CardBody`), e il tema scuro lo riconosce da `.dark` o
   `[data-theme="dark"]`. Le sue peer sono **cinque** e le installa l'applicazione: `react-aria`,
   `react-aria-components`, `@react-aria/ssr`, `@react-aria/i18n`, `@react-aria/utils`.
+- ⚠️ **Vestire HeroUI 3 non è riscrivere un componente: è ridichiarare le sue variabili grezze.**
+  Dichiara le utility con `@theme inline` sopra a `--accent`, `--success`, `--focus`, `--surface`…,
+  e quelle le definisce il suo tema dentro `@layer base`. Le nostre righe stanno **fuori da ogni
+  layer**, così vincono senza dipendere dall'ordine degli import.
+- ⚠️ **I verdi dei Ludoratti sono due e hanno due mestieri, non è un doppione.** `brand` è il
+  **lime `#a3e635`** della corporazione — è quello di `ludoratti.it`, l'unico che la pagina del
+  marchio usa; `plague-400…700` sono i verdi della **malattia**, quelli di RattInventario. E il
+  nero è `#030712`, che **è** il `gray-950` di Tailwind: per questo la libreria non dichiara nessuna
+  scala di grigi: ridichiararne una che vale quanto la predefinita vuol dire solo sovrascriverla a
+  chi installa.
 - ⚠️ **La tavolozza va in `@theme`, non in `:root`.** `@theme` **genera** le utility, `:root`
   dichiara solo una variabile — in RattInventario i token stanno in `:root` e infatti
   `animate-scale-bounce` **non esiste affatto**: la classe non è mai stata generata e quel rimbalzo
