@@ -1,6 +1,8 @@
 import { Button } from '@heroui/react';
 import { PoisonIcon, RatIcon, SkullIcon, TechLabel, VirusIcon } from 'plague-board-ui';
 
+import { BIOHAZARD_SIZES, BIOHAZARDS } from './biohazards';
+
 // ⚠️ Questa pagina è un RIFERIMENTO, non un'implementazione: è la direzione `B · Laboratorio`
 // decisa il 2026-09-16, disegnata a mano per avere davanti il bersaglio mentre si costruiscono i
 // componenti veri. Quando `PlaguePanel`, `RatSwarm` e gli altri esistono, questa pagina si
@@ -152,6 +154,34 @@ export default function StyleReference() {
             quarta — che era il difetto del pallino. ⚠️ A <strong>20px</strong>: sotto, il tratto
             interno scende sotto il pixel e il cuore sembra un graffio.
           </p>
+        </div>
+      </section>
+
+      <section className="flex flex-col gap-3">
+        <h2 className="text-lg font-medium">I due biohazard</h2>
+        <p className="max-w-2xl text-sm text-default-500">
+          Le due fonti ne hanno uno ciascuna e <strong>non si somigliano affatto</strong>. Alle
+          quattro misure vere: 16 dentro una riga, 24 accanto a un testo, 48 in un&apos;intestazione,
+          96 come fondale.
+        </p>
+
+        <div className="flex flex-col divide-y divide-gray-800 overflow-hidden rounded-lg border border-gray-700">
+          {BIOHAZARDS.map(({ id, title, source, note, Icon }) => (
+            <div key={id} className="flex flex-col gap-3 p-4">
+              <div className="flex items-end gap-6 text-brand">
+                {BIOHAZARD_SIZES.map((size) => (
+                  <span key={size} className="flex flex-col items-center gap-1">
+                    <Icon size={size} />
+                    <span className="text-[10px] text-gray-500">{size}</span>
+                  </span>
+                ))}
+              </div>
+              <p className="max-w-xl text-sm">
+                <strong>{title}</strong>
+                <span className="text-default-500"> — {source}. {note}</span>
+              </p>
+            </div>
+          ))}
         </div>
       </section>
 
