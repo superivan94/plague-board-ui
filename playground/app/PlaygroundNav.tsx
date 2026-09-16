@@ -2,7 +2,7 @@
 
 import Link from 'next/link';
 import { usePathname } from 'next/navigation';
-import { PlagueBar, PulseDot, TechLabel } from 'plague-board-ui';
+import { PlagueBar, RatIcon, TechLabel } from 'plague-board-ui';
 
 import { PLAYGROUND_PAGES, type PlaygroundPage } from './pages';
 
@@ -39,11 +39,13 @@ export function PlaygroundNav() {
   return (
     <PlagueBar>
       <nav className="mx-auto flex max-w-5xl flex-wrap items-center gap-x-5 gap-y-2 px-4 py-3">
-        {/* Il pallino sta accanto al marchio e vuol dire quello che vuol dire su `ludoratti.it`:
-            «acceso, raggiungibile». ⚠️ Prima marcava le pagine essenziali, cioè una categoria —
-            e un pallino una categoria non la sa dire. Quelle adesso hanno un'etichetta. */}
+        {/* Il marchio, e batte. ⚠️ Scelto fra cinque candidati il 2026-09-17, e il motivo non è
+            estetico: quel segno a prima vista è un cuore, poi due che si abbracciano, e solo per
+            via delle orecchie il muso di un ratto. Un cuore che batte dice «acceso» raccontando
+            la prima delle sue tre letture, invece di aggiungerne una quarta — che era il difetto
+            del pallino che stava qui prima. ⚠️ A 20px: sotto, il tratto interno sparisce. */}
         <span className="flex items-center gap-2">
-          <PulseDot size={8} />
+          <RatIcon size={20} className="animate-heartbeat shrink-0 text-brand" />
           <TechLabel className="text-gray-500">plague-board-ui</TechLabel>
         </span>
 

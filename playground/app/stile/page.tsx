@@ -1,7 +1,5 @@
 import { Button } from '@heroui/react';
-import { PoisonIcon, SkullIcon, TechLabel, VirusIcon } from 'plague-board-ui';
-
-import { MARK_CANDIDATES, MARK_KEYFRAMES } from './marks';
+import { PoisonIcon, RatIcon, SkullIcon, TechLabel, VirusIcon } from 'plague-board-ui';
 
 // ⚠️ Questa pagina è un RIFERIMENTO, non un'implementazione: è la direzione `B · Laboratorio`
 // decisa il 2026-09-16, disegnata a mano per avere davanti il bersaglio mentre si costruiscono i
@@ -51,7 +49,7 @@ const lexicon = [
 export default function StyleReference() {
   return (
     <main className="mx-auto flex min-h-dvh max-w-3xl flex-col gap-10 px-4 py-12">
-      <style>{KEYFRAMES + MARK_KEYFRAMES}</style>
+      <style>{KEYFRAMES}</style>
 
       <header className="flex flex-col gap-2">
         <h1 className="text-2xl font-semibold">La direzione, come riferimento</h1>
@@ -139,26 +137,21 @@ export default function StyleReference() {
 
       <section className="flex flex-col gap-3">
         <h2 className="text-lg font-medium">Il segno della barra</h2>
-        <p className="max-w-2xl text-sm text-default-500">
-          Sta a sinistra del marchio e vuol dire «acceso, raggiungibile». Il pallino fa il suo
-          lavoro ma non è di nessuno: ce l&apos;hanno tutti. Qui sono{' '}
-          <strong>a grandezza vera</strong>, ognuno alla misura minima a cui il suo disegno regge —
-          il pallino 8, la pozione 12, il marchio 20: un segno ingrandito mente.
-        </p>
 
-        <div className="flex flex-col divide-y divide-gray-800 overflow-hidden rounded-lg border border-gray-700">
-          {MARK_CANDIDATES.map(({ id, title, note, Mark }) => (
-            <div key={id} className="flex flex-wrap items-center gap-x-6 gap-y-2 p-4">
-              <span className="flex w-56 shrink-0 items-center gap-2 rounded bg-gray-950/70 px-3 py-2">
-                <Mark />
-                <TechLabel className="text-gray-500">plague-board-ui</TechLabel>
-              </span>
-              <span className="text-sm">
-                <strong>{title}</strong>
-                <span className="text-default-500"> — {note}</span>
-              </span>
-            </div>
-          ))}
+        <div className="flex flex-wrap items-center gap-x-6 gap-y-3 rounded-lg border border-gray-700 p-4">
+          <span className="flex shrink-0 items-center gap-2 rounded bg-gray-950/70 px-3 py-2">
+            <RatIcon size={20} className="animate-heartbeat shrink-0 text-brand" />
+            <TechLabel className="text-gray-500">plague-board-ui</TechLabel>
+          </span>
+          <p className="max-w-lg text-sm text-default-500">
+            <strong className="text-white">Il marchio che batte</strong>, scelto il 2026-09-17 fra
+            cinque candidati — pallino, pozione, goccia, biohazard. Il motivo non è estetico: quel
+            segno a prima vista è un <strong>cuore</strong>, poi <strong>due che si abbracciano</strong>,
+            e solo per via delle orecchie il <strong>muso di un ratto</strong>. Un cuore che batte
+            dice «acceso» raccontando la prima delle sue tre letture, invece di aggiungerne una
+            quarta — che era il difetto del pallino. ⚠️ A <strong>20px</strong>: sotto, il tratto
+            interno scende sotto il pixel e il cuore sembra un graffio.
+          </p>
         </div>
       </section>
 
