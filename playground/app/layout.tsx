@@ -1,6 +1,7 @@
 import type { Metadata } from 'next';
 import { Poppins, Share_Tech_Mono } from 'next/font/google';
 import './globals.css';
+import { PlaygroundNav } from './PlaygroundNav';
 
 // I due caratteri che `ludoratti.it` usa davvero, misurati sul sito vivo: `Poppins` per il testo e
 // `Share Tech Mono` per i titoli e le etichette di servizio.
@@ -31,7 +32,10 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
   // affiancando chiaro e scuro: la pagina intera non deve avere un tema suo.
   return (
     <html lang="it" className={`dark ${poppins.variable} ${shareTechMono.variable}`}>
-      <body className="min-h-dvh bg-background text-foreground antialiased">{children}</body>
+      <body className="min-h-dvh bg-background text-foreground antialiased">
+        <PlaygroundNav />
+        {children}
+      </body>
     </html>
   );
 }
