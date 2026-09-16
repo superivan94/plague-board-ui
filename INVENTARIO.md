@@ -43,6 +43,9 @@ biohazard, un dado o un segnalino lì non ci sono e non ci saranno.
 | Il pulsare, e l'emettitore all'hover | — | **da zero** | sono animazioni su ciò che avvolgono, non controlli |
 | La firma «umano e AI» | `card` | **misto** | la scheda si veste, l'easter egg è nostro |
 | La schermata di accesso | — | **composizione** | |
+| La barra in cima alla pagina | `surface` — ⚠️ **non** `header` e **non** `toolbar` | **vestire `Surface`** | letti prima di decidere: il suo `header` è l'intestazione di una *sezione* di elenco (`text-xs text-muted`), e `toolbar` è un gruppo di controlli `w-fit` con navigazione a frecce. Una lastra appiccicata in cima, semitrasparente e sfocata, non c'è |
+| Il pallino che pulsa | — | **da zero** | è un `<span>` tondo con `animate-pulse`: non c'è niente da vestire, e metterlo in un `chip` sarebbe un componente intero per un cerchio |
+| L'etichetta di servizio a caratteri fissi | `typography` | **da zero** | ⚠️ da rivedere: `typography` esiste e non l'ho ancora letto. Per ora è tre classi, e il valore sta nell'averle in un posto solo |
 
 ## ⚠️ Quello che HeroUI ha e che le nostre app si sono scritte a mano
 

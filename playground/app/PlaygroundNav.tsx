@@ -2,51 +2,65 @@
 
 import Link from 'next/link';
 import { usePathname } from 'next/navigation';
+import { PlagueBar, PulseDot, TechLabel } from 'plague-board-ui';
 
-import { PLAYGROUND_PAGES } from './pages';
+import { PLAYGROUND_PAGES, type PlaygroundPage } from './pages';
 
 /**
- * La barra del playground: un posto solo da cui si raggiungono tutte le pagine.
+ * La barra del playground.
  *
- * ⚠️ Volutamente **spenta**. È la cornice attorno a ciò che si sta giudicando, e una cornice che
- * usa i colori della libreria toglie il fondo neutro contro cui li si guarda: i pezzi qui sotto si
- * confrontano con `rattinventario.ludoratti.it`, non con questa barra.
+ * ⚠️ **La barra è della libreria, quello che ci sta dentro è dell'applicazione.** `PlagueBar` è la
+ * lastra; il marchio, le voci e gli indirizzi li mette questo file, perché sono roba di questo
+ * playground e di nessun altro. È la stessa regola per cui nella libreria non entra un header.
  */
+function NavLink({ page, isCurrent }: { page: PlaygroundPage; isCurrent: boolean }) {
+  return (
+    <Link
+      href={page.href}
+      // ⚠️ Niente `title`: il nome che uno screen reader annuncia diventerebbe la frase lunga
+      // invece di «Tavolozza», e il collegamento si leggerebbe in due modi diversi.
+      aria-current={isCurrent ? 'page' : undefined}
+      className={`text-sm transition-colors ${
+        isCurrent
+          ? 'text-brand-ink underline decoration-brand/60 underline-offset-8'
+          : 'text-gray-400 hover:text-white'
+      }`}
+    >
+      {page.title}
+    </Link>
+  );
+}
+
 export function PlaygroundNav() {
   const pathname = usePathname();
+  const demos = PLAYGROUND_PAGES.filter((page) => page.kind === 'demo');
+  const essentials = PLAYGROUND_PAGES.filter((page) => page.kind === 'essenziale');
 
   return (
-    <header className="sticky top-0 z-20 border-b border-gray-800 bg-black/70 backdrop-blur-sm">
-      <nav className="mx-auto flex max-w-5xl flex-wrap items-center gap-x-5 gap-y-1 px-4 py-3">
-        <span className="font-mono text-xs uppercase tracking-[0.2em] text-gray-500">
-          plague-board-ui
+    <PlagueBar>
+      <nav className="mx-auto flex max-w-5xl flex-wrap items-center gap-x-5 gap-y-2 px-4 py-3">
+        {/* Il pallino sta accanto al marchio e vuol dire quello che vuol dire su `ludoratti.it`:
+            «acceso, raggiungibile». ⚠️ Prima marcava le pagine essenziali, cioè una categoria —
+            e un pallino una categoria non la sa dire. Quelle adesso hanno un'etichetta. */}
+        <span className="flex items-center gap-2">
+          <PulseDot size={8} />
+          <TechLabel className="text-gray-500">plague-board-ui</TechLabel>
         </span>
 
-        {PLAYGROUND_PAGES.map((page) => {
-          const current = pathname === page.href;
-          return (
-            <Link
-              key={page.href}
-              href={page.href}
-              // ⚠️ Niente `title`: il nome che uno screen reader annuncia diventerebbe la frase
-              // lunga invece di «Tavolozza», e il collegamento si leggerebbe in due modi diversi.
-              // La riga di `blurb` serve all'indice delle storie, non alla barra.
-              aria-current={current ? 'page' : undefined}
-              className={`text-sm transition-colors ${
-                current ? 'text-white underline underline-offset-4' : 'text-gray-400 hover:text-white'
-              }`}
-            >
-              {page.title}
-              {page.kind === 'essenziale' && (
-                // Il pallino dice «questa pagina spiega, non mostra». Il titolo non lo direbbe.
-                <span className="ml-1 align-super text-[8px] text-brand" aria-hidden="true">
-                  ●
-                </span>
-              )}
-            </Link>
-          );
-        })}
+        {demos.map((page) => (
+          <NavLink key={page.href} page={page} isCurrent={pathname === page.href} />
+        ))}
+
+        {essentials.length > 0 && (
+          <span className="flex items-center gap-4">
+            <span className="h-4 w-px bg-gray-700" aria-hidden="true" />
+            <TechLabel className="text-[10px] text-brand/60">filosofia</TechLabel>
+            {essentials.map((page) => (
+              <NavLink key={page.href} page={page} isCurrent={pathname === page.href} />
+            ))}
+          </span>
+        )}
       </nav>
-    </header>
+    </PlagueBar>
   );
 }

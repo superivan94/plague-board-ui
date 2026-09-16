@@ -6,6 +6,11 @@
 // ⚠️ Gli export si scrivono **uno per uno**, mai con `export *`: questo file è l'elenco della
 // superficie pubblica, e un asterisco lo renderebbe una domanda invece che una risposta.
 
+// I segni del marchio: le cose che dicono «Ludoratti» senza essere un'applicazione.
+export { PlagueBar, type PlagueBarProps } from './brand/PlagueBar';
+export { PulseDot, type PulseDotProps } from './brand/PulseDot';
+export { TechLabel, type TechLabelProps } from './brand/TechLabel';
+
 // Le icone. `IconProps` è pubblico perché è il contratto che deve rispettare chi sostituisce
 // l'icona predefinita di un componente con la propria.
 export { BiohazardIcon } from './icons/BiohazardIcon';

@@ -1,9 +1,291 @@
-/* Le animazioni dei Ludoratti, tutte qui.
+/* Le animazioni dei Ludoratti, in un file solo.
  *
- * ⚠️ In RattInventario vivono in CINQUE posti — un foglio di stile, il `globals.css`, e tre
- * `<style>` incorporati dentro i componenti — più due copie morte che hanno già divergato dalla
- * viva. Il motivo per cui questo file esiste è che sia l'unico.
+ * ⚠️ **In RattInventario stanno in cinque posti**, e due sono copie morte che hanno già divergato:
+ * `styles/plague-animations.css` (viva), `app/plague-animations.css` (116 righe che nessuno
+ * importa), `ui/PlagueAnimations.tsx` (128 righe iniettate a runtime, senza chiamanti), più nove
+ * `@keyframes` dentro tre `<style>` incorporati nei componenti. Questo file è la cosa che quelle
+ * copie le toglie.
  *
- * Le regole arrivano col componente che le usa: un `@keyframes` senza il suo componente è un
- * pezzo di CSS che nessuno cancellerà mai più.
+ * ⚠️ **I `@keyframes` stanno al livello più esterno, non dentro `@theme`, ed è una scelta.**
+ * L'idioma di Tailwind v4 li vorrebbe dentro, così vengono emessi solo quando l'utility
+ * corrispondente è usata. Ma qui alcune animazioni non si raggiungono da un'utility: le chiamano
+ * le classi in fondo al file — `.binary-digit` e `.comic-bubble-footer` — e Tailwind non lo può
+ * sapere. Dentro `@theme`, quelle due classi punterebbero a un'animazione **che non esiste**, in
+ * silenzio: è la forma esatta del difetto `animate-scale-bounce` di RattInventario. Il prezzo è
+ * un chilobyte sempre presente; il guadagno è che non si può sbagliare.
+ *
+ * ⚠️ **I nomi dei fotogrammi portano `pb-`, i nomi delle utility no.** Un `@keyframes float` senza
+ * prefisso si scontrerebbe con quello che un'applicazione ha già — e RattInventario ce l'ha —
+ * mentre `animate-float` è il nome con cui si scrive, e deve restare leggibile.
  */
+
+/* ─────────────────────────────────────────────────────────────────────────────
+ * Le sei della peste. Vengono dalla copia VIVA di `styles/plague-animations.css`.
+ * ───────────────────────────────────────────────────────────────────────────── */
+
+@keyframes pb-float {
+  0%,
+  100% {
+    transform: translateY(0px);
+  }
+  50% {
+    transform: translateY(-20px);
+  }
+}
+
+@keyframes pb-float-delayed {
+  0%,
+  100% {
+    transform: translateY(-10px);
+  }
+  50% {
+    transform: translateY(-30px);
+  }
+}
+
+/* Il pulsare del richiamo: cambiano insieme fondo, bordo e alone. ⚠️ I quattro verdi sono quelli
+ * di `plague-400…700`, che qui restano scritti per esteso perché un `@keyframes` non può leggere
+ * una variabile del tema senza `@property`. */
+@keyframes pb-plague-pulse {
+  0%,
+  100% {
+    background-color: #15803d;
+    border-color: #22c55e;
+    box-shadow:
+      0 10px 15px -3px rgb(34 197 94 / 0.2),
+      0 4px 6px -2px rgb(34 197 94 / 0.05);
+  }
+  50% {
+    background-color: #16a34a;
+    border-color: #4ade80;
+    box-shadow:
+      0 10px 15px -3px rgb(34 197 94 / 0.4),
+      0 4px 6px -2px rgb(34 197 94 / 0.1);
+  }
+}
+
+@keyframes pb-skull-sway {
+  0%,
+  50%,
+  100% {
+    transform: rotate(-6deg);
+  }
+  25%,
+  75% {
+    transform: rotate(6deg);
+  }
+}
+
+@keyframes pb-biohazard-sway {
+  0%,
+  50%,
+  100% {
+    transform: rotate(4deg);
+  }
+  25%,
+  75% {
+    transform: rotate(-4deg);
+  }
+}
+
+@keyframes pb-virus-spin {
+  from {
+    transform: rotate(0deg);
+  }
+  to {
+    transform: rotate(360deg);
+  }
+}
+
+/* ─────────────────────────────────────────────────────────────────────────────
+ * Le tre che stavano in `globals.css` di RattInventario.
+ * ───────────────────────────────────────────────────────────────────────────── */
+
+/* ⚠️ Questa è la prova del difetto che questo file evita: di là `animate-scale-bounce` **non
+ * esiste**, perché il token stava in `:root` e l'utility non è mai stata generata. Il rimbalzo del
+ * clic sulla mascotte e quello della spunta non sono mai partiti. */
+@keyframes pb-scale-bounce {
+  0%,
+  100% {
+    transform: scale(1);
+  }
+  50% {
+    transform: scale(1.15);
+  }
+}
+
+@keyframes pb-float-up {
+  0% {
+    opacity: 0;
+    transform: translateY(0px);
+  }
+  10%,
+  90% {
+    opacity: 1;
+  }
+  100% {
+    opacity: 0;
+    transform: translateY(-40px);
+  }
+}
+
+@keyframes pb-bubble-pop {
+  0% {
+    opacity: 0;
+    transform: scale(0.3) translateY(10px);
+  }
+  15% {
+    opacity: 1;
+    transform: scale(1.1) translateY(-5px);
+  }
+  25%,
+  85% {
+    opacity: 1;
+    transform: scale(1) translateY(0px);
+  }
+  100% {
+    opacity: 0;
+    transform: scale(0.8) translateY(-10px);
+  }
+}
+
+/* ─────────────────────────────────────────────────────────────────────────────
+ * Le tre di `ludoratti.it`, che a RattInventario mancano del tutto.
+ * ───────────────────────────────────────────────────────────────────────────── */
+
+/* La goccia che cola dall'alto e si allunga cadendo. ⚠️ L'altezza è una variabile perché la
+ * distanza da percorrere dipende da dove sta il contenitore, e un valore fisso la fa sparire a
+ * metà o uscire dallo schermo. */
+@keyframes pb-drip {
+  0% {
+    opacity: 0;
+    transform: translateY(-16px) scaleY(1);
+  }
+  6% {
+    opacity: 1;
+  }
+  85% {
+    opacity: 1;
+    transform: translateY(var(--pb-drip-distance, 100vh)) scaleY(1.6);
+  }
+  100% {
+    opacity: 0;
+    transform: translateY(var(--pb-drip-distance, 100vh)) scaleY(1.6);
+  }
+}
+
+/* Il disturbo sul nome: si applica a due pseudo-elementi sfalsati, uno ciano e uno rosa. */
+@keyframes pb-glitch {
+  0% {
+    clip-path: inset(10% 0 80% 0);
+  }
+  20% {
+    clip-path: inset(50% 0 20% 0);
+  }
+  40% {
+    clip-path: inset(25% 0 55% 0);
+  }
+  60% {
+    clip-path: inset(70% 0 5% 0);
+  }
+  80% {
+    clip-path: inset(40% 0 45% 0);
+  }
+  100% {
+    clip-path: inset(85% 0 5% 0);
+  }
+}
+
+/* Il lampo: per due decimi di secondo ogni cinque, compare quello che c'è sotto. */
+@keyframes pb-reveal {
+  0%,
+  90%,
+  94%,
+  98%,
+  100% {
+    opacity: 0;
+  }
+  91% {
+    opacity: 1;
+    clip-path: inset(10% 0 40% 0);
+  }
+  95% {
+    opacity: 1;
+    clip-path: inset(40% 0 10% 0);
+  }
+}
+
+/* ─────────────────────────────────────────────────────────────────────────────
+ * Le utility. `@theme` le GENERA — è la differenza con `:root`, che dichiara e basta.
+ * ───────────────────────────────────────────────────────────────────────────── */
+
+@theme {
+  --animate-float: pb-float 6s ease-in-out infinite;
+  --animate-float-delayed: pb-float-delayed 8s ease-in-out 2s infinite;
+  --animate-plague-pulse: pb-plague-pulse 2s ease-in-out infinite;
+  --animate-skull-sway: pb-skull-sway 4s linear infinite;
+  --animate-biohazard-sway: pb-biohazard-sway 5s linear infinite;
+  --animate-virus-spin: pb-virus-spin 6s linear infinite;
+  --animate-scale-bounce: pb-scale-bounce 0.4s ease-in-out;
+  --animate-float-up: pb-float-up 1.2s linear forwards;
+  --animate-bubble-pop: pb-bubble-pop 2.5s ease-out forwards;
+  --animate-drip: pb-drip 8s ease-in infinite;
+  --animate-glitch: pb-glitch 2.5s infinite reverse;
+  --animate-reveal: pb-reveal 5s infinite;
+}
+
+/* ─────────────────────────────────────────────────────────────────────────────
+ * Le due classi che non sono utility: sono **elementi effimeri** che un emettitore sputa in
+ * pagina, e portano con sé geometria e animazione insieme.
+ * ───────────────────────────────────────────────────────────────────────────── */
+
+/* La cifra binaria che sale dalla scheda dello sviluppatore AI. */
+.pb-binary-digit {
+  position: absolute;
+  pointer-events: none;
+  font-family: ui-monospace, monospace;
+  font-weight: bold;
+  animation: pb-float-up linear forwards;
+  z-index: 5;
+}
+
+/* Il fumetto minuscolo che compare sopra la scheda dell'autore umano. */
+.pb-comic-bubble {
+  position: absolute;
+  min-width: 80px;
+  max-width: 180px;
+  padding: 2px 6px;
+  border: 1px solid rgb(255 255 255 / 0.3);
+  border-radius: 6px;
+  background: rgb(0 0 0 / 0.9);
+  color: #fff;
+  font-size: 8px;
+  text-align: center;
+  white-space: nowrap;
+  pointer-events: none;
+  animation: pb-bubble-pop 2.5s ease-out forwards;
+  z-index: 20;
+}
+
+/* La punta del fumetto, che di là è uno pseudo-elemento con tre bordi. */
+.pb-comic-bubble::after {
+  content: '';
+  position: absolute;
+  bottom: -4px;
+  left: 50%;
+  width: 0;
+  height: 0;
+  transform: translateX(-50%);
+  border-top: 4px solid rgb(0 0 0 / 0.9);
+  border-right: 4px solid transparent;
+  border-left: 4px solid transparent;
+}
+
+/* ⚠️ Chi ha chiesto meno movimento lo ottiene, e vale per tutto il file in una riga sola. */
+@media (prefers-reduced-motion: reduce) {
+  .pb-binary-digit,
+  .pb-comic-bubble,
+  [class*='animate-'] {
+    animation: none !important;
+  }
+}

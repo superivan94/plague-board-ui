@@ -77,6 +77,14 @@ npm run playground     # il dev server, sulla 3100
   **composti** (`Card.Header` invece di `CardBody`), e il tema scuro lo riconosce da `.dark` o
   `[data-theme="dark"]`. Le sue peer sono **cinque** e le installa l'applicazione: `react-aria`,
   `react-aria-components`, `@react-aria/ssr`, `@react-aria/i18n`, `@react-aria/utils`.
+- ⚠️ **In HeroUI 3 l'elemento si cambia con `render`, non con `as`.** I suoi componenti sono
+  polimorfi con una funzione — `<Surface render={(props) => <header {...props} />}>` — e chi cerca
+  `as` non lo trova. Sta in `utils/dom.d.ts`.
+- ⚠️ **I `@keyframes` di `animations.css` stanno al livello più esterno, non dentro `@theme`.**
+  L'idioma di Tailwind v4 li vorrebbe dentro, così vengono emessi solo quando si usa l'utility —
+  ma alcune animazioni le chiamano le nostre classi (`.pb-binary-digit`), e Tailwind non lo può
+  sapere: finirebbero a puntare a un'animazione **che non esiste, in silenzio**. È la forma esatta
+  del difetto `animate-scale-bounce` di RattInventario.
 - ⚠️ **Vestire HeroUI 3 non è riscrivere un componente: è ridichiarare le sue variabili grezze.**
   Dichiara le utility con `@theme inline` sopra a `--accent`, `--success`, `--focus`, `--surface`…,
   e quelle le definisce il suo tema dentro `@layer base`. Le nostre righe stanno **fuori da ogni
