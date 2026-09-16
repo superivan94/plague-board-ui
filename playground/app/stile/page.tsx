@@ -1,5 +1,12 @@
 import { Button } from '@heroui/react';
-import { PoisonIcon, SkullIcon, VirusIcon } from 'plague-board-ui';
+import {
+  BiohazardIcon,
+  PoisonIcon,
+  PulseDot,
+  SkullIcon,
+  TechLabel,
+  VirusIcon,
+} from 'plague-board-ui';
 
 // ⚠️ Questa pagina è un RIFERIMENTO, non un'implementazione: è la direzione `B · Laboratorio`
 // decisa il 2026-09-16, disegnata a mano per avere davanti il bersaglio mentre si costruiscono i
@@ -10,6 +17,14 @@ import { PoisonIcon, SkullIcon, VirusIcon } from 'plague-board-ui';
 // il `gray-950` di `ludoratti.it`.
 
 const KEYFRAMES = `
+/* La goccia appesa: sta, si gonfia, si stacca, e se ne forma un'altra. */
+@keyframes mark-hang {
+  0%, 55%   { transform: translateY(0) scaleY(1);      opacity: 1; }
+  67%       { transform: translateY(0) scaleY(1.3);    opacity: 1; }
+  82%       { transform: translateY(16px) scaleY(1.7); opacity: 0; }
+  83%       { transform: translateY(0) scaleY(0.5);    opacity: 0; }
+  93%, 100% { transform: translateY(0) scaleY(1);      opacity: 1; }
+}
 @keyframes pb-float { 0%,100% { transform: translateY(0); } 50% { transform: translateY(-14px); } }
 @keyframes pb-drip {
   0%   { transform: translateY(-16px) scaleY(1); opacity: 0; }
@@ -36,6 +51,51 @@ function DiceIcon({ size = 24 }: { size?: number }) {
     </svg>
   );
 }
+
+/** La goccia appesa al filo della barra: il candidato consigliato. */
+function HangingDrop() {
+  return (
+    <svg
+      width="7"
+      height="14"
+      viewBox="0 0 8 20"
+      fill="currentColor"
+      aria-hidden="true"
+      className="shrink-0 text-brand"
+      style={{ animation: 'mark-hang 6s ease-in infinite', transformOrigin: 'top center' }}
+    >
+      <path d="M4 20C4 20 8 13.68 8 8.82C8 3.96 4 0 4 0C4 0 0 3.96 0 8.82C0 13.68 4 20 4 20Z" />
+    </svg>
+  );
+}
+
+/** Il contagio che ondeggia: l'emblema della famiglia, in piccolo. */
+function SwayingBiohazard() {
+  return <BiohazardIcon size={13} className="animate-biohazard-sway shrink-0 text-brand" />;
+}
+
+const markCandidates = [
+  {
+    id: 'dot',
+    title: 'Il pallino, com’è adesso',
+    note: 'onesto e illeggibile come marchio: è il segno di stato di qualunque cruscotto.',
+    Mark: () => <PulseDot size={8} />,
+  },
+  {
+    id: 'drop',
+    title: 'La goccia che si stacca',
+    note:
+      'sta appesa, si gonfia, cade, e se ne forma un’altra. È già nostra — su ludoratti.it le gocce colano lungo tutta la pagina — e lega la barra a quello che succede sotto.',
+    Mark: HangingDrop,
+  },
+  {
+    id: 'biohazard',
+    title: 'Il contagio che ondeggia',
+    note:
+      'l’emblema della famiglia, a 13px e con l’oscillazione lenta. Si riconosce, ma ha già un mestiere: dice «roba della peste», non «acceso».',
+    Mark: SwayingBiohazard,
+  },
+];
 
 const lexicon = [
   ['Accedi', 'Entra nella tana'],
@@ -132,6 +192,30 @@ export default function StyleReference() {
               la malattia — <code>plague-400</code>, il verde di RattInventario
             </span>
           </span>
+        </div>
+      </section>
+
+      <section className="flex flex-col gap-3">
+        <h2 className="text-lg font-medium">Il segno della barra</h2>
+        <p className="max-w-2xl text-sm text-default-500">
+          Sta a sinistra del marchio e vuol dire «acceso, raggiungibile». Il pallino fa il suo
+          lavoro ma non è di nessuno: ce l&apos;hanno tutti. Qui sono a grandezza vera —{' '}
+          <strong>si giudicano a 10px, non ingranditi</strong>.
+        </p>
+
+        <div className="flex flex-col divide-y divide-gray-800 overflow-hidden rounded-lg border border-gray-700">
+          {markCandidates.map(({ id, title, note, Mark }) => (
+            <div key={id} className="flex flex-wrap items-center gap-x-6 gap-y-2 p-4">
+              <span className="flex w-56 shrink-0 items-center gap-2 rounded bg-gray-950/70 px-3 py-2">
+                <Mark />
+                <TechLabel className="text-gray-500">plague-board-ui</TechLabel>
+              </span>
+              <span className="text-sm">
+                <strong>{title}</strong>
+                <span className="text-default-500"> — {note}</span>
+              </span>
+            </div>
+          ))}
         </div>
       </section>
 
