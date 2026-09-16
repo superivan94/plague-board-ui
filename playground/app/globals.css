@@ -10,3 +10,16 @@
  * libreria non generano nessuna utility. Qui il percorso è quello del workspace — in
  * un'applicazione vera è `node_modules/plague-board-ui/dist`, come dice il README. */
 @source "../../packages/plague-board-ui/dist";
+
+/* I due caratteri dei Ludoratti, misurati su `ludoratti.it`: `Poppins` per il testo e
+ * `Share Tech Mono` per i titoli e le etichette di servizio. Li carica `next/font` nel layout, e
+ * qui si agganciano alle utility di Tailwind — `font-sans` e `font-mono` — così li prende anche la
+ * base di HeroUI, che scrive `font-family` sul `body`.
+ *
+ * ⚠️ È una scelta dell'APPLICAZIONE, non della libreria: un pacchetto di componenti che imponesse
+ * un carattere lo imporrebbe a quattro app insieme. La libreria dice quali sono; caricarli è di
+ * chi la installa. */
+@theme inline {
+  --font-sans: var(--font-poppins);
+  --font-mono: var(--font-tech);
+}
