@@ -3,11 +3,16 @@
  * uno albino con orecchie e coda rosa e occhi rossi, uno marrone — e restano tali anche adesso che
  * il disegno è rifatto. ⚠️ Statiche, e si dichiara: sono il pelo di un animale, non colori del
  * tema. Un ratto grigio è grigio su fondo chiaro come su fondo scuro.
+ *
+ * ⚠️ **`shade` è il pelo del lato in ombra, e non è `tail`.** Le zampe lontane prendevano il colore
+ * della coda, e sull'albino venivano **rosa**: la coda è rosa perché è pelle nuda, ma una zampa in
+ * ombra è pelo, e il pelo bianco in ombra è grigio chiaro. Sul grigio e sul marrone `tail` era
+ * quasi giusto per caso — sul grigio era persino più chiaro del corpo, che per un'ombra è l'opposto.
  */
 export const RAT_LIVERIES = {
-  grey: { body: '#595959', ear: '#808080', tail: '#707070', eye: '#1a1a1a', nose: '#333333' },
-  white: { body: '#f7f7f7', ear: '#fec5d6', tail: '#fec5d6', eye: '#ff4d4d', nose: '#ffb3b3' },
-  brown: { body: '#8B4513', ear: '#A0522D', tail: '#654321', eye: '#000000', nose: '#2F1B14' },
+  grey: { body: '#595959', shade: '#3f3f46', ear: '#808080', tail: '#707070', eye: '#1a1a1a', nose: '#333333' },
+  white: { body: '#f7f7f7', shade: '#d4d4d8', ear: '#fec5d6', tail: '#fec5d6', eye: '#ff4d4d', nose: '#ffb3b3' },
+  brown: { body: '#8B4513', shade: '#6b3410', ear: '#A0522D', tail: '#654321', eye: '#000000', nose: '#2F1B14' },
 } as const;
 
 export type RatLivery = keyof typeof RAT_LIVERIES;
@@ -39,11 +44,12 @@ const BODY =
   'C199,52 198,56 193,57 C183,59 173,60 163,60 ' +
   'C151,61 143,64 134,68 C117,75 92,76 74,72 ' +
   'C62,69 58,62 58,50 Z';
-// La coda: due bordi che si incontrano in punta — spessa 12 all'anca, zero al termine — e l'arco
-// sale all'indietro. Quella di prima era un tratto a spessore costante che si arricciava in avanti.
+// La coda: **un arco solo**, che parte dal basso della groppa, striscia indietro e risale a punta.
+// Due bordi che non si incrociano mai — spessa 10 all'anca, 4 a metà, zero in punta. La versione
+// precedente finiva con un ricciolo in cui i bordi quasi si toccavano, e leggeva come attorcigliata.
 const TAIL =
-  'M61,44 C43,39 25,36 16,29 C8,22 10,12 20,10 ' +
-  'C24,12 22,13 21,15 C15,18 15,24 20,29 C29,38 47,47 61,56 Z';
+  'M61,50 C50,49 42,50 34,47 C26,43 17,36 13,26 ' +
+  'C18,38 26,46 35,51 C44,56 52,60 61,60 Z';
 // ⚠️ **Una zampa è un percorso solo**: coscia, stinco e piede in una sagoma, con un contorno.
 // Prima erano tre pezzi — una coscia a blob incollata sulla groppa, una capsula, un piede a parte —
 // e dove si sovrapponevano i contorni si raddoppiavano. La zampa dietro è la «Z» del roditore,
@@ -97,11 +103,11 @@ const WHISKERS = [
  * cercare il primo e l'ultimo pixel non trasparente; né `getBBox()` né `getBoundingClientRect()`
  * servono, perché il tratto non lo contano.
  *
- * Misurato il 2026-09-18: da **9,75** (la punta della coda) a **229,5** (la punta del becco), da
- * **0** (il tappo dell'ampolla) a **88,25** (la pianta dei piedi, dopo il ridisegno delle zampe).
- * ⚠️ La prima cornice, scritta a occhio prima di misurare, finiva a 88 e **tagliava i piedi**.
+ * Misurato il 2026-09-18 con la coda nuova: da **11,75** (la punta della coda) a **229,5** (la punta
+ * del becco), da **0** (il tappo dell'ampolla) a **88,25** (la pianta dei piedi). ⚠️ Ogni volta che
+ * si sposta un pezzo si rimisura: la prima cornice, scritta a occhio, tagliava i piedi.
  */
-const VIEW_BOX = { x: 9, y: -1, width: 221, height: 90 } as const;
+const VIEW_BOX = { x: 11, y: -1, width: 219, height: 90 } as const;
 const RATIO = VIEW_BOX.width / VIEW_BOX.height;
 
 export interface RatProps {
@@ -130,9 +136,13 @@ export interface RatProps {
  * Disegnato **da zero** il 2026-09-17 nella tecnica della mascotte con l'ampolla — contorno
  * d'inchiostro e campiture piatte — perché i due siano lo stesso personaggio. Rispetto al disegno
  * che veniva da RattInventario: un occhio solo (era di profilo con due occhi), l'orecchio sul cranio
- * e non sulla fronte, il muso che rastrema a punta, corpo e testa in una sagoma sola, la coda che
- * rastrema e sale, ogni zampa in un percorso solo con coscia e piede, i baffi in avanti, e il
+ * e non sulla fronte, il muso che rastrema a punta, corpo e testa in una sagoma sola, la coda in un
+ * arco che rastrema, ogni zampa in un percorso solo con coscia e piede, i baffi in avanti, e il
  * sopracciglio.
+ *
+ * ⚠️ **Il contorno è quello che lo tiene su qualunque fondo.** Il pelo dell'albino è `#f7f7f7`, e
+ * su una pagina chiara sparirebbe: lo tiene su l'inchiostro, come tiene su la mascotte. Per questo
+ * il ratto **segue il tema** e non va messo su una lastra scura per forza.
  *
  * ⚠️ **Sta fermo, ed è il punto.** Le parti che si muovono portano un nome — `pb-rat-body`,
  * `pb-rat-tail`, `pb-rat-ears`, `pb-rat-leg-front`, `pb-rat-leg-back`, `pb-rat-vial` — e le regole
@@ -176,15 +186,15 @@ export function Rat({
         <g className="pb-rat-body">
           <path d={EAR_FAR} fill={c.ear} />
 
-          {/* Le zampe del lato lontano: più scure, più indietro, e dietro a tutto. */}
+          {/* Le zampe del lato lontano: nel pelo in ombra, più indietro, e dietro a tutto. */}
           <g transform="translate(-13,0)">
             <g className="pb-rat-leg-back">
-              <path d={LEG_BACK} fill={c.tail} />
+              <path d={LEG_BACK} fill={c.shade} />
             </g>
           </g>
           <g transform="translate(-11,0)">
             <g className="pb-rat-leg-front">
-              <path d={LEG_FRONT} fill={c.tail} />
+              <path d={LEG_FRONT} fill={c.shade} />
             </g>
           </g>
 

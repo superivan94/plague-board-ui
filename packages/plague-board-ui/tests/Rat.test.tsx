@@ -35,6 +35,24 @@ describe('Rat', () => {
     expect(parti(container).coda).toHaveAttribute('fill', RAT_LIVERIES.grey.tail);
   });
 
+  it("le zampe in ombra sono pelo in ombra, non coda: sull'albino grigio chiaro, non rosa", () => {
+    const { container } = render(<Rat livery="white" />);
+
+    // ⚠️ Le zampe lontane prendevano il colore della **coda**, e sull'albino venivano rosa: la coda
+    // è pelle nuda, una zampa in ombra è pelo, e il pelo bianco in ombra è grigio chiaro. Lo slot è
+    // `shade`, e per tutte e tre le livree deve essere diverso dalla coda. Le zampe lontane sono i
+    // gruppi di zampa dentro un `<g transform>`.
+    const lontane = [...container.querySelectorAll('g[transform^="translate"] path')];
+    expect(lontane).toHaveLength(2);
+    for (const zampa of lontane) {
+      expect(zampa).toHaveAttribute('fill', RAT_LIVERIES.white.shade);
+      expect(zampa).not.toHaveAttribute('fill', RAT_LIVERIES.white.tail);
+    }
+    for (const livery of Object.keys(RAT_LIVERIES) as RatLivery[]) {
+      expect(RAT_LIVERIES[livery].shade).not.toBe(RAT_LIVERIES[livery].tail);
+    }
+  });
+
   it("l'albino ha l'occhio rosso, non d'inchiostro", () => {
     const { container } = render(<Rat livery="white" />);
 
@@ -184,11 +202,12 @@ describe('Rat', () => {
     // ⚠️ I numeri vengono dai **pixel dipinti** del ratto con tutto addosso — l'SVG su una tela a
     // 4×, primo e ultimo pixel non trasparente — perché né `getBBox()` né `getBoundingClientRect()`
     // contano il tratto. Qui si tiene il vincolo, non il valore: la cornice deve contenere la punta
-    // della coda a sinistra (9,75), il tappo dell'ampolla in alto (0), il becco a destra (229,5) e
-    // la pianta dei piedi in basso (88,25, dopo il ridisegno delle zampe: prima era 89,25). Sono le
-    // quattro cifre misurate il 2026-09-18 — e la prima cornice, scritta prima di misurare, questo
-    // test l'avrebbe presa: finiva a 88 con i piedi a 89,25.
-    expect(x).toBeLessThanOrEqual(9.75);
+    // della coda a sinistra (11,75 con la coda ad arco; era 9,75 con quella a ricciolo), il tappo
+    // dell'ampolla in alto (0), il becco a destra (229,5) e la pianta dei piedi in basso (88,25,
+    // dopo il ridisegno delle zampe: prima era 89,25). Sono le quattro cifre misurate il 2026-09-18
+    // — e la prima cornice, scritta prima di misurare, questo test l'avrebbe presa: finiva a 88 con
+    // i piedi a 89,25. Ogni volta che si sposta un pezzo, si rimisura e si aggiorna qui.
+    expect(x).toBeLessThanOrEqual(11.75);
     expect(y).toBeLessThanOrEqual(0);
     expect(x + w).toBeGreaterThanOrEqual(229.5);
     expect(y + h).toBeGreaterThanOrEqual(88.25);

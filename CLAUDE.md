@@ -213,6 +213,14 @@ exist in target module» che **non sono veri**. Si guarda la pagina, o si crede 
   **lo stesso personaggio** invece di due disegni. Il verde dell'ampolla sul dorso è invece quello
   della tavolozza (`plague-500`), non quello della mascotte (`#30b020`): ampolla e interfaccia
   intorno devono dire lo stesso verde.
+- ⚠️ **Il contorno d'inchiostro tiene il ratto in chiaro e non fa niente in scuro.** Misurato il
+  2026-09-18 su `/stile`: `#180828` fa **19,02** sul bianco della superficie chiara e **1,07** su
+  quella scura. In chiaro è il contorno a reggere l'albino (`#f7f7f7` su bianco); in scuro reggono
+  le campiture, e i tratti che sono **solo** inchiostro — sopracciglio, baffi, cinghie, orbita del
+  teschio — di fatto spariscono. Non è un difetto da correggere in fretta: la mascotte con l'ampolla
+  ha la stessa proprietà ed è quella che dà l'identità. Ma è il motivo per cui il ratto **segue il
+  tema** invece di stare su una lastra scura fissa, e il giorno che si vorrà l'espressione anche in
+  scuro la leva è un inchiostro che cambia col tema, in `theme.css`.
 - ⚠️ **Una `transform` in CSS sostituisce l'attributo `transform`, non si somma.** Le zampe lontane
   di `Rat` stanno più indietro e più in basso con un `translate(-14,2)` come attributo: se la
   classe che l'animazione aggancia stesse sullo stesso `<g>`, il primo fotogramma le riporterebbe

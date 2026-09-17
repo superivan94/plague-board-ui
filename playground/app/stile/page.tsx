@@ -188,9 +188,11 @@ export default function StyleReference() {
           sua misura è <strong>l&apos;altezza</strong>, perché è lungo due volte e mezzo tanto.
         </p>
 
-        {/* ⚠️ Lastra scura anche in tema chiaro: il grigio `#595959` e il marrone `#8B4513` sono
-            pellicce, tarate su un fondo scuro come tutto il resto dell'identità. */}
-        <div className="dark flex flex-col gap-5 rounded-lg border border-border bg-gray-950/90 p-4">
+        {/* ⚠️ **Nessuna lastra scura**: il ratto segue il tema, apposta. Il contorno d'inchiostro è
+            quello che lo tiene su qualunque fondo — sull'albino il pelo è `#f7f7f7`, e su pagina
+            chiara sparirebbe senza. È la stessa ragione per cui la mascotte con l'ampolla regge in
+            chiaro, e la demo deve poterlo mostrare, non nasconderlo dietro un fondo scuro fisso. */}
+        <div className="flex flex-col gap-5 rounded-lg border border-border bg-surface p-4">
           <div className="flex flex-wrap items-end gap-8">
             {RAT_LIVERIES_ORDER.map((livery) => (
               <span key={livery} className="flex flex-col items-center gap-2">
