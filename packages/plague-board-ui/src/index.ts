@@ -8,6 +8,10 @@
 
 // I segni del marchio: le cose che dicono «Ludoratti» senza essere un'applicazione.
 export { PlagueBar, type PlagueBarProps } from './brand/PlagueBar';
+// ⚠️ Le misure **non** escono da `PlagueBar.tsx`, che dichiara `'use client'`: un dato esportato
+// da un modulo client arriva a una pagina server come riferimento, e chi lo indicizza ottiene
+// `undefined` senza che niente diventi rosso. Il perché per esteso sta in `plagueBarSizes.ts`.
+export { PLAGUE_BAR_MARK_SIZE, type PlagueBarSize } from './brand/plagueBarSizes';
 export { PulseDot, type PulseDotProps } from './brand/PulseDot';
 export { TechLabel, type TechLabelProps } from './brand/TechLabel';
 

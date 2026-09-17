@@ -2,7 +2,7 @@
 
 import Link from 'next/link';
 import { usePathname } from 'next/navigation';
-import { PlagueBar, RatIcon, TechLabel } from 'plague-board-ui';
+import { PLAGUE_BAR_MARK_SIZE, PlagueBar, RatIcon, TechLabel } from 'plague-board-ui';
 
 import { PLAYGROUND_PAGES, type PlaygroundPage } from './pages';
 
@@ -38,14 +38,22 @@ export function PlaygroundNav() {
 
   return (
     <PlagueBar>
-      <nav className="mx-auto flex max-w-5xl flex-wrap items-center gap-x-5 gap-y-2 px-4 py-3">
+      {/* ⚠️ Niente `py` qui: l'altezza è della barra, che la porta con la sua taglia. Questo
+          `<nav>` decide solo quanto è larga la colonna — che è roba della pagina, non della
+          libreria. */}
+      <nav className="mx-auto flex max-w-5xl flex-wrap items-center gap-x-5 gap-y-2 px-4">
         {/* Il marchio, e batte. ⚠️ Scelto fra cinque candidati il 2026-09-17, e il motivo non è
             estetico: quel segno a prima vista è un cuore, poi due che si abbracciano, e solo per
             via delle orecchie il muso di un ratto. Un cuore che batte dice «acceso» raccontando
             la prima delle sue tre letture, invece di aggiungerne una quarta — che era il difetto
-            del pallino che stava qui prima. ⚠️ A 20px: sotto, il tratto interno sparisce. */}
+            del pallino che stava qui prima.
+            ⚠️ La misura non è scritta a mano: la barra è `medium`, e chi mette il segno chiede
+            alla libreria quanto farlo grande per quella taglia. */}
         <span className="flex items-center gap-2">
-          <RatIcon size={20} className="animate-heartbeat shrink-0 text-brand" />
+          <RatIcon
+            size={PLAGUE_BAR_MARK_SIZE.medium}
+            className="animate-heartbeat shrink-0 text-brand"
+          />
           <TechLabel className="text-gray-500">plague-board-ui</TechLabel>
         </span>
 

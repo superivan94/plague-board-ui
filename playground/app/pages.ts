@@ -27,6 +27,12 @@ export const PLAYGROUND_PAGES: readonly PlaygroundPage[] = [
     kind: 'demo',
   },
   {
+    href: '/barra',
+    title: 'La barra',
+    blurb: 'Le tre altezze di `PlagueBar`, e il segno che non le segue fino in fondo.',
+    kind: 'demo',
+  },
+  {
     href: '/stile',
     title: 'La direzione',
     blurb: 'Il bersaglio: come deve venire una schermata vestita da Ludoratti.',

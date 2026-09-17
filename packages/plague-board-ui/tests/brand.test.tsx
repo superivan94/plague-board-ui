@@ -1,7 +1,7 @@
 import { render, screen } from '@testing-library/react';
 import { describe, expect, it } from 'vitest';
 
-import { PlagueBar, PulseDot, TechLabel } from '../src';
+import { PLAGUE_BAR_MARK_SIZE, PlagueBar, type PlagueBarSize, PulseDot, TechLabel } from '../src';
 
 describe('PulseDot', () => {
   it('pulsa, se non gli si dice di stare fermo', () => {
@@ -71,5 +71,38 @@ describe('PlagueBar', () => {
     const bar = screen.getByRole('banner');
     expect(bar).toHaveClass('px-8');
     expect(bar).toHaveClass('sticky');
+  });
+
+  // ⚠️ L'altezza è **l'unica misura che la barra possiede**: quanto è larga la colonna dentro lo
+  // decide chi la usa, e infatti il playground ci mette il suo `mx-auto max-w-5xl px-4`. Se un
+  // giorno la spaziatura verticale tornasse nel contenuto, queste tre righe diventano rosse ed è
+  // il posto giusto dove accorgersene: due `py` annidati non si sommano in modo prevedibile a
+  // occhio, e la barra smetterebbe di avere una taglia.
+  it.each([
+    ['small', 'py-2'],
+    ['medium', 'py-3'],
+    ['large', 'py-4'],
+  ] as const)('la taglia %s porta la sua altezza', (size, padding) => {
+    render(<PlagueBar size={size}>x</PlagueBar>);
+
+    expect(screen.getByRole('banner')).toHaveClass(padding);
+  });
+
+  it('senza taglia è media', () => {
+    render(<PlagueBar>x</PlagueBar>);
+
+    expect(screen.getByRole('banner')).toHaveClass('py-3');
+  });
+
+  it('il segno cresce con la barra e non scende mai sotto i 20px', () => {
+    const sizes: readonly PlagueBarSize[] = ['small', 'medium', 'large'];
+    const marks = sizes.map((size) => PLAGUE_BAR_MARK_SIZE[size]);
+
+    // ⚠️ Il 20 non è un gusto: sotto quella misura il tratto interno di `RatIcon` scende sotto il
+    // pixel e il cuore diventa un graffio. È il pavimento della barra **compatta**, ed è la prima
+    // cosa che verrebbe sacrificata da chi la vuole ancora più bassa.
+    expect(Math.min(...marks)).toBeGreaterThanOrEqual(20);
+    expect(marks).toStrictEqual([...marks].sort((a, b) => a - b));
+    expect(new Set(marks).size).toBe(sizes.length);
   });
 });

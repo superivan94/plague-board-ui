@@ -112,6 +112,21 @@ npm run playground     # il dev server, sulla 3100
 - ⚠️ **`'use client'` sopravvive a `tsc`**, e sopravvive alla **riga 1**, prima dell'import di
   `react/jsx-runtime` che il trasformatore JSX inietta. È ciò che regge la decisione «la build è
   `tsc` e basta». Misurato il 2026-09-16 con una sonda compilata e cancellata.
+- ⚠️ **Chi passa `render` a HeroUI deve dichiarare `'use client'`.** `render` è una **funzione** e i
+  componenti di HeroUI sono client: usata da una pagina server, quella prop non attraversa il
+  confine e il prerender muore con «Functions cannot be passed directly to Client Components». Per
+  una barra è il caso normale, visto che le intestazioni vivono in `layout.tsx`. Misurato il
+  2026-09-17 con `next build`, e tenuto da `tests/boundaries.test.ts`.
+- ⚠️ **E un modulo `'use client'` non esporta dati, solo componenti.** È l'altra metà dello stesso
+  confine, e la peggiore: **nessuna build diventa rossa**. Un modulo client consegna a un
+  componente server un **riferimento**, non i suoi valori — per un componente è il meccanismo
+  giusto, per una tabella di numeri vuol dire che chi la indicizza ottiene `undefined` in silenzio.
+  `PLAGUE_BAR_MARK_SIZE` è finito così in `brand/plagueBarSizes.ts`, che la direttiva non ce l'ha.
+  L'alternativa legittima al guard non è spegnerlo: è il modulo accanto.
+- ⚠️ **`Surface` porta solo `variant`**: niente taglia, niente spaziatura. L'altezza di `PlagueBar`
+  è nostra, ed è **l'unica misura che possiede** — la larghezza della colonna dentro la decide chi
+  la usa, perché dipende dalla pagina. Due `py` annidati non si sommano in un modo che si possa
+  prevedere a occhio.
 - ⚠️ **Un'icona non risponde al ruolo `img` se non gliel'hai dato.** Un `<svg>` senza `role`
   esplicito per l'albero di accessibilità è un `graphics-document`, quindi un test che asserisce
   `queryByRole('img')` per dire «è decorativa» resta **verde anche togliendo l'`aria-hidden`** che

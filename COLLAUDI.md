@@ -133,3 +133,34 @@ di cui si conosca lo slug), e una su `http://localhost:3100`, sezione «I segni 
 **Che cosa protegge:** sono le **uniche due icone ridisegnate da zero** — di là sono glifi di un
 font scaricato da un CDN, che non entra nella libreria. Il disegno è quindi una ricostruzione, e
 l'unica prova che valga qualcosa è metterlo accanto all'originale.
+
+---
+
+### Le tre altezze della barra, e il segno che le sta dentro — 2026-09-17
+
+**Esegue:** agente — è tutto nel playground.
+**Ultima esecuzione:** agente, 2026-09-17 — **le tre taglie sono distinte e il segno le segue**.
+
+**Preparazione:** `npm run build` (il playground consuma `dist/`, non `src/`), poi
+`npm run playground` e `http://localhost:3100/barra`. Le misure si leggono dal DOM, non a occhio:
+`getBoundingClientRect().height` sulle tre `section header`, e l'attributo `width` del loro `<svg>`.
+
+| Azione | Atteso | Ottenuto |
+|---|---|---|
+| Rientro verticale delle tre barre | 8, 12 e 16 px | 8, 12 e 16 px |
+| Altezza totale, con la riga di questa pagina | tre valori distinti e crescenti | 38, 50 e 66 px |
+| `width` del marchio nelle tre barre | 20, 24 e 32 | 20, 24 e 32 |
+| L'etichetta «segno …px» accanto al titolo | porta il numero | «segno 20px», «24px», «32px» |
+
+**Che cosa protegge:** il difetto trovato proprio qui il 2026-09-17, e il punto è **come** si è
+visto. `next build` era **verde**, i test erano verdi, la pagina si generava statica — e in pagina
+il marchio era a 24 in tutte e tre le barre, con l'etichetta che diceva «segno px» col numero
+mancante. Il motivo: `PLAGUE_BAR_MARK_SIZE` stava dentro `PlagueBar.tsx`, che dichiara
+`'use client'`, e un modulo client non consegna a un componente server i **valori** che esporta —
+gli consegna un riferimento. Indicizzarlo dà `undefined`, in silenzio.
+
+⚠️ Quindi l'ultima riga della tabella non è un doppione della terza: la terza guarda il disegno,
+l'ultima guarda **il numero scritto**, che è la cosa che si è vista mancare per prima. E l'altra
+metà del difetto — la barra usata da una pagina server — quella sì che `next build` la prende:
+`render` è una funzione e non attraversa il confine. Le due metà sono tenute da
+`tests/boundaries.test.ts`.
