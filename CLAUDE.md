@@ -138,6 +138,12 @@ exist in target module» che **non sono veri**. Si guarda la pagina, o si crede 
   è nostra, ed è **l'unica misura che possiede** — la larghezza della colonna dentro la decide chi
   la usa, perché dipende dalla pagina. Due `py` annidati non si sommano in un modo che si possa
   prevedere a occhio.
+- ⚠️ **Un'animazione CSS non riparte perché è cambiato il testo dentro l'elemento.** React riusa lo
+  stesso nodo, e l'animazione prosegue da dov'era: un'animazione con `forwards` che finisce a
+  opacità zero lascia poi un elemento **presente e invisibile**, che continua ad aggiornarsi senza
+  che si veda niente. Si riparte cambiando la **chiave**, così il nodo è nuovo. Misurato il
+  2026-09-17 su `SpeechBubble` — `currentTime` a 1558ms invece di 0 — ed è lo scenario del fumetto
+  interrotto in [`COLLAUDI.md`](COLLAUDI.md).
 - ⚠️ **Una regione viva va creata prima del contenuto, e un messaggio non è una descrizione.**
   `role="status"` annuncia ciò che *cambia* al suo interno: nata già piena, può non essere
   annunciata affatto — perciò il contenitore di `SpeechBubble` c'è anche quando non c'è frase. E un

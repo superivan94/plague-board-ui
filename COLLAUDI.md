@@ -164,3 +164,36 @@ l'ultima guarda **il numero scritto**, che è la cosa che si è vista mancare pe
 metà del difetto — la barra usata da una pagina server — quella sì che `next build` la prende:
 `render` è una funzione e non attraversa il confine. Le due metà sono tenute da
 `tests/boundaries.test.ts`.
+
+---
+
+### Il fumetto interrotto: clic su clic, prima che il precedente sia finito — 2026-09-17
+
+**Esegue:** agente — è nel playground, e si misura dal DOM.
+**Ultima esecuzione:** agente, 2026-09-17 — **animazione e conto alla rovescia ripartono insieme**.
+
+**Preparazione:** `npm run build`, `npm run playground`, poi `http://localhost:3100/voce`. Le misure
+si leggono dal fumetto con `getAnimations()[0].currentTime` e l'opacità calcolata: a occhio questo
+difetto si vede ma non si spiega, e infatti è stato **riferito** come due difetti diversi.
+
+| Azione | Atteso | Ottenuto |
+|---|---|---|
+| Clic, e si guarda dopo 0,6s | visibile, animazione a ~600ms | opacità 1,00 · 600ms |
+| Secondo clic a 1,5s dal primo | l'animazione **riparte da zero** | 67ms · opacità 0,28 e in salita |
+| Terzo clic a 3,0s | riparte ancora, e si vede | 75ms · opacità 0,31 |
+| Quarto clic a 4,1s | riparte ancora, e si vede | 67ms · opacità 0,28 |
+| Senza più toccare, a 2,3s dall'ultimo | sta svanendo | 2309ms · opacità 0,33 |
+| A 2,7s dall'ultimo | smontato | smontato |
+
+**Che cosa protegge:** il difetto che l'utente ha visto il 2026-09-17 e ha riferito come due —
+«il messaggio dura meno» e «poi non funziona più finché non clicco fuori dal bottone». Era **uno**:
+cambiando solo il testo React riusa lo stesso nodo, e **un'animazione CSS in corso non riparte per
+un cambio di contenuto**. Misurato allora: al secondo clic `currentTime` valeva **1558ms** invece
+di 0. Da lì tutto il resto — il fumetto svaniva quando scadeva la *prima* animazione e non 2,5s
+dopo il clic; e una volta finita, `forwards` la teneva a **opacità zero**, così i clic successivi
+cambiavano il testo di un nodo invisibile. Non c'entrava il fuoco sul pulsante: la cura era
+smettere di cliccare per 2,5s, cioè lasciare che il timer smontasse il nodo.
+
+⚠️ **Le prime due righe sono quelle che contano, e la seconda è quella che a occhio non si legge**:
+un'animazione ripartita e una a metà corsa sembrano uguali nell'istante dello scatto. La riga
+`currentTime` è l'unica che distingue «è ricominciata» da «sta finendo».

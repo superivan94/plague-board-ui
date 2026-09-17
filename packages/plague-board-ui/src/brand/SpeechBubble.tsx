@@ -2,6 +2,8 @@
 
 import { useEffect, useRef } from 'react';
 
+const DEFAULT_AUTO_HIDE_MS = 2500;
+
 export interface SpeechBubbleProps {
   /** Quello che c'è da dire, oppure `null`: il fumetto compare quando c'è una frase. */
   message: string | null;
@@ -39,13 +41,16 @@ export interface SpeechBubbleProps {
  * ⚠️ **La regione viva nasce prima del contenuto.** Il contenitore c'è sempre, anche senza frase,
  * perché una regione che compare già piena può non essere annunciata affatto.
  *
+ * ⚠️ **Una frase nuova è un messaggio nuovo, e una frase uguale non lo è.** Animazione e conto alla
+ * rovescia ripartono quando `message` **cambia**: ripassare la stessa stringa non è una nuova
+ * battuta per questo componente. Non è una limitazione da aggirare — `useRandomPhrase` non ripete
+ * mai, e chi pilota il fumetto a mano sa qual è la battuta che sta facendo dire.
+ *
  * ⚠️ **Il fumetto non si clicca.** Di là era un `role="button"` con `aria-label="Chiudi
  * messaggio"` addosso a tutto: quel nome sostituisce il contenuto, e la frase — l'unica cosa che
  * il fumetto esiste per dire — restava fuori dal nome accessibile. Un messaggio che se ne va da
  * sé non ha bisogno di un comando per chiuderlo.
  */
-const DEFAULT_AUTO_HIDE_MS = 2500;
-
 export function SpeechBubble({
   message,
   autoHideMs: autoHideMsProp = DEFAULT_AUTO_HIDE_MS,
@@ -77,6 +82,15 @@ export function SpeechBubble({
     >
       {message !== null && (
         <span
+          // ⚠️ **La chiave non è un vezzo di React: è quello che fa ripartire l'animazione.**
+          // Cambiando solo il testo, React riusa lo stesso nodo, e un'animazione CSS già in corso
+          // **non riparte** per un cambio di contenuto. Misurato il 2026-09-17: al secondo clic il
+          // `currentTime` dell'animazione era 1558ms invece di 0. Da lì i due sintomi che l'utente
+          // ha visto e che sono la stessa cosa — il fumetto che «dura meno» (l'animazione finisce
+          // quando le pare, non 2,5s dopo il clic) e quello che «non compare più» (finita a
+          // opacità zero con `forwards`, il nodo resta lì invisibile finché non lo si smonta).
+          // Con la chiave legata al messaggio, animazione e conto alla rovescia ripartono insieme.
+          key={message}
           // ⚠️ Niente `whitespace-nowrap`, che di là stava **insieme** a `max-w-xs`: sono due
           // istruzioni contrarie, e vince la seconda — il fumetto sfonda la larghezza massima
           // invece di andare a capo. Misurato: «Sssh... sto organizzando la prossima scorribanda!»

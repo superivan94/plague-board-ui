@@ -97,6 +97,22 @@ describe('SpeechBubble', () => {
     expect(onHide).toHaveBeenCalledOnce();
   });
 
+  it('una frase nuova è un nodo nuovo, non lo stesso con dentro altre parole', () => {
+    const { rerender } = render(<SpeechBubble message="Squit!" />);
+    const primo = screen.getByRole('status').firstElementChild;
+
+    rerender(<SpeechBubble message="Squit squit!" />);
+    const secondo = screen.getByRole('status').firstElementChild;
+
+    // ⚠️ Qui si asserisce **l'identità del nodo**, e non è pignoleria: in jsdom le animazioni non
+    // girano, quindi «l'animazione riparte» non è osservabile. Il nodo nuovo è il meccanismo che
+    // la fa ripartire, ed è la parte che un test può tenere. Riusando lo stesso nodo — che è ciò
+    // che React fa quando cambia solo il testo — l'animazione prosegue da dov'era: misurato nel
+    // browser il 2026-09-17 a 1558ms invece di 0, e lo scenario sta in COLLAUDI.md.
+    expect(secondo).not.toBe(primo);
+    expect(secondo).toHaveTextContent('Squit squit!');
+  });
+
   it('smontato non chiama più niente', () => {
     const onHide = vi.fn();
     const { unmount } = render(<SpeechBubble message="Squit!" onHide={onHide} />);
