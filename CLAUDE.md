@@ -123,6 +123,12 @@ npm run playground     # il dev server, sulla 3100
   giusto, per una tabella di numeri vuol dire che chi la indicizza ottiene `undefined` in silenzio.
   `PLAGUE_BAR_MARK_SIZE` è finito così in `brand/plagueBarSizes.ts`, che la direttiva non ce l'ha.
   L'alternativa legittima al guard non è spegnerlo: è il modulo accanto.
+- ⚠️ **Vestire HeroUI non finisce quando il componente è suo: i suoi colori sono tarati sulle sue
+  superfici.** `--separator` su `gray-950` fa **1,24** di contrasto e la riga sparisce; `gray-700`
+  fa 1,96. Quindi si prende il suo componente — ruolo e attributi ARIA valgono più di un `<span>`
+  scritto a mano — e il colore resta **statico**, finché non si sa che cosa deve fare nel tema
+  chiaro. La leva per quel giorno è ridichiarare `--separator` in `theme.css`, accanto ad
+  `--accent`: sistema anche i separatori disegnati dentro i componenti di HeroUI.
 - ⚠️ **`Surface` porta solo `variant`**: niente taglia, niente spaziatura. L'altezza di `PlagueBar`
   è nostra, ed è **l'unica misura che possiede** — la larghezza della colonna dentro la decide chi
   la usa, perché dipende dalla pagina. Due `py` annidati non si sommano in un modo che si possa

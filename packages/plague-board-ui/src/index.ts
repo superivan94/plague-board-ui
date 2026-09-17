@@ -14,6 +14,7 @@ export { PlagueBar, type PlagueBarProps } from './brand/PlagueBar';
 export { PLAGUE_BAR_MARK_SIZE, type PlagueBarSize } from './brand/plagueBarSizes';
 export { PulseDot, type PulseDotProps } from './brand/PulseDot';
 export { TechLabel, type TechLabelProps } from './brand/TechLabel';
+export { TechRule, type TechRuleProps } from './brand/TechRule';
 
 // Le icone. `IconProps` è pubblico perché è il contratto che deve rispettare chi sostituisce
 // l'icona predefinita di un componente con la propria.

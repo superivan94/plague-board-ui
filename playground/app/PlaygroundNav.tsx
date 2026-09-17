@@ -2,7 +2,7 @@
 
 import Link from 'next/link';
 import { usePathname } from 'next/navigation';
-import { PLAGUE_BAR_MARK_SIZE, PlagueBar, RatIcon, TechLabel } from 'plague-board-ui';
+import { PLAGUE_BAR_MARK_SIZE, PlagueBar, RatIcon, TechLabel, TechRule } from 'plague-board-ui';
 
 import { PLAYGROUND_PAGES, type PlaygroundPage } from './pages';
 
@@ -63,8 +63,10 @@ export function PlaygroundNav() {
 
         {essentials.length > 0 && (
           <span className="flex items-center gap-4">
-            <span className="h-4 w-px bg-gray-700" aria-hidden="true" />
-            <TechLabel className="text-[10px] text-brand/60">filosofia</TechLabel>
+            {/* ⚠️ Il filo e il nome erano scritti qui a mano. Adesso sono `TechRule`, e non è un
+                riordino: era il segno che divide due categorie di pagine, cioè una cosa che
+                qualunque app dei Ludoratti rifarebbe uguale. Si ricompone, non si copia. */}
+            <TechRule orientation="vertical">filosofia</TechRule>
             {essentials.map((page) => (
               <NavLink key={page.href} page={page} isCurrent={pathname === page.href} />
             ))}

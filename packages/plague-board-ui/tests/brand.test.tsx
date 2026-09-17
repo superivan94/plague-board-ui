@@ -1,7 +1,14 @@
 import { render, screen } from '@testing-library/react';
 import { describe, expect, it } from 'vitest';
 
-import { PLAGUE_BAR_MARK_SIZE, PlagueBar, type PlagueBarSize, PulseDot, TechLabel } from '../src';
+import {
+  PLAGUE_BAR_MARK_SIZE,
+  PlagueBar,
+  type PlagueBarSize,
+  PulseDot,
+  TechLabel,
+  TechRule,
+} from '../src';
 
 describe('PulseDot', () => {
   it('pulsa, se non gli si dice di stare fermo', () => {
@@ -40,6 +47,49 @@ describe('TechLabel', () => {
     const label = screen.getByText('rete della peste');
     expect(label).toHaveClass('uppercase');
     expect(label.textContent).toBe('rete della peste');
+  });
+});
+
+describe('TechRule', () => {
+  it('dice il nome della categoria', () => {
+    render(<TechRule>filosofia</TechRule>);
+
+    expect(screen.getByText('filosofia')).toBeInTheDocument();
+  });
+
+  it('il filo è un separatore vero, e da verticale lo dichiara', () => {
+    const { rerender } = render(<TechRule>filosofia</TechRule>);
+
+    // ⚠️ Un separatore e non un filo decorativo con `aria-hidden`: quella riga **è** il confine fra
+    // due gruppi, e chi non la vede ha lo stesso bisogno di sapere che il gruppo cambia.
+    // ⚠️ E l'orizzontale **non** scrive `aria-orientation`, misurato qui: è il valore predefinito
+    // del ruolo, e `react-aria` — che sta sotto al `Separator` di HeroUI — mette l'attributo solo
+    // quando serve. Scriverlo a mano sarebbe stato rumore.
+    expect(screen.getByRole('separator')).not.toHaveAttribute('aria-orientation');
+
+    rerender(<TechRule orientation="vertical">filosofia</TechRule>);
+    expect(screen.getByRole('separator')).toHaveAttribute('aria-orientation', 'vertical');
+  });
+
+  it('il colore si cambia da fuori, e vale per il filo e per il nome', () => {
+    const { container } = render(<TechRule className="text-gray-500">filosofia</TechRule>);
+
+    // ⚠️ Il colore sta sul contenitore e il nome lo **eredita**: è la stessa scelta delle icone,
+    // dove il colore viaggia su `color` e non dentro `fill`. Scrivendolo sull'etichetta, chi usa
+    // il componente non avrebbe modo di cambiarlo senza riscriverlo.
+    expect(container.firstElementChild).toHaveClass('text-gray-500');
+    expect(screen.getByText('filosofia')).not.toHaveClass('text-gray-500');
+  });
+
+  it('non litiga con la taglia del testo di `TechLabel`', () => {
+    render(<TechRule>filosofia</TechRule>);
+
+    // ⚠️ Due valori arbitrari della stessa proprietà — `text-[10px]` addosso a `text-[11px]` —
+    // non si risolvono in modo prevedibile: nella classe vince chi sta più in basso nel CSS
+    // generato, non chi sta più a destra nell'attributo. Qui la taglia dev'essere **una sola**,
+    // quella che `TechLabel` porta di suo.
+    const sizes = screen.getByText('filosofia').className.match(/text-\[\d+px\]/g) ?? [];
+    expect(sizes).toHaveLength(1);
   });
 });
 

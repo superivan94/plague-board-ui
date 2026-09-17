@@ -8,6 +8,7 @@ import {
   RobotIcon,
   SkullIcon,
   SparklesIcon,
+  TechRule,
   VirusIcon,
 } from 'plague-board-ui';
 
@@ -65,6 +66,12 @@ export default function Home() {
     <main className="mx-auto flex min-h-dvh max-w-2xl flex-col gap-8 px-4 py-16">
       <h1 className="text-2xl font-semibold">plague-board-ui</h1>
 
+      {/* ⚠️ `TechRule` **non** sostituisce i titoli: li raggruppa. I due `<h2>` che seguono restano
+          dove sono, perché la gerarchia dei titoli è il modo in cui si salta da una sezione
+          all'altra senza vedere la pagina; la riga dice un'altra cosa, cioè che da qui in giù si
+          parla di un'altra specie di roba. */}
+      <TechRule>i colori</TechRule>
+
       <section className="flex flex-col gap-4">
         <h2 className="text-lg font-medium">La tavolozza, statica</h2>
 
@@ -98,6 +105,8 @@ export default function Home() {
           </div>
         </div>
       </section>
+
+      <TechRule>i segni</TechRule>
 
       <section className="flex flex-col gap-4">
         <h2 className="text-lg font-medium">Le cinque icone della peste</h2>

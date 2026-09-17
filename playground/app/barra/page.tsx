@@ -5,6 +5,7 @@ import {
   PulseDot,
   RatIcon,
   TechLabel,
+  TechRule,
 } from 'plague-board-ui';
 
 // ⚠️ Ogni barra in mostra sta dentro una `<section>`, e l'intestazione di questa pagina è una
@@ -82,6 +83,8 @@ export default function BarPage() {
         </p>
       </div>
 
+      <TechRule>le tre taglie</TechRule>
+
       {SAMPLES.map(({ size, padding, measured, use }) => (
         <section key={size} className="flex flex-col gap-3">
           <div className="flex flex-wrap items-baseline gap-3">
@@ -101,6 +104,8 @@ export default function BarPage() {
           <p className="text-sm text-default-500">{use}</p>
         </section>
       ))}
+
+      <TechRule>i vincoli</TechRule>
 
       <section className="flex flex-col gap-3">
         <h2 className="text-lg font-medium">Perché il segno non scende quanto la barra</h2>
