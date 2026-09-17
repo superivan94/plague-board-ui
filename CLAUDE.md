@@ -201,6 +201,12 @@ exist in target module» che **non sono veri**. Si guarda la pagina, o si crede 
   `@media (prefers-reduced-motion: reduce)`: è `[data-reduce-motion="true"]` **oppure** il media
   query quando quell'attributo non c'è. Vuol dire che un `motion-reduce:` scritto qui risponde sia
   alla preferenza di sistema sia a un interruttore dentro l'applicazione, gratis.
+- ⚠️ **Per la cornice di un SVG né `getBBox()` né `getBoundingClientRect()` bastano: il tratto non
+  lo contano.** Misurati tutti e tre il 2026-09-17 sulla coda di `Rat`, i primi due danno **−31,67**
+  — la geometria del percorso — mentre il pixel dipinto più a sinistra sta a **−33,75**, perché
+  `stroke-width: 4` con la punta tonda dipinge 2 oltre. Il metodo che risponde è disegnare l'SVG su
+  una tela a 4× e cercare il primo e l'ultimo pixel non trasparente. Fidandosi di `getBBox()`, un
+  `viewBox` stretto taglia il tratto e nessuno se ne accorge finché non lo guarda ingrandito.
 - ⚠️ **La spaziatura in CSS non entra nel testo, e il nome accessibile la legge attaccata.** La
   `gap` di una flex separa i riquadri, non i caratteri: due `<span>` adiacenti dentro un comando
   danno «…tutte quante33 in 2 elenchi». Si cura con un **nodo di testo** — `{' '}` fra i due —, non

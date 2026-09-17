@@ -1,5 +1,18 @@
 import { Button } from '@heroui/react';
-import { PoisonIcon, RatIcon, SkullIcon, TechLabel, VirusIcon } from 'plague-board-ui';
+import {
+  PoisonIcon,
+  RAT_LIVERIES,
+  Rat,
+  RatIcon,
+  type RatLivery,
+  SkullIcon,
+  TechLabel,
+  VirusIcon,
+} from 'plague-board-ui';
+
+// Le livree si leggono dalla tabella invece di riscriverle: così una quarta pelliccia compare qui
+// da sé. L'ordine è quello in cui sono dichiarate — per le chiavi stringa è garantito.
+const RAT_LIVERIES_ORDER = Object.keys(RAT_LIVERIES) as RatLivery[];
 
 // ⚠️ Questa pagina è un RIFERIMENTO, non un'implementazione: è la direzione `B · Laboratorio`
 // decisa il 2026-09-16, disegnata a mano per avere davanti il bersaglio mentre si costruiscono i
@@ -160,6 +173,35 @@ export default function StyleReference() {
             pixel e il cuore sembra un graffio.
           </p>
         </div>
+      </section>
+
+      <section className="flex flex-col gap-3">
+        <h2 className="text-lg font-medium">Il ratto, che è un&apos;altra cosa dal marchio</h2>
+
+        <p className="max-w-2xl text-sm text-muted">
+          Il segno qui sopra è l&apos;<strong>emblema</strong>, fatto per essere riconosciuto a
+          18px. Questo è il <strong>personaggio</strong>: di profilo, con la coda e tre pellicce.{' '}
+          <code>Rat</code> sta fermo — chi lo fa correre è <code>RatRun</code>, che arriva dopo — e
+          la sua misura è <strong>l&apos;altezza</strong>, perché è lungo più di tre volte tanto.
+        </p>
+
+        {/* ⚠️ Lastra scura anche in tema chiaro: il grigio `#595959` e il marrone `#8B4513` sono
+            pellicce, tarate su un fondo scuro come tutto il resto dell'identità. */}
+        <div className="dark flex flex-wrap items-end gap-8 rounded-lg border border-border bg-gray-950/90 p-4">
+          {RAT_LIVERIES_ORDER.map((livery) => (
+            <span key={livery} className="flex flex-col items-center gap-2">
+              <Rat livery={livery} size={44} />
+              <TechLabel className="text-muted">{livery}</TechLabel>
+            </span>
+          ))}
+        </div>
+
+        <p className="max-w-2xl text-sm text-muted">
+          ⚠️ La cornice del disegno comincia a <strong>−34</strong>, non a zero: la coda esce a
+          sinistra dell&apos;anca fino a −33,75, e di là il ratto sbordava dalla propria scatola con{' '}
+          <code>overflow: visible</code>. Con la cornice giusta, la misura che chiedi è quella che
+          occupa — e lo si può mettere in una riga.
+        </p>
       </section>
 
       <section className="flex flex-col gap-3">
