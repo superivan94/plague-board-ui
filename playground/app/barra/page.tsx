@@ -11,7 +11,7 @@ import {
 // ⚠️ Ogni barra in mostra sta dentro una `<section>`, e l'intestazione di questa pagina è una
 // `<div>` invece che un `<header>`: `PlagueBar` si rende come `<header>`, e un `<header>` vale
 // `banner` quando il suo antenato di sezione più vicino è il `<body>` — `section` lo è, `main` no.
-// Perciò l'unico `banner` della pagina resta la barra vera in cima, e le quattro qui dentro non
+// Perciò l'unico `banner` della pagina resta la barra vera in cima, e le tre qui dentro non
 // competono con lei.
 // ⚠️ Letto nella specifica, **non** misurato qui: l'albero che gli strumenti del browser
 // restituiscono segna `banner` ogni `<header>`, e il ruolo calcolato non è leggibile da JavaScript.
@@ -46,7 +46,13 @@ const SAMPLES: readonly BarSample[] = [
   },
 ];
 
-/** Il contenuto di esempio: lo stesso nelle tre barre, così a cambiare è solo la taglia. */
+/**
+ * Il contenuto di esempio: lo stesso nelle tre barre, così a cambiare è solo la taglia.
+ *
+ * ⚠️ Dentro ci sono i **tre mestieri della voce di servizio** dei Ludoratti, ed è il motivo per cui
+ * questa finta barra non è fatta di sole voci: il marchio scritto (`TechLabel`), il confine fra due
+ * gruppi di voci (`TechRule`), e lo stato dell'impianto in fondo (`PulseDot` più `TechLabel`).
+ */
 function BarContent({ size }: { size: PlagueBarSize }) {
   return (
     <nav className="mx-auto flex max-w-3xl flex-wrap items-center gap-x-5 gap-y-2 px-4">
@@ -58,12 +64,21 @@ function BarContent({ size }: { size: PlagueBarSize }) {
         <TechLabel className="text-gray-500">rattoteca</TechLabel>
       </span>
       <span className="text-sm text-brand-ink underline decoration-brand/60 underline-offset-8">
-        I manuali della diffusione
+        I manuali
       </span>
       <span className="text-sm text-gray-400">I vettori ludici</span>
+
+      {/* Il confine: da qui in là le voci non sono più contenuti ma comandi dell'impianto. È lo
+          stesso componente che divide i blocchi di questa pagina, girato di novanta gradi. */}
+      <TechRule orientation="vertical">il grande piano</TechRule>
+      <span className="text-sm text-gray-400">Parametri</span>
+
       <span className="ml-auto flex items-center gap-2">
         <PulseDot />
-        <TechLabel className="text-[10px] text-gray-500">operativo</TechLabel>
+        {/* ⚠️ Niente `text-[10px]` addosso al `text-[11px]` di `TechLabel`: erano due valori
+            arbitrari della stessa proprietà nella stessa classe, e vince chi sta più in basso nel
+            CSS generato — non chi sta più a destra qui. */}
+        <TechLabel className="text-gray-500">operativo</TechLabel>
       </span>
     </nav>
   );
@@ -105,6 +120,55 @@ export default function BarPage() {
         </section>
       ))}
 
+      <TechRule>che cosa ci sta dentro</TechRule>
+
+      <section className="flex flex-col gap-3">
+        <h2 className="text-lg font-medium">La voce di servizio, e i suoi tre mestieri</h2>
+        <p className="max-w-2xl text-sm text-default-500">
+          Le tre barre qui sopra non sono fatte di sole voci di menu. Il carattere fisso in
+          maiuscoletto — <code>TechLabel</code> — è la voce con cui l&apos;impianto parla di sé, e
+          nella stessa riga fa <strong>tre lavori diversi</strong>, che è il modo in cui va guardato
+          prima di metterlo in una barra vera.
+        </p>
+
+        <ul className="flex max-w-2xl flex-col gap-3 text-sm text-default-500">
+          <li>
+            <TechLabel className="text-gray-500">rattoteca</TechLabel> — <strong>il nome scritto</strong>{' '}
+            accanto al marchio. Non è un titolo: è l&apos;etichetta dell&apos;impianto, e sta in
+            grigio perché il marchio lì accanto è già il segno che si guarda.
+          </li>
+          <li>
+            <span className="inline-flex translate-y-1 items-center">
+              <TechRule orientation="vertical">il grande piano</TechRule>
+            </span>{' '}
+            — <strong>il confine</strong>. Da lì in là le voci cambiano specie: prima ci sono i
+            contenuti, dopo i comandi dell&apos;impianto. È lo stesso <code>TechRule</code> che
+            divide i blocchi di questa pagina, girato di novanta gradi, ed è quello che la barra del
+            playground usa per separare le pagine che mostrano da quelle che spiegano —
+            «filosofia».
+          </li>
+          <li>
+            <span className="inline-flex translate-y-0.5 items-center gap-2">
+              <PulseDot />
+              <TechLabel className="text-gray-500">operativo</TechLabel>
+            </span>{' '}
+            — <strong>lo stato</strong>, in fondo a destra con <code>ml-auto</code>. Il pallino
+            pulsa perché dice «acceso, adesso»; accanto a un elenco di venti voci si spegne con{' '}
+            <code>isStatic</code>, o smette di significare qualcosa.
+          </li>
+        </ul>
+
+        <p className="max-w-2xl text-sm text-default-500">
+          ⚠️ <strong>Il confine non è una voce disattivata</strong>, e non deve sembrarlo. Una voce
+          disattivata è un comando che si potrebbe dare e adesso no: chi naviga con la tastiera ci
+          finisce sopra e resta fermo senza capire. Questo non è un comando spento — è il punto in
+          cui finisce un gruppo e ne comincia un altro, e infatti non riceve il fuoco. ⚠️ E non è
+          nemmeno un titolo: un titolo apre una sezione e vive nella gerarchia dei{' '}
+          <code>&lt;h*&gt;</code>, che è il modo in cui si salta di sezione senza vedere la pagina.
+          La riga dice un&apos;altra cosa, e convive coi titoli invece di sostituirli — come qui.
+        </p>
+      </section>
+
       <TechRule>i vincoli</TechRule>
 
       <section className="flex flex-col gap-3">
@@ -120,7 +184,7 @@ export default function BarPage() {
           {SAMPLES.map(({ size }) => (
             <span key={size} className="flex flex-col items-center gap-2 text-brand">
               <RatIcon size={PLAGUE_BAR_MARK_SIZE[size]} />
-              <TechLabel className="text-[10px] text-gray-400">
+              <TechLabel className="text-gray-400">
                 {size} · {PLAGUE_BAR_MARK_SIZE[size]}
               </TechLabel>
             </span>
