@@ -33,6 +33,12 @@ export const PLAYGROUND_PAGES: readonly PlaygroundPage[] = [
     kind: 'demo',
   },
   {
+    href: '/voce',
+    title: 'La voce',
+    blurb: 'Le frasi di casa, il sorteggio che non ripete, e il fumetto che se ne va da solo.',
+    kind: 'demo',
+  },
+  {
     href: '/stile',
     title: 'La direzione',
     blurb: 'Il bersaglio: come deve venire una schermata vestita da Ludoratti.',

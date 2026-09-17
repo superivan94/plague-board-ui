@@ -138,6 +138,12 @@ exist in target module» che **non sono veri**. Si guarda la pagina, o si crede 
   è nostra, ed è **l'unica misura che possiede** — la larghezza della colonna dentro la decide chi
   la usa, perché dipende dalla pagina. Due `py` annidati non si sommano in un modo che si possa
   prevedere a occhio.
+- ⚠️ **Una regione viva va creata prima del contenuto, e un messaggio non è una descrizione.**
+  `role="status"` annuncia ciò che *cambia* al suo interno: nata già piena, può non essere
+  annunciata affatto — perciò il contenitore di `SpeechBubble` c'è anche quando non c'è frase. E un
+  `Tooltip` non va bene per una frase che passa: lega il testo al grilletto con `aria-describedby`,
+  cioè lo rende la sua descrizione permanente. Misurato con una sonda il 2026-09-17, in
+  [`INVENTARIO.md`](INVENTARIO.md).
 - ⚠️ **Un'icona non risponde al ruolo `img` se non gliel'hai dato.** Un `<svg>` senza `role`
   esplicito per l'albero di accessibilità è un `graphics-document`, quindi un test che asserisce
   `queryByRole('img')` per dire «è decorativa» resta **verde anche togliendo l'`aria-hidden`** che

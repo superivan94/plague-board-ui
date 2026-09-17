@@ -13,6 +13,7 @@ export { PlagueBar, type PlagueBarProps } from './brand/PlagueBar';
 // `undefined` senza che niente diventi rosso. Il perché per esteso sta in `plagueBarSizes.ts`.
 export { PLAGUE_BAR_MARK_SIZE, type PlagueBarSize } from './brand/plagueBarSizes';
 export { PulseDot, type PulseDotProps } from './brand/PulseDot';
+export { SpeechBubble, type SpeechBubbleProps } from './brand/SpeechBubble';
 export { TechLabel, type TechLabelProps } from './brand/TechLabel';
 export { TechRule, type TechRuleProps } from './brand/TechRule';
 
@@ -28,3 +29,8 @@ export { SkullIcon } from './icons/SkullIcon';
 export { SparklesIcon } from './icons/SparklesIcon';
 export { VirusIcon } from './icons/VirusIcon';
 export type { IconProps } from './icons/types';
+
+// Il meccanismo, e i dati che gli si danno da mangiare: due moduli, perché chi vuole la voce dei
+// Ludoratti e chi vuole solo il sorteggio sono due persone diverse.
+export { useRandomPhrase, type RandomPhrase } from './hooks/useRandomPhrase';
+export { DEV_PHRASES, RAT_PHRASES } from './data/phrases';

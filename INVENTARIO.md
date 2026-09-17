@@ -36,7 +36,7 @@ biohazard, un dado o un segnalino lì non ci sono e non ci saranno.
 | Il livello tossico, quattro stati | `toggle-button-group`, `slider`, `meter` | **vestire** | ⚠️ da verificare quale dei tre: è un valore ordinato di quattro passi, e i tre lo dicono in modi diversi |
 | Il comando della musica | `toggle-button` + `slider` | **vestire** | acceso/spento e volume sono due controlli, non uno |
 | Il gruppo di chip che si conta | `chip`, `tag-group` | **misto** | il chip si veste; ⚠️ **il contenitore che ne mostra pochi e si espande non c'è** |
-| Il fumetto del ratto | `tooltip`, `popover` | ⚠️ **da verificare** | i suoi sono ancorati e a innesco d'interazione; il nostro nasce da un **clic** e si spegne **da sé** dopo 2,5s. Se `Tooltip` accetta di essere pilotato si veste, altrimenti da zero |
+| Il fumetto del ratto | `tooltip`, `popover` | **da zero** — ✅ verificato il 2026-09-17 | `Tooltip` **accetta** di essere pilotato con `isOpen`: la domanda non era quella. Con una sonda si è letto che cosa produce, e produce `role="tooltip"` legato al grilletto con **`aria-describedby`** dentro un contenitore di sovrapposizione: la frase diventa la *descrizione permanente* di chi la dice, riannunciata a ogni fuoco. «Squit!» non descrive il ratto — è una cosa che dice una volta. Per un messaggio che arriva e se ne va il ruolo è `status`, e il fumetto sta appeso a chi parla invece che in un portale |
 | Le icone di dominio | — | **da zero** | vedi sopra: `shared-icons` non ne ha |
 | Il ratto: disegno, corsa, sciame | — | **da zero** | |
 | Fondale, bolle tossiche, gocce che colano | — | **da zero** | |
