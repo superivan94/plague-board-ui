@@ -2,6 +2,7 @@ import { Button } from '@heroui/react';
 import {
   BiohazardIcon,
   CodeIcon,
+  MoleculeIcon,
   PoisonIcon,
   RobotIcon,
   SkullIcon,
@@ -15,6 +16,7 @@ import {
 const icons = [
   { name: 'PoisonIcon', Icon: PoisonIcon },
   { name: 'SkullIcon', Icon: SkullIcon },
+  { name: 'MoleculeIcon', Icon: MoleculeIcon },
   { name: 'BiohazardIcon', Icon: BiohazardIcon },
   { name: 'VirusIcon', Icon: VirusIcon },
 ];
@@ -91,10 +93,12 @@ export default function Home() {
       </section>
 
       <section className="flex flex-col gap-4">
-        <h2 className="text-lg font-medium">Le quattro icone della peste</h2>
+        <h2 className="text-lg font-medium">Le cinque icone della peste</h2>
 
         {/* Le tre taglie sono quelle vere di RattInventario: 56 nel fondale di ingresso, 24 accanto
-            a un testo, 16 ai lati del livello tossico. */}
+            a un testo, 16 ai lati del livello tossico.
+            ⚠️ La riga dei 16 dice da sola perché `MoleculeIcon` e `BiohazardIcon` sono due icone e
+            non una: la molecola regge, il trifoglio si chiude in una macchia. */}
         {[56, 24, 16].map((size) => (
           <div key={size} className="flex items-center gap-6">
             <span className="w-20 text-sm text-default-500">{size}px</span>

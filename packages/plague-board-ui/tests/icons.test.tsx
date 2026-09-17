@@ -5,6 +5,7 @@ import { describe, expect, it } from 'vitest';
 import {
   BiohazardIcon,
   CodeIcon,
+  MoleculeIcon,
   type IconProps,
   PoisonIcon,
   RatIcon,
@@ -29,6 +30,7 @@ const icons: readonly IconEntry[] = [
   { name: 'PoisonIcon', Icon: PoisonIcon, paint: 'fill' },
   { name: 'SkullIcon', Icon: SkullIcon, paint: 'fill' },
   { name: 'BiohazardIcon', Icon: BiohazardIcon, paint: 'fill' },
+  { name: 'MoleculeIcon', Icon: MoleculeIcon, paint: 'fill' },
   { name: 'VirusIcon', Icon: VirusIcon, paint: 'fill' },
   { name: 'RobotIcon', Icon: RobotIcon, paint: 'fill' },
   { name: 'CodeIcon', Icon: CodeIcon, paint: 'stroke' },

@@ -15,6 +15,7 @@ export { TechLabel, type TechLabelProps } from './brand/TechLabel';
 // l'icona predefinita di un componente con la propria.
 export { BiohazardIcon } from './icons/BiohazardIcon';
 export { CodeIcon } from './icons/CodeIcon';
+export { MoleculeIcon } from './icons/MoleculeIcon';
 export { PoisonIcon } from './icons/PoisonIcon';
 export { RatIcon } from './icons/RatIcon';
 export { RobotIcon } from './icons/RobotIcon';
