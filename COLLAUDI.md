@@ -268,8 +268,9 @@ definizione. Una passata che non le sa distinguere non è una passata: è un num
 ### La cornice di un SVG, misurata sui pixel dipinti — 2026-09-18
 
 **Esegue:** agente — è una misura, e si rifà ogni volta che un disegno cambia.
-**Ultima esecuzione:** agente, 2026-09-18, su `Rat` con teschio e ampolla — dipinto **dentro** la
-cornice, `tuttoDentro: true`.
+**Ultima esecuzione:** agente, 2026-09-18, su `Rat` con teschio e ampolla, **dopo il ridisegno
+delle zampe** — 9,75 / 0 / 229,5 / **88,25** dentro `9 -1 221 90`, `tuttoDentro: true`. La misura
+precedente, con le zampe vecchie, dava 89,25: cambiare un pezzo cambia la cornice, e si rimisura.
 
 **Preparazione:** `npm run build`, `npm run playground`, la pagina che mostra il disegno vestito di
 tutto. Si clona l'`<svg>`, gli si dà una cornice larga e nota, lo si serializza in un `data:` URI,

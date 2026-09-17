@@ -33,6 +33,12 @@ playground/                 l'app Next che guarda la libreria — non si pubblic
 più `npm run build --workspace playground` quando si tocca qualcosa che il playground rende.
 La baseline attuale: lint **0 errori / 0 avvisi**, e la pagina `/` del playground **statica**.
 
+⚠️ **Il gate si legge dal codice d'uscita, non dalle ultime righe.** `tsc --noEmit` con un errore
+stampa **una riga in mezzo** ed esce con 2: dentro un `| tail -2` si vede il banner di npm e niente
+altro, e sembra verde. È passato un commit così il 2026-09-18 — un `.baseVal` su un tipo `string`,
+verde a runtime e rosso per `tsc`. Si concatena con `&&` e senza `tail`, oppure si guarda
+`${PIPESTATUS[0]}`.
+
 ```bash
 npm run playground     # il dev server, sulla 3100
 ```

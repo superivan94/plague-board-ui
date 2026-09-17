@@ -44,11 +44,22 @@ const BODY =
 const TAIL =
   'M61,44 C43,39 25,36 16,29 C8,22 10,12 20,10 ' +
   'C24,12 22,13 21,15 C15,18 15,24 20,29 C29,38 47,47 61,56 Z';
-const HAUNCH = 'M66,48 C80,45 90,54 89,65 C88,74 78,79 68,76 C58,73 55,61 58,54 Z';
-const LEG_BACK = 'M72,68 C78,68 81,73 81,78 C81,84 78,86 74,86 C70,86 68,84 68,81 L68,73 Z';
-const LEG_FRONT = 'M131,62 C136,62 139,67 139,73 C139,80 136,83 132,83 C128,83 126,81 126,78 L126,68 Z';
-const FOOT_BACK = 'M66,83 C66,80 70,80 74,80 L86,80 C89,80 89,86 86,86 L70,86 C67,86 66,85 66,83 Z';
-const FOOT_FRONT = 'M124,80 C124,77 128,77 131,77 L141,77 C144,77 144,83 141,83 L128,83 C125,83 124,82 124,80 Z';
+// ⚠️ **Una zampa è un percorso solo**: coscia, stinco e piede in una sagoma, con un contorno.
+// Prima erano tre pezzi — una coscia a blob incollata sulla groppa, una capsula, un piede a parte —
+// e dove si sovrapponevano i contorni si raddoppiavano. La zampa dietro è la «Z» del roditore,
+// semplificata: la coscia sporge all'indietro sulla groppa, il ginocchio punta avanti, lo stinco
+// scende all'indietro fino al tallone, il piede va avanti.
+const LEG_BACK =
+  'M78,46 C62,47 55,60 60,71 C63,78 66,83 67,87 L91,87 C94,87 94,83 91,83 L79,82 ' +
+  'C78,77 79,71 84,66 C88,60 90,52 86,47 Z';
+// La zampa davanti è dritta, con una leggera spalla, e il piede in avanti.
+const LEG_FRONT =
+  'M136,59 C127,60 123,68 124,77 C124,82 124,85 125,87 L142,87 C145,87 145,83 142,83 L133,82 ' +
+  'C132,76 134,70 139,64 C141,61 140,59 136,59 Z';
+// Le dita: un cuscinetto nel colore delle orecchie, **senza contorno**, dentro il piede. È quello
+// che sull'albino fa i piedi rosa senza aggiungere un pezzo con il suo bordo.
+const PAD_BACK = 'M74,84 L90,84 C91,84 91,86 90,86 L74,86 C73,86 73,84 74,84 Z';
+const PAD_FRONT = 'M129,84 L141,84 C142,84 142,86 141,86 L129,86 C128,86 128,84 129,84 Z';
 // L'orecchio sta **sul cranio, dietro l'occhio**: sulla fronte leggeva come un fiocco.
 const EAR = 'M145,30 C144,18 153,12 162,15 C171,19 172,31 164,36 C156,41 146,39 145,30 Z';
 const EAR_FAR = 'M131,31 C130,21 137,16 144,18 C151,21 151,31 145,35 C139,39 132,38 131,31 Z';
@@ -69,7 +80,15 @@ const VIAL_NECK = 'M108.5,4 L115.5,4 L115.5,9 L108.5,9 Z';
 const VIAL_CORK = 'M107.5,1 L116.5,1 L116.5,5 L107.5,5 Z';
 const STRAP_A = 'M106,24 C104,36 101,48 99,60';
 const STRAP_B = 'M118,24 C122,36 128,44 134,50';
-const WHISKERS = ['M190,48 C180,43 172,40 164,39', 'M192,52 C181,51 172,50 163,50', 'M190,55 C181,58 173,60 165,61'];
+// ⚠️ **I baffi partono dal muso e vanno avanti**, mai indietro verso l'occhio. Nella prima versione
+// tornavano verso la guancia fino a x 164, cioè sotto l'occhio a 174, e a seconda della livrea
+// leggevano come una ruga o uno strizzare: l'espressione cambiava da sola. Ora la punta più
+// arretrata sta a x 186, dodici unità avanti all'occhio, e un test lo tiene.
+const WHISKERS = [
+  'M186,49 C192,47 198,45 204,44',
+  'M187,52 C193,52 199,52 206,52',
+  'M186,55 C192,57 198,59 203,61',
+];
 
 /**
  * La cornice, **misurata sui pixel dipinti** del ratto con tutto addosso — teschio e ampolla —
@@ -79,10 +98,10 @@ const WHISKERS = ['M190,48 C180,43 172,40 164,39', 'M192,52 C181,51 172,50 163,5
  * servono, perché il tratto non lo contano.
  *
  * Misurato il 2026-09-18: da **9,75** (la punta della coda) a **229,5** (la punta del becco), da
- * **0** (il tappo dell'ampolla) a **89,25** (la pianta dei piedi). ⚠️ La prima cornice, scritta a
- * occhio prima di misurare, finiva a 88 e **tagliava i piedi di un'unità e un quarto**.
+ * **0** (il tappo dell'ampolla) a **88,25** (la pianta dei piedi, dopo il ridisegno delle zampe).
+ * ⚠️ La prima cornice, scritta a occhio prima di misurare, finiva a 88 e **tagliava i piedi**.
  */
-const VIEW_BOX = { x: 9, y: -1, width: 221, height: 91 } as const;
+const VIEW_BOX = { x: 9, y: -1, width: 221, height: 90 } as const;
 const RATIO = VIEW_BOX.width / VIEW_BOX.height;
 
 export interface RatProps {
@@ -112,7 +131,8 @@ export interface RatProps {
  * d'inchiostro e campiture piatte — perché i due siano lo stesso personaggio. Rispetto al disegno
  * che veniva da RattInventario: un occhio solo (era di profilo con due occhi), l'orecchio sul cranio
  * e non sulla fronte, il muso che rastrema a punta, corpo e testa in una sagoma sola, la coda che
- * rastrema e sale, le zampe con la coscia e i piedi, e il sopracciglio.
+ * rastrema e sale, ogni zampa in un percorso solo con coscia e piede, i baffi in avanti, e il
+ * sopracciglio.
  *
  * ⚠️ **Sta fermo, ed è il punto.** Le parti che si muovono portano un nome — `pb-rat-body`,
  * `pb-rat-tail`, `pb-rat-ears`, `pb-rat-leg-front`, `pb-rat-leg-back`, `pb-rat-vial` — e le regole
@@ -120,9 +140,9 @@ export interface RatProps {
  * Qui dentro non c'è nessun `<style>`.
  *
  * ⚠️ **Le zampe stanno in due gruppi annidati apposta.** Quello fuori porta lo spostamento come
- * attributo — le zampe del lato lontano stanno più indietro e più in basso — e quello dentro porta
- * la classe: una `transform` in CSS **sostituisce** l'attributo invece di sommarsi, quindi
- * animare il gruppo che ha già lo spostamento lo riporterebbe all'origine.
+ * attributo — le zampe del lato lontano stanno più indietro — e quello dentro porta la classe: una
+ * `transform` in CSS **sostituisce** l'attributo invece di sommarsi, quindi animare il gruppo che
+ * ha già lo spostamento lo riporterebbe all'origine.
  *
  * ⚠️ **Guarda a destra.** Per farlo andare dall'altra parte si ribalta chi lo contiene con
  * `scale-x-[-1]`.
@@ -156,17 +176,15 @@ export function Rat({
         <g className="pb-rat-body">
           <path d={EAR_FAR} fill={c.ear} />
 
-          {/* Le zampe del lato lontano: più scure, e dietro a tutto. */}
-          <g transform="translate(-14,2)">
+          {/* Le zampe del lato lontano: più scure, più indietro, e dietro a tutto. */}
+          <g transform="translate(-13,0)">
             <g className="pb-rat-leg-back">
               <path d={LEG_BACK} fill={c.tail} />
-              <path d={FOOT_BACK} fill={c.tail} />
             </g>
           </g>
-          <g transform="translate(-12,2)">
+          <g transform="translate(-11,0)">
             <g className="pb-rat-leg-front">
               <path d={LEG_FRONT} fill={c.tail} />
-              <path d={FOOT_FRONT} fill={c.tail} />
             </g>
           </g>
 
@@ -179,15 +197,13 @@ export function Rat({
             </>
           )}
 
-          <path d={HAUNCH} fill={c.body} />
-
           <g className="pb-rat-leg-back">
             <path d={LEG_BACK} fill={c.body} />
-            <path d={FOOT_BACK} fill={c.ear} />
+            <path d={PAD_BACK} fill={c.ear} stroke="none" />
           </g>
           <g className="pb-rat-leg-front">
             <path d={LEG_FRONT} fill={c.body} />
-            <path d={FOOT_FRONT} fill={c.ear} />
+            <path d={PAD_FRONT} fill={c.ear} stroke="none" />
           </g>
 
           <g className="pb-rat-ears">
@@ -222,7 +238,7 @@ export function Rat({
           <circle cx="174" cy="42.5" r="3.8" fill={c.eye} stroke="none" />
           <circle cx="175.3" cy="41.2" r="1.3" fill="#ffffff" opacity="0.92" stroke="none" />
 
-          <g fill="none" strokeWidth={STROKE * 0.55} opacity="0.85">
+          <g className="pb-rat-whiskers" fill="none" strokeWidth={STROKE * 0.55} opacity="0.85">
             {WHISKERS.map((d) => (
               <path key={d} d={d} />
             ))}

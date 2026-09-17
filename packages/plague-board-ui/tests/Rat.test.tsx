@@ -85,7 +85,48 @@ describe('Rat', () => {
     }
     const lontane = [...container.querySelectorAll('g[transform^="translate"]')];
     expect(lontane).toHaveLength(2);
-    for (const g of lontane) expect(g.firstElementChild?.className.baseVal).toMatch(/pb-rat-leg/);
+    // ⚠️ `getAttribute('class')` e non `className`: su un `Element` il tipo di `className` è
+    // `string`, ma a runtime su un `<g>` jsdom dà un `SVGAnimatedString` — quindi `.baseVal`
+    // passava il test e falliva `tsc`. Ed è passato un commit così, perché `typecheck` in un `tail`
+    // perde il codice d'uscita.
+    for (const g of lontane) expect(g.firstElementChild?.getAttribute('class')).toMatch(/pb-rat-leg/);
+  });
+
+  it("i baffi vanno avanti, e non tornano verso l'occhio", () => {
+    const { container } = render(<Rat />);
+    const baffi = [...container.querySelectorAll('.pb-rat-whiskers path')];
+    const occhioX = Number(
+      [...container.querySelectorAll('circle')]
+        .find((el) => el.getAttribute('r') === '3.8')
+        ?.getAttribute('cx'),
+    );
+
+    // ⚠️ Nella prima versione i baffi partivano dal naso e tornavano verso la guancia fino a x 164,
+    // cioè **sotto l'occhio** a 174: a seconda della livrea leggevano come una ruga o uno strizzare,
+    // e l'espressione cambiava da sola. Qui si legge ogni coordinata x di ogni baffo e si chiede che
+    // stia davanti all'occhio di almeno dieci unità. Sono tre, e devono esserci tutti.
+    expect(baffi).toHaveLength(3);
+    for (const baffo of baffi) {
+      const xs = (baffo.getAttribute('d') ?? '').match(/(-?\d+(?:\.\d+)?),/g)?.map((s) => Number(s.slice(0, -1))) ?? [];
+      expect(xs.length).toBeGreaterThan(0);
+      expect(Math.min(...xs)).toBeGreaterThanOrEqual(occhioX + 10);
+    }
+  });
+
+  it('una zampa è un percorso solo, e le dita non hanno contorno', () => {
+    const { container } = render(<Rat />);
+
+    // ⚠️ Prima erano tre pezzi per zampa — coscia a blob, capsula, piede a parte — e dove si
+    // sovrapponevano i contorni si raddoppiavano. Ora ogni gruppo di zampa vicina ha **un** percorso
+    // col contorno e **uno** senza (il cuscinetto delle dita); quelli lontani ne hanno uno solo.
+    const gruppi = [...container.querySelectorAll('.pb-rat-leg-back, .pb-rat-leg-front')];
+    expect(gruppi).toHaveLength(4);
+    for (const g of gruppi) {
+      const percorsi = [...g.querySelectorAll('path')];
+      const conContorno = percorsi.filter((p) => p.getAttribute('stroke') !== 'none');
+      expect(conContorno).toHaveLength(1);
+      expect(percorsi.length).toBeLessThanOrEqual(2);
+    }
   });
 
   it("nasce senza niente addosso, e l'allestimento si accende a pezzi", () => {
@@ -144,12 +185,13 @@ describe('Rat', () => {
     // 4×, primo e ultimo pixel non trasparente — perché né `getBBox()` né `getBoundingClientRect()`
     // contano il tratto. Qui si tiene il vincolo, non il valore: la cornice deve contenere la punta
     // della coda a sinistra (9,75), il tappo dell'ampolla in alto (0), il becco a destra (229,5) e
-    // la pianta dei piedi in basso (89,25). Sono le quattro cifre misurate il 2026-09-18 — e la
-    // prima cornice, scritta prima di misurare, questo test l'avrebbe presa: finiva a 88.
+    // la pianta dei piedi in basso (88,25, dopo il ridisegno delle zampe: prima era 89,25). Sono le
+    // quattro cifre misurate il 2026-09-18 — e la prima cornice, scritta prima di misurare, questo
+    // test l'avrebbe presa: finiva a 88 con i piedi a 89,25.
     expect(x).toBeLessThanOrEqual(9.75);
     expect(y).toBeLessThanOrEqual(0);
     expect(x + w).toBeGreaterThanOrEqual(229.5);
-    expect(y + h).toBeGreaterThanOrEqual(89.25);
+    expect(y + h).toBeGreaterThanOrEqual(88.25);
     expect(container.querySelector('svg')).not.toHaveStyle({ overflow: 'visible' });
   });
 });
