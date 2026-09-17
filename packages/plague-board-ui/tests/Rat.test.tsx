@@ -9,7 +9,12 @@ const parti = (container: HTMLElement) => ({
   orecchie: container.querySelector('.pb-rat-ears'),
   zampeAvanti: container.querySelectorAll('.pb-rat-leg-front'),
   zampeDietro: container.querySelectorAll('.pb-rat-leg-back'),
+  teschio: container.querySelector('.pb-rat-skull'),
+  ampolla: container.querySelector('.pb-rat-vial'),
 });
+
+const viewBoxDi = (container: HTMLElement) =>
+  container.querySelector('svg')?.getAttribute('viewBox')?.split(' ').map(Number) ?? [];
 
 describe('Rat', () => {
   it('le tre livree sono quelle di là, e si scelgono per nome', () => {
@@ -19,7 +24,7 @@ describe('Rat', () => {
       // ⚠️ Il colore si legge dalla **coda**, non dal corpo: è l'unica parte che nella livrea
       // bianca non vale quanto il corpo — `tail` è il rosa `#fec5d6`, `body` il bianco sporco. Un
       // test che guardasse il corpo resterebbe verde anche scambiando due slot su tre.
-      expect(parti(container).coda).toHaveAttribute('stroke', RAT_LIVERIES[livery].tail);
+      expect(parti(container).coda).toHaveAttribute('fill', RAT_LIVERIES[livery].tail);
       unmount();
     }
   });
@@ -27,11 +32,24 @@ describe('Rat', () => {
   it('senza livrea è grigio, che è il ratto normale', () => {
     const { container } = render(<Rat />);
 
-    expect(parti(container).coda).toHaveAttribute('stroke', RAT_LIVERIES.grey.tail);
+    expect(parti(container).coda).toHaveAttribute('fill', RAT_LIVERIES.grey.tail);
+  });
+
+  it("l'albino ha l'occhio rosso, non d'inchiostro", () => {
+    const { container } = render(<Rat livery="white" />);
+
+    // ⚠️ Nel primo studio l'occhio era inchiostrato come il contorno per tutte e tre le livree, e
+    // il ratto bianco aveva perso il suo tratto più riconoscibile — quello che ha anche la mascotte
+    // con l'ampolla. L'occhio è il cerchio pieno più grande: la luce sopra è più piccola e bianca.
+    const occhio = [...container.querySelectorAll('circle')].find(
+      (el) => el.getAttribute('fill') === RAT_LIVERIES.white.eye,
+    );
+    expect(occhio).toBeDefined();
+    expect(occhio).toHaveAttribute('r', '3.8');
   });
 
   it('non porta un foglio di stile dentro', () => {
-    const { container } = render(<Rat />);
+    const { container } = render(<Rat hasSkull hasVial />);
 
     // ⚠️ È il contratto di questo componente, non un dettaglio. L'originale di RattInventario
     // teneva **novanta righe** di `<style>` incorporato nell'SVG, con sei `@keyframes` dentro: così
@@ -55,14 +73,58 @@ describe('Rat', () => {
     expect(p.zampeDietro).toHaveLength(2);
   });
 
+  it('le zampe lontane portano lo spostamento fuori dal gruppo che si anima', () => {
+    const { container } = render(<Rat />);
+
+    // ⚠️ Una `transform` in CSS **sostituisce** l'attributo `transform`, non si somma. Se la classe
+    // stesse sullo stesso `<g>` che porta `translate(-14,2)`, il primo fotogramma dell'animazione
+    // riporterebbe la zampa lontana sopra a quella vicina. Il gruppo con la classe non deve avere
+    // nessun attributo `transform`, e il suo genitore sì.
+    for (const zampa of container.querySelectorAll('.pb-rat-leg-back, .pb-rat-leg-front')) {
+      expect(zampa).not.toHaveAttribute('transform');
+    }
+    const lontane = [...container.querySelectorAll('g[transform^="translate"]')];
+    expect(lontane).toHaveLength(2);
+    for (const g of lontane) expect(g.firstElementChild?.className.baseVal).toMatch(/pb-rat-leg/);
+  });
+
+  it("nasce senza niente addosso, e l'allestimento si accende a pezzi", () => {
+    const nudo = render(<Rat />);
+    expect(parti(nudo.container).teschio).toBeNull();
+    expect(parti(nudo.container).ampolla).toBeNull();
+    nudo.unmount();
+
+    const conTeschio = render(<Rat hasSkull />);
+    expect(parti(conTeschio.container).teschio).not.toBeNull();
+    expect(parti(conTeschio.container).ampolla).toBeNull();
+    conTeschio.unmount();
+
+    const conTutto = render(<Rat hasSkull hasVial />);
+    expect(parti(conTutto.container).teschio).not.toBeNull();
+    expect(parti(conTutto.container).ampolla).not.toBeNull();
+  });
+
+  it("la cornice è la stessa con e senza l'allestimento", () => {
+    const nudo = render(<Rat />);
+    const cornice = viewBoxDi(nudo.container);
+    nudo.unmount();
+
+    const vestito = render(<Rat hasSkull hasVial />);
+
+    // ⚠️ In uno sciame i ratti hanno tutti la stessa scatola, qualunque cosa portino: se
+    // l'ampolla allargasse la cornice, accenderla sposterebbe il ratto di qualche pixel e cambierebbe
+    // la sua misura — e in una riga di testo, la riga. La cornice contiene sempre tutto.
+    expect(viewBoxDi(vestito.container)).toEqual(cornice);
+  });
+
   it("la misura è l'altezza, e la lunghezza viene dal disegno", () => {
     const { container } = render(<Rat size={50} />);
     const svg = container.querySelector('svg');
 
-    // ⚠️ Un ratto è lungo tre volte quanto è alto, quindi «il lato» non vuol dire niente: `size` è
-    // l'altezza, come per `RatMascot`, e la larghezza la porta il rapporto del disegno.
+    // ⚠️ Un ratto è lungo due volte e mezzo quanto è alto, quindi «il lato» non vuol dire niente:
+    // `size` è l'altezza, come per `RatMascot`, e la larghezza la porta il rapporto del disegno.
     expect(svg).toHaveAttribute('height', '50');
-    expect(Number(svg?.getAttribute('width'))).toBeGreaterThan(50);
+    expect(Number(svg?.getAttribute('width'))).toBeGreaterThan(100);
   });
 
   it('è decorativo finché non gli si dà un nome', () => {
@@ -74,19 +136,20 @@ describe('Rat', () => {
     expect(screen.getByRole('img', { name: 'Un ratto' })).toBeInTheDocument();
   });
 
-  it('il disegno sta tutto dentro la sua cornice', () => {
-    const { container } = render(<Rat />);
-    const viewBox = container.querySelector('svg')?.getAttribute('viewBox')?.split(' ').map(Number);
+  it('il disegno sta tutto dentro la sua cornice, tratto compreso', () => {
+    const { container } = render(<Rat hasSkull hasVial />);
+    const [x, y, w, h] = viewBoxDi(container);
 
-    // ⚠️ Di là il `viewBox` era `0 0 120 60` con `overflow: visible`, e la coda usciva fino a
-    // x = −33,75: il ratto sbordava dalla propria scatola, quindi la sua misura non diceva quanto
-    // spazio occupava. Qui la cornice comincia in negativo perché **contiene** la coda.
-    //
-    // ⚠️ I numeri vengono dai **pixel dipinti** — l'SVG su una tela a 4×, primo e ultimo pixel non
-    // trasparente — perché né `getBBox()` né `getBoundingClientRect()` contano il tratto: danno la
-    // coda a −31,67 invece che a −33,75, e fidandosi di loro resterebbe tagliata di due unità.
-    expect(viewBox?.[0]).toBeLessThanOrEqual(-33.75);
-    expect(viewBox?.[0] + viewBox?.[2]).toBeGreaterThanOrEqual(122);
+    // ⚠️ I numeri vengono dai **pixel dipinti** del ratto con tutto addosso — l'SVG su una tela a
+    // 4×, primo e ultimo pixel non trasparente — perché né `getBBox()` né `getBoundingClientRect()`
+    // contano il tratto. Qui si tiene il vincolo, non il valore: la cornice deve contenere la punta
+    // della coda a sinistra (9,75), il tappo dell'ampolla in alto (0), il becco a destra (229,5) e
+    // la pianta dei piedi in basso (89,25). Sono le quattro cifre misurate il 2026-09-18 — e la
+    // prima cornice, scritta prima di misurare, questo test l'avrebbe presa: finiva a 88.
+    expect(x).toBeLessThanOrEqual(9.75);
+    expect(y).toBeLessThanOrEqual(0);
+    expect(x + w).toBeGreaterThanOrEqual(229.5);
+    expect(y + h).toBeGreaterThanOrEqual(89.25);
     expect(container.querySelector('svg')).not.toHaveStyle({ overflow: 'visible' });
   });
 });

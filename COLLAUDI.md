@@ -265,6 +265,28 @@ sopra soglia — non se un colore solo ci sta.
 `brand` al **19%**, cioè 1,52. Sono decorazione, e la decorazione è fuori dalla regola per
 definizione. Una passata che non le sa distinguere non è una passata: è un numero.
 
+### La cornice di un SVG, misurata sui pixel dipinti — 2026-09-18
+
+**Esegue:** agente — è una misura, e si rifà ogni volta che un disegno cambia.
+**Ultima esecuzione:** agente, 2026-09-18, su `Rat` con teschio e ampolla — dipinto **dentro** la
+cornice, `tuttoDentro: true`.
+
+**Preparazione:** `npm run build`, `npm run playground`, la pagina che mostra il disegno vestito di
+tutto. Si clona l'`<svg>`, gli si dà una cornice larga e nota, lo si serializza in un `data:` URI,
+lo si disegna su una tela a **4×** e si cerca il primo e l'ultimo pixel con alfa > 8 nelle due
+direzioni. Le quattro cifre, riportate nelle unità del disegno, sono la cornice.
+
+| Azione | Atteso | Ottenuto |
+|---|---|---|
+| Sinistra / alto / destra / basso dipinti | contenuti nella cornice dichiarata | 9,75 / 0 / 229,5 / 89,25 dentro `9 -1 221 91` |
+| Stessa misura con la prima cornice, `7 -1 223 89` | — | i piedi a 89,25 **uscivano** dal fondo a 88 |
+| Il test `il disegno sta tutto dentro la sua cornice` con l'altezza a 89 | rosso | rosso, e solo lui |
+
+**Che cosa protegge:** ⚠️ **due modi sbagliati di misurare, entrambi provati.** `getBBox()` e
+`getBoundingClientRect()` danno la geometria dei percorsi **senza il tratto** — sulla coda del ratto
+di prima, −31,67 invece di −33,75. E una cornice scritta a occhio dopo aver spostato un pezzo taglia
+in silenzio: qui i piedi, di un'unità e un quarto, e a schermo non si vede finché non si ingrandisce.
+
 ### L'elenco consultabile delle frasi — 2026-09-17
 
 **Esegue:** agente — e qui è l'**unica** verifica che esiste: il playground non sta nel progetto di

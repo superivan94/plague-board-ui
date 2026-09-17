@@ -180,27 +180,49 @@ export default function StyleReference() {
 
         <p className="max-w-2xl text-sm text-muted">
           Il segno qui sopra è l&apos;<strong>emblema</strong>, fatto per essere riconosciuto a
-          18px. Questo è il <strong>personaggio</strong>: di profilo, con la coda e tre pellicce.{' '}
-          <code>Rat</code> sta fermo — chi lo fa correre è <code>RatRun</code>, che arriva dopo — e
-          la sua misura è <strong>l&apos;altezza</strong>, perché è lungo più di tre volte tanto.
+          18px. Questo è il <strong>personaggio</strong>: di profilo, con l&apos;inchiostro e le
+          campiture piatte del topo con l&apos;ampolla, così i due sono lo stesso ratto. Un occhio
+          solo, il sopracciglio, e un allestimento che si accende a pezzi: il{' '}
+          <strong>teschio di corvo</strong> portato come elmo, l&apos;<strong>ampolla</strong> legata
+          sulle spalle. <code>Rat</code> sta fermo — chi lo fa correre è <code>RatRun</code> — e la
+          sua misura è <strong>l&apos;altezza</strong>, perché è lungo due volte e mezzo tanto.
         </p>
 
         {/* ⚠️ Lastra scura anche in tema chiaro: il grigio `#595959` e il marrone `#8B4513` sono
             pellicce, tarate su un fondo scuro come tutto il resto dell'identità. */}
-        <div className="dark flex flex-wrap items-end gap-8 rounded-lg border border-border bg-gray-950/90 p-4">
-          {RAT_LIVERIES_ORDER.map((livery) => (
-            <span key={livery} className="flex flex-col items-center gap-2">
-              <Rat livery={livery} size={44} />
-              <TechLabel className="text-muted">{livery}</TechLabel>
+        <div className="dark flex flex-col gap-5 rounded-lg border border-border bg-gray-950/90 p-4">
+          <div className="flex flex-wrap items-end gap-8">
+            {RAT_LIVERIES_ORDER.map((livery) => (
+              <span key={livery} className="flex flex-col items-center gap-2">
+                <Rat livery={livery} size={64} />
+                <TechLabel className="text-muted">{livery}</TechLabel>
+              </span>
+            ))}
+          </div>
+          <div className="flex flex-wrap items-end gap-8">
+            <span className="flex flex-col items-center gap-2">
+              <Rat livery="grey" size={64} hasSkull />
+              <TechLabel className="text-muted">hasSkull</TechLabel>
             </span>
-          ))}
+            <span className="flex flex-col items-center gap-2">
+              <Rat livery="brown" size={64} hasVial />
+              <TechLabel className="text-muted">hasVial</TechLabel>
+            </span>
+            <span className="flex flex-col items-center gap-2">
+              <Rat livery="white" size={64} hasSkull hasVial />
+              <TechLabel className="text-muted">tutto addosso</TechLabel>
+            </span>
+            <span className="flex flex-col items-center gap-2">
+              <Rat livery="grey" size={28} hasSkull hasVial />
+              <TechLabel className="text-muted">a 28px</TechLabel>
+            </span>
+          </div>
         </div>
 
         <p className="max-w-2xl text-sm text-muted">
-          ⚠️ La cornice del disegno comincia a <strong>−34</strong>, non a zero: la coda esce a
-          sinistra dell&apos;anca fino a −33,75, e di là il ratto sbordava dalla propria scatola con{' '}
-          <code>overflow: visible</code>. Con la cornice giusta, la misura che chiedi è quella che
-          occupa — e lo si può mettere in una riga.
+          ⚠️ La cornice è <strong>una sola</strong>, misurata sui pixel del ratto con tutto addosso:
+          accendere l&apos;ampolla non sposta il ratto e non gli cambia la misura. Per questo, e non
+          per pigrizia, un ratto nudo ha un po&apos; d&apos;aria sopra la testa.
         </p>
       </section>
 

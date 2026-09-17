@@ -201,6 +201,20 @@ exist in target module» che **non sono veri**. Si guarda la pagina, o si crede 
   `@media (prefers-reduced-motion: reduce)`: è `[data-reduce-motion="true"]` **oppure** il media
   query quando quell'attributo non c'è. Vuol dire che un `motion-reduce:` scritto qui risponde sia
   alla preferenza di sistema sia a un interruttore dentro l'applicazione, gratis.
+- ⚠️ **L'inchiostro dei Ludoratti non è nero: è `#180828`.** Misurato il 2026-09-17 sui pixel di
+  `LudoRatti_Logo.png` — il colore scuro più frequente del contorno è un viola-nero. `Rat` lo usa
+  per il proprio contorno, ed è quello che rende il ratto che corre e la mascotte con l'ampolla
+  **lo stesso personaggio** invece di due disegni. Il verde dell'ampolla sul dorso è invece quello
+  della tavolozza (`plague-500`), non quello della mascotte (`#30b020`): ampolla e interfaccia
+  intorno devono dire lo stesso verde.
+- ⚠️ **Una `transform` in CSS sostituisce l'attributo `transform`, non si somma.** Le zampe lontane
+  di `Rat` stanno più indietro e più in basso con un `translate(-14,2)` come attributo: se la
+  classe che l'animazione aggancia stesse sullo stesso `<g>`, il primo fotogramma le riporterebbe
+  all'origine, sopra a quelle vicine. Perciò due gruppi annidati — fuori lo spostamento, dentro la
+  classe — e un test che lo tiene.
+- ⚠️ **Una cornice scritta a occhio prima di misurare taglia qualcosa, e lo fa in silenzio.** La
+  prima di `Rat` ridisegnato finiva a 88; la pianta dei piedi dipinta sta a **89,25**. Si è visto
+  solo misurando i pixel, e da lì il test tiene le quattro cifre misurate come vincolo.
 - ⚠️ **Per la cornice di un SVG né `getBBox()` né `getBoundingClientRect()` bastano: il tratto non
   lo contano.** Misurati tutti e tre il 2026-09-17 sulla coda di `Rat`, i primi due danno **−31,67**
   — la geometria del percorso — mentre il pixel dipinto più a sinistra sta a **−33,75**, perché
