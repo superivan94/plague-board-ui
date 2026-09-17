@@ -147,6 +147,16 @@ exist in target module» che **non sono veri**. Si guarda la pagina, o si crede 
   è nostra, ed è **l'unica misura che possiede** — la larghezza della colonna dentro la decide chi
   la usa, perché dipende dalla pagina. Due `py` annidati non si sommano in un modo che si possa
   prevedere a occhio.
+- ⚠️ **Una superficie che resta scura nei due temi deve portare `dark` addosso, e non essere
+  traslucida.** Sono due cose insieme: al 70% su pagina chiara la lastra compone un **grigio
+  medio**, non il nero; e senza la classe, i token `*-ink` e i componenti di HeroUI che ci stanno
+  dentro leggono il tema della **pagina** e scrivono scuro su scuro. Misurato il 2026-09-17 in tema
+  chiaro: l'etichetta del commutatore nella barra faceva **2,05**, il collegamento corrente
+  **1,67**. Con `dark` e il velo al 90%: nessun testo sotto 4,5 su nessuna pagina.
+- ⚠️ **Ridichiarare una variabile di HeroUI va fatto in tutti e due i blocchi del tema.** Le nostre
+  righe stanno fuori da ogni layer e vincono sul suo tema in `@layer base` **anche quando la sua è
+  più specifica**: un `--muted` scritto solo in `:root` spegne pure quello del tema scuro. Misurato
+  sbagliandolo — il grigio secondario in scuro è crollato da 6,5 a **2,62**.
 - ⚠️ **`text-default-500` non esiste, e per mesi non se n'è accorto nessuno.** HeroUI 3 non ha una
   scala numerata: i suoi token sono `muted`, `default`, `border`, `separator`, `surface`,
   `background`, `foreground` e le loro varianti. Una classe che non esiste **non colora**, quindi

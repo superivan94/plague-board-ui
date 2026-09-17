@@ -197,3 +197,34 @@ smettere di cliccare per 2,5s, cioè lasciare che il timer smontasse il nodo.
 ⚠️ **Le prime due righe sono quelle che contano, e la seconda è quella che a occhio non si legge**:
 un'animazione ripartita e una a metà corsa sembrano uguali nell'istante dello scatto. La riga
 `currentTime` è l'unica che distingue «è ricominciata» da «sta finendo».
+
+---
+
+### Ogni testo, nei due temi, su tutte le pagine — 2026-09-17
+
+**Esegue:** agente — si misura dal DOM, e a occhio non si fa.
+**Ultima esecuzione:** agente, 2026-09-17 — **nessun testo sotto soglia, in nessuno dei due temi**.
+
+**Preparazione:** `npm run build`, `npm run playground`. Per ogni pagina e per ogni tema si
+percorre `main` e la barra, si compone lo sfondo **effettivo** — risalendo gli antenati e fondendo
+le trasparenze nell'ordine giusto, perché la barra è semitrasparente — e si confronta col colore
+del testo. Soglie WCAG: 4,5 normale, 3 per il testo grande.
+
+| Azione | Atteso | Ottenuto |
+|---|---|---|
+| Le quattro pagine in tema scuro | nessun testo sotto soglia | nessuno · peggiore **5,08** |
+| Le quattro pagine in tema chiaro | nessun testo sotto soglia | nessuno · peggiore **4,58** |
+
+**Che cosa protegge:** la passata che l'ha inaugurato ha trovato **otto** casi, e sette stavano nel
+tema chiaro. Le cause erano tre, e nessuna si vedeva guardando:
+
+- la **barra semitrasparente**: al 70% su pagina chiara componeva un grigio medio invece del nero,
+  e i colori tarati sul nero ci finivano sopra — l'etichetta del commutatore a **2,05**, il
+  collegamento corrente a **1,67**;
+- i **token che leggevano il tema della pagina** dentro una superficie che resta scura: risolto
+  dichiarando quelle superfici isole di tema scuro con la classe `dark`;
+- `toxic` **scritto in toxic** dentro una frase, a **1,26** — nella stessa frase che dice di non
+  usarlo come colore di testo.
+
+⚠️ **Lo sfondo va composto, non letto.** Prendendo il primo `background-color` non trasparente che
+si incontra, la barra risulta nera anche quando è grigia, e l'intero difetto sparisce dalla misura.

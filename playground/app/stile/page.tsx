@@ -65,7 +65,7 @@ export default function StyleReference() {
         </p>
       </div>
 
-      <div className="relative overflow-hidden rounded-xl bg-gray-950 p-8">
+      <div className="dark relative overflow-hidden rounded-xl bg-gray-950 p-8">
         {['30%', '57%', '72%'].map((left, i) => (
           <span
             key={left}
@@ -143,9 +143,9 @@ export default function StyleReference() {
         <h2 className="text-lg font-medium">Il segno della barra</h2>
 
         <div className="flex flex-wrap items-center gap-x-6 gap-y-3 rounded-lg border border-border p-4">
-          <span className="flex shrink-0 items-center gap-2 rounded bg-gray-950/70 px-3 py-2">
+          <span className="dark flex shrink-0 items-center gap-2 rounded bg-gray-950/90 px-3 py-2">
             <RatIcon size={20} className="animate-heartbeat shrink-0 text-brand" />
-            <TechLabel className="text-gray-500">plague-board-ui</TechLabel>
+            <TechLabel className="text-muted">plague-board-ui</TechLabel>
           </span>
           <p className="max-w-lg text-sm text-muted">
             <strong className="text-foreground">Il marchio che batte.</strong> Quel segno si legge

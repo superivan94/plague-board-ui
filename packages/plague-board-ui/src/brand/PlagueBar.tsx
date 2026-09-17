@@ -38,6 +38,17 @@ export interface PlagueBarProps {
  * `backdrop-blur`: è il segno che sotto c'è qualcosa che si muove — i ratti, le gocce, il fondale
  * appestato — e che la barra ci galleggia sopra invece di coprirlo.
  *
+ * ⚠️ **La barra è un'isola di tema scuro, e porta `dark` addosso.** È la lastra dei Ludoratti: resta
+ * scura anche in una pagina chiara. Ma «scura» dev'essere vero anche per **quello che ci sta
+ * dentro**, altrimenti i componenti di HeroUI e i token `*-ink` leggono il tema della pagina e
+ * scrivono scuro su scuro. Misurato in chiaro prima di metterla: l'etichetta del commutatore faceva
+ * **2,05** di contrasto, il collegamento corrente **1,67**. La classe sul contenitore è lo stesso
+ * meccanismo con cui il playground affianca i due temi nella stessa pagina.
+ *
+ * ⚠️ **E per questo il velo è al 90%, non al 70%.** Al 70% su pagina chiara la lastra compone un
+ * grigio medio invece del nero: la sfocatura si vede lo stesso, ma «resta scura» smette di essere
+ * vero proprio dove serve.
+ *
  * ⚠️ **Le tre taglie sono altezze, e la taglia non arriva a chi sta dentro.** La barra non ha modo
  * di ridimensionare un `<svg>` che non conosce, quindi chi mette il marchio legge da sé quanto
  * farlo grande in `PLAGUE_BAR_MARK_SIZE`, che sta in `plagueBarSizes.ts` — fuori da questo file, e
@@ -54,7 +65,7 @@ export function PlagueBar({
     <Surface
       variant="transparent"
       render={(props) => <header {...props} />}
-      className={`${isSticky ? 'sticky top-0 z-20' : ''} w-full border-b border-brand/20 bg-gray-950/70 backdrop-blur-sm ${PLAGUE_BAR_PADDING[size]} ${className}`}
+      className={`dark ${isSticky ? 'sticky top-0 z-20' : ''} w-full border-b border-brand/20 bg-gray-950/90 backdrop-blur-sm ${PLAGUE_BAR_PADDING[size]} ${className}`}
     >
       {children}
     </Surface>

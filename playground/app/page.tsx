@@ -83,8 +83,9 @@ export default function Home() {
           <strong>Nessuna scala di grigi.</strong> Il nero dei Ludoratti è già il{' '}
           <code>gray-950</code> di Tailwind, e i grigi delle superfici sono quelli di HeroUI:
           ridichiararli vorrebbe dire sovrascriverli a chi installa.{' '}
-          <strong className="text-toxic">toxic</strong> è un accento, non un colore di testo — si
-          usa su fondo scuro e a bassa opacità.
+          <code>toxic</code> è un accento, <strong>non un colore di testo</strong>: su bianco fa{' '}
+          <strong>1,37</strong> di contrasto. Si usa su fondo scuro, a bassa opacità, e su
+          superfici — mai sotto una frase.
         </p>
 
         <div className="flex flex-wrap items-center gap-3">

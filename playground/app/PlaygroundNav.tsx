@@ -24,7 +24,7 @@ function NavLink({ page, isCurrent }: { page: PlaygroundPage; isCurrent: boolean
       className={`text-sm transition-colors ${
         isCurrent
           ? 'text-brand-ink underline decoration-brand/60 underline-offset-8'
-          : 'text-gray-400 hover:text-white'
+          : 'text-muted hover:text-foreground'
       }`}
     >
       {page.title}
@@ -55,7 +55,7 @@ export function PlaygroundNav() {
             size={PLAGUE_BAR_MARK_SIZE.medium}
             className="animate-heartbeat shrink-0 text-brand"
           />
-          <TechLabel className="text-gray-500">plague-board-ui</TechLabel>
+          <TechLabel className="text-muted">plague-board-ui</TechLabel>
         </span>
 
         {demos.map((page) => (

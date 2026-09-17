@@ -94,12 +94,23 @@
 [data-theme='light'] {
   --pb-brand-ink: #4d7c0f; /* lime-700 — 4,99 sul bianco */
   --pb-plague-ink: #15803d; /* plague-700 — 5,02 sul bianco */
+
+  /* ⚠️ Il grigio del testo secondario di HeroUI, ridichiarato di un gradino. Il suo fa **4,43**
+   * sul proprio fondo chiaro, cioè manca il 4,5 per sette centesimi: misurato il 2026-09-17 su
+   * ogni testo del playground. Non si vede a occhio, e proprio per questo passerebbe.
+   *
+   * ⚠️ E va ridichiarato **in tutti e due i blocchi**. Queste righe stanno fuori da ogni layer,
+   * quindi vincono sul tema di HeroUI che sta in `@layer base` — anche quando la sua è più
+   * specifica. Scritto solo qui, questo `:root` spegnerebbe pure il grigio del tema scuro, che
+   * crollerebbe a 2,62: misurato, sbagliandolo. */
+  --muted: #52525b; /* zinc-600 — 7,46 sul fondo chiaro di HeroUI */
 }
 
 .dark,
 [data-theme='dark'] {
   --pb-brand-ink: #a3e635; /* il lime del marchio — 13,35 sul nero */
   --pb-plague-ink: #4ade80; /* plague-400 — 11,55 sul nero, ed è il verde del testo di là */
+  --muted: #a1a1aa; /* zinc-400 — 6,50 sul fondo scuro di HeroUI */
 }
 
 /* ─────────────────────────────────────────────────────────────────────────────

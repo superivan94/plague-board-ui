@@ -43,8 +43,10 @@ const SAMPLES: readonly BarSample[] = [
 /**
  * Il contenuto di esempio: lo stesso nelle tre barre, così a cambiare è solo la taglia.
  *
- * ⚠️ I colori qui dentro sono **scritti scuri di proposito**, non dimenticati: la barra resta
- * scura nei due temi, quindi quello che ci sta dentro non segue il tema della pagina.
+ * ⚠️ Qui dentro si usano i **token normali** — `text-muted`, `text-brand-ink` — e vengono scuri
+ * lo stesso: `PlagueBar` porta `dark` addosso, quindi è un'isola di tema scuro e i token si
+ * risolvono su quello. È il motivo per cui il contenuto di una barra non va scritto con grigi
+ * fissi: seguirebbe la lastra, ma solo per caso.
  */
 function BarContent({ size }: { size: PlagueBarSize }) {
   return (
@@ -54,21 +56,21 @@ function BarContent({ size }: { size: PlagueBarSize }) {
           size={PLAGUE_BAR_MARK_SIZE[size]}
           className="animate-heartbeat shrink-0 text-brand"
         />
-        <TechLabel className="text-gray-500">rattoteca</TechLabel>
+        <TechLabel className="text-muted">rattoteca</TechLabel>
       </span>
       <span className="text-sm text-brand-ink underline decoration-brand/60 underline-offset-8">
         I manuali
       </span>
-      <span className="text-sm text-gray-400">I vettori ludici</span>
+      <span className="text-sm text-muted">I vettori ludici</span>
 
-      <TechRule orientation="vertical" className="text-brand/60">
+      <TechRule orientation="vertical">
         il grande piano
       </TechRule>
-      <span className="text-sm text-gray-400">Parametri</span>
+      <span className="text-sm text-muted">Parametri</span>
 
       <span className="ml-auto flex items-center gap-2">
         <PulseDot />
-        <TechLabel className="text-gray-500">operativo</TechLabel>
+        <TechLabel className="text-muted">operativo</TechLabel>
       </span>
     </nav>
   );
