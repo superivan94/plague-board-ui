@@ -13,6 +13,14 @@ export { PlagueBar, type PlagueBarProps } from './brand/PlagueBar';
 // `undefined` senza che niente diventi rosso. Il perché per esteso sta in `plagueBarSizes.ts`.
 export { PLAGUE_BAR_MARK_SIZE, type PlagueBarSize } from './brand/plagueBarSizes';
 export { PulseDot, type PulseDotProps } from './brand/PulseDot';
+// La faccia di marca. ⚠️ Il disegno sta in un modulo a parte e pesa 25,8 KB di base64: chi non
+// importa `RatMascot` non se lo porta dietro, perché il pacchetto è `sideEffects: ["*.css"]`.
+export { RatMascot, type RatMascotProps } from './brand/RatMascot';
+export {
+  RAT_MASCOT_HEIGHT,
+  RAT_MASCOT_SRC,
+  RAT_MASCOT_WIDTH,
+} from './assets/ratMascotImage';
 export { SpeechBubble, type SpeechBubbleProps } from './brand/SpeechBubble';
 export { TalkingMascot, type TalkingMascotProps } from './brand/TalkingMascot';
 export { TechLabel, type TechLabelProps } from './brand/TechLabel';

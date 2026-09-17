@@ -3,11 +3,12 @@ import {
   DEV_PHRASES,
   RAT_PHRASES,
   RatIcon,
+  RatMascot,
   TalkingMascot,
   TechLabel,
   TechRule,
 } from 'plague-board-ui';
-import type { ComponentType } from 'react';
+import type { ReactNode } from 'react';
 
 // ⚠️ Pagina **server**, senza `'use client'`: il cablaggio fra sorteggio e fumetto sta tutto dentro
 // `TalkingMascot`, quindi qui non c'è nessun hook e nessuno stato. È la misura di che cosa fa quel
@@ -15,14 +16,34 @@ import type { ComponentType } from 'react';
 
 interface Voice {
   readonly name: string;
-  readonly Mark: ComponentType<{ size?: number; className?: string }>;
+  readonly face: ReactNode;
   readonly phrases: readonly string[];
   readonly label: string;
 }
 
+// ⚠️ Le prime due voci hanno **le stesse frasi e una faccia diversa**: è il punto della pagina.
+// `TalkingMascot` non conosce nessuna faccia — si sceglie passandola come figlio, quindi ci va
+// anche il marchio di un'applicazione che la libreria non ha mai visto.
 const VOICES: readonly Voice[] = [
-  { name: 'il ratto', Mark: RatIcon, phrases: RAT_PHRASES, label: 'Sveglia il ratto' },
-  { name: 'lo sviluppatore', Mark: CodeIcon, phrases: DEV_PHRASES, label: 'Chiedi al collega' },
+  {
+    name: 'il ratto, disegnato',
+    face: <RatMascot size={56} />,
+    phrases: RAT_PHRASES,
+    label: 'Sveglia il ratto disegnato',
+  },
+  {
+    name: 'il ratto, in segno',
+    // ⚠️ `brand-ink` e non `brand`: il lime grezzo su una pagina chiara fa 1,38 di contrasto.
+    face: <RatIcon size={56} className="text-brand-ink" />,
+    phrases: RAT_PHRASES,
+    label: 'Sveglia il ratto in segno',
+  },
+  {
+    name: 'lo sviluppatore',
+    face: <CodeIcon size={56} className="text-brand-ink" />,
+    phrases: DEV_PHRASES,
+    label: 'Chiedi al collega',
+  },
 ];
 
 const RULES = [
@@ -33,6 +54,10 @@ const RULES = [
   [
     'Il nome del comando è obbligatorio',
     'La mascotte non disegna niente di suo, e le icone della libreria sono decorative: senza un nome dichiarato resterebbe un pulsante muto. Per questo la prop è obbligatoria — il nome non può dipendere da che cosa capita di avvolgere.',
+  ],
+  [
+    'Il disegno non segue il tema, il segno sì',
+    'RatMascot è un raster: il contorno scuro lo tiene su nei due temi, ma non prende il colore del testo e non scala all’infinito. Dove serve un segno che si colora — dentro una barra, accanto a una riga — la faccia giusta è RatIcon.',
   ],
   [
     'È un messaggio, non una descrizione',
@@ -56,22 +81,20 @@ const PIECES = [
   ['useRandomPhrase', 'pesca una frase e non ripete mai quella appena detta'],
   ['SpeechBubble', 'la mostra appesa a chi parla, e se ne va da solo'],
   ['TalkingMascot', 'mette insieme i due e ci attacca il grilletto'],
+  ['RatMascot', 'la faccia di marca: il topo con l’ampolla, 19,3 KB che viaggiano col pacchetto'],
 ];
 
 /** Una voce sola: la faccia che si preme, e quante battute conosce. */
-function VoiceDemo({ name, Mark, phrases, label }: Voice) {
+function VoiceDemo({ name, face, phrases, label }: Voice) {
   return (
     <div className="flex flex-col items-center gap-4 rounded-lg border border-border p-6">
-      <TechLabel className="text-muted">{name}</TechLabel>
+      <TechLabel className="text-center text-muted">{name}</TechLabel>
 
       {/* L'altezza fissa è il posto che si lascia al fumetto, così le colonne non ballano quando
           compare. Il `relative` che lo ancora ce l'ha `TalkingMascot` addosso. */}
       <span className="flex h-32 items-start justify-center">
         <TalkingMascot label={label} phrases={phrases}>
-          {/* ⚠️ `brand-ink` e non `brand`: il lime grezzo su una pagina chiara fa **1,38** di
-              contrasto e la faccia sparisce. Dentro la barra il lime va bene perché quella è
-              un'isola scura; qui siamo sul fondo della pagina, che cambia col tema. */}
-          <Mark size={56} className="text-brand-ink" />
+          {face}
         </TalkingMascot>
       </span>
 
@@ -87,16 +110,17 @@ export default function VoicePage() {
         <h1 className="text-2xl font-semibold">La voce</h1>
         <p className="text-sm text-muted">
           Una mascotte che al clic dice la sua. <code>TalkingMascot</code> avvolge{' '}
-          <strong>qualunque figlio</strong> — un SVG, il logo in PNG, una foto — e non disegna
-          niente di suo: è la faccia di chi lo usa a parlare. Le frasi di casa —{' '}
-          <code>RAT_PHRASES</code> e <code>DEV_PHRASES</code> — viaggiano con la libreria, ma
-          chiunque può passare le sue.
+          <strong>qualunque figlio</strong> e non disegna niente di suo: <strong>la faccia si
+          sceglie passandola</strong>, quindi ci va il disegno di casa, un segno di linea, o il
+          marchio di un&apos;applicazione che la libreria non ha mai visto. Le frasi di casa —{' '}
+          <code>RAT_PHRASES</code> e <code>DEV_PHRASES</code> — viaggiano col pacchetto, ma{' '}
+          <code>phrases</code> è obbligatoria: la voce la decide chi la usa.
         </p>
       </div>
 
-      <TechRule>premile</TechRule>
+      <TechRule>premile · la stessa voce, facce diverse</TechRule>
 
-      <div className="grid gap-4 sm:grid-cols-2">
+      <div className="grid gap-4 sm:grid-cols-3">
         {VOICES.map((voice) => (
           <VoiceDemo key={voice.name} {...voice} />
         ))}

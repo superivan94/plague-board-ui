@@ -201,6 +201,20 @@ exist in target module» che **non sono veri**. Si guarda la pagina, o si crede 
   `@media (prefers-reduced-motion: reduce)`: è `[data-reduce-motion="true"]` **oppure** il media
   query quando quell'attributo non c'è. Vuol dire che un `motion-reduce:` scritto qui risponde sia
   alla preferenza di sistema sia a un interruttore dentro l'applicazione, gratis.
+- ⚠️ **Un file binario in una libreria `tsc` va dentro un modulo, non accanto.** Un pacchetto npm
+  spedisce qualunque file, ma un binario ha bisogno di un **URL**, e quell'URL lo fabbrica il
+  bundler dell'applicazione che lo installa: la libreria non sa a che indirizzo il proprio file
+  verrà servito, e `tsc` non copia niente e non riscrive import. Dentro un modulo il disegno è
+  **codice**, e chi installa non configura niente. Il prezzo è il peso in JavaScript, quindi si
+  converte prima: `LudoRatti_Logo.png` era **222 KB** per 527×493 — di cui due terzi di spreco,
+  visto che gli stessi pixel in PNG con palette fanno 74 KB — ed è diventato un WebP a 288 di
+  larghezza, **19,3 KB**, 25,8 in base64. La larghezza non è a caso: nell'intestazione il disegno
+  è alto al massimo 88px, e 88 × 3 × (527/493) fa **282**.
+- ⚠️ **E con `sideEffects: ["*.css"]` quel peso lo paga solo chi lo usa — anzi, spesso nessuno.**
+  Misurato sulla build del playground: il disegno compare **solo** nell'HTML di `/voce` (88 KB
+  contro gli 80 di `/`) e in **zero** chunk JavaScript, perché `RatMascot` è un componente server e
+  la stringa finisce nell'HTML una volta sola invece che nel bundle. ⚠️ Dentro un componente
+  client, invece, nel bundle ci finirebbe.
 - ⚠️ **La passata sui contrasti dei testi non vede la grafica, e lì si nasconde lo stesso difetto.**
   La soglia della grafica che porta significato — segni, e soprattutto **indicatori di fuoco** — è
   **3**, e si misura sullo stesso sfondo composto. L'anello di fuoco della mascotte, scritto con

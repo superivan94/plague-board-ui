@@ -244,6 +244,8 @@ contrasto **non testuale** — grafica che porta significato e indicatori di fuo
 | I segni delle quattro pagine, nei due temi | nessuno sotto 3 | nessuno, tolte le tre decorazioni |
 | L'anello di fuoco della mascotte, tema scuro | ≥ 3 | **13,43** |
 | L'anello di fuoco della mascotte, tema chiaro | ≥ 3 | **4,58** |
+| Il disegno di `RatMascot` sul fondo chiaro | non sparisce | pixel più scuro a **19,16**; il 29,5% del disegno stacca ≥ 3 |
+| Il disegno di `RatMascot` sul fondo scuro | non sparisce | pixel più chiaro a **20,25**; l'81,7% stacca ≥ 3 |
 
 **Che cosa protegge:** ⚠️ **la passata sui testi non vede questa roba, e i due difetti che ha
 lasciato passare erano entrambi verdi su chiaro.** L'anello di fuoco della mascotte, scritto con
@@ -251,6 +253,12 @@ lasciato passare erano entrambi verdi su chiaro.** L'anello di fuoco della masco
 tastiera non si trova. E i segni delle demo, sempre in `brand`, lo stesso **1,38** — il lime va
 bene *dentro* la barra, che è un'isola scura, e non sul fondo della pagina. Entrambi si curano con
 `brand-ink`, che è il token fatto apposta.
+
+⚠️ **Un raster si misura sui suoi pixel, non sul suo `color`.** Il topo bianco su una pagina bianca
+è la domanda ovvia, e la risposta è nel disegno: il contorno scuro e spesso porta il pixel più
+scuro a 19,16 sul fondo chiaro, e il corpo bianco porta il più chiaro a 20,25 su quello scuro. Si
+scandisce la bitmap, si scartano i pixel quasi trasparenti, e si conta **quanto** del disegno sta
+sopra soglia — non se un colore solo ci sta.
 
 ⚠️ **Le eccezioni si dichiarano, non si alzano le soglie.** Le tre uscite che restano sono gli
 `<svg>` sparsi del bozzetto della direzione: `pointer-events-none absolute`, `aria-hidden="true"`,
