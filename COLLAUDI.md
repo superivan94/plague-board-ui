@@ -264,3 +264,35 @@ sopra soglia — non se un colore solo ci sta.
 `<svg>` sparsi del bozzetto della direzione: `pointer-events-none absolute`, `aria-hidden="true"`,
 `brand` al **19%**, cioè 1,52. Sono decorazione, e la decorazione è fuori dalla regola per
 definizione. Una passata che non le sa distinguere non è una passata: è un numero.
+
+### L'elenco consultabile delle frasi — 2026-09-17
+
+**Esegue:** agente — e qui è l'**unica** verifica che esiste: il playground non sta nel progetto di
+test, che compila solo `packages/plague-board-ui`. Non c'è nessun test unitario su questa logica.
+**Ultima esecuzione:** agente, 2026-09-17 — tutto come atteso.
+
+**Preparazione:** `npm run build`, `npm run playground`, `/voce`, si apre «Le frasi, tutte quante».
+
+| Azione | Atteso | Ottenuto |
+|---|---|---|
+| Aperto senza cercare | 33 frasi, numerate come nell'array | 33, numerate da 0 |
+| Si scrive `squit` | le quattro varianti, e zero fra le frasi dello sviluppatore | «4 su 33» · indici 0, 3, 7, 11 · `DEV_PHRASES 0 su 14` |
+| Si scrive `e solo l` (senza accento) | trova «È solo l'inizio... 🏭» | «1 su 33» · indice 4 |
+| Si scrive `zzz` | lo dice, invece di mostrare il vuoto | «0 su 33» e «Nessuna frase contiene «zzz».» |
+| Esc nel campo | svuota e rimette tutto | valore `""`, 33 righe |
+| La scaletta dei titoli | nessun salto di livello | `h1` → `h2` → due `h3` |
+| Il nome del comando, letto dall'albero | leggibile | «Le frasi, tutte quante · 33 in 2 elenchi» |
+| Ogni testo, nei due temi | nessuno sotto soglia | nessuno, in entrambi |
+
+**Che cosa protegge:** ⚠️ **due difetti che si vedono solo nell'albero di accessibilità, non a
+schermo.** Il `Heading` di HeroUI vale `h3` se non gli si passa `level`, quindi sotto un `h1`
+produceva un salto — e a video non cambia niente. E la spaziatura in CSS **non entra nel testo**:
+la `gap` di una flex separa i riquadri ma non i caratteri, quindi il nome del comando veniva «…
+tutte quante33 in 2 elenchi» e ogni riga «0Squit!». Si cura con un nodo di testo, `{' '}`, non con
+un margine.
+
+⚠️ **Non c'è nessun segnalatore automatico di doppioni, ed è una misura, non una pigrizia.**
+Cercandoli a macchina sulle 33 frasi — stessa forma a meno di punteggiatura, oppure metà delle
+parole lunghe in comune — escono **zero** doppioni veri e **otto** falsi allarmi, di cui sei sono
+le varianti volute di «Squit!». Un avviso che grida al lupo sulle cose giuste si impara a
+ignorare. La ricerca fa il lavoro: si scrive una parola e chi la ripete finisce in fila.

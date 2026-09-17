@@ -59,6 +59,19 @@ riscrive due volte:
 `scroll-shadow` · `meter` · `progress-circle` · `progress-bar` · `pagination` · `table` ·
 `typography` · `breadcrumbs` · `disclosure` · `search-field` · `number-field` · `input-group`
 
+✅ **Quattro di questi sono stati usati davvero**, nell'elenco consultabile delle frasi del
+playground (2026-09-17), e reggono senza una riga di stile nostra:
+
+- **`Disclosure`** — `Root`/`Heading`/`Trigger`/`Content`/`Body`/`Indicator`. Il grilletto è un
+  `<button>` con `aria-expanded` e `aria-controls` già cablati. ⚠️ **`Heading` vale `h3` se non gli
+  si dice `level`**, quindi sotto un `h1` è un salto di livello: si passa `level={2}`.
+- **`SearchField`** — `type="search"`, Esc che svuota, e il pulsante di pulizia già dentro. Serve
+  solo `aria-label`, perché un campo senza etichetta visibile resterebbe senza nome.
+- **`ScrollShadow`** — un `<div>` che scorre e si sfuma ai bordi quando c'è altro sopra o sotto.
+  `size`, `offset`, `visibility`, `hideScrollBar`.
+- **`EmptyState`** — ⚠️ è **solo un contenitore vestito**: non ha sotto-componenti per icona,
+  titolo e testo, quindi il contenuto è tutto di chi lo usa.
+
 ## Come si aggiorna
 
 Una riga per componente nuovo, **prima** di scriverlo. Se la riga dice `da zero`, deve dire anche

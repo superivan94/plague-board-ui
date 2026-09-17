@@ -10,6 +10,15 @@ import {
 } from 'plague-board-ui';
 import type { ReactNode } from 'react';
 
+import { PhraseBrowser, type PhraseGroup } from './PhraseBrowser';
+
+// ⚠️ `PhraseBrowser` è `'use client'` e questa pagina no: un componente client dentro una pagina
+// server è il caso normale, e passa il confine perché riceve solo dati — array di stringhe.
+const GROUPS: readonly PhraseGroup[] = [
+  { name: 'RAT_PHRASES', phrases: RAT_PHRASES },
+  { name: 'DEV_PHRASES', phrases: DEV_PHRASES },
+];
+
 // ⚠️ Pagina **server**, senza `'use client'`: il cablaggio fra sorteggio e fumetto sta tutto dentro
 // `TalkingMascot`, quindi qui non c'è nessun hook e nessuno stato. È la misura di che cosa fa quel
 // componente — prima questa stessa pagina doveva essere client per intero.
@@ -125,6 +134,8 @@ export default function VoicePage() {
           <VoiceDemo key={voice.name} {...voice} />
         ))}
       </div>
+
+      <PhraseBrowser groups={GROUPS} />
 
       <TechRule>i tre pezzi</TechRule>
 

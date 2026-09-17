@@ -201,6 +201,12 @@ exist in target module» che **non sono veri**. Si guarda la pagina, o si crede 
   `@media (prefers-reduced-motion: reduce)`: è `[data-reduce-motion="true"]` **oppure** il media
   query quando quell'attributo non c'è. Vuol dire che un `motion-reduce:` scritto qui risponde sia
   alla preferenza di sistema sia a un interruttore dentro l'applicazione, gratis.
+- ⚠️ **La spaziatura in CSS non entra nel testo, e il nome accessibile la legge attaccata.** La
+  `gap` di una flex separa i riquadri, non i caratteri: due `<span>` adiacenti dentro un comando
+  danno «…tutte quante33 in 2 elenchi». Si cura con un **nodo di testo** — `{' '}` fra i due —, non
+  con un margine. E il `Heading` di HeroUI vale **`h3`** se non gli si passa `level`, quindi sotto
+  un `h1` è un salto di livello che a schermo non si vede. Le due cose si trovano solo leggendo
+  l'albero di accessibilità, ed è lo scenario dell'elenco delle frasi in [`COLLAUDI.md`](COLLAUDI.md).
 - ⚠️ **Un file binario in una libreria `tsc` va dentro un modulo, non accanto.** Un pacchetto npm
   spedisce qualunque file, ma un binario ha bisogno di un **URL**, e quell'URL lo fabbrica il
   bundler dell'applicazione che lo installa: la libreria non sa a che indirizzo il proprio file
