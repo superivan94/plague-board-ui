@@ -184,6 +184,30 @@ exist in target module» che **non sono veri**. Si guarda la pagina, o si crede 
   esplicito per l'albero di accessibilità è un `graphics-document`, quindi un test che asserisce
   `queryByRole('img')` per dire «è decorativa» resta **verde anche togliendo l'`aria-hidden`** che
   dovrebbe difendere. Si asserisce l'attributo.
+- ⚠️ **Il `Button` di HeroUI è un controllo con una taglia: non avvolge contenuto di misura
+  qualunque.** `.button` è `h-10 md:h-9 px-4 rounded-3xl`, e `.button--sm` arriva a scrivere
+  `svg { size-4 }` — un segno da 56px ci finisce dentro a 16. È il rovescio della scoperta su
+  `Surface`, che di taglie non ne ha nessuna. E il `Pressable` di `react-aria` **non** è la via
+  d'uscita: letto nel sorgente, clona il figlio e pretende che sia **già** focalizzabile e con un
+  ruolo interattivo — non aggiunge né `role` né `tabIndex`. Il pezzo giusto è `usePress` su un
+  `<button>` proprio.
+- ⚠️ **`usePress` non fa scattare `onPress` al rilascio: aspetta il `click`** — e se entro 80ms non
+  arriva, **lo sintetizza**, perché iOS e Android non lo emettono dopo una pressione lunga. È la
+  ragione concreta per preferirlo a un `onClick`: tenere premuta una mascotte su un telefono, con
+  `onClick`, non la fa parlare. In jsdom questo è anche **l'unica cosa che porta la tastiera**:
+  sostituendo `pressProps` con `onClick` sullo stesso `<button>` vero, il test dell'Invio diventa
+  rosso, perché jsdom non sintetizza il `click` da un tasto.
+- ⚠️ **HeroUI 3 ridefinisce la variante `motion-reduce` di Tailwind.** Non è più solo
+  `@media (prefers-reduced-motion: reduce)`: è `[data-reduce-motion="true"]` **oppure** il media
+  query quando quell'attributo non c'è. Vuol dire che un `motion-reduce:` scritto qui risponde sia
+  alla preferenza di sistema sia a un interruttore dentro l'applicazione, gratis.
+- ⚠️ **La passata sui contrasti dei testi non vede la grafica, e lì si nasconde lo stesso difetto.**
+  La soglia della grafica che porta significato — segni, e soprattutto **indicatori di fuoco** — è
+  **3**, e si misura sullo stesso sfondo composto. L'anello di fuoco della mascotte, scritto con
+  `brand`, faceva **1,38** in tema chiaro: un comando che da tastiera non si trova. Idem i segni
+  delle demo. Il lime grezzo va **dentro** la barra, che è un'isola scura; sul fondo della pagina
+  ci va `brand-ink`. Lo scenario sta in [`COLLAUDI.md`](COLLAUDI.md), decorazioni dichiarate
+  comprese.
 
 ## Memoria di sessione
 

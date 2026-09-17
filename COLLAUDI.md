@@ -228,3 +228,31 @@ tema chiaro. Le cause erano tre, e nessuna si vedeva guardando:
 
 ⚠️ **Lo sfondo va composto, non letto.** Prendendo il primo `background-color` non trasparente che
 si incontra, la barra risulta nera anche quando è grigia, e l'intero difetto sparisce dalla misura.
+
+### Ogni segno e ogni anello di fuoco, nei due temi — 2026-09-17
+
+**Esegue:** agente — stessa misura del testo, su ciò che testo non è.
+**Ultima esecuzione:** agente, 2026-09-17 — **nessun segno sotto soglia**, tolte tre decorazioni
+dichiarate.
+
+**Preparazione:** come sopra, ma si percorrono gli `<svg>` con lato ≥ 16 e si mette a fuoco ogni
+comando da tastiera per leggere `outlineColor`. La soglia qui è **3**, non 4,5: è la soglia del
+contrasto **non testuale** — grafica che porta significato e indicatori di fuoco.
+
+| Azione | Atteso | Ottenuto |
+|---|---|---|
+| I segni delle quattro pagine, nei due temi | nessuno sotto 3 | nessuno, tolte le tre decorazioni |
+| L'anello di fuoco della mascotte, tema scuro | ≥ 3 | **13,43** |
+| L'anello di fuoco della mascotte, tema chiaro | ≥ 3 | **4,58** |
+
+**Che cosa protegge:** ⚠️ **la passata sui testi non vede questa roba, e i due difetti che ha
+lasciato passare erano entrambi verdi su chiaro.** L'anello di fuoco della mascotte, scritto con
+`brand`, faceva **1,38** in tema chiaro: un indicatore di fuoco invisibile è un comando che da
+tastiera non si trova. E i segni delle demo, sempre in `brand`, lo stesso **1,38** — il lime va
+bene *dentro* la barra, che è un'isola scura, e non sul fondo della pagina. Entrambi si curano con
+`brand-ink`, che è il token fatto apposta.
+
+⚠️ **Le eccezioni si dichiarano, non si alzano le soglie.** Le tre uscite che restano sono gli
+`<svg>` sparsi del bozzetto della direzione: `pointer-events-none absolute`, `aria-hidden="true"`,
+`brand` al **19%**, cioè 1,52. Sono decorazione, e la decorazione è fuori dalla regola per
+definizione. Una passata che non le sa distinguere non è una passata: è un numero.

@@ -158,7 +158,10 @@ export default function BarPage() {
           il cuore sembra un graffio. La misura si chiede a <code>PLAGUE_BAR_MARK_SIZE</code>,
           invece di scriverla a mano in ogni applicazione.
         </p>
-        <div className="flex items-end gap-8 rounded-lg border border-border p-4 text-brand">
+        {/* ⚠️ `brand-ink` e non `brand`: qui i tre segni si guardano per la **misura**, e sono sul
+            fondo della pagina, non dentro la lastra scura. Il lime grezzo in tema chiaro fa 1,38 di
+            contrasto — dentro la barra qui sopra va bene, perché quella è un'isola scura. */}
+        <div className="flex items-end gap-8 rounded-lg border border-border p-4 text-brand-ink">
           {SAMPLES.map(({ size }) => (
             <span key={size} className="flex flex-col items-center gap-2">
               <RatIcon size={PLAGUE_BAR_MARK_SIZE[size]} />

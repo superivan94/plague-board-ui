@@ -123,7 +123,11 @@ export default function StyleReference() {
 
       <section className="flex flex-col gap-3">
         <h2 className="text-lg font-medium">Il dado, e i due verdi che non litigano</h2>
-        <div className="flex flex-wrap items-center gap-6 rounded-lg border border-border p-4">
+        {/* ⚠️ I due segni stanno su una lastra scura anche in tema chiaro, e non è vezzo: `brand` e
+            `plague-400` sono tinte **da fondo scuro** — su una pagina chiara fanno 1,38 e 1,74 di
+            contrasto, cioè spariscono. Mostrarli così è mostrarli dove vivono; il verde con cui si
+            *scrive* in tema chiaro è un'altra cosa, ed è `brand-ink`. */}
+        <div className="dark flex flex-wrap items-center gap-6 rounded-lg border border-border bg-gray-950/90 p-4">
           <span className="flex items-center gap-2 text-brand">
             <DiceIcon size={36} />
             <span className="text-xs text-muted">

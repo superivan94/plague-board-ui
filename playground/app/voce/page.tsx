@@ -1,35 +1,39 @@
-'use client';
-
-import { Button } from '@heroui/react';
 import {
   CodeIcon,
   DEV_PHRASES,
   RAT_PHRASES,
   RatIcon,
-  SpeechBubble,
+  TalkingMascot,
   TechLabel,
   TechRule,
-  useRandomPhrase,
 } from 'plague-board-ui';
-import { type ComponentType, useState } from 'react';
+import type { ComponentType } from 'react';
 
-// ⚠️ Pagina `'use client'` per intero: `useRandomPhrase` è un hook, e un hook gira solo di là.
-// Quando arriverà `TalkingMascot` le due colonne qui sotto si riducono a una riga, perché è
-// esattamente questo cablaggio che quel componente incapsula.
+// ⚠️ Pagina **server**, senza `'use client'`: il cablaggio fra sorteggio e fumetto sta tutto dentro
+// `TalkingMascot`, quindi qui non c'è nessun hook e nessuno stato. È la misura di che cosa fa quel
+// componente — prima questa stessa pagina doveva essere client per intero.
 
 interface Voice {
   readonly name: string;
   readonly Mark: ComponentType<{ size?: number; className?: string }>;
   readonly phrases: readonly string[];
-  readonly action: string;
+  readonly label: string;
 }
 
 const VOICES: readonly Voice[] = [
-  { name: 'il ratto', Mark: RatIcon, phrases: RAT_PHRASES, action: 'Sveglia il ratto' },
-  { name: 'lo sviluppatore', Mark: CodeIcon, phrases: DEV_PHRASES, action: 'Chiedi al collega' },
+  { name: 'il ratto', Mark: RatIcon, phrases: RAT_PHRASES, label: 'Sveglia il ratto' },
+  { name: 'lo sviluppatore', Mark: CodeIcon, phrases: DEV_PHRASES, label: 'Chiedi al collega' },
 ];
 
 const RULES = [
+  [
+    'Si preme, non ci si passa sopra',
+    'Il passaggio del mouse non esiste su un telefono: un easter egg appeso all’hover è invisibile a chi usa l’app dal palmo della mano. Qui il grilletto è un pulsante vero, quindi risponde anche a Invio e Spazio.',
+  ],
+  [
+    'Il nome del comando è obbligatorio',
+    'La mascotte non disegna niente di suo, e le icone della libreria sono decorative: senza un nome dichiarato resterebbe un pulsante muto. Per questo la prop è obbligatoria — il nome non può dipendere da che cosa capita di avvolgere.',
+  ],
   [
     'È un messaggio, non una descrizione',
     'Il fumetto è una regione viva: si legge quando arriva e poi non c’è più. Un tooltip invece lega il testo a chi lo dice per sempre, e lo ripete a ogni fuoco.',
@@ -48,39 +52,28 @@ const RULES = [
   ],
 ];
 
-/**
- * Una voce sola: il segno, il fumetto appeso sotto, e il comando che la fa parlare.
- *
- * ⚠️ Lo stato «sta parlando» è di qui, non dell'hook: `useRandomPhrase` tiene l'ultima frase e non
- * la dimentica più. Dire e *smettere di dire* sono due cose.
- */
-function VoiceDemo({ name, Mark, phrases, action }: Voice) {
-  const { phrase, pick } = useRandomPhrase(phrases);
-  const [isTalking, setIsTalking] = useState(false);
+const PIECES = [
+  ['useRandomPhrase', 'pesca una frase e non ripete mai quella appena detta'],
+  ['SpeechBubble', 'la mostra appesa a chi parla, e se ne va da solo'],
+  ['TalkingMascot', 'mette insieme i due e ci attacca il grilletto'],
+];
 
-  const say = () => {
-    pick();
-    setIsTalking(true);
-  };
-
+/** Una voce sola: la faccia che si preme, e quante battute conosce. */
+function VoiceDemo({ name, Mark, phrases, label }: Voice) {
   return (
     <div className="flex flex-col items-center gap-4 rounded-lg border border-border p-6">
       <TechLabel className="text-muted">{name}</TechLabel>
 
-      {/* ⚠️ Il `relative` sta stretto **attorno al segno**: il fumetto si appende a chi parla, e
-          appeso a una scatola grande uscirebbe dal suo bordo inferiore, cioè addosso al pulsante.
-          L'altezza fissa qui fuori è il posto che si lascia al fumetto, così le colonne non ballano
-          quando compare. */}
+      {/* L'altezza fissa è il posto che si lascia al fumetto, così le colonne non ballano quando
+          compare. Il `relative` che lo ancora ce l'ha `TalkingMascot` addosso. */}
       <span className="flex h-32 items-start justify-center">
-        <span className="relative">
-          <Mark size={56} className="text-brand" />
-          <SpeechBubble message={isTalking ? phrase : null} onHide={() => setIsTalking(false)} />
-        </span>
+        <TalkingMascot label={label} phrases={phrases}>
+          {/* ⚠️ `brand-ink` e non `brand`: il lime grezzo su una pagina chiara fa **1,38** di
+              contrasto e la faccia sparisce. Dentro la barra il lime va bene perché quella è
+              un'isola scura; qui siamo sul fondo della pagina, che cambia col tema. */}
+          <Mark size={56} className="text-brand-ink" />
+        </TalkingMascot>
       </span>
-
-      <Button variant="primary" onPress={say}>
-        {action}
-      </Button>
 
       <TechLabel className="text-muted">{phrases.length} frasi</TechLabel>
     </div>
@@ -93,21 +86,42 @@ export default function VoicePage() {
       <div className="flex flex-col gap-2">
         <h1 className="text-2xl font-semibold">La voce</h1>
         <p className="text-sm text-muted">
-          Due pezzi separati, perché il <em>meccanismo</em> e il <em>contenuto</em> lo sono.{' '}
-          <code>useRandomPhrase</code> pesca una frase e non ripete mai quella appena detta;{' '}
-          <code>SpeechBubble</code> la mostra e se ne va da solo. Le frasi di casa —{' '}
+          Una mascotte che al clic dice la sua. <code>TalkingMascot</code> avvolge{' '}
+          <strong>qualunque figlio</strong> — un SVG, il logo in PNG, una foto — e non disegna
+          niente di suo: è la faccia di chi lo usa a parlare. Le frasi di casa —{' '}
           <code>RAT_PHRASES</code> e <code>DEV_PHRASES</code> — viaggiano con la libreria, ma
           chiunque può passare le sue.
         </p>
       </div>
 
-      <TechRule>le due voci</TechRule>
+      <TechRule>premile</TechRule>
 
       <div className="grid gap-4 sm:grid-cols-2">
         {VOICES.map((voice) => (
           <VoiceDemo key={voice.name} {...voice} />
         ))}
       </div>
+
+      <TechRule>i tre pezzi</TechRule>
+
+      <section className="flex flex-col gap-3">
+        <p className="max-w-2xl text-sm text-muted">
+          Meccanismo, forma e cablaggio sono separati, perché servono a tre momenti diversi: chi
+          vuole solo il sorteggio prende il primo, chi ha già uno stato suo prende i primi due, chi
+          vuole la mascotte e basta prende il terzo.
+        </p>
+
+        <dl className="flex max-w-2xl flex-col gap-2">
+          {PIECES.map(([name, body]) => (
+            <div key={name} className="flex flex-col gap-0.5 sm:flex-row sm:gap-3">
+              <dt className="shrink-0 text-sm font-semibold text-brand-ink sm:w-44">
+                <code>{name}</code>
+              </dt>
+              <dd className="text-sm text-muted">{body}</dd>
+            </div>
+          ))}
+        </dl>
+      </section>
 
       <TechRule>le regole</TechRule>
 

@@ -14,6 +14,7 @@ export { PlagueBar, type PlagueBarProps } from './brand/PlagueBar';
 export { PLAGUE_BAR_MARK_SIZE, type PlagueBarSize } from './brand/plagueBarSizes';
 export { PulseDot, type PulseDotProps } from './brand/PulseDot';
 export { SpeechBubble, type SpeechBubbleProps } from './brand/SpeechBubble';
+export { TalkingMascot, type TalkingMascotProps } from './brand/TalkingMascot';
 export { TechLabel, type TechLabelProps } from './brand/TechLabel';
 export { TechRule, type TechRuleProps } from './brand/TechRule';
 
