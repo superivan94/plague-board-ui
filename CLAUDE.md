@@ -184,3 +184,17 @@ exist in target module» che **non sono veri**. Si guarda la pagina, o si crede 
   esplicito per l'albero di accessibilità è un `graphics-document`, quindi un test che asserisce
   `queryByRole('img')` per dire «è decorativa» resta **verde anche togliendo l'`aria-hidden`** che
   dovrebbe difendere. Si asserisce l'attributo.
+
+## Memoria di sessione
+
+Dopo un compact, la riga di `SessionStart` dice se c'è uno stato salvato e **dove sta**:
+`[smart-compact] Stato dell'ultimo compact di questa sessione: <percorso>`. Se c'è, leggilo al
+primo turno — contiene le decisioni prese e i passi concordati che il compact ha compresso — e
+prosegui in silenzio, con una riga sola su dove si era arrivati. Se l'operazione che descrive è
+chiusa, cancella il file e dillo in una riga; se è in corso, lo aggiorna la skill `smart-compact`
+al prossimo compact.
+
+**Il percorso non si costruisce a mano** e il file **non si chiama `current.md`**: lo nomina il
+`session_id`, perché due sessioni sullo stesso progetto con lo stesso nome si sovrascriverebbero
+a vicenda. Se quella riga non c'è, non è ancora avvenuto nessun compact in questa sessione: non
+c'è niente da cercare.
