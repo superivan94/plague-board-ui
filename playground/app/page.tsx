@@ -1,4 +1,5 @@
 import { Button } from '@heroui/react';
+import { Fragment } from 'react';
 import {
   BiohazardIcon,
   CodeIcon,
@@ -20,6 +21,12 @@ const icons = [
   { name: 'BiohazardIcon', Icon: BiohazardIcon },
   { name: 'VirusIcon', Icon: VirusIcon },
 ];
+
+// La griglia delle icone: una colonna per l'etichetta della misura, e una per ogni icona. Le due
+// tabelle — su scuro e su chiaro — la condividono, così le colonne restano allineate e il nome
+// scritto in cima vale per tutte e due.
+const ICON_GRID = 'grid items-end gap-x-3 gap-y-3';
+const iconGridColumns = { gridTemplateColumns: `5rem repeat(${icons.length}, minmax(0, 1fr))` };
 
 const staticSwatches = [
   ['brand', 'bg-brand'],
@@ -98,15 +105,31 @@ export default function Home() {
         {/* Le tre taglie sono quelle vere di RattInventario: 56 nel fondale di ingresso, 24 accanto
             a un testo, 16 ai lati del livello tossico.
             ⚠️ La riga dei 16 dice da sola perché `MoleculeIcon` e `BiohazardIcon` sono due icone e
-            non una: la molecola regge, il trifoglio si chiude in una macchia. */}
-        {[56, 24, 16].map((size) => (
-          <div key={size} className="flex items-center gap-6">
-            <span className="w-20 text-sm text-default-500">{size}px</span>
-            {icons.map(({ name, Icon }) => (
-              <Icon key={name} size={size} color="#22c55e" />
-            ))}
-          </div>
-        ))}
+            non una: la molecola regge, il trifoglio si chiude in una macchia.
+
+            ⚠️ **Il nome sta scritto, non appeso all'hover.** Un'etichetta che compare solo al
+            passaggio del mouse non esiste su telefono — è una regola dei progetti dei Ludoratti —
+            e non esiste nemmeno in uno screenshot, che è il modo in cui questa pagina viene
+            davvero guardata quando si decide qualcosa. */}
+        <div className={ICON_GRID} style={iconGridColumns}>
+          <span />
+          {icons.map(({ name }) => (
+            <span key={name} className="text-center font-mono text-[10px] text-brand-ink">
+              {name}
+            </span>
+          ))}
+
+          {[56, 24, 16].map((size) => (
+            <Fragment key={size}>
+              <span className="text-sm text-default-500">{size}px</span>
+              {icons.map(({ name, Icon }) => (
+                <span key={name} className="flex justify-center">
+                  <Icon size={size} color="#22c55e" />
+                </span>
+              ))}
+            </Fragment>
+          ))}
+        </div>
 
         {/* Senza `color` l'icona prende il colore del testo: è il caso che ne permette la
             sostituzione dentro un comando senza sapere in che tema si troverà.
@@ -114,10 +137,12 @@ export default function Home() {
             il verde del tema scuro — la pagina ha `dark` sull'`<html>` — e su questo fondo bianco
             farebbe 1,74 di contrasto. È il difetto che il token esiste per impedire, ed è bastato
             dimenticarsi una classe per rifarlo. */}
-        <div className="light flex items-center gap-6 rounded-lg bg-white p-4 text-plague-ink">
-          <span className="w-20 text-sm">su fondo chiaro</span>
+        <div className={`light rounded-lg bg-white p-4 text-plague-ink ${ICON_GRID}`} style={iconGridColumns}>
+          <span className="text-sm">su chiaro</span>
           {icons.map(({ name, Icon }) => (
-            <Icon key={name} size={24} />
+            <span key={name} className="flex justify-center">
+              <Icon size={24} />
+            </span>
           ))}
         </div>
       </section>
@@ -140,11 +165,18 @@ export default function Home() {
           </span>
         </div>
 
-        <div className="flex items-center gap-6">
-          <span className="w-20 text-sm text-default-500">48px</span>
-          <CodeIcon size={48} />
-          <RobotIcon size={48} />
-          <SparklesIcon size={48} />
+        <div className="flex items-end gap-8">
+          <span className="text-sm text-default-500">48px</span>
+          {[
+            { name: 'CodeIcon', Icon: CodeIcon },
+            { name: 'RobotIcon', Icon: RobotIcon },
+            { name: 'SparklesIcon', Icon: SparklesIcon },
+          ].map(({ name, Icon }) => (
+            <span key={name} className="flex flex-col items-center gap-2">
+              <Icon size={48} />
+              <span className="font-mono text-[10px] text-brand-ink">{name}</span>
+            </span>
+          ))}
         </div>
       </section>
     </main>
