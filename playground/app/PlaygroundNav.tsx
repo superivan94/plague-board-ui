@@ -5,6 +5,7 @@ import { usePathname } from 'next/navigation';
 import { PLAGUE_BAR_MARK_SIZE, PlagueBar, RatIcon, TechLabel, TechRule } from 'plague-board-ui';
 
 import { PLAYGROUND_PAGES, type PlaygroundPage } from './pages';
+import { ThemeToggle } from './ThemeToggle';
 
 /**
  * La barra del playground.
@@ -72,6 +73,10 @@ export function PlaygroundNav() {
             ))}
           </span>
         )}
+
+        <span className="ml-auto">
+          <ThemeToggle />
+        </span>
       </nav>
     </PlagueBar>
   );

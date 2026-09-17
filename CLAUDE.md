@@ -68,6 +68,15 @@ exist in target module» che **non sono veri**. Si guarda la pagina, o si crede 
 - 📌 **I colori si rifiniscono alla fine**, quando tutti i componenti ci sono. Un colore diventa
   variabile solo quando si sa che cosa deve fare nei due temi; **nel dubbio resta statico**, e lo
   si dichiara.
+- 📌 **Il testo del playground spiega il componente, non come è stato fatto.** La demo è uno
+  storyboard da leggere in fretta: a che serve, quando si usa, quali vincoli rispettare, e i numeri
+  che servono a decidere — misure, contrasti, soglie. **Fuori**: date, cronaca dello sviluppo,
+  difetti incontrati, confronti con RattInventario, domande retoriche. Quella roba serve a chi
+  lavora al codice e sta nei **commenti**, in `COLLAUDI.md` e nel piano.
+- 📌 **Ogni pagina del playground regge i due temi.** Niente colori scritti a mano: i token di
+  HeroUI — `text-muted`, `border-border`, `bg-surface`, `bg-background` — e i nostri `*-ink`. Un
+  `text-gray-400` è invisibile in chiaro. Le eccezioni sono le superfici che **restano scure nei
+  due temi** — la barra, il riquadro della direzione — e vanno dichiarate dove stanno.
 - 📌 **`main` e le pull request solo su richiesta esplicita dell'utente.**
 
 ## Cose misurate, da non riscoprire
@@ -138,6 +147,17 @@ exist in target module» che **non sono veri**. Si guarda la pagina, o si crede 
   è nostra, ed è **l'unica misura che possiede** — la larghezza della colonna dentro la decide chi
   la usa, perché dipende dalla pagina. Due `py` annidati non si sommano in un modo che si possa
   prevedere a occhio.
+- ⚠️ **`text-default-500` non esiste, e per mesi non se n'è accorto nessuno.** HeroUI 3 non ha una
+  scala numerata: i suoi token sono `muted`, `default`, `border`, `separator`, `surface`,
+  `background`, `foreground` e le loro varianti. Una classe che non esiste **non colora**, quindi
+  il testo restava `foreground` e sembrava solo un po' troppo acceso — la stessa forma di
+  `animate-scale-bounce` in RattInventario. Si verifica cercando la regola nel CSS generato, non
+  guardando la pagina.
+- ⚠️ **Il tema si applica con uno script che gira prima del primo disegno, non con un effetto.** Gli
+  effetti partono **dopo**, e lì il lampo del tema sbagliato si vede. Il prezzo è che il server
+  rende una classe e il client ne trova un'altra: `suppressHydrationWarning` sull'`<html>` è la
+  riga che dice «questa differenza è voluta». Misurato: senza, un avviso a ogni caricamento; con,
+  il contatore degli errori non si muove.
 - ⚠️ **Un'animazione CSS non riparte perché è cambiato il testo dentro l'elemento.** React riusa lo
   stesso nodo, e l'animazione prosegue da dov'era: un'animazione con `forwards` che finisce a
   opacità zero lascia poi un elemento **presente e invisibile**, che continua ad aggiornarsi senza

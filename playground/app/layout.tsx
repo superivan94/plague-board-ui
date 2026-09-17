@@ -26,12 +26,27 @@ export const metadata: Metadata = {
   description: 'I componenti dei Ludoratti, ai tre formati e nei due temi.',
 };
 
+// ⚠️ Gira **prima** che la pagina si disegni, quindi chi torna col tema chiaro non vede un lampo
+// scuro. Non può essere un effetto di React: gli effetti partono dopo il primo disegno, ed è lì
+// che il lampo si vede.
+const THEME_BOOT = `try{var t=localStorage.getItem('pb-playground-theme')==='light'?'light':'dark';var c=document.documentElement.classList;c.toggle('dark',t==='dark');c.toggle('light',t==='light')}catch(e){}`;
+
 export default function RootLayout({ children }: { children: React.ReactNode }) {
-  // ⚠️ La classe `dark` sulla radice è il modo in cui HeroUI 3 riconosce il tema scuro — accetta
-  // anche `data-theme="dark"`. Qui è fissa perché il playground il tema lo commuta per riquadro,
-  // affiancando chiaro e scuro: la pagina intera non deve avere un tema suo.
+  // La classe sulla radice è il modo in cui sia HeroUI sia `theme.css` riconoscono il tema. Qui
+  // parte `dark`, e lo script qui sopra la corregge subito se l'ultima scelta era un'altra.
   return (
-    <html lang="it" className={`dark ${poppins.variable} ${shareTechMono.variable}`}>
+    // ⚠️ `suppressHydrationWarning` è qui perché la differenza è **voluta**: il server scrive
+    // `dark`, lo script qui sopra la cambia prima che React idrati, e React trova una classe
+    // diversa da quella che ha reso. Senza questa riga è un avviso a ogni caricamento; con un
+    // effetto al posto dello script, sarebbe un lampo del tema sbagliato a ogni caricamento.
+    <html
+      lang="it"
+      suppressHydrationWarning
+      className={`dark ${poppins.variable} ${shareTechMono.variable}`}
+    >
+      <head>
+        <script dangerouslySetInnerHTML={{ __html: THEME_BOOT }} />
+      </head>
       <body className="min-h-dvh bg-background text-foreground antialiased">
         <PlaygroundNav />
         {children}

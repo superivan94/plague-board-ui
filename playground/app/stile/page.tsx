@@ -51,15 +51,19 @@ export default function StyleReference() {
     <main className="mx-auto flex min-h-dvh max-w-3xl flex-col gap-10 px-4 py-12">
       <style>{KEYFRAMES}</style>
 
-      <header className="flex flex-col gap-2">
-        <h1 className="text-2xl font-semibold">La direzione, come riferimento</h1>
-        <p className="text-sm text-default-500">
-          <strong>B · Laboratorio</strong>, col lime del marchio su <code>gray-950</code>.
-          Superficie semitrasparente e sfocata, angoli morbidi, icone che galleggiano, gocce che
-          colano, <code>Share Tech Mono</code> sui titoli e <code>Poppins</code> nel testo.
-          ⚠️ Disegnata a mano: i componenti veri devono arrivare a questo, non partire da questo.
+      <div className="flex flex-col gap-2">
+        <h1 className="text-2xl font-semibold">La direzione</h1>
+        <p className="text-sm text-muted">
+          <strong>Laboratorio</strong>: lime del marchio su <code>gray-950</code>, superficie
+          semitrasparente e sfocata, angoli morbidi, icone che galleggiano, gocce che colano.{' '}
+          <code>Share Tech Mono</code> sui titoli e sulle etichette, <code>Poppins</code> nel testo.
         </p>
-      </header>
+        <p className="text-sm text-muted">
+          ⚠️ Il riquadro qui sotto è il <strong>bersaglio</strong>, disegnato a mano: i componenti
+          veri devono arrivarci, non partire da qui. E resta scuro nei due temi — la direzione è
+          questa.
+        </p>
+      </div>
 
       <div className="relative overflow-hidden rounded-xl bg-gray-950 p-8">
         {['30%', '57%', '72%'].map((left, i) => (
@@ -119,17 +123,17 @@ export default function StyleReference() {
 
       <section className="flex flex-col gap-3">
         <h2 className="text-lg font-medium">Il dado, e i due verdi che non litigano</h2>
-        <div className="flex flex-wrap items-center gap-6 rounded-lg border border-gray-700 p-4">
+        <div className="flex flex-wrap items-center gap-6 rounded-lg border border-border p-4">
           <span className="flex items-center gap-2 text-brand">
             <DiceIcon size={36} />
-            <span className="text-xs text-gray-400">
-              il marchio — <code>brand</code>, il lime della corporazione
+            <span className="text-xs text-muted">
+              il marchio — <code>brand</code>: il dado è il segno dei giochi da tavolo
             </span>
           </span>
           <span className="flex items-center gap-2 text-plague-400">
             <SkullIcon size={36} />
-            <span className="text-xs text-gray-400">
-              la malattia — <code>plague-400</code>, il verde di RattInventario
+            <span className="text-xs text-muted">
+              la malattia — <code>plague-400</code>: icone, fondali, stati
             </span>
           </span>
         </div>
@@ -138,26 +142,25 @@ export default function StyleReference() {
       <section className="flex flex-col gap-3">
         <h2 className="text-lg font-medium">Il segno della barra</h2>
 
-        <div className="flex flex-wrap items-center gap-x-6 gap-y-3 rounded-lg border border-gray-700 p-4">
+        <div className="flex flex-wrap items-center gap-x-6 gap-y-3 rounded-lg border border-border p-4">
           <span className="flex shrink-0 items-center gap-2 rounded bg-gray-950/70 px-3 py-2">
             <RatIcon size={20} className="animate-heartbeat shrink-0 text-brand" />
             <TechLabel className="text-gray-500">plague-board-ui</TechLabel>
           </span>
-          <p className="max-w-lg text-sm text-default-500">
-            <strong className="text-white">Il marchio che batte</strong>, scelto il 2026-09-17 fra
-            cinque candidati — pallino, pozione, goccia, biohazard. Il motivo non è estetico: quel
-            segno a prima vista è un <strong>cuore</strong>, poi <strong>due che si abbracciano</strong>,
-            e solo per via delle orecchie il <strong>muso di un ratto</strong>. Un cuore che batte
-            dice «acceso» raccontando la prima delle sue tre letture, invece di aggiungerne una
-            quarta — che era il difetto del pallino. ⚠️ A <strong>20px</strong>: sotto, il tratto
-            interno scende sotto il pixel e il cuore sembra un graffio.
+          <p className="max-w-lg text-sm text-muted">
+            <strong className="text-foreground">Il marchio che batte.</strong> Quel segno si legge
+            in tre modi: a prima vista un <strong>cuore</strong>, poi <strong>due figure che si
+            abbracciano</strong>, e solo per via delle orecchie il <strong>muso di un ratto</strong>.
+            Il battito dice «acceso» raccontando la prima delle tre letture, invece di aggiungerne
+            una quarta. ⚠️ Mai sotto i <strong>20px</strong>: il tratto interno scende sotto il
+            pixel e il cuore sembra un graffio.
           </p>
         </div>
       </section>
 
       <section className="flex flex-col gap-3">
         <h2 className="text-lg font-medium">Il lessico, come dato</h2>
-        <p className="max-w-2xl text-sm text-default-500">
+        <p className="max-w-2xl text-sm text-muted">
           Le parole di casa non stanno dentro i componenti: sono un dizionario che la libreria
           esporta e che ogni app applica se vuole la voce.
         </p>
@@ -165,9 +168,9 @@ export default function StyleReference() {
           {lexicon.map(([before, after]) => (
             <div
               key={before}
-              className="flex flex-col gap-1 rounded-lg border border-gray-700 bg-gray-900 p-3"
+              className="flex flex-col gap-1 rounded-lg border border-border bg-surface p-3"
             >
-              <span className="text-xs text-gray-400 line-through">{before}</span>
+              <span className="text-xs text-muted line-through">{before}</span>
               <span className="font-mono text-sm text-brand-ink">{after}</span>
             </div>
           ))}

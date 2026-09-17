@@ -29,6 +29,11 @@ export interface TechRuleProps {
  * mano `role="separator"` e `aria-orientation`, cioè esattamente ciò che una dipendenza già pagata
  * fa meglio di noi.
  *
+ * ⚠️ **Il nome usa `brand-ink`, cioè il lime che cambia col tema, non `brand`.** Il lime grezzo al
+ * 60% su fondo chiaro fa **1,38** di contrasto e l'etichetta sparisce: misurato il 2026-09-17
+ * accendendo il tema chiaro nel playground. Chi lo mette in un posto che resta scuro nei due temi
+ * — dentro la barra, per esempio — passa il colore da `className`.
+ *
  * ⚠️ **Il colore del filo però è nostro, e resta statico.** `--separator` di HeroUI su
  * `gray-950` fa **1,24** di contrasto — misurato il 2026-09-17: la riga sparisce, perché quel
  * token è tarato sulle superfici chiare del suo tema e non sul nero dei Ludoratti. `gray-700` fa
@@ -47,7 +52,7 @@ export function TechRule({ children, orientation = 'horizontal', className = '' 
 
   return (
     <span
-      className={`flex text-brand/60 ${isVertical ? 'items-center gap-4' : 'flex-col gap-2'} ${className}`}
+      className={`flex text-brand-ink ${isVertical ? 'items-center gap-4' : 'flex-col gap-2'} ${className}`}
     >
       <Separator
         orientation={orientation}

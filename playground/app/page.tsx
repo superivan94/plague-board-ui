@@ -8,13 +8,14 @@ import {
   RobotIcon,
   SkullIcon,
   SparklesIcon,
+  TechLabel,
   TechRule,
   VirusIcon,
 } from 'plague-board-ui';
 
-// ⚠️ Questa pagina è provvisoria e lo resta fino al punto 3, dove diventa l'indice delle storie.
-// Finché le storie non ci sono, i componenti si guardano qui: senza un posto dove renderli, il
-// collaudo per confronto con RattInventario non si può fare affatto.
+// ⚠️ Nessun colore scritto a mano in questa pagina: tutto passa dai token, perché è la pagina che
+// deve reggere il commutatore del tema in cima. Un `text-gray-400` qui dentro sarebbe invisibile
+// in chiaro, ed è esattamente il difetto che la pagina esiste per non far succedere.
 const icons = [
   { name: 'PoisonIcon', Icon: PoisonIcon },
   { name: 'SkullIcon', Icon: SkullIcon },
@@ -23,167 +24,161 @@ const icons = [
   { name: 'VirusIcon', Icon: VirusIcon },
 ];
 
-// La griglia delle icone: una colonna per l'etichetta della misura, e una per ogni icona. Le due
-// tabelle — su scuro e su chiaro — la condividono, così le colonne restano allineate e il nome
-// scritto in cima vale per tutte e due.
-const ICON_GRID = 'grid items-end gap-x-3 gap-y-3';
+const ICON_GRID = 'grid items-end gap-3';
 const iconGridColumns = { gridTemplateColumns: `5rem repeat(${icons.length}, minmax(0, 1fr))` };
 
-const staticSwatches = [
+const swatches = [
   ['brand', 'bg-brand'],
   ['brand-light', 'bg-brand-light'],
   ['brand-dark', 'bg-brand-dark'],
+  ['toxic', 'bg-toxic'],
   ['plague-400', 'bg-plague-400'],
   ['plague-500', 'bg-plague-500'],
   ['plague-600', 'bg-plague-600'],
   ['plague-700', 'bg-plague-700'],
-  ['toxic', 'bg-toxic'],
-  ['gray-200', 'bg-gray-200'],
-  ['gray-400', 'bg-gray-400'],
-  ['gray-600', 'bg-gray-600'],
-  ['gray-700', 'bg-gray-700'],
-  ['gray-800', 'bg-gray-800'],
-  ['gray-900', 'bg-gray-900'],
 ];
 
-/** I due token che il tema cambia, resi nello stesso modo dentro le due isole. */
+const signature = [
+  { name: 'CodeIcon', Icon: CodeIcon, label: 'Superivan94' },
+  { name: 'RobotIcon', Icon: RobotIcon, label: 'AI-Dev' },
+  { name: 'SparklesIcon', Icon: SparklesIcon, label: 'suggerito' },
+];
+
+/** I due token che cambiano col tema, resi identici dentro le due isole. */
 function InkSample({ label }: { label: string }) {
   return (
     <div className="flex flex-col gap-1 rounded-lg bg-background p-4 text-foreground">
-      <span className="text-xs opacity-60">{label}</span>
-      <span data-ink="plague" className="text-plague-ink">
-        Il verde con cui si scrive
-      </span>
-      <span data-ink="brand" className="text-brand-ink">
-        Il verde del marchio
-      </span>
+      <TechLabel className="text-muted">{label}</TechLabel>
+      <span className="text-plague-ink">Il verde con cui si scrive</span>
+      <span className="text-brand-ink">Il verde del marchio</span>
     </div>
   );
 }
 
 export default function Home() {
   return (
-    <main className="mx-auto flex min-h-dvh max-w-2xl flex-col gap-8 px-4 py-16">
-      <h1 className="text-2xl font-semibold">plague-board-ui</h1>
+    <main className="mx-auto flex min-h-dvh max-w-2xl flex-col gap-8 px-4 py-12">
+      <div className="flex flex-col gap-2">
+        <h1 className="text-2xl font-semibold">La tavolozza</h1>
+        <p className="text-sm text-muted">
+          Due verdi con due mestieri. <strong>brand</strong> è il lime della corporazione, quello
+          del marchio e dei comandi principali; <strong>plague</strong> è il verde della malattia,
+          che veste icone, fondali e stati. Non si scambiano.
+        </p>
+      </div>
 
-      {/* ⚠️ `TechRule` **non** sostituisce i titoli: li raggruppa. I due `<h2>` che seguono restano
-          dove sono, perché la gerarchia dei titoli è il modo in cui si salta da una sezione
-          all'altra senza vedere la pagina; la riga dice un'altra cosa, cioè che da qui in giù si
-          parla di un'altra specie di roba. */}
       <TechRule>i colori</TechRule>
 
       <section className="flex flex-col gap-4">
-        <h2 className="text-lg font-medium">La tavolozza, statica</h2>
-
         <div className="grid grid-cols-2 gap-2 sm:grid-cols-4">
-          {staticSwatches.map(([name, className]) => (
+          {swatches.map(([name, className]) => (
             <div key={name} className="flex items-center gap-2">
-              <span className={`size-8 rounded border border-gray-600 ${className}`} />
-              <span className="text-xs text-default-500">{name}</span>
+              <span className={`size-8 rounded border border-border ${className}`} />
+              <TechLabel className="text-muted">{name}</TechLabel>
             </div>
           ))}
         </div>
 
+        <p className="text-sm text-muted">
+          <strong>Nessuna scala di grigi.</strong> Il nero dei Ludoratti è già il{' '}
+          <code>gray-950</code> di Tailwind, e i grigi delle superfici sono quelli di HeroUI:
+          ridichiararli vorrebbe dire sovrascriverli a chi installa.{' '}
+          <strong className="text-toxic">toxic</strong> è un accento, non un colore di testo — si
+          usa su fondo scuro e a bassa opacità.
+        </p>
+
         <div className="flex flex-wrap items-center gap-3">
-          <Button>Un bottone di HeroUI</Button>
-          <span className="text-toxic/40">toxic al 40%</span>
-          <span className="text-toxic">toxic pieno</span>
+          <Button variant="primary">Un bottone di HeroUI</Button>
+          <span className="text-sm text-muted">
+            vestito dal solo <code>theme.css</code>, senza una riga sua
+          </span>
         </div>
       </section>
 
-      <section className="flex flex-col gap-4">
-        <h2 className="text-lg font-medium">I due colori che il tema cambia</h2>
+      <TechRule>i due temi</TechRule>
 
-        {/* Le due isole nella stessa pagina: è il motivo per cui i selettori del tema sono classi
-            qualunque e non `:root.dark`. Il playground del punto 3 farà così per ogni componente. */}
+      <section className="flex flex-col gap-4">
+        <p className="text-sm text-muted">
+          Su fondo chiaro i verdi della peste non si leggono: <code>plague-400</code> su bianco fa{' '}
+          <strong>1,74</strong> di contrasto. Per questo il testo verde non usa mai il colore
+          grezzo ma <code>text-plague-ink</code> e <code>text-brand-ink</code>, che cambiano col
+          tema. Prova il commutatore in alto a destra, o guarda i due temi affiancati:
+        </p>
+
         <div className="grid gap-3 sm:grid-cols-2">
           <div className="light">
-            <InkSample label="tema chiaro" />
+            <InkSample label="chiaro" />
           </div>
           <div className="dark">
-            <InkSample label="tema scuro" />
+            <InkSample label="scuro" />
           </div>
         </div>
+
+        <p className="text-sm text-muted">
+          I due riquadri qui sopra sono nella stessa pagina: i selettori del tema sono{' '}
+          <strong>classi qualunque</strong>, non <code>:root</code>, quindi un&apos;isola chiara può
+          vivere dentro una pagina scura e viceversa.
+        </p>
       </section>
 
       <TechRule>i segni</TechRule>
 
       <section className="flex flex-col gap-4">
-        <h2 className="text-lg font-medium">Le cinque icone della peste</h2>
+        <p className="text-sm text-muted">
+          Le tre misure sono quelle vere: <strong>56</strong> in un fondale, <strong>24</strong>{' '}
+          accanto a un testo, <strong>16</strong> dentro una riga di stato. La riga dei 16 dice da
+          sola perché i contagi sono due icone e non una — <code>MoleculeIcon</code> regge,{' '}
+          <code>BiohazardIcon</code> si chiude in una macchia e non va sotto i 32.
+        </p>
 
-        {/* Le tre taglie sono quelle vere di RattInventario: 56 nel fondale di ingresso, 24 accanto
-            a un testo, 16 ai lati del livello tossico.
-            ⚠️ La riga dei 16 dice da sola perché `MoleculeIcon` e `BiohazardIcon` sono due icone e
-            non una: la molecola regge, il trifoglio si chiude in una macchia.
-
-            ⚠️ **Il nome sta scritto, non appeso all'hover.** Un'etichetta che compare solo al
-            passaggio del mouse non esiste su telefono — è una regola dei progetti dei Ludoratti —
-            e non esiste nemmeno in uno screenshot, che è il modo in cui questa pagina viene
-            davvero guardata quando si decide qualcosa. */}
-        <div className={ICON_GRID} style={iconGridColumns}>
+        <div className={`${ICON_GRID} text-plague-ink`} style={iconGridColumns}>
           <span />
           {icons.map(({ name }) => (
-            <span key={name} className="text-center font-mono text-[10px] text-brand-ink">
-              {name}
-            </span>
+            <TechLabel key={name} className="text-center text-muted">
+              {name.replace('Icon', '')}
+            </TechLabel>
           ))}
 
           {[56, 24, 16].map((size) => (
             <Fragment key={size}>
-              <span className="text-sm text-default-500">{size}px</span>
+              <TechLabel className="text-muted">{size}px</TechLabel>
               {icons.map(({ name, Icon }) => (
                 <span key={name} className="flex justify-center">
-                  <Icon size={size} color="#22c55e" />
+                  <Icon size={size} />
                 </span>
               ))}
             </Fragment>
           ))}
         </div>
 
-        {/* Senza `color` l'icona prende il colore del testo: è il caso che ne permette la
-            sostituzione dentro un comando senza sapere in che tema si troverà.
-            ⚠️ La classe `light` qui non è decorazione: senza, `text-plague-ink` continua a valere
-            il verde del tema scuro — la pagina ha `dark` sull'`<html>` — e su questo fondo bianco
-            farebbe 1,74 di contrasto. È il difetto che il token esiste per impedire, ed è bastato
-            dimenticarsi una classe per rifarlo. */}
-        <div className={`light rounded-lg bg-white p-4 text-plague-ink ${ICON_GRID}`} style={iconGridColumns}>
-          <span className="text-sm">su chiaro</span>
-          {icons.map(({ name, Icon }) => (
-            <span key={name} className="flex justify-center">
-              <Icon size={24} />
+        <p className="text-sm text-muted">
+          Nessuna icona ha un colore addosso: prendono quello del testo che le contiene, ed è
+          quello che permette di sostituirle dentro un comando senza sapere in che tema finiranno.
+        </p>
+      </section>
+
+      <TechRule>la firma</TechRule>
+
+      <section className="flex flex-col gap-4">
+        <p className="text-sm text-muted">
+          A <strong>20px</strong> accanto al nome di chi ha scritto una cosa: umano, AI, o
+          suggerito dall&apos;AI e accettato.
+        </p>
+
+        <div className="flex flex-wrap items-center gap-6">
+          {signature.map(({ name, Icon, label }) => (
+            <span key={name} className="flex items-center gap-1 text-plague-ink">
+              <Icon size={20} /> {label}
             </span>
           ))}
         </div>
-      </section>
-
-      <section className="flex flex-col gap-4">
-        <h2 className="text-lg font-medium">I segni della firma</h2>
-
-        {/* Le stesse misure della firma di RattInventario, dove le icone stanno a 20px accanto al
-            nome dell'autore. `CodeIcon` e `RobotIcon` vanno confrontate col piede del sito vero:
-            di là sono glifi di Material Symbols, qui sono ridisegnate. */}
-        <div className="flex items-center gap-6">
-          <span className="flex items-center gap-1 text-plague-ink">
-            <CodeIcon size={20} /> Superivan94
-          </span>
-          <span className="flex items-center gap-1 text-brand-ink">
-            <RobotIcon size={20} /> AI-Dev
-          </span>
-          <span className="flex items-center gap-1 text-plague-400">
-            <SparklesIcon size={20} /> suggerito
-          </span>
-        </div>
 
         <div className="flex items-end gap-8">
-          <span className="text-sm text-default-500">48px</span>
-          {[
-            { name: 'CodeIcon', Icon: CodeIcon },
-            { name: 'RobotIcon', Icon: RobotIcon },
-            { name: 'SparklesIcon', Icon: SparklesIcon },
-          ].map(({ name, Icon }) => (
-            <span key={name} className="flex flex-col items-center gap-2">
+          <TechLabel className="text-muted">48px</TechLabel>
+          {signature.map(({ name, Icon }) => (
+            <span key={name} className="flex flex-col items-center gap-2 text-plague-ink">
               <Icon size={48} />
-              <span className="font-mono text-[10px] text-brand-ink">{name}</span>
+              <TechLabel className="text-muted">{name.replace('Icon', '')}</TechLabel>
             </span>
           ))}
         </div>
