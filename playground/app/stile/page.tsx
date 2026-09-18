@@ -201,21 +201,28 @@ export default function StyleReference() {
               </span>
             ))}
           </div>
+          {/* Tre interruttori, otto combinazioni: qui le tre reference ricomposte esatte — il bruno
+              col teschio e il collare, l'albino con l'ampolla — e due che nelle reference non
+              esistono, perché è il punto dei pezzi separati. */}
           <div className="flex flex-wrap items-end gap-8">
             <span className="flex flex-col items-center gap-2">
-              <Rat livery="grey" size={64} hasSkull />
-              <TechLabel className="text-muted">hasSkull</TechLabel>
+              <Rat livery="brown" size={64} hasSkull hasCollar />
+              <TechLabel className="text-muted">hasSkull hasCollar</TechLabel>
             </span>
             <span className="flex flex-col items-center gap-2">
-              <Rat livery="brown" size={64} hasVial />
+              <Rat livery="white" size={64} hasVial />
               <TechLabel className="text-muted">hasVial</TechLabel>
             </span>
             <span className="flex flex-col items-center gap-2">
-              <Rat livery="white" size={64} hasSkull hasVial />
+              <Rat livery="grey" size={64} hasSkull hasVial />
+              <TechLabel className="text-muted">grigio col teschio e l&apos;ampolla</TechLabel>
+            </span>
+            <span className="flex flex-col items-center gap-2">
+              <Rat livery="white" size={64} hasSkull hasCollar hasVial />
               <TechLabel className="text-muted">tutto addosso</TechLabel>
             </span>
             <span className="flex flex-col items-center gap-2">
-              <Rat livery="grey" size={28} hasSkull hasVial />
+              <Rat livery="brown" size={28} hasCollar hasVial />
               <TechLabel className="text-muted">a 28px</TechLabel>
             </span>
           </div>

@@ -265,6 +265,29 @@ sopra soglia — non se un colore solo ci sta.
 `brand` al **19%**, cioè 1,52. Sono decorazione, e la decorazione è fuori dalla regola per
 definizione. Una passata che non le sa distinguere non è una passata: è un numero.
 
+### Il ricalco del ratto riproduce il modulo dati — 2026-09-18
+
+**Esegue:** agente — è la prova che `ratArt.ts` è un prodotto e non un file a mano.
+**Ultima esecuzione:** agente, 2026-09-18 — corpo 96 percorsi, teschio 15, collare 12,
+imbracatura 78, cornice `13 22 364 176`, 59,5 KB; su `/stile` otto ratti con i kit richiesti, la
+cornice del componente uguale a quella dello script.
+
+**Preparazione:** `npm run art:ratto -- --anteprime <dir>`, poi `npm run build` e `/stile`.
+
+| Azione | Atteso | Ottenuto |
+|---|---|---|
+| Lo script parte dalle tre reference | i conteggi sopra, e nessun percorso nato fuori maschera | conteggi identici a due corse successive; `fuori: 0` pixel nel raster mascherato |
+| Anteprima `ratto-corpo.png` | il grigio nudo senza trattini attorno | pulito; con l'anello di antialiasing non tolto c'erano trattini su coda e zampe |
+| Anteprima `ratto-tutto.png` | teschio sull'orecchio, collare con la pedina, ampolla col tappo **e il collo**, dado | tutto presente; il collo mancava finché il vetro non ha avuto il suo recinto |
+| Su `/stile`, in chiaro su bianco | otto ratti, kit come da etichetta, nessuna classe del disegno vecchio | 8, `SC-`/`--V`/`S-V`/`SCV`/`-CV`, zero `.pb-rat-tail` |
+| Rigenerazione dal repository e da fuori | stesso modulo | identico salvo il commento d'intestazione |
+
+**Che cosa protegge:** la riproducibilità dell'arte. Se qualcuno ritocca `ratArt.ts` a mano, la
+prossima `npm run art:ratto` lo cancella: il posto dove intervenire è lo script — semi, recinti,
+tavolozza — o le reference. ⚠️ E i tre difetti che lo script ha avuto e non deve riavere: i kit
+che si portano dietro il ratto donatore (pixel trasparenti col colore dentro), i trattini
+dell'antialiasing (fondo non allargato), il tappo che galleggia (recinto che taglia il collo).
+
 ### La cornice di un SVG, misurata sui pixel dipinti — 2026-09-18
 
 **Esegue:** agente — è una misura, e si rifà ogni volta che un disegno cambia.

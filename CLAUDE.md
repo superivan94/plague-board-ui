@@ -27,7 +27,13 @@ packages/plague-board-ui/   la libreria — l'UNICA cosa che si pubblica
 ├── styles/                 theme.css e animations.css, che viaggiano com'è senza passare da dist
 └── tests/                  i test, fuori da src/ perché tsconfig.build.json compila solo src/
 playground/                 l'app Next che guarda la libreria — non si pubblica
+art/reference/              le tre illustrazioni del ratto e il prompt che le ha generate — la FONTE
+scripts/genera-ratto.mjs    le ricalca in src/brand/ratArt.ts: `npm run art:ratto`
 ```
+
+⚠️ **`src/brand/ratArt.ts` è generato e non si modifica a mano.** Il ratto non è disegnato: è
+**ricalcato** dalle tre reference con `imagetracerjs`, e lo script è la sola cosa da toccare. Con
+`--anteprime <dir>` rende anche i PNG su fondo grigio per guardare il risultato.
 
 **Il gate è `npm run build`, `npm run typecheck`, `npm run lint` e `npm test`, tutti e quattro**,
 più `npm run build --workspace playground` quando si tocca qualcosa che il playground rende.
@@ -207,6 +213,33 @@ exist in target module» che **non sono veri**. Si guarda la pagina, o si crede 
   `@media (prefers-reduced-motion: reduce)`: è `[data-reduce-motion="true"]` **oppure** il media
   query quando quell'attributo non c'è. Vuol dire che un `motion-reduce:` scritto qui risponde sia
   alla preferenza di sistema sia a un interruttore dentro l'applicazione, gratis.
+- ⚠️ **Un disegno alla qualità della mascotte non si fa a numeri: si genera nel suo stile e si
+  ricalca.** Tre giri a mano di `Rat` — punti Bézier piazzati a coordinate — non sono arrivati
+  alla coscia né alla coda giuste, e l'analisi ha detto che il limite non era l'SVG ma il metodo.
+  L'utente ha generato tre reference nello stile della mascotte (il prompt sta in
+  `art/reference/prompt-e-note.md`) e il ricalco con `imagetracerjs` tiene tutto: contorno con i
+  suoi spessori, due toni per materiale, baffi, dita, l'etichetta col teschio. Il corpo viene dal
+  ratto grigio nudo e si **ricolora per slot**; teschio, collare e imbracatura sono kit ritagliati
+  dagli altri due, e si accendono a caso in uno sciame.
+- ⚠️ **Il vettorizzatore vuole una tavolozza fissa, e i pixel trasparenti tutti a zero.** Con la
+  quantizzazione libera il verde dell'ampolla si fondeva col cuoio, l'occhio rosso (0,1% dei
+  pixel) spariva per `mincolorratio: 0.02`, e i colori cambiavano da una corsa all'altra: ogni pixel
+  va al colore più vicino di una tavolozza **nominata** prima del ricalco, così ogni percorso porta
+  un nome. E un pixel tolto deve essere (0,0,0,0): la distanza è su quattro canali, e uno con
+  l'alfa a zero e il colore lasciato dentro resta più vicino al suo colore (255) che al trasparente
+  (r+g+b) — così i kit si portavano dietro l'intero ratto donatore, e il fondo bianco era diventato
+  «pelo bianco». Misurato il 2026-09-18.
+- ⚠️ **Il fondo si toglie riempiendo dai bordi, non cancellando il bianco — e poi si allarga di
+  due pixel.** Il pelo dell'albino è bianco quanto il fondo ma sta dentro il contorno, e il
+  riempimento non ci arriva. Sul bordo restano pixel di antialiasing sotto 235 che il ricalco
+  quantizza a inchiostro: un anello di trattini attorno a tutto il ratto, visibile solo dopo aver
+  tolto il fondo. Due pixel su un contorno largo otto non si vedono.
+- ⚠️ **I kit si ritagliano in raster, con semi + dilatazione + recinto.** Nel ricalco libero il
+  contorno del teschio e quello della testa sono **un percorso solo**: si semina la maschera coi
+  colori del kit, si dilata di 9 pixel per prendere il loro inchiostro, e si **recinta** in un
+  rettangolo dell'immagine donatrice — perché il vetro dell'ampolla e l'ombra del pelo bianco
+  distano 40 su 765, e senza recinto tutta l'ombra del bianco diventava seme. Il collo dell'ampolla,
+  vetro che non tocca il verde, ha il suo recinto stretto.
 - ⚠️ **L'inchiostro dei Ludoratti non è nero: è `#180828`.** Misurato il 2026-09-17 sui pixel di
   `LudoRatti_Logo.png` — il colore scuro più frequente del contorno è un viola-nero. `Rat` lo usa
   per il proprio contorno, ed è quello che rende il ratto che corre e la mascotte con l'ampolla

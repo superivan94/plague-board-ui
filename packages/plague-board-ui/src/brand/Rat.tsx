@@ -1,128 +1,49 @@
+import {
+  RAT_BODY,
+  RAT_COLLAR,
+  RAT_HARNESS,
+  RAT_KIT_COLORS,
+  RAT_SKULL,
+  RAT_VIEW_BOX,
+  type RatBodySlot,
+  type RatKitColor,
+  type RatPath,
+} from './ratArt';
+
 /**
- * Le tre livree, con i colori del pelo di RattInventario: sono **credibili** — un ratto grigio,
- * uno albino con orecchie e coda rosa e occhi rossi, uno marrone — e restano tali anche adesso che
- * il disegno è rifatto. ⚠️ Statiche, e si dichiara: sono il pelo di un animale, non colori del
- * tema. Un ratto grigio è grigio su fondo chiaro come su fondo scuro.
+ * Le tre livree: i colori del pelo **misurati sulle tre reference**, uno per ogni slot del disegno
+ * ricalcato. Il pelo, la sua ombra, la pancia, l'ombra della pancia; il rosa e la sua ombra per
+ * orecchie, coda e zampe; l'occhio, l'inchiostro e la luce nell'occhio. L'albino ha la pancia dello
+ * stesso bianco del pelo e l'ombra blu-grigia, com'è nella reference.
  *
- * ⚠️ **`shade` è il pelo del lato in ombra, e non è `tail`.** Le zampe lontane prendevano il colore
- * della coda, e sull'albino venivano **rosa**: la coda è rosa perché è pelle nuda, ma una zampa in
- * ombra è pelo, e il pelo bianco in ombra è grigio chiaro. Sul grigio e sul marrone `tail` era
- * quasi giusto per caso — sul grigio era persino più chiaro del corpo, che per un'ombra è l'opposto.
+ * ⚠️ Statiche, e si dichiara: sono il pelo di un animale, non colori del tema. Un ratto grigio è
+ * grigio su fondo chiaro come su fondo scuro, e lo tiene su il contorno d'inchiostro.
  */
-export const RAT_LIVERIES = {
-  grey: { body: '#595959', shade: '#3f3f46', ear: '#808080', tail: '#707070', eye: '#1a1a1a', nose: '#333333' },
-  white: { body: '#f7f7f7', shade: '#d4d4d8', ear: '#fec5d6', tail: '#fec5d6', eye: '#ff4d4d', nose: '#ffb3b3' },
-  brown: { body: '#8B4513', shade: '#6b3410', ear: '#A0522D', tail: '#654321', eye: '#000000', nose: '#2F1B14' },
-} as const;
+export const RAT_LIVERIES: Record<'grey' | 'white' | 'brown', Record<RatBodySlot, string>> = {
+  grey: { fur: '#585860', shade: '#484850', belly: '#e0e0e0', bellyShade: '#b8b8b8', pink: '#f8b0a8', pinkShade: '#f09898', eye: '#d01820', ink: '#100020', highlight: '#ffffff' },
+  white: { fur: '#fdfdfd', shade: '#c8d8e8', belly: '#f4f6f8', bellyShade: '#c8d8e8', pink: '#f8b0a8', pinkShade: '#f09898', eye: '#d01820', ink: '#100020', highlight: '#ffffff' },
+  brown: { fur: '#a86040', shade: '#884838', belly: '#f8e0c0', bellyShade: '#e0c0a0', pink: '#f8b0a8', pinkShade: '#f09898', eye: '#d01820', ink: '#100020', highlight: '#ffffff' },
+};
 
 export type RatLivery = keyof typeof RAT_LIVERIES;
 
-/**
- * **L'inchiostro dei Ludoratti.** È il contorno della mascotte con l'ampolla, misurato sui suoi
- * pixel il 2026-09-17: non è nero, è un viola-nero (`#180828`, il colore scuro più frequente del
- * disegno). Usare lo stesso qui è quello che fa dei due ratti lo stesso personaggio.
- */
-const INK = '#180828';
-const BONE = '#efe6d3';
-const BONE_SHADE = '#d9cdb4';
-/** Il veleno è il verde della peste della tavolozza, non quello della mascotte: così l'ampolla sul
- * dorso e l'interfaccia intorno dicono lo stesso verde. */
-const POISON = '#22c55e';
-const POISON_LIGHT = '#4ade80';
-const GLASS = 'rgba(255,255,255,0.22)';
-const CORK = '#a16207';
-
-/** Lo spessore del contorno, nelle unità del disegno. A 44px di altezza vale 1,15 pixel. */
-const STROKE = 2.4;
-
-// ── La geometria, nelle unità della cornice. Il ratto guarda a destra. ────────────────────────
-// Corpo e testa sono **un percorso solo**: è quello che dà collo, spalla e groppa a una sagoma che
-// prima era due ellissi sovrapposte. Il muso rastrema fino al naso.
-const BODY =
-  'M58,50 C56,33 72,25 94,25 C112,25 126,28 136,33 ' +
-  'C142,23 156,17 168,22 C180,27 190,38 197,49 ' +
-  'C199,52 198,56 193,57 C183,59 173,60 163,60 ' +
-  'C151,61 143,64 134,68 C117,75 92,76 74,72 ' +
-  'C62,69 58,62 58,50 Z';
-// La coda: **un arco solo**, che parte dal basso della groppa, striscia indietro e risale a punta.
-// Due bordi che non si incrociano mai — spessa 10 all'anca, 4 a metà, zero in punta. La versione
-// precedente finiva con un ricciolo in cui i bordi quasi si toccavano, e leggeva come attorcigliata.
-const TAIL =
-  'M61,50 C50,49 42,50 34,47 C26,43 17,36 13,26 ' +
-  'C18,38 26,46 35,51 C44,56 52,60 61,60 Z';
-// ⚠️ **Una zampa è un percorso solo**: coscia, stinco e piede in una sagoma, con un contorno.
-// Prima erano tre pezzi — una coscia a blob incollata sulla groppa, una capsula, un piede a parte —
-// e dove si sovrapponevano i contorni si raddoppiavano. La zampa dietro è la «Z» del roditore,
-// semplificata: la coscia sporge all'indietro sulla groppa, il ginocchio punta avanti, lo stinco
-// scende all'indietro fino al tallone, il piede va avanti.
-const LEG_BACK =
-  'M78,46 C62,47 55,60 60,71 C63,78 66,83 67,87 L91,87 C94,87 94,83 91,83 L79,82 ' +
-  'C78,77 79,71 84,66 C88,60 90,52 86,47 Z';
-// La zampa davanti è dritta, con una leggera spalla, e il piede in avanti.
-const LEG_FRONT =
-  'M136,59 C127,60 123,68 124,77 C124,82 124,85 125,87 L142,87 C145,87 145,83 142,83 L133,82 ' +
-  'C132,76 134,70 139,64 C141,61 140,59 136,59 Z';
-// Le dita: un cuscinetto nel colore delle orecchie, **senza contorno**, dentro il piede. È quello
-// che sull'albino fa i piedi rosa senza aggiungere un pezzo con il suo bordo.
-const PAD_BACK = 'M74,84 L90,84 C91,84 91,86 90,86 L74,86 C73,86 73,84 74,84 Z';
-const PAD_FRONT = 'M129,84 L141,84 C142,84 142,86 141,86 L129,86 C128,86 128,84 129,84 Z';
-// L'orecchio sta **sul cranio, dietro l'occhio**: sulla fronte leggeva come un fiocco.
-const EAR = 'M145,30 C144,18 153,12 162,15 C171,19 172,31 164,36 C156,41 146,39 145,30 Z';
-const EAR_FAR = 'M131,31 C130,21 137,16 144,18 C151,21 151,31 145,35 C139,39 132,38 131,31 Z';
-const EAR_INNER = 'M149,30 C148,22 154,18 160,20 C166,23 166,31 160,34 C154,37 150,35 149,30 Z';
-// Il sopracciglio: un tratto che scende verso il naso. È la differenza fra «un ratto» e «un ratto
-// che sa il fatto suo» — senza, l'occhio tondo è tenero.
-const BROW = 'M166,35 C171,35.5 176,37 181,39.5';
-// Il teschio di corvo, portato come elmo col becco sul muso. Sta un po' avanti sul cranio, così
-// dietro spunta il bordo dell'orecchio — senza, il ratto perde la sua sagoma più riconoscibile.
-const SKULL = 'M157,34 C155,19 167,8 182,9 C196,10 203,20 202,29 C202,33 200,35 197,36 L162,38 C158,38 157,36 157,34 Z';
-const BEAK = 'M198,21 C210,20 220,29 228,42 C229,45 227,46 224,45 C215,39 206,36 197,36 C195,36 195,22 198,21 Z';
-const SKULL_SOCKET = 'M176,24 C176,20 180,18 184,19 C188,20 189,25 186,28 C183,30 177,29 176,24 Z';
-const SKULL_NOSTRIL = 'M208,30 C211,31 213,33 214,35';
-// L'ampolla sulle spalle, con due cinghie. Il liquido è la metà bassa del pallone.
-const VIAL = { cx: 112, cy: 17, r: 9 } as const;
-const VIAL_LIQUID = 'M103.5,15 A9,9 0 1 0 120.5,15 Z';
-const VIAL_NECK = 'M108.5,4 L115.5,4 L115.5,9 L108.5,9 Z';
-const VIAL_CORK = 'M107.5,1 L116.5,1 L116.5,5 L107.5,5 Z';
-const STRAP_A = 'M106,24 C104,36 101,48 99,60';
-const STRAP_B = 'M118,24 C122,36 128,44 134,50';
-// ⚠️ **I baffi partono dal muso e vanno avanti**, mai indietro verso l'occhio. Nella prima versione
-// tornavano verso la guancia fino a x 164, cioè sotto l'occhio a 174, e a seconda della livrea
-// leggevano come una ruga o uno strizzare: l'espressione cambiava da sola. Ora la punta più
-// arretrata sta a x 186, dodici unità avanti all'occhio, e un test lo tiene.
-const WHISKERS = [
-  'M186,49 C192,47 198,45 204,44',
-  'M187,52 C193,52 199,52 206,52',
-  'M186,55 C192,57 198,59 203,61',
-];
-
-/**
- * La cornice, **misurata sui pixel dipinti** del ratto con tutto addosso — teschio e ampolla —
- * perché la cornice non cambia con l'allestimento: in uno sciame i ratti hanno tutti la stessa
- * scatola, e accendere un'ampolla non sposta niente. Il metodo è disegnare l'SVG su una tela a 4× e
- * cercare il primo e l'ultimo pixel non trasparente; né `getBBox()` né `getBoundingClientRect()`
- * servono, perché il tratto non lo contano.
- *
- * Misurato il 2026-09-18 con la coda nuova: da **11,75** (la punta della coda) a **229,5** (la punta
- * del becco), da **0** (il tappo dell'ampolla) a **88,25** (la pianta dei piedi). ⚠️ Ogni volta che
- * si sposta un pezzo si rimisura: la prima cornice, scritta a occhio, tagliava i piedi.
- */
-const VIEW_BOX = { x: 11, y: -1, width: 219, height: 90 } as const;
-const RATIO = VIEW_BOX.width / VIEW_BOX.height;
+const RATIO = RAT_VIEW_BOX.width / RAT_VIEW_BOX.height;
 
 export interface RatProps {
-  /** Quale pelo. Il grigio è il ratto normale; il bianco e il marrone sono le varianti. */
+  /** Quale pelo. Il grigio è il ratto normale; il bianco albino e il marrone sono le varianti. */
   livery?: RatLivery;
   /**
    * L'altezza a cui disegnarlo, in pixel.
    *
-   * ⚠️ **È l'altezza, come per {@link RatMascot}**: un ratto è lungo due volte e mezzo quanto è
+   * ⚠️ **È l'altezza, come per {@link RatMascot}**: un ratto in corsa è lungo il doppio di quanto è
    * alto, quindi «il lato» non vorrebbe dire niente. La lunghezza la porta il rapporto del disegno.
    */
   size?: number;
-  /** Il teschio di corvo portato come elmo, col becco sul muso. */
+  /** Il teschio di corvo portato come elmo, col becco sul muso e la cinghia sotto il mento. */
   hasSkull?: boolean;
-  /** L'ampolla di veleno legata sulle spalle. */
+  /** Il collare viola strappato, con la pedina di legno che ci pende. */
+  hasCollar?: boolean;
+  /** L'imbracatura di cuoio con l'ampolla di veleno sul dorso e il dado che ci pende. */
   hasVial?: boolean;
   /** Classi aggiuntive sull'`<svg>`. È da qui che passano l'alone della peste e il ribaltamento. */
   className?: string;
@@ -130,29 +51,43 @@ export interface RatProps {
   title?: string;
 }
 
+/** Un livello del disegno: i percorsi con il colore risolto. */
+function Layer<C extends string>({
+  paths,
+  colors,
+  className,
+}: {
+  paths: readonly RatPath<C>[];
+  colors: Record<C, string>;
+  className: string;
+}) {
+  return (
+    <g className={className}>
+      {paths.map((p, i) => (
+        <path key={i} fill={colors[p.c]} d={p.d} />
+      ))}
+    </g>
+  );
+}
+
 /**
- * **Il ratto dei Ludoratti**, di profilo, che sa il fatto suo.
+ * **Il ratto dei Ludoratti**, in corsa, di profilo verso destra.
  *
- * Disegnato **da zero** il 2026-09-17 nella tecnica della mascotte con l'ampolla — contorno
- * d'inchiostro e campiture piatte — perché i due siano lo stesso personaggio. Rispetto al disegno
- * che veniva da RattInventario: un occhio solo (era di profilo con due occhi), l'orecchio sul cranio
- * e non sulla fronte, il muso che rastrema a punta, corpo e testa in una sagoma sola, la coda in un
- * arco che rastrema, ogni zampa in un percorso solo con coscia e piede, i baffi in avanti, e il
- * sopracciglio.
+ * Non è disegnato a mano: è **ricalcato** dalle tre illustrazioni in `art/reference/`, generate
+ * nello stile della mascotte con l'ampolla — contorno d'inchiostro `#100020`, campiture piatte
+ * con un tono d'ombra per materiale, occhio rosso con la luce. Il corpo viene dal ratto grigio e
+ * si ricolora per livrea; i tre kit vengono dagli altri due e si accendono **indipendentemente**,
+ * così uno sciame li può combinare a caso: un bruno con l'ampolla, un albino col teschio, un grigio
+ * con tutto. Il come sta in `scripts/genera-ratto.mjs`, e `ratArt.ts` è il suo prodotto.
  *
- * ⚠️ **Il contorno è quello che lo tiene su qualunque fondo.** Il pelo dell'albino è `#f7f7f7`, e
- * su una pagina chiara sparirebbe: lo tiene su l'inchiostro, come tiene su la mascotte. Per questo
- * il ratto **segue il tema** e non va messo su una lastra scura per forza.
+ * ⚠️ **La cornice è una sola, con o senza kit**: accendere l'ampolla non sposta il ratto e non gli
+ * cambia la misura. Per questo un ratto nudo ha aria sopra la testa, dove starebbe l'ampolla.
  *
- * ⚠️ **Sta fermo, ed è il punto.** Le parti che si muovono portano un nome — `pb-rat-body`,
- * `pb-rat-tail`, `pb-rat-ears`, `pb-rat-leg-front`, `pb-rat-leg-back`, `pb-rat-vial` — e le regole
- * che le animano vivono in `animations.css`, agganciate a una classe che mette chi lo fa correre.
- * Qui dentro non c'è nessun `<style>`.
- *
- * ⚠️ **Le zampe stanno in due gruppi annidati apposta.** Quello fuori porta lo spostamento come
- * attributo — le zampe del lato lontano stanno più indietro — e quello dentro porta la classe: una
- * `transform` in CSS **sostituisce** l'attributo invece di sommarsi, quindi animare il gruppo che
- * ha già lo spostamento lo riporterebbe all'origine.
+ * ⚠️ **Sta fermo, ed è il punto.** Qui dentro non c'è nessun `<style>`; le regole che lo faranno
+ * correre vivono in `animations.css`, agganciate ai gruppi `pb-rat-body`, `pb-rat-skull`,
+ * `pb-rat-collar`, `pb-rat-vial`. ⚠️ Le zampe e la coda **non sono ancora gruppi a sé**: il ricalco
+ * dà livelli per colore, non per parte, e separarli — con la maschera per parte e il completamento
+ * delle articolazioni — è il lavoro di `RatRun`.
  *
  * ⚠️ **Guarda a destra.** Per farlo andare dall'altra parte si ribalta chi lo contiene con
  * `scale-x-[-1]`.
@@ -161,16 +96,18 @@ export function Rat({
   livery = 'grey',
   size = 60,
   hasSkull = false,
+  hasCollar = false,
   hasVial = false,
   className = '',
   title,
 }: RatProps) {
-  const c = RAT_LIVERIES[livery];
+  const colors = RAT_LIVERIES[livery];
+  const kit: Record<RatKitColor, string> = RAT_KIT_COLORS;
 
   return (
     <svg
       xmlns="http://www.w3.org/2000/svg"
-      viewBox={`${VIEW_BOX.x} ${VIEW_BOX.y} ${VIEW_BOX.width} ${VIEW_BOX.height}`}
+      viewBox={`${RAT_VIEW_BOX.x} ${RAT_VIEW_BOX.y} ${RAT_VIEW_BOX.width} ${RAT_VIEW_BOX.height}`}
       width={Math.round(size * RATIO)}
       height={size}
       className={className}
@@ -179,82 +116,11 @@ export function Rat({
       aria-label={title}
     >
       {title !== undefined && <title>{title}</title>}
-
-      <g stroke={INK} strokeWidth={STROKE} strokeLinejoin="round" strokeLinecap="round">
-        <path className="pb-rat-tail" d={TAIL} fill={c.tail} />
-
-        <g className="pb-rat-body">
-          <path d={EAR_FAR} fill={c.ear} />
-
-          {/* Le zampe del lato lontano: nel pelo in ombra, più indietro, e dietro a tutto. */}
-          <g transform="translate(-13,0)">
-            <g className="pb-rat-leg-back">
-              <path d={LEG_BACK} fill={c.shade} />
-            </g>
-          </g>
-          <g transform="translate(-11,0)">
-            <g className="pb-rat-leg-front">
-              <path d={LEG_FRONT} fill={c.shade} />
-            </g>
-          </g>
-
-          <path d={BODY} fill={c.body} />
-
-          {hasVial && (
-            <>
-              <path d={STRAP_A} fill="none" strokeWidth={STROKE + 0.2} />
-              <path d={STRAP_B} fill="none" strokeWidth={STROKE + 0.2} />
-            </>
-          )}
-
-          <g className="pb-rat-leg-back">
-            <path d={LEG_BACK} fill={c.body} />
-            <path d={PAD_BACK} fill={c.ear} stroke="none" />
-          </g>
-          <g className="pb-rat-leg-front">
-            <path d={LEG_FRONT} fill={c.body} />
-            <path d={PAD_FRONT} fill={c.ear} stroke="none" />
-          </g>
-
-          <g className="pb-rat-ears">
-            <path d={EAR} fill={c.body} />
-            <path d={EAR_INNER} fill={c.ear} strokeWidth={STROKE * 0.7} />
-          </g>
-
-          <ellipse cx="195" cy="52" rx="3.4" ry="2.8" fill={c.nose} strokeWidth={STROKE * 0.7} />
-
-          {hasSkull && (
-            <g className="pb-rat-skull">
-              <path d={BEAK} fill={BONE_SHADE} />
-              <path d={SKULL} fill={BONE} />
-              <path d={SKULL_SOCKET} fill={INK} strokeWidth={STROKE * 0.6} />
-              <path d={SKULL_NOSTRIL} fill="none" strokeWidth={STROKE * 0.7} />
-            </g>
-          )}
-
-          {hasVial && (
-            <g className="pb-rat-vial">
-              <path d={VIAL_CORK} fill={CORK} strokeWidth={STROKE * 0.75} />
-              <path d={VIAL_NECK} fill={GLASS} strokeWidth={STROKE * 0.75} />
-              <circle cx={VIAL.cx} cy={VIAL.cy} r={VIAL.r} fill={GLASS} strokeWidth={STROKE * 0.85} />
-              <path d={VIAL_LIQUID} fill={POISON} stroke="none" />
-              <ellipse cx="108.5" cy="19.5" rx="1.6" ry="2.4" fill={POISON_LIGHT} stroke="none" />
-            </g>
-          )}
-
-          <path d={BROW} fill="none" />
-          {/* L'occhio prende il colore della livrea, non l'inchiostro: l'albino ce l'ha rosso, come
-              la mascotte. Sul grigio e sul marrone la differenza dall'inchiostro non si vede. */}
-          <circle cx="174" cy="42.5" r="3.8" fill={c.eye} stroke="none" />
-          <circle cx="175.3" cy="41.2" r="1.3" fill="#ffffff" opacity="0.92" stroke="none" />
-
-          <g className="pb-rat-whiskers" fill="none" strokeWidth={STROKE * 0.55} opacity="0.85">
-            {WHISKERS.map((d) => (
-              <path key={d} d={d} />
-            ))}
-          </g>
-        </g>
-      </g>
+      <Layer className="pb-rat-body" paths={RAT_BODY} colors={colors} />
+      {/* Il collare sta sotto l'imbracatura, e il teschio sopra a tutto: copre il bordo dell'orecchio. */}
+      {hasCollar && <Layer className="pb-rat-collar" paths={RAT_COLLAR} colors={kit} />}
+      {hasVial && <Layer className="pb-rat-vial" paths={RAT_HARNESS} colors={kit} />}
+      {hasSkull && <Layer className="pb-rat-skull" paths={RAT_SKULL} colors={kit} />}
     </svg>
   );
 }
