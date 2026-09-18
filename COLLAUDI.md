@@ -283,6 +283,7 @@ del componente uguale a quella dello script.
 | Su `/stile`, in chiaro su bianco | otto ratti, kit come da etichetta, nessuna classe del disegno vecchio | 8, `SC-`/`--V`/`S-V`/`SCV`/`-CV`, zero `.pb-rat-tail` |
 | Rigenerazione dal repository e da fuori | stesso modulo | identico salvo il commento d'intestazione |
 | La lente a 2000px: testa, orecchio, groppa, ampolla, collare | etichetta col teschietto leggibile, dado con i puntini, nessun filetto chiaro fra rosa e inchiostro, teschio intero | tutto; con due passate di despeckle il teschietto era una nuvola e il dado puntini a mezz'aria |
+| L'orecchio in primo piano col teschio addosso, sul grigio e sul bruno | rosa, come senza teschio | rosa; prima portava un anello chiaro — il bordo crema dell'orecchio del **bruno**, dello stesso colore dell'osso, entrato nel kit. Segnalato dall'utente sulle anteprime |
 
 **Che cosa protegge:** la riproducibilità dell'arte. Se qualcuno ritocca `ratArt.ts` a mano, la
 prossima `npm run art:ratto` lo cancella: il posto dove intervenire è lo script — semi, recinti,

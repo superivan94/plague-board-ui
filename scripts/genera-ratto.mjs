@@ -269,6 +269,39 @@ const sonda = (img, nome, colori) => {
     if (n) console.log(`  ${c.padEnd(11)} x ${x0}–${x1}  y ${y0}–${y1}  baricentro (${Math.round(sx / n)},${Math.round(sy / n)})  ${n} px`);
   }
 };
+
+// Le componenti connesse (4-vicinato) di un colore dentro un recinto, dalla più grande: è quello
+// che distingue il teschio — un pezzo grande — dal bordo chiaro dell'orecchio dello stesso colore,
+// che è una mezzaluna sottile staccata da lui dal suo stesso inchiostro.
+function componenti({ W, H, idx }, colore, recinto) {
+  const k = NOMI.indexOf(colore);
+  const visto = new Uint8Array(W * H);
+  const trovate = [];
+  for (let y = recinto.y0; y < recinto.y1; y++) for (let x = recinto.x0; x < recinto.x1; x++) {
+    const s = y * W + x;
+    if (visto[s] || idx[s] !== k) continue;
+    const pixel = [];
+    const coda = [s]; visto[s] = 1;
+    let x0 = x, x1 = x, y0 = y, y1 = y;
+    while (coda.length) {
+      const i = coda.pop(); pixel.push(i);
+      const cx = i % W, cy = (i - cx) / W;
+      if (cx < x0) x0 = cx; if (cx > x1) x1 = cx; if (cy < y0) y0 = cy; if (cy > y1) y1 = cy;
+      for (const [dx, dy] of [[1, 0], [-1, 0], [0, 1], [0, -1]]) {
+        const xx = cx + dx, yy = cy + dy;
+        if (xx < recinto.x0 || yy < recinto.y0 || xx >= recinto.x1 || yy >= recinto.y1) continue;
+        const j = yy * W + xx;
+        if (!visto[j] && idx[j] === k) { visto[j] = 1; coda.push(j); }
+      }
+    }
+    trovate.push({ pixel, n: pixel.length, x0, x1, y0, y1 });
+  }
+  return trovate.sort((a, b) => b.n - a.n);
+}
+if (process.env.SONDA) {
+  console.log('— componenti di osso nel recinto del teschio');
+  for (const c of componenti(bruno, 'bone', { x0: 1000, y0: 90, x1: 1530, y1: 415 }).slice(0, 8)) console.log(`  ${String(c.n).padStart(6)} px  x ${c.x0}–${c.x1}  y ${c.y0}–${c.y1}`);
+}
 sonda(bruno, 'bruno', ['bone', 'leather', 'gold', 'purple']);
 // Sul bianco, etichetta e dado tremano fra crema e bianco-pelo: si leggono crema, nei loro rettangoli.
 const bianco = await carica('ludoratto-bianco-pozione', [
@@ -290,11 +323,19 @@ const corpo = ricalca(grigio, null, null, { brownBelly: 'greyBelly', bone: 'grey
 // coda finisce a x 600, l'orecchio comincia a x 1040). Il **collo** dell'ampolla è vetro e non
 // tocca il verde: si semina a parte, in un recinto stretto dove l'ombra del pelo bianco — quasi lo
 // stesso colore — non arriva.
-// Il teschio per colore nel suo rettangolo. ⚠️ L'osso arriva sopra l'orecchio fino a x 1030 —
-// misurato: nel rettangolo dell'orecchio il 30% dei pixel è `#f8f0e0`, l'osso stesso — e un
-// recinto a 1090 lo tagliava sul retro con una riga verticale. Il riempimento da punti qui non
-// serve: il teschio ha un colore suo, e i punti a occhio cadevano sull'inchiostro.
-const mTeschio = maschera(bruno, ['bone', 'leather'], RAGGIO, { x0: 1000, y0: 90, x1: 1530, y1: 415 });
+// ⚠️ Il teschio è la **componente connessa più grande** dell'osso, non tutto l'osso: nel bruno il
+// bordo dell'orecchio è un anello crema dello stesso `#f8f0e0` — 4.683 px a x 1000–1110, staccato
+// dal teschio (14.090 px a x 1064–1459) dal suo stesso inchiostro. Per colore non si separano, e
+// per rettangolo nemmeno, perché si sovrappongono in x. Sul grigio e sul bruno quell'anello
+// arrivava nel kit come una macchia bianca sull'orecchio. La cinghia è aperta e si semina per
+// colore nel suo rettangolo.
+const RECINTO_TESCHIO = { x0: 1000, y0: 90, x1: 1530, y1: 415 };
+const semiTeschio = new Uint8Array(bruno.W * bruno.H);
+for (const i of componenti(bruno, 'bone', RECINTO_TESCHIO)[0].pixel) semiTeschio[i] = 1;
+const mTeschio = unisci(
+  attorno(bruno, semiTeschio, RAGGIO),
+  maschera(bruno, ['leather'], RAGGIO, { x0: 1130, y0: 280, x1: 1260, y1: 415 }),
+);
 const teschio = ricalca(bruno, mTeschio, new Set(['bone', 'leather', 'gold', 'ink']), { brownShade: 'ink' }, 48);
 const mCollare = maschera(bruno, ['purple', 'gold'], RAGGIO, { x0: 1040, y0: 380, x1: 1310, y1: 660 });
 const collare = ricalca(bruno, mCollare, new Set(['purple', 'gold', 'ink']), {}, 48);

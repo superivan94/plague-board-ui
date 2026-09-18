@@ -242,10 +242,15 @@ exist in target module» che **non sono veri**. Si guarda la pagina, o si crede 
   solo grazie alle briciole crema che il despeckle ha pulito, ed è uscito. Dove un oggetto non ha un
   colore suo, il seme è il **riempimento da un punto interno** fermato dall'inchiostro; i punti
   però si prendono dalla sonda (`SONDA=1`), non a occhio — sette su otto cadevano sull'inchiostro.
-- ⚠️ **Prima di correggere un difetto del ricalco, si misura di che colore è.** La «luce
-  dell'orecchio quantizzata a osso» era l'osso stesso: il teschio nel bruno arriva sopra l'orecchio
-  fino a x 1030, e la riga verticale era il recinto che lo tagliava. Un giro intero di semi per
-  riempimento è nato da una diagnosi a occhio.
+- ⚠️ **Prima di correggere un difetto del ricalco, si guarda la reference al punto giusto.** La
+  macchia chiara sull'orecchio del ratto col teschio ha avuto **tre** diagnosi: «luce
+  dell'orecchio quantizzata a osso» (ho rifatto teschio e ampolla con semi per riempimento, a
+  vuoto), «è l'osso stesso che posa sull'orecchio» (ho allargato il recinto, e la macchia è
+  rimasta), e infine — ritagliando la reference del bruno a 3× — **il bordo dell'orecchio del bruno
+  è un anello crema dello stesso `#f8f0e0` del teschio**, mentre nel grigio è rosa. Per colore non
+  si separa, per rettangolo nemmeno (si sovrappongono in x): si separa per **componente connessa**
+  — il teschio è un pezzo da 14.090 px, l'anello un pezzo da 4.683 staccato da lui dal suo stesso
+  inchiostro. La sonda le stampa. Due giri persi per non aver guardato subito i pixel giusti.
 - ⚠️ **I kit si ritagliano in raster, con semi + dilatazione + recinto.** Nel ricalco libero il
   contorno del teschio e quello della testa sono **un percorso solo**: si semina la maschera coi
   colori del kit, si dilata di 9 pixel per prendere il loro inchiostro, e si **recinta** in un
