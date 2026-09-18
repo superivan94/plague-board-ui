@@ -331,9 +331,15 @@ const corpo = ricalca(grigio, null, null, { brownBelly: 'greyBelly', bone: 'grey
 // colore nel suo rettangolo.
 // Semi dalle `quante` componenti più grandi di un colore in un recinto: il pezzo vero è grande e
 // il rumore del pelo quantizzato a quel colore è briciole. Il recinto può essere generoso.
+// `quante` è un numero (le N più grandi) oppure `{ almeno }`: tutte quelle sopra una soglia di
+// pixel. ⚠️ Il collare è **due** componenti — la pedina lo spezza con il suo inchiostro, e il pezzo
+// sotto la mascella, a destra della pedina, con «la più grande» restava fuori. Segnalato dall'utente.
 const semiComponenti = (img, colore, recinto, quante = 1) => {
   const s = new Uint8Array(img.W * img.H);
-  for (const c of componenti(img, colore, recinto).slice(0, quante)) for (const i of c.pixel) s[i] = 1;
+  const tutte = componenti(img, colore, recinto);
+  const scelte = typeof quante === 'number' ? tutte.slice(0, quante) : tutte.filter((c) => c.n >= quante.almeno);
+  if (process.env.SONDA) console.log(`  ${colore.padEnd(8)} componenti: ${tutte.slice(0, 6).map((c) => c.n).join(' ')} → tenute ${scelte.length}`);
+  for (const c of scelte) for (const i of c.pixel) s[i] = 1;
   return s;
 };
 // ⚠️ La cinghia scende dal teschio **verso sinistra e in basso**, dietro la mascella, a x 1040–1140:
@@ -354,7 +360,8 @@ const teschio = ricalca(bruno, mTeschio, new Set(['bone', 'leather', 'gold', 'in
 // a y 600: il recinto vecchio (380–660, da x 1040) lo tagliava in alto e a sinistra.
 const RECINTO_COLLARE = { x0: 930, y0: 300, x1: 1220, y1: 660 };
 const mCollare = unisci(
-  attorno(bruno, semiComponenti(bruno, 'purple', RECINTO_COLLARE, 1), RAGGIO),
+  // Tre componenti in tutto nel recinto — 13.106, 349, 142 px — e nessun rumore: si tengono tutte.
+  attorno(bruno, semiComponenti(bruno, 'purple', RECINTO_COLLARE, { almeno: 100 }), RAGGIO),
   attorno(bruno, semiComponenti(bruno, 'gold', RECINTO_COLLARE, 3), RAGGIO),
 );
 const collare = ricalca(bruno, mCollare, new Set(['purple', 'gold', 'ink']), {}, 48);
