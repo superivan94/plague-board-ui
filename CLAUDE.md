@@ -251,6 +251,13 @@ exist in target module» che **non sono veri**. Si guarda la pagina, o si crede 
   si separa, per rettangolo nemmeno (si sovrappongono in x): si separa per **componente connessa**
   — il teschio è un pezzo da 14.090 px, l'anello un pezzo da 4.683 staccato da lui dal suo stesso
   inchiostro. La sonda le stampa. Due giri persi per non aver guardato subito i pixel giusti.
+- ⚠️ **Un colore del kit può portare il nome di un colore del pelo, e il filtro lo butta.** L'ombra
+  dell'osso del teschio quantizza a `brownBellyShade`, l'ombra della pancia del bruno: 3.817 px
+  dentro la maschera del teschio, scartati perché il filtro teneva solo `bone`. Il teschio sembrava
+  mangiato attorno all'orbita e in punta al becco. Il filtro si scrive **contando i colori dentro la
+  maschera** (`SONDA=1`), e il rename ridà a quei pixel il nome giusto (`boneShade`). E un buco
+  circondato dal pezzo è del pezzo: l'orbita, larga 50 px, non la raggiunge una dilatazione di 9 —
+  i buchi della maschera si riempiono.
 - ⚠️ **I kit si ritagliano in raster, con semi + dilatazione + recinto.** Nel ricalco libero il
   contorno del teschio e quello della testa sono **un percorso solo**: si semina la maschera coi
   colori del kit, si dilata di 9 pixel per prendere il loro inchiostro, e si **recinta** in un

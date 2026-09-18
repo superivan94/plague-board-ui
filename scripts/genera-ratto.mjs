@@ -348,14 +348,48 @@ const semiComponenti = (img, colore, recinto, quante = 1) => {
 // `brownShade → ink` trasformava in inchiostro ogni ombra di pelo finita nella maschera: via.
 const RECINTO_TESCHIO = { x0: 1000, y0: 90, x1: 1530, y1: 415 };
 const RECINTO_CINGHIA = { x0: 1020, y0: 280, x1: 1170, y1: 460 };
+// ⚠️ L'orbita è un'ellisse scura larga 50 px circondata dall'osso: i suoi pixel sono inchiostro,
+// ma la dilatazione di 9 dal bordo dell'osso non arriva al centro, e restava un buco che mostrava
+// il pelo. Tutto ciò che l'osso circonda è teschio: i buchi della maschera si riempiono.
+function riempiBuchi(m, W, H) {
+  const fuori = new Uint8Array(W * H);
+  const coda = [];
+  const spingi = (i) => { if (!fuori[i] && !m[i]) { fuori[i] = 1; coda.push(i); } };
+  for (let x = 0; x < W; x++) { spingi(x); spingi((H - 1) * W + x); }
+  for (let y = 0; y < H; y++) { spingi(y * W); spingi(y * W + W - 1); }
+  while (coda.length) {
+    const i = coda.pop();
+    const x = i % W, y = (i - x) / W;
+    if (x > 0) spingi(i - 1); if (x < W - 1) spingi(i + 1); if (y > 0) spingi(i - W); if (y < H - 1) spingi(i + W);
+  }
+  const pieno = new Uint8Array(m);
+  for (let i = 0; i < W * H; i++) if (!m[i] && !fuori[i]) pieno[i] = 1;
+  return pieno;
+}
 const mTeschio = unisci(
   unisci(
-    attorno(bruno, semiComponenti(bruno, 'bone', RECINTO_TESCHIO), RAGGIO),
+    attorno(bruno, riempiBuchi(semiComponenti(bruno, 'bone', RECINTO_TESCHIO), bruno.W, bruno.H), RAGGIO),
     attorno(bruno, semiComponenti(bruno, 'leather', RECINTO_CINGHIA, 2), RAGGIO),
   ),
   attorno(bruno, semiComponenti(bruno, 'gold', RECINTO_CINGHIA, 1), RAGGIO),
 );
-const teschio = ricalca(bruno, mTeschio, new Set(['bone', 'leather', 'gold', 'ink']), {}, 48);
+if (process.env.SONDA) {
+  const dentro = new Map();
+  for (let i = 0; i < bruno.W * bruno.H; i++) if (mTeschio[i] && bruno.idx[i] >= 0) dentro.set(NOMI[bruno.idx[i]], (dentro.get(NOMI[bruno.idx[i]]) ?? 0) + 1);
+  console.log('  dentro la maschera del teschio:', [...dentro.entries()].sort((a, b) => b[1] - a[1]).map(([k, v]) => `${k} ${v}`).join('  '));
+}
+// ⚠️ Il teschio è a **due toni**: osso chiaro sopra e un'ombra crema-tan sulla metà bassa, attorno
+// all'orbita e sotto il becco. Quell'ombra quantizza a `brownBellyShade` — il colore dell'ombra
+// della pancia del bruno — e senza questo rename veniva scartata: 3.817 pixel di osso spariti, e il
+// teschio sembrava mangiato attorno all'occhio e in punta al becco. Segnalato dall'utente. Le luci
+// quasi bianche (`cream`, `whiteFur`) tornano osso; il fondo scuro dell'orbita (`greyShade`) è
+// inchiostro.
+const teschio = ricalca(
+  bruno, mTeschio,
+  new Set(['bone', 'boneShade', 'leather', 'gold', 'ink']),
+  { brownBellyShade: 'boneShade', cream: 'bone', whiteFur: 'bone', greyShade: 'ink' },
+  48,
+);
 // Il collare comincia a y 320 e a x 960 — dietro la mascella, non sotto — e finisce con la pedina
 // a y 600: il recinto vecchio (380–660, da x 1040) lo tagliava in alto e a sinistra.
 const RECINTO_COLLARE = { x0: 930, y0: 300, x1: 1220, y1: 660 };
@@ -413,7 +447,10 @@ for (const k of Object.keys(ART)) console.log(k.padEnd(8), String(ART[k].length)
 console.log('viewBox ', vb);
 
 // ── Il modulo dati per la libreria ───────────────────────────────────────────────────────────────
-const KIT_COLORI = ['ink', 'bone', 'leather', 'gold', 'purple', 'green', 'greenLight', 'cream', 'glass'];
+// I colori fissi dei kit. `boneShade` non è nella tavolozza di quantizzazione — nasce dal rename di
+// `brownBellyShade` dentro il teschio — quindi il suo valore sta qui: l'ombra dell'osso della reference.
+const KIT_COLORI = ['ink', 'bone', 'boneShade', 'leather', 'gold', 'purple', 'green', 'greenLight', 'cream', 'glass'];
+PALETTE.boneShade = '#e4d4b8';
 const riga = (p) => `  { c: '${p.c}', d: '${p.d}' },`;
 const modulo = `// ⚠️ **File generato**: non si modifica a mano. Lo scrive \`scripts/genera-ratto.mjs\` a partire dalle
 // tre reference in \`art/reference/\`, e si rigenera con \`npm run art:ratto\` quando cambiano loro.

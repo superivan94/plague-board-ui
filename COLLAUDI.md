@@ -286,6 +286,12 @@ del componente uguale a quella dello script.
 | L'orecchio in primo piano col teschio addosso, sul grigio e sul bruno | rosa, come senza teschio | rosa; prima portava un anello chiaro — il bordo crema dell'orecchio del **bruno**, dello stesso colore dell'osso, entrato nel kit. Segnalato dall'utente sulle anteprime |
 | I kit **da soli**, sulla testa (`kit-testa-solo.png`) | teschio, cinghia con la fibbia, collare intero con la pedina — e niente altro | così; prima c'erano due frammenti bruni e un blocco nero a spigoli sotto il teschio, e il collare mancava della punta in alto e a sinistra. Segnalato dall'utente |
 | La linguetta viola a destra della pedina | c'è, a punta, come nella reference | c'è; era **due** componenti (349 e 142 px) divise da una piega d'inchiostro, e «la componente più grande» le lasciava fuori entrambe. Segnalato dall'utente |
+| Il teschio a **due toni**, con l'orbita piena | osso chiaro sopra, ombra crema-tan attorno all'orbita e sotto il becco, orbita scura piena | così; prima l'ombra dell'osso — 3.817 px quantizzati a `brownBellyShade`, l'ombra della pancia del bruno — veniva scartata e il teschio sembrava mangiato attorno all'occhio e in punta al becco, e l'orbita era un buco che mostrava il pelo. Segnalato dall'utente |
+
+⚠️ **Prima di tenere o scartare, si contano i colori dentro la maschera** (`SONDA=1` li stampa). Il
+teschio conteneva 14.156 px di osso e 3.817 di `brownBellyShade`: un colore del pelo del donatore
+che lì dentro era ombra dell'osso. Il filtro dei colori del kit va scritto guardando quel conteggio,
+non la tavolozza.
 
 ⚠️ **I kit si guardano da soli, senza il corpo sotto.** Il corpo nasconde: un frammento di pelo
 bruno preso per cuoio, appoggiato sul grigio, sembra un'ombra. Reso da solo su grigio medio, ogni
