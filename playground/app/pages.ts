@@ -39,6 +39,12 @@ export const PLAYGROUND_PAGES: readonly PlaygroundPage[] = [
     kind: 'demo',
   },
   {
+    href: '/corsa',
+    title: 'La corsa',
+    blurb: 'Il ratto che attraversa lo schermo: le zampe a coppie, la coda, e la fine detta da animationend.',
+    kind: 'demo',
+  },
+  {
     href: '/stile',
     title: 'La direzione',
     blurb: 'Il bersaglio: come deve venire una schermata vestita da Ludoratti.',

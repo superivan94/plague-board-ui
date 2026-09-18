@@ -15,6 +15,7 @@ export { PLAGUE_BAR_MARK_SIZE, type PlagueBarSize } from './brand/plagueBarSizes
 export { PulseDot, type PulseDotProps } from './brand/PulseDot';
 // Il personaggio, non il marchio: `RatIcon` è l'emblema, questo è il ratto che cammina.
 export { RAT_LIVERIES, Rat, type RatLivery, type RatProps } from './brand/Rat';
+export { RatRun, type RatRunProps } from './brand/RatRun';
 // La faccia di marca. ⚠️ Il disegno sta in un modulo a parte e pesa 25,8 KB di base64: chi non
 // importa `RatMascot` non se lo porta dietro, perché il pacchetto è `sideEffects: ["*.css"]`.
 export { RatMascot, type RatMascotProps } from './brand/RatMascot';

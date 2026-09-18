@@ -265,11 +265,12 @@ exist in target module» che **non sono veri**. Si guarda la pagina, o si crede 
   distano 40 su 765, e senza recinto tutta l'ombra del bianco diventava seme. Il collo dell'ampolla,
   vetro che non tocca il verde, ha il suo recinto stretto.
 - ⚠️ **L'inchiostro dei Ludoratti non è nero: è `#180828`.** Misurato il 2026-09-17 sui pixel di
-  `LudoRatti_Logo.png` — il colore scuro più frequente del contorno è un viola-nero. `Rat` lo usa
-  per il proprio contorno, ed è quello che rende il ratto che corre e la mascotte con l'ampolla
-  **lo stesso personaggio** invece di due disegni. Il verde dell'ampolla sul dorso è invece quello
-  della tavolozza (`plague-500`), non quello della mascotte (`#30b020`): ampolla e interfaccia
-  intorno devono dire lo stesso verde.
+  `LudoRatti_Logo.png` — il colore scuro più frequente del contorno è un viola-nero. Il ratto
+  ricalcato porta l'inchiostro delle **reference**, generate nello stile della mascotte e
+  quantizzate a `#100020`: stessa famiglia, ed è quello che rende il ratto che corre e la mascotte
+  con l'ampolla **lo stesso personaggio** invece di due disegni. Il verde dell'ampolla è quello
+  delle reference (`#86b84a`), non `plague-500`: il ricalco riproduce il disegno, e il giorno che si
+  vorrà accordarlo alla tavolozza la leva è `RAT_KIT_COLORS`.
 - ⚠️ **Il contorno d'inchiostro tiene il ratto in chiaro e non fa niente in scuro.** Misurato il
   2026-09-18 su `/stile`: `#180828` fa **19,02** sul bianco della superficie chiara e **1,07** su
   quella scura. In chiaro è il contorno a reggere l'albino (`#f7f7f7` su bianco); in scuro reggono
@@ -278,11 +279,14 @@ exist in target module» che **non sono veri**. Si guarda la pagina, o si crede 
   ha la stessa proprietà ed è quella che dà l'identità. Ma è il motivo per cui il ratto **segue il
   tema** invece di stare su una lastra scura fissa, e il giorno che si vorrà l'espressione anche in
   scuro la leva è un inchiostro che cambia col tema, in `theme.css`.
-- ⚠️ **Una `transform` in CSS sostituisce l'attributo `transform`, non si somma.** Le zampe lontane
-  di `Rat` stanno più indietro e più in basso con un `translate(-14,2)` come attributo: se la
-  classe che l'animazione aggancia stesse sullo stesso `<g>`, il primo fotogramma le riporterebbe
-  all'origine, sopra a quelle vicine. Perciò due gruppi annidati — fuori lo spostamento, dentro la
-  classe — e un test che lo tiene.
+- ⚠️ **Una `transform` in CSS sostituisce l'attributo `transform`, non si somma.** Nel primo `Rat`
+  disegnato a mano le zampe lontane stavano indietro con un `translate(-14,2)` come attributo, e
+  l'animazione sullo stesso `<g>` le avrebbe riportate all'origine al primo fotogramma. Nel ratto
+  ricalcato **nessuna parte porta un attributo `transform`**: i percorsi stanno in coordinate
+  assolute e il perno è un `transform-origin` in unità del viewBox — che vale solo con
+  `transform-box: view-box`, perché senza l'origine si conta dal riquadro della parte e la zampa
+  ruota attorno a se stessa. Misurato il 2026-09-18 su `/corsa`: `transformOrigin` calcolato
+  `166px 153px` per la posteriore vicina, cioè il perno scritto dal generatore.
 - ⚠️ **Una cornice scritta a occhio prima di misurare taglia qualcosa, e lo fa in silenzio.** La
   prima di `Rat` ridisegnato finiva a 88; la pianta dei piedi dipinta sta a **89,25**. Si è visto
   solo misurando i pixel, e da lì il test tiene le quattro cifre misurate come vincolo.
@@ -319,6 +323,30 @@ exist in target module» che **non sono veri**. Si guarda la pagina, o si crede 
   delle demo. Il lime grezzo va **dentro** la barra, che è un'isola scura; sul fondo della pagina
   ci va `brand-ink`. Lo scenario sta in [`COLLAUDI.md`](COLLAUDI.md), decorazioni dichiarate
   comprese.
+- ⚠️ **Tagliare le parti di un pupazzo con un poligono si porta via anche il tronco che ci sta
+  dentro, e tenerlo lascia la parte due volte.** Il poligono di una zampa contiene pixel della
+  zampa **e** pixel della groppa su cui poggia: toglierli tutti dal tronco apre un buco quando la
+  zampa ruota, non toglierne nessuno lascia una zampa fantasma ferma sotto quella che si muove. Il
+  criterio che li distingue è morfologico: il **nucleo** del tronco è un'apertura — erosione di 35
+  px, poi dilatazione di 35 — della sagoma piena: ciò che sporge di meno di 35 px, coda e zampe,
+  sparisce, e ciò che resta è tronco. Dentro il nucleo la parte è **sopra** il tronco e il tronco si
+  completa col pelo; fuori è la parte e basta. Sta in `tronco()` di `scripts/genera-ratto.mjs`, e
+  l'anteprima `ratto-parti.png` colora ogni pezzo per vedere i tagli.
+- ⚠️ **jsdom non ha `AnimationEvent`, e la cosa costa due volte.** `fireEvent.animationEnd` ripiega
+  su `Event` e **scarta** `animationName`. E React, non trovando `AnimationEvent` in `window`,
+  registra `onAnimationEnd` sul nome **col prefisso** — `webkitAnimationEnd`, perché
+  `WebkitAnimation` sta in `style` — quindi un `animationend` liscio non arriva a nessun handler.
+  Prima della sonda il test di `onDone` restava a zero chiamate **anche col filtro spento**, e
+  sembrava un difetto del componente. `tests/Rat.test.tsx` costruisce l'evento a mano, col nome che
+  React ascolta deciso come lo decide lui.
+- ⚠️ **Un `Math.random` nello stato iniziale di un componente client rompe l'idratazione.** Il
+  componente viene reso anche sul server, e il client pesca un altro numero: React scarta l'HTML,
+  ridisegna tutta la pagina e in console compaiono «Hydration failed» **e** l'avviso sullo
+  `<script>` del tema, che è una conseguenza del ridisegno e non la causa. La cura non è un
+  `setState` in un effetto — `react-hooks/set-state-in-effect` lo rifiuta — ma
+  `useSyncExternalStore` con `() => true` sul client e `() => false` sul server: server e
+  idratazione rendono il vuoto, il ratto compare al render successivo. È `useMontato` in
+  `playground/app/corsa/RunDemo.tsx`.
 
 ## Memoria di sessione
 

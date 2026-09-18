@@ -360,3 +360,37 @@ Cercandoli a macchina sulle 33 frasi — stessa forma a meno di punteggiatura, o
 parole lunghe in comune — escono **zero** doppioni veri e **otto** falsi allarmi, di cui sei sono
 le varianti volute di «Squit!». Un avviso che grida al lupo sulle cose giuste si impara a
 ignorare. La ricerca fa il lavoro: si scrive una parola e chi la ripete finisce in fila.
+
+### Il ratto corre attorno ai suoi perni, e la fine la dice `animationend` — 2026-09-18
+
+**Esegue:** agente — in jsdom le animazioni non girano: il test tiene il contratto (classi, perni
+come stile, filtro di `onDone`), qui si misura che il browser faccia il resto.
+**Ultima esecuzione:** agente, 2026-09-18 — tutto come atteso.
+
+**Preparazione:** `npm run build`, `npm run playground`, `/corsa` in una **scheda nuova** — la
+console dello strumento è cumulativa, e un errore di un caricamento precedente resta lì.
+
+| Azione | Atteso | Ottenuto |
+|---|---|---|
+| `getComputedStyle` sulle parti del ratto in corsa | `transform-origin` uguale al perno scritto dal generatore, `transform-box: view-box` | posteriore vicina `166px 153px`, anteriore lontana `290px 143px`, coda `137px 110px`, pedina `287px 139px`, dado `216px 116px`, ampolla `211px 57px`; cinghie ferme |
+| `getAnimations()` sulle stesse | galoppo a coppie: una `alternate`, l'altra `alternate-reverse`, 0,42 s; coda e pendagli 0,84 s con ritardi diversi | posteriore vicina e anteriore lontana `alternate`, anteriore vicina `alternate-reverse`; coda `pb-rat-wag` 0,84 s; pedina e dado `pb-rat-sway` −0,25 s; ampolla `pb-rat-wag` −0,15 s al contrario; corpo `pb-rat-bounce` |
+| Il ratto fermo accanto | nessuna animazione | `animationName: none`, `getAnimations()` vuoto |
+| Il contenitore che attraversa | `pb-rat-cross-left` o `-right`, la durata pescata, da destra il disegno ribaltato | `pb-rat-cross-right`, `5.83s`, `top: 59%`, `-scale-x-100` sull'`<svg>` |
+| Si segna il nodo e si aspetta la fine | il nodo dopo è **un altro**, con lato e altezza nuovi | il segno non c'è più; da `left`/`39%` a `right`/`34%` |
+| Si campiona la fascia ogni 100 ms per 11 s | il ratto esce, la fascia resta **vuota** per la pausa, poi ne entra un altro | `presente` 4,51 s → `assente` 828 ms → `presente` 5,72 s → `assente` 828 ms → `presente`; la pausa è quella che, con meno movimento, impedisce alla catena di girare a vuoto |
+| La console, in una scheda nuova | niente errori | solo React DevTools e `[HMR] connected`; prima della cura c'erano «Hydration failed» e l'avviso sullo `<script>` |
+| Ogni testo di `main`, nei due temi | nessuno sotto 4,5 | 23 testi; minimo **6,91** in scuro, **4,58** in chiaro (l'etichetta di `TechRule`) |
+| Le regole sotto `prefers-reduced-motion`, lette dai fogli | zampe senza animazione, traversata a 1 ms | `animation-name: none` sulle parti in corsa, `.pb-rat-run { animation-duration: 1ms }` — il browser dello strumento non emula la preferenza, quindi si leggono le regole e non si guarda |
+
+⚠️ **La console dello strumento non si svuota cambiando pagina.** I due errori dell'idratazione
+comparivano identici su `/barra`, che non ha niente di casuale: erano quelli di `/corsa` prima
+della cura, rimasti nella coda. La misura vale in una scheda appena aperta.
+
+⚠️ **I colori calcolati escono in `lab()`**, non in `rgb()`: un parser scritto per `rgb(` li legge
+come trasparenti e il fondo scuro diventa bianco — la prima passata dava 2,56 a tutto il tema
+scuro. Il modo che risponde è passare il colore a un `<canvas>` di un pixel e leggere i byte.
+
+**Che cosa protegge:** il pupazzo. Se un perno si sposta — un poligono ritoccato nel generatore, un
+`transform-box` perso in `animations.css` — le zampe ruotano attorno a se stesse e il ratto sembra
+disarticolato, e nessun test in jsdom lo vede. E la cura dell'idratazione della demo: un
+`Math.random` nello stato iniziale di un componente client si vede solo in console.

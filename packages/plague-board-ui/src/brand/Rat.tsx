@@ -1,13 +1,18 @@
+import type { CSSProperties } from 'react';
+
 import {
-  RAT_BODY,
   RAT_COLLAR,
   RAT_HARNESS,
   RAT_KIT_COLORS,
+  RAT_PARTS,
   RAT_SKULL,
+  RAT_TORSO,
   RAT_VIEW_BOX,
   type RatBodySlot,
   type RatKitColor,
+  type RatKitPiece,
   type RatPath,
+  type RatPivot,
 } from './ratArt';
 
 /**
@@ -45,26 +50,55 @@ export interface RatProps {
   hasCollar?: boolean;
   /** L'imbracatura di cuoio con l'ampolla di veleno sul dorso e il dado che ci pende. */
   hasVial?: boolean;
+  /**
+   * Se le zampe ciclano, la coda ondeggia, il corpo sobbalza e ciò che pende oscilla. Le regole
+   * stanno in `animations.css`; qui c'è solo la classe che le accende. Chi attraversa lo schermo lo
+   * mette {@link RatRun}; da fermo nella demo il ratto sta fermo.
+   */
+  isRunning?: boolean;
   /** Classi aggiuntive sull'`<svg>`. È da qui che passano l'alone della peste e il ribaltamento. */
   className?: string;
   /** Il nome con cui si annuncia. Senza, è **decorativo**. */
   title?: string;
 }
 
-/** Un livello del disegno: i percorsi con il colore risolto. */
+/** Da `legBackFar` a `leg-back-far`: le classi seguono l'idioma del CSS, i dati quello di TypeScript. */
+const kebab = (name: string) => name.replace(/[A-Z]/g, (c) => `-${c.toLowerCase()}`);
+
+/**
+ * ⚠️ Il perno è `transform-origin` in **unità della cornice**, e l'`svg` in CSS lo permette perché
+ * `transform-box` degli elementi SVG è `view-box`: `137px 110px` vuol dire il punto (137, 110) del
+ * `viewBox`, non dello schermo. Senza, ogni rotazione partirebbe dall'angolo in alto a sinistra.
+ */
+const origin = (pivot: RatPivot): CSSProperties => ({ transformOrigin: `${pivot.x}px ${pivot.y}px` });
+
 function Layer<C extends string>({
   paths,
   colors,
   className,
+  pivot,
 }: {
   paths: readonly RatPath<C>[];
   colors: Record<C, string>;
   className: string;
+  pivot?: RatPivot;
 }) {
   return (
-    <g className={className}>
+    <g className={className} style={pivot === undefined ? undefined : origin(pivot)}>
       {paths.map((p, i) => (
         <path key={i} fill={colors[p.c]} d={p.d} />
+      ))}
+    </g>
+  );
+}
+
+/** Un kit: i suoi pezzi, ognuno con la classe `pb-rat-<kit>-<pezzo>`; quelli col perno oscillano. */
+function Kit({ name, pieces }: { name: string; pieces: readonly RatKitPiece[] }) {
+  const kit: Record<RatKitColor, string> = RAT_KIT_COLORS;
+  return (
+    <g className={`pb-rat-${name}`}>
+      {pieces.map((q) => (
+        <Layer key={q.name} className={`pb-rat-${name}-${q.name}`} paths={q.paths} colors={kit} pivot={q.pivot} />
       ))}
     </g>
   );
@@ -77,20 +111,24 @@ function Layer<C extends string>({
  * nello stile della mascotte con l'ampolla — contorno d'inchiostro `#100020`, campiture piatte
  * con un tono d'ombra per materiale, occhio rosso con la luce. Il corpo viene dal ratto grigio e
  * si ricolora per livrea; i tre kit vengono dagli altri due e si accendono **indipendentemente**,
- * così uno sciame li può combinare a caso: un bruno con l'ampolla, un albino col teschio, un grigio
- * con tutto. Il come sta in `scripts/genera-ratto.mjs`, e `ratArt.ts` è il suo prodotto.
+ * così uno sciame li può combinare a caso. Il come sta in `scripts/genera-ratto.mjs`, e
+ * `ratArt.ts` è il suo prodotto.
+ *
+ * ⚠️ **È un pupazzo articolato, non un disegno solo.** Il tronco è un pezzo; coda e quattro zampe
+ * sono pezzi a sé con un perno sull'articolazione, e stanno **dietro** (coda, zampe del lato
+ * lontano) o **davanti** (zampe vicine) al tronco. Dove una zampa davanti copre la pancia, il tronco
+ * ha pelo sotto — completato dal generatore — così quando la zampa si muove non c'è un buco. Anche
+ * la bottiglia, il dado e la pedina hanno un perno: pendono e oscillano.
  *
  * ⚠️ **La cornice è una sola, con o senza kit**: accendere l'ampolla non sposta il ratto e non gli
  * cambia la misura. Per questo un ratto nudo ha aria sopra la testa, dove starebbe l'ampolla.
  *
- * ⚠️ **Sta fermo, ed è il punto.** Qui dentro non c'è nessun `<style>`; le regole che lo faranno
- * correre vivono in `animations.css`, agganciate ai gruppi `pb-rat-body`, `pb-rat-skull`,
- * `pb-rat-collar`, `pb-rat-vial`. ⚠️ Le zampe e la coda **non sono ancora gruppi a sé**: il ricalco
- * dà livelli per colore, non per parte, e separarli — con la maschera per parte e il completamento
- * delle articolazioni — è il lavoro di `RatRun`.
+ * ⚠️ **Sta fermo finché non gli si dice `isRunning`.** Qui dentro non c'è nessun `<style>`: le
+ * regole che lo fanno correre vivono in `animations.css`, agganciate a `pb-rat--running` e ai nomi
+ * dei pezzi. Il pelo, i perni e l'ordine dei livelli sono qui; il **tempo** è di là.
  *
- * ⚠️ **Guarda a destra.** Per farlo andare dall'altra parte si ribalta chi lo contiene con
- * `scale-x-[-1]`.
+ * ⚠️ **Guarda a destra.** Per farlo andare dall'altra parte si ribalta con `-scale-x-100`, ed è
+ * quello che fa {@link RatRun}.
  */
 export function Rat({
   livery = 'grey',
@@ -98,11 +136,13 @@ export function Rat({
   hasSkull = false,
   hasCollar = false,
   hasVial = false,
+  isRunning = false,
   className = '',
   title,
 }: RatProps) {
   const colors = RAT_LIVERIES[livery];
-  const kit: Record<RatKitColor, string> = RAT_KIT_COLORS;
+  const behind = RAT_PARTS.filter((p) => p.behind);
+  const front = RAT_PARTS.filter((p) => !p.behind);
 
   return (
     <svg
@@ -110,17 +150,26 @@ export function Rat({
       viewBox={`${RAT_VIEW_BOX.x} ${RAT_VIEW_BOX.y} ${RAT_VIEW_BOX.width} ${RAT_VIEW_BOX.height}`}
       width={Math.round(size * RATIO)}
       height={size}
-      className={className}
+      className={`pb-rat ${isRunning ? 'pb-rat--running' : ''} ${className}`}
       role={title === undefined ? undefined : 'img'}
       aria-hidden={title === undefined ? true : undefined}
       aria-label={title}
     >
       {title !== undefined && <title>{title}</title>}
-      <Layer className="pb-rat-body" paths={RAT_BODY} colors={colors} />
-      {/* Il collare sta sotto l'imbracatura, e il teschio sopra a tutto: copre il bordo dell'orecchio. */}
-      {hasCollar && <Layer className="pb-rat-collar" paths={RAT_COLLAR} colors={kit} />}
-      {hasVial && <Layer className="pb-rat-vial" paths={RAT_HARNESS} colors={kit} />}
-      {hasSkull && <Layer className="pb-rat-skull" paths={RAT_SKULL} colors={kit} />}
+      {/* Il gruppo che sobbalza: tutto il ratto, kit compresi, così l'ampolla sale e scende col dorso. */}
+      <g className="pb-rat-body">
+        {behind.map((p) => (
+          <Layer key={p.name} className={`pb-rat-part pb-rat-${kebab(p.name)}`} paths={p.paths} colors={colors} pivot={p.pivot} />
+        ))}
+        <Layer className="pb-rat-torso" paths={RAT_TORSO} colors={colors} />
+        {front.map((p) => (
+          <Layer key={p.name} className={`pb-rat-part pb-rat-${kebab(p.name)}`} paths={p.paths} colors={colors} pivot={p.pivot} />
+        ))}
+        {/* Il collare sta sotto l'imbracatura, e il teschio sopra a tutto: copre il bordo dell'orecchio. */}
+        {hasCollar && <Kit name="collar" pieces={RAT_COLLAR} />}
+        {hasVial && <Kit name="vial" pieces={RAT_HARNESS} />}
+        {hasSkull && <Kit name="skull" pieces={RAT_SKULL} />}
+      </g>
     </svg>
   );
 }

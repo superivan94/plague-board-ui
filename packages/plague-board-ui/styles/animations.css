@@ -306,11 +306,149 @@
   border-left: 4px solid transparent;
 }
 
-/* ⚠️ Chi ha chiesto meno movimento lo ottiene, e vale per tutto il file in una riga sola. */
+/* ─────────────────────────────────────────────────────────────────────────────
+ * La corsa del ratto. Il disegno è un pupazzo articolato — tronco, coda, quattro zampe, e i pezzi
+ * che pendono dai kit — e ogni pezzo porta il proprio perno come `transform-origin`, scritto dal
+ * componente nelle unità della cornice. Qui c'è solo il **tempo**: che cosa ruota, di quanto, e con
+ * che sfasamento. Si accende tutto con una classe sola, `pb-rat--running`, e da fermo niente si muove.
+ *
+ * ⚠️ **Il passo è fluido, non a scatti**: rotazioni continue con `ease-in-out` e `alternate`,
+ * decisione dell'utente. Le zampe vanno a coppie diagonali — posteriore vicina con anteriore
+ * lontana, e viceversa — come un galoppo: le due coppie sono la stessa animazione, una dritta e una
+ * `alternate-reverse`. Il ciclo è 0,42 s; coda e pendagli vanno al doppio, 0,84 s, perché sono
+ * pesi che oscillano, non arti che spingono.
+ *
+ * ⚠️ **Il sobbalzo è sul gruppo che contiene tutto**, kit compresi: l'ampolla deve salire e
+ * scendere col dorso, o galleggia. Le unità sono quelle del `viewBox` — il ratto è alto 176 — e
+ * tre unità sono un pixel e mezzo a 88px di altezza.
+ * ───────────────────────────────────────────────────────────────────────────── */
+
+@keyframes pb-rat-gallop {
+  from {
+    transform: rotate(-16deg);
+  }
+  to {
+    transform: rotate(16deg);
+  }
+}
+
+@keyframes pb-rat-wag {
+  from {
+    transform: rotate(-5deg);
+  }
+  to {
+    transform: rotate(5deg);
+  }
+}
+
+@keyframes pb-rat-bounce {
+  from {
+    transform: translateY(0);
+  }
+  to {
+    transform: translateY(-3px);
+  }
+}
+
+@keyframes pb-rat-sway {
+  from {
+    transform: rotate(-9deg);
+  }
+  to {
+    transform: rotate(9deg);
+  }
+}
+
+/* La traversata: dal bordo sinistro oltre il destro, o il contrario. ⚠️ `100vw` e non la larghezza
+ * del genitore: il ratto attraversa lo **schermo**, come di là, e il genitore è una fascia a tutta
+ * larghezza con `overflow-hidden`. Il `-100%` è la larghezza del ratto stesso: parte tutto fuori. */
+@keyframes pb-rat-cross-left {
+  from {
+    transform: translateX(-100%);
+  }
+  to {
+    transform: translateX(100vw);
+  }
+}
+
+@keyframes pb-rat-cross-right {
+  from {
+    transform: translateX(100vw);
+  }
+  to {
+    transform: translateX(-100%);
+  }
+}
+
+/* ⚠️ `transform-box: view-box` è ciò che fa valere il perno nelle unità del disegno. È il valore
+ * predefinito degli elementi SVG, scritto perché è la riga da cui dipende tutto. */
+.pb-rat-part,
+.pb-rat-collar-pawn,
+.pb-rat-vial-bottle,
+.pb-rat-vial-dice {
+  transform-box: view-box;
+}
+
+.pb-rat--running .pb-rat-leg-back-near,
+.pb-rat--running .pb-rat-leg-front-far {
+  animation: pb-rat-gallop 0.42s ease-in-out infinite alternate;
+}
+
+.pb-rat--running .pb-rat-leg-front-near,
+.pb-rat--running .pb-rat-leg-back-far {
+  animation: pb-rat-gallop 0.42s ease-in-out infinite alternate-reverse;
+}
+
+.pb-rat--running .pb-rat-tail {
+  animation: pb-rat-wag 0.84s ease-in-out infinite alternate;
+}
+
+.pb-rat--running .pb-rat-body {
+  animation: pb-rat-bounce 0.42s ease-in-out infinite alternate;
+}
+
+/* I pendagli vanno in ritardo sul passo — è il movimento secondario che li fa sembrare pesanti. */
+.pb-rat--running .pb-rat-collar-pawn,
+.pb-rat--running .pb-rat-vial-dice {
+  animation: pb-rat-sway 0.84s ease-in-out -0.25s infinite alternate;
+}
+
+.pb-rat--running .pb-rat-vial-bottle {
+  animation: pb-rat-wag 0.84s ease-in-out -0.15s infinite alternate-reverse;
+}
+
+/* Il contenitore che attraversa. La durata la scrive `RatRun` in linea, perché è una prop. */
+.pb-rat-run {
+  animation-timing-function: linear;
+  animation-fill-mode: forwards;
+  will-change: transform;
+}
+
+.pb-rat-run--left {
+  animation-name: pb-rat-cross-left;
+}
+
+.pb-rat-run--right {
+  animation-name: pb-rat-cross-right;
+}
+
+/* ⚠️ Chi ha chiesto meno movimento lo ottiene, e vale per tutto il file in una riga sola.
+ * Il ratto che corre fa eccezione in un punto: la traversata non si spegne ma dura un millisecondo,
+ * così `animationend` arriva, `onDone` arriva, e chi ha messo il ratto lo toglie — con `none` il
+ * ratto resterebbe fermo a metà schermo per sempre. Le zampe invece si fermano. */
 @media (prefers-reduced-motion: reduce) {
   .pb-binary-digit,
   .pb-comic-bubble,
-  [class*='animate-'] {
+  [class*='animate-'],
+  .pb-rat--running .pb-rat-part,
+  .pb-rat--running .pb-rat-body,
+  .pb-rat--running .pb-rat-collar-pawn,
+  .pb-rat--running .pb-rat-vial-bottle,
+  .pb-rat--running .pb-rat-vial-dice {
     animation: none !important;
+  }
+
+  .pb-rat-run {
+    animation-duration: 1ms !important;
   }
 }
