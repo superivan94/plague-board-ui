@@ -284,6 +284,13 @@ del componente uguale a quella dello script.
 | Rigenerazione dal repository e da fuori | stesso modulo | identico salvo il commento d'intestazione |
 | La lente a 2000px: testa, orecchio, groppa, ampolla, collare | etichetta col teschietto leggibile, dado con i puntini, nessun filetto chiaro fra rosa e inchiostro, teschio intero | tutto; con due passate di despeckle il teschietto era una nuvola e il dado puntini a mezz'aria |
 | L'orecchio in primo piano col teschio addosso, sul grigio e sul bruno | rosa, come senza teschio | rosa; prima portava un anello chiaro — il bordo crema dell'orecchio del **bruno**, dello stesso colore dell'osso, entrato nel kit. Segnalato dall'utente sulle anteprime |
+| I kit **da soli**, sulla testa (`kit-testa-solo.png`) | teschio, cinghia con la fibbia, collare intero con la pedina — e niente altro | così; prima c'erano due frammenti bruni e un blocco nero a spigoli sotto il teschio, e il collare mancava della punta in alto e a sinistra. Segnalato dall'utente |
+
+⚠️ **I kit si guardano da soli, senza il corpo sotto.** Il corpo nasconde: un frammento di pelo
+bruno preso per cuoio, appoggiato sul grigio, sembra un'ombra. Reso da solo su grigio medio, ogni
+cosa nel kit che non è il kit si vede. E il rettangolo di ricerca **va dove sta la cosa**, misurato
+sulla reference ritagliata: la cinghia scende verso sinistra dietro la mascella (x 1040–1140), e un
+rettangolo sulla guancia (1130–1260) raccoglieva l'ombra del pelo quantizzata a cuoio.
 
 **Che cosa protegge:** la riproducibilità dell'arte. Se qualcuno ritocca `ratArt.ts` a mano, la
 prossima `npm run art:ratto` lo cancella: il posto dove intervenire è lo script — semi, recinti,

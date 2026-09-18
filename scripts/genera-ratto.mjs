@@ -329,15 +329,34 @@ const corpo = ricalca(grigio, null, null, { brownBelly: 'greyBelly', bone: 'grey
 // per rettangolo nemmeno, perché si sovrappongono in x. Sul grigio e sul bruno quell'anello
 // arrivava nel kit come una macchia bianca sull'orecchio. La cinghia è aperta e si semina per
 // colore nel suo rettangolo.
+// Semi dalle `quante` componenti più grandi di un colore in un recinto: il pezzo vero è grande e
+// il rumore del pelo quantizzato a quel colore è briciole. Il recinto può essere generoso.
+const semiComponenti = (img, colore, recinto, quante = 1) => {
+  const s = new Uint8Array(img.W * img.H);
+  for (const c of componenti(img, colore, recinto).slice(0, quante)) for (const i of c.pixel) s[i] = 1;
+  return s;
+};
+// ⚠️ La cinghia scende dal teschio **verso sinistra e in basso**, dietro la mascella, a x 1040–1140:
+// un rettangolo a x 1130–1260 la cercava sulla guancia, dove prendeva l'ombra del pelo bruno
+// quantizzata a cuoio — i frammenti bruni e il blocco nero sotto il teschio. E il rename
+// `brownShade → ink` trasformava in inchiostro ogni ombra di pelo finita nella maschera: via.
 const RECINTO_TESCHIO = { x0: 1000, y0: 90, x1: 1530, y1: 415 };
-const semiTeschio = new Uint8Array(bruno.W * bruno.H);
-for (const i of componenti(bruno, 'bone', RECINTO_TESCHIO)[0].pixel) semiTeschio[i] = 1;
+const RECINTO_CINGHIA = { x0: 1020, y0: 280, x1: 1170, y1: 460 };
 const mTeschio = unisci(
-  attorno(bruno, semiTeschio, RAGGIO),
-  maschera(bruno, ['leather'], RAGGIO, { x0: 1130, y0: 280, x1: 1260, y1: 415 }),
+  unisci(
+    attorno(bruno, semiComponenti(bruno, 'bone', RECINTO_TESCHIO), RAGGIO),
+    attorno(bruno, semiComponenti(bruno, 'leather', RECINTO_CINGHIA, 2), RAGGIO),
+  ),
+  attorno(bruno, semiComponenti(bruno, 'gold', RECINTO_CINGHIA, 1), RAGGIO),
 );
-const teschio = ricalca(bruno, mTeschio, new Set(['bone', 'leather', 'gold', 'ink']), { brownShade: 'ink' }, 48);
-const mCollare = maschera(bruno, ['purple', 'gold'], RAGGIO, { x0: 1040, y0: 380, x1: 1310, y1: 660 });
+const teschio = ricalca(bruno, mTeschio, new Set(['bone', 'leather', 'gold', 'ink']), {}, 48);
+// Il collare comincia a y 320 e a x 960 — dietro la mascella, non sotto — e finisce con la pedina
+// a y 600: il recinto vecchio (380–660, da x 1040) lo tagliava in alto e a sinistra.
+const RECINTO_COLLARE = { x0: 930, y0: 300, x1: 1220, y1: 660 };
+const mCollare = unisci(
+  attorno(bruno, semiComponenti(bruno, 'purple', RECINTO_COLLARE, 1), RAGGIO),
+  attorno(bruno, semiComponenti(bruno, 'gold', RECINTO_COLLARE, 3), RAGGIO),
+);
 const collare = ricalca(bruno, mCollare, new Set(['purple', 'gold', 'ink']), {}, 48);
 // L'imbracatura: cinghie, fibbie, liquido, bolle, etichetta e tappo per colore nel loro
 // rettangolo; il vetro del collo — che non tocca il verde e somiglia all'ombra del pelo bianco — nel
