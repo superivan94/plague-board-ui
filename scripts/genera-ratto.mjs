@@ -86,7 +86,10 @@ function dilata(m, W, H, raggio) {
 }
 
 // ── Caricamento: via il fondo dai bordi, poi ogni pixel al colore più vicino della tavolozza ────
-async function carica(nome) {
+// `fusioni`: rettangoli dell'immagine in cui un colore si legge come un altro **prima** del
+// despeckle. Servono dove il donatore trema fra due colori vicini — la carta dell'etichetta e il
+// dado, fra crema e bianco-pelo — e il ricalco ne farebbe un mosaico di frammenti.
+async function carica(nome, fusioni = []) {
   const { data, info } = await sharp(join(REFERENCE, `${nome}.png`)).ensureAlpha().raw().toBuffer({ resolveWithObject: true });
   const { width: W, height: H } = info;
   const px = new Uint8ClampedArray(data);
@@ -109,11 +112,50 @@ async function carica(nome) {
   // quantizza a inchiostro — un anello di trattini attorno a tutto il ratto.
   fondo = dilata(fondo, W, H, 2);
 
-  const idx = new Int8Array(W * H).fill(-1);
+  let idx = new Int8Array(W * H).fill(-1);
   for (let i = 0; i < W * H; i++) {
-    if (fondo[i]) { azzera(px, i); continue; }
-    const k = piuVicino(px[i * 4], px[i * 4 + 1], px[i * 4 + 2]);
-    idx[i] = k;
+    if (fondo[i]) continue;
+    idx[i] = piuVicino(px[i * 4], px[i * 4 + 1], px[i * 4 + 2]);
+  }
+
+  for (const f of fusioni) {
+    const da = NOMI.indexOf(f.da), a = NOMI.indexOf(f.a);
+    for (let y = f.y0; y < f.y1; y++) for (let x = f.x0; x < f.x1; x++) if (idx[y * W + x] === da) idx[y * W + x] = a;
+  }
+
+  // ⚠️ Despeckle: filtro di maggioranza 3×3 sull'indice, **una** passata, e **l'inchiostro non si
+  // tocca**. La quantizzazione lascia pixel isolati e filetti da un pixel — antialiasing fra rosa e
+  // inchiostro finito su «pancia» — e il ricalco trasforma ognuno in un percorso. Un pixel con meno
+  // di tre vicini del suo colore prende il colore di maggioranza dei vicini. Non è uno sfocamento:
+  // i bordi netti restano netti. ⚠️ Con due passate e senza la riserva sull'inchiostro morivano le
+  // linee sottili — il teschietto sull'etichetta, i puntini del dado — perché una linea larga due
+  // pixel non ha mai tre vicini uguali. Il trasparente non vince mai, così il contorno non si erode.
+  const INK = NOMI.indexOf('ink');
+  {
+    const fuori = new Int8Array(idx);
+    for (let y = 1; y < H - 1; y++) for (let x = 1; x < W - 1; x++) {
+      const i = y * W + x;
+      const k = idx[i];
+      if (k < 0 || k === INK) continue;
+      const conteggio = new Map();
+      let uguali = 0;
+      for (let dy = -1; dy <= 1; dy++) for (let dx = -1; dx <= 1; dx++) {
+        if (!dx && !dy) continue;
+        const v = idx[i + dy * W + dx];
+        if (v === k) uguali++;
+        if (v >= 0) conteggio.set(v, (conteggio.get(v) ?? 0) + 1);
+      }
+      if (uguali >= 3) continue;
+      let migliore = k, n = -1;
+      for (const [v, c] of conteggio) if (c > n) { n = c; migliore = v; }
+      fuori[i] = migliore;
+    }
+    idx = fuori;
+  }
+
+  for (let i = 0; i < W * H; i++) {
+    const k = idx[i];
+    if (k < 0) { azzera(px, i); continue; }
     [px[i * 4], px[i * 4 + 1], px[i * 4 + 2]] = RGB[k]; px[i * 4 + 3] = 255;
   }
   return { W, H, px, idx, pieno: idx.map((v) => (v >= 0 ? 1 : 0)) };
@@ -136,6 +178,40 @@ function maschera({ W, H, idx }, colori, raggio, recinto) {
   return d;
 }
 const unisci = (a, b) => a.map((v, i) => v | b[i]);
+
+// ⚠️ Semi **per riempimento**: da un punto dentro l'oggetto si prende tutto ciò che si raggiunge
+// senza attraversare inchiostro o trasparente. Un rettangolo non sa separare il teschio dalla luce
+// dell'orecchio che gli sta dietro, né il dado dal pelo che gli sta intorno; il contorno
+// d'inchiostro sì, perché è chiuso. Un punto che cade sull'inchiostro non semina niente e lo dice.
+function alluvione({ W, H, idx }, punti, nome) {
+  const INK = NOMI.indexOf('ink');
+  const m = new Uint8Array(W * H);
+  const coda = [];
+  for (const [x, y] of punti) {
+    const i = y * W + x;
+    if (idx[i] < 0 || idx[i] === INK) { console.warn(`  ⚠️ ${nome}: il punto (${x},${y}) cade su ${idx[i] < 0 ? 'trasparente' : 'inchiostro'}`); continue; }
+    if (!m[i]) { m[i] = 1; coda.push(i); }
+  }
+  while (coda.length) {
+    const i = coda.pop();
+    const x = i % W, y = (i - x) / W;
+    for (const [dx, dy] of [[1, 0], [-1, 0], [0, 1], [0, -1]]) {
+      const xx = x + dx, yy = y + dy;
+      if (xx < 0 || yy < 0 || xx >= W || yy >= H) continue;
+      const j = yy * W + xx;
+      if (m[j] || idx[j] < 0 || idx[j] === INK) continue;
+      m[j] = 1; coda.push(j);
+    }
+  }
+  return m;
+}
+// La maschera di un oggetto chiuso: il suo interno più l'inchiostro attorno, per dilatazione.
+const attorno = (img, interno, raggio) => dilata(interno, img.W, img.H, raggio);
+// Fonde a un colore i pixel di una regione — il dado, che dentro trema fra bianco e ombra.
+function fondi(img, regione, nome) {
+  const k = NOMI.indexOf(nome);
+  for (let i = 0; i < img.W * img.H; i++) if (regione[i]) { img.idx[i] = k; [img.px[i * 4], img.px[i * 4 + 1], img.px[i * 4 + 2]] = RGB[k]; img.px[i * 4 + 3] = 255; }
+}
 
 // ── Ricalco di un raster (eventualmente mascherato) → percorsi con il nome del colore ───────────
 // `tieni` filtra ai colori del pezzo; `rinomina` fonde i colori spuri (il bianco del dado → cream).
@@ -177,7 +253,32 @@ function trasforma(d, dx, dy) {
 // ── Montaggio ────────────────────────────────────────────────────────────────────────────────────
 const grigio = await carica('ludoratto-grigio');
 const bruno = await carica('ludoratto-bruno-teschio');
-const bianco = await carica('ludoratto-bianco-pozione');
+
+// La sonda (`SONDA=1`): i riquadri dei colori dei kit dopo la quantizzazione, per scegliere i
+// punti di riempimento dai numeri invece che a occhio — un punto sull'inchiostro non semina niente.
+const sonda = (img, nome, colori) => {
+  if (!process.env.SONDA) return;
+  console.log(`— ${nome}`);
+  for (const c of colori) {
+    const k = NOMI.indexOf(c);
+    let x0 = 1e9, y0 = 1e9, x1 = -1, y1 = -1, n = 0, sx = 0, sy = 0;
+    for (let y = 0; y < img.H; y++) for (let x = 0; x < img.W; x++) if (img.idx[y * img.W + x] === k) {
+      n++; sx += x; sy += y;
+      if (x < x0) x0 = x; if (x > x1) x1 = x; if (y < y0) y0 = y; if (y > y1) y1 = y;
+    }
+    if (n) console.log(`  ${c.padEnd(11)} x ${x0}–${x1}  y ${y0}–${y1}  baricentro (${Math.round(sx / n)},${Math.round(sy / n)})  ${n} px`);
+  }
+};
+sonda(bruno, 'bruno', ['bone', 'leather', 'gold', 'purple']);
+// Sul bianco, etichetta e dado tremano fra crema e bianco-pelo: si leggono crema, nei loro rettangoli.
+const bianco = await carica('ludoratto-bianco-pozione', [
+  { x0: 770, y0: 250, x1: 930, y1: 420, da: 'whiteFur', a: 'cream' },
+]);
+sonda(bianco, 'bianco', ['green', 'greenLight', 'glass', 'cream', 'leather', 'gold']);
+// Il dado: il suo interno per riempimento, fuso a crema — dentro trema fra bianco e ombra, e le
+// briciole crema che ne restavano erano gli unici semi che lo tenevano nel kit.
+const dado = alluvione(bianco, [[895, 545]], 'dado');
+fondi(bianco, dado, 'cream');
 
 // Il corpo: i colori del grigio diventano **slot** della livrea. I pochi percorsi finiti su bone /
 // brownBelly sono luci della pancia grigia quantizzate male: vanno con la pancia. Il puntino bianco
@@ -189,13 +290,23 @@ const corpo = ricalca(grigio, null, null, { brownBelly: 'greyBelly', bone: 'grey
 // coda finisce a x 600, l'orecchio comincia a x 1040). Il **collo** dell'ampolla è vetro e non
 // tocca il verde: si semina a parte, in un recinto stretto dove l'ombra del pelo bianco — quasi lo
 // stesso colore — non arriva.
-const mTeschio = maschera(bruno, ['bone', 'leather'], RAGGIO, { x0: 1090, y0: 90, x1: 1530, y1: 415 });
+// Il teschio per colore nel suo rettangolo. ⚠️ L'osso arriva sopra l'orecchio fino a x 1030 —
+// misurato: nel rettangolo dell'orecchio il 30% dei pixel è `#f8f0e0`, l'osso stesso — e un
+// recinto a 1090 lo tagliava sul retro con una riga verticale. Il riempimento da punti qui non
+// serve: il teschio ha un colore suo, e i punti a occhio cadevano sull'inchiostro.
+const mTeschio = maschera(bruno, ['bone', 'leather'], RAGGIO, { x0: 1000, y0: 90, x1: 1530, y1: 415 });
 const teschio = ricalca(bruno, mTeschio, new Set(['bone', 'leather', 'gold', 'ink']), { brownShade: 'ink' }, 48);
 const mCollare = maschera(bruno, ['purple', 'gold'], RAGGIO, { x0: 1040, y0: 380, x1: 1310, y1: 660 });
 const collare = ricalca(bruno, mCollare, new Set(['purple', 'gold', 'ink']), {}, 48);
+// L'imbracatura: cinghie, fibbie, liquido, bolle, etichetta e tappo per colore nel loro
+// rettangolo; il vetro del collo — che non tocca il verde e somiglia all'ombra del pelo bianco — nel
+// suo rettangolo stretto; il dado per riempimento, perché non ha un colore suo.
 const mImbracatura = unisci(
-  maschera(bianco, ['leather', 'green', 'greenLight', 'cream', 'gold'], RAGGIO, { x0: 690, y0: 80, x1: 1010, y1: 740 }),
-  maschera(bianco, ['glass', 'whiteShade'], RAGGIO, { x0: 770, y0: 80, x1: 980, y1: 340 }),
+  unisci(
+    maschera(bianco, ['leather', 'green', 'greenLight', 'cream', 'gold'], RAGGIO, { x0: 690, y0: 80, x1: 1010, y1: 740 }),
+    maschera(bianco, ['glass', 'whiteShade'], RAGGIO, { x0: 770, y0: 80, x1: 980, y1: 340 }),
+  ),
+  attorno(bianco, dado, RAGGIO),
 );
 const imbracatura = ricalca(bianco, mImbracatura, new Set(['leather', 'green', 'greenLight', 'cream', 'glass', 'gold', 'ink']), { whiteFur: 'cream', greyBelly: 'cream', whiteShade: 'glass' }, 48);
 

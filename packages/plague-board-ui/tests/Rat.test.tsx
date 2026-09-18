@@ -22,7 +22,9 @@ describe('Rat', () => {
       expect(arte.length).toBeGreaterThan(5);
       for (const p of arte) expect(p.d).toMatch(/^M -?\d/);
     }
-    expect(RAT_BODY.length).toBeGreaterThan(50);
+    // Dopo il despeckle il corpo sta sui 50 percorsi (erano 96 con le briciole): la soglia è
+    // sotto per non rompersi a ogni taratura, e sopra il livello in cui il ricalco è vuoto.
+    expect(RAT_BODY.length).toBeGreaterThan(30);
   });
 
   it('ogni slot del corpo trova il suo colore in ogni livrea', () => {

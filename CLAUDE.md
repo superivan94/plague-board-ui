@@ -234,6 +234,18 @@ exist in target module» che **non sono veri**. Si guarda la pagina, o si crede 
   riempimento non ci arriva. Sul bordo restano pixel di antialiasing sotto 235 che il ricalco
   quantizza a inchiostro: un anello di trattini attorno a tutto il ratto, visibile solo dopo aver
   tolto il fondo. Due pixel su un contorno largo otto non si vedono.
+- ⚠️ **Il despeckle è una passata sola, e l'inchiostro non si tocca.** Il filtro di maggioranza
+  3×3 sull'indice dei colori toglie i filetti chiari fra rosa e inchiostro e i mosaici di frammenti
+  — il corpo scende da 96 a 52 percorsi — ma una linea larga due pixel non ha mai tre vicini
+  uguali: con due passate e senza la riserva sull'inchiostro il teschietto sull'etichetta era una
+  nuvola e il dado puntini a mezz'aria. ⚠️ E il despeckle **cambia i semi**: il dado stava nel kit
+  solo grazie alle briciole crema che il despeckle ha pulito, ed è uscito. Dove un oggetto non ha un
+  colore suo, il seme è il **riempimento da un punto interno** fermato dall'inchiostro; i punti
+  però si prendono dalla sonda (`SONDA=1`), non a occhio — sette su otto cadevano sull'inchiostro.
+- ⚠️ **Prima di correggere un difetto del ricalco, si misura di che colore è.** La «luce
+  dell'orecchio quantizzata a osso» era l'osso stesso: il teschio nel bruno arriva sopra l'orecchio
+  fino a x 1030, e la riga verticale era il recinto che lo tagliava. Un giro intero di semi per
+  riempimento è nato da una diagnosi a occhio.
 - ⚠️ **I kit si ritagliano in raster, con semi + dilatazione + recinto.** Nel ricalco libero il
   contorno del teschio e quello della testa sono **un percorso solo**: si semina la maschera coi
   colori del kit, si dilata di 9 pixel per prendere il loro inchiostro, e si **recinta** in un
