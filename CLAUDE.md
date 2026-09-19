@@ -465,6 +465,27 @@ exist in target module» che **non sono veri**. Si guarda la pagina, o si crede 
   ancorato col proprio spigolo sinistro, largo 179 px su una scheda da 142, sbordava di **81 px** a
   destra e sembrava il fumetto di qualcun altro. ⚠️ E quel 179 è l'altra misura da non perdere: la
   frase più lunga di RattInventario stava dentro i suoi 180 px di `max-width` **per un pixel**.
+- ⚠️ **`ScrollShadow` di HeroUI sbiadisce i primi 40 px anche quando non c'è niente da scorrere.**
+  La variante `fade` ricava la dissolvenza da una **scroll timeline** CSS, e il suo stesso
+  commento dichiara che un contenitore senza traboccamento lascia le due sfumature a zero. Non è
+  così: con niente da scorrere l'intervallo dell'animazione è lungo **zero**, il progresso cade
+  a fondo corsa invece che a inizio, e la maschera vale `transparent 0 → #000 40px`. Misurato il
+  2026-09-20 su `/voce`, filtrando «ratto»: il titolo `RAT_PHRASES 3 su 19` cadeva lì dentro e
+  si leggeva slavato, con `opacity` **1** e il colore giusto — è il paint che manca, non lo stile,
+  quindi cercandolo in `getComputedStyle(nodo).color` non si trova. Si legge in `maskImage` del
+  contenitore. La cura è non usarlo dove il contenuto può stare tutto: un `overflow-y-auto` con
+  la utility `scrollbar` di HeroUI dà lo stesso riquadro senza maschera.
+- ⚠️ **Un popover di HeroUI vuole un elemento interattivo vero come grilletto, e in TSX va detto
+  anche al tipo.** `Popover.Trigger` usa `Pressable`, che clona il figlio e non aggiunge né `role`
+  né `tabIndex`: col suo `<div>` predefinito il menù si apre col mouse e **non da tastiera**. Si
+  passa un `<button>` con `render`, come per `Surface`, ma qui in più serve il parametro generico
+  — `<Popover.Trigger<'button'> render={(props) => <button {...props} />}>` — perché senza, `tsc`
+  tipa le props per un `<div>` e rifiuta il `ref`. Con `Surface` non succedeva perché `<header>`
+  accetta le props di un elemento generico, mentre `<button>` no. ⚠️ **E un collegamento dentro un
+  popover lo chiude da sé**: con Next la barra non si smonta cambiando pagina, quindi il menù
+  resterebbe aperto sopra la pagina nuova. Si chiude nell'`onClick` del collegamento, non in un
+  effetto che guarda il percorso — quello sarebbe un `setState` in un effetto, che
+  `react-hooks/set-state-in-effect` rifiuta.
 - ⚠️ **Due cose larghe quanto il loro testo non si separano disponendole: si separano nel tempo.**
   I fumetti dell'emettitore sono larghi quanto la frase che contengono — da 80 a 200 px su una
   scheda di 142 — quindi due che convivono si disturbano comunque, e allontanarli in verticale

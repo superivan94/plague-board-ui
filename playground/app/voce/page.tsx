@@ -14,9 +14,12 @@ import { PhraseBrowser, type PhraseGroup } from './PhraseBrowser';
 
 // ⚠️ `PhraseBrowser` è `'use client'` e questa pagina no: un componente client dentro una pagina
 // server è il caso normale, e passa il confine perché riceve solo dati — array di stringhe.
+// ⚠️ `speakers` dice chi le usa **in questo playground**, non chi le possiede: `DEV_PHRASES` le
+// dice la mascotte qui sotto e l'emettitore su `/tocco`, ed è il punto — un elenco di frasi è un
+// dato, e il selettore serve a chi sta per montare un componente e vuole sapere che voce gli esce.
 const GROUPS: readonly PhraseGroup[] = [
-  { name: 'RAT_PHRASES', phrases: RAT_PHRASES },
-  { name: 'DEV_PHRASES', phrases: DEV_PHRASES },
+  { name: 'RAT_PHRASES', phrases: RAT_PHRASES, speakers: ['TalkingMascot'] },
+  { name: 'DEV_PHRASES', phrases: DEV_PHRASES, speakers: ['TalkingMascot', 'HoverEmitter'] },
 ];
 
 // ⚠️ Pagina **server**, senza `'use client'`: il cablaggio fra sorteggio e fumetto sta tutto dentro

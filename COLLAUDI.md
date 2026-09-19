@@ -336,14 +336,18 @@ test, che compila solo `packages/plague-board-ui`. Non c'è nessun test unitario
 **Ultima esecuzione:** agente, 2026-09-17 — tutto come atteso.
 
 **Preparazione:** `npm run build`, `npm run playground`, `/voce`, si apre «Le frasi, tutte quante».
+⚠️ **Le righe con 33 sono della prima esecuzione**, quando le frasi dello sviluppatore erano
+quattordici: da 2026-09-20 sono ventidue, e il totale è 41.
 
 | Azione | Atteso | Ottenuto |
 |---|---|---|
-| Aperto senza cercare | 33 frasi, numerate come nell'array | 33, numerate da 0 |
+| Aperto senza cercare | tutte le frasi, numerate come nell'array | 33, numerate da 0 (2026-09-17) · 41 (2026-09-20) |
 | Si scrive `squit` | le quattro varianti, e zero fra le frasi dello sviluppatore | «4 su 33» · indici 0, 3, 7, 11 · `DEV_PHRASES 0 su 14` |
 | Si scrive `e solo l` (senza accento) | trova «È solo l'inizio... 🏭» | «1 su 33» · indice 4 |
 | Si scrive `zzz` | lo dice, invece di mostrare il vuoto | «0 su 33» e «Nessuna frase contiene «zzz».» |
 | Esc nel campo | svuota e rimette tutto | valore `""`, 33 righe |
+| Si sceglie `HoverEmitter` nel selettore «le dice» | resta solo l'elenco che quel componente usa davvero | un gruppo solo, `DEV_PHRASES 22 frasi · le dice TalkingMascot, HoverEmitter`, e la riga viva dice «22 frasi» |
+| Si filtra `ratto` e si guarda il primo titolo di gruppo | leggibile come il secondo, non sbiadito | `mask-image: none` e nessun `.scroll-shadow` in pagina: prima la maschera valeva `transparent 0 → #000 40px` e mangiava i primi quaranta pixel |
 | La scaletta dei titoli | nessun salto di livello | `h1` → `h2` → due `h3` |
 | Il nome del comando, letto dall'albero | leggibile | «Le frasi, tutte quante · 33 in 2 elenchi» |
 | Ogni testo, nei due temi | nessuno sotto soglia | nessuno, in entrambi |
@@ -360,6 +364,32 @@ Cercandoli a macchina sulle 33 frasi — stessa forma a meno di punteggiatura, o
 parole lunghe in comune — escono **zero** doppioni veri e **otto** falsi allarmi, di cui sei sono
 le varianti volute di «Squit!». Un avviso che grida al lupo sulle cose giuste si impara a
 ignorare. La ricerca fa il lavoro: si scrive una parola e chi la ripete finisce in fila.
+
+### La barra a famiglie, e i suoi popover — 2026-09-20
+
+**Esegue:** agente — come sopra, il playground non ha test automatici. Quello che conta qui è la
+**tastiera**, che è l'unico modo in cui un menù si rompe senza che si veda.
+**Ultima esecuzione:** agente, 2026-09-20 — tutto come atteso.
+
+**Preparazione:** `npm run build`, `npm run playground`, una pagina qualunque. Lo stato del menù si
+legge da `aria-expanded` sul grilletto, non a occhio.
+
+| Azione | Atteso | Ottenuto |
+|---|---|---|
+| Si preme «Il ratto» col mouse | si apre col nome della famiglia, le sue pagine, i componenti e le righe di descrizione | «Il personaggio: come è fatto…» più `La corsa · RATRUN · RATSWARM` e `La lente · RAT` |
+| Si preme una voce dentro il popover | si va alla pagina **e il menù si chiude** | `/corsa`, `aria-expanded="false"` su tutti e tre, nessun `[role=dialog]` in pagina |
+| Si guarda quale famiglia è segnata | quella che contiene la pagina corrente | su `/corsa` è «Il ratto» a portare il colore e la sottolineatura |
+| Col fuoco sul grilletto, Invio | apre, e il fuoco entra nel riquadro | `aria-expanded="true"`, `document.activeElement` è il dialogo |
+| Esc | chiude e **riporta il fuoco** sul grilletto | `aria-expanded="false"`, `activeElement === grilletto` |
+| Il nome del dialogo, letto dall'albero | dice quale famiglia è | `aria-label="Il ratto"`: senza, tre menù identici si annunciano tutti «dialogo» |
+| I due temi | pannello leggibile su entrambi | bianco in chiaro, `lab(8.3 0.6 −2.1)` in scuro |
+| I titoli dentro il popover | una riga per nome | «La voce» e «Il tocco» alti 18 px, cioè una riga: senza `whitespace-nowrap` il nome si spezzava per far posto ai tre componenti |
+
+**Che cosa protegge:** un menù che si apre col mouse e non da tastiera — che è lo stato in cui
+nasce un popover se il grilletto non è un elemento interattivo vero, perché `Pressable` di
+react-aria **clona il figlio** e non aggiunge né `role` né `tabIndex`. ⚠️ E la chiusura alla
+navigazione: con Next la barra non si smonta cambiando pagina, quindi un popover aperto resta
+aperto **sopra** la pagina nuova, e non c'è nessun errore da nessuna parte.
 
 ### Il ratto corre attorno ai suoi perni, e la fine la dice `animationend` — 2026-09-18
 

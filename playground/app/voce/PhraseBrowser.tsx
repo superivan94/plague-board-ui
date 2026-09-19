@@ -1,6 +1,6 @@
 'use client';
 
-import { Disclosure, EmptyState, ScrollShadow, SearchField } from '@heroui/react';
+import { Disclosure, EmptyState, SearchField, ToggleButton, ToggleButtonGroup } from '@heroui/react';
 import { TechLabel } from 'plague-board-ui';
 import { useMemo, useState } from 'react';
 
@@ -8,7 +8,19 @@ export interface PhraseGroup {
   /** Il nome con cui l'elenco è esportato dalla libreria. */
   readonly name: string;
   readonly phrases: readonly string[];
+  /**
+   * Chi le dice, coi nomi veri dei componenti.
+   *
+   * ⚠️ **Un elenco di frasi non appartiene a nessuno**: è un dato, e lo stesso array può finire in
+   * bocca a componenti diversi — `DEV_PHRASES` le dice la mascotte su questa pagina e l'emettitore
+   * su `/tocco`. Questo campo dice **chi le usa in questo playground**, che è l'unica cosa vera che
+   * si possa scrivere, ed è quello su cui filtra il selettore.
+   */
+  readonly speakers: readonly string[];
 }
+
+/** Il valore del selettore quando non si filtra per componente. */
+const TUTTI = 'tutti';
 
 /**
  * ⚠️ **Confronto senza accenti**: `NFD` separa la lettera dal suo segno, e la classe di caratteri
@@ -27,35 +39,59 @@ interface Esito extends PhraseGroup {
 }
 
 /**
- * L'elenco delle frasi, consultabile. Sta chiuso finché non serve, perché 33 righe in fondo a una
- * pagina di demo sono rumore; aperto, è lo strumento per cercare una parola e vedere in un colpo
- * chi la ripete.
+ * L'elenco delle frasi, consultabile. Sta chiuso finché non serve, perché quaranta righe in fondo a
+ * una pagina di demo sono rumore; aperto, è lo strumento per cercare una parola e vedere in un
+ * colpo chi la ripete.
+ *
+ * ⚠️ **Si filtra per componente, e non è un doppione della ricerca.** La ricerca risponde a «chi
+ * dice questa parola»; il selettore risponde a «che cosa può dire questo componente», che è la
+ * domanda di chi sta per montarne uno e vuole sapere che voce gli esce. Con un elenco solo e due
+ * filtri non serve una seconda pagina che rifaccia la stessa cosa per le frasi dello sviluppatore.
  *
  * ⚠️ **Non c'è nessun segnalatore automatico di doppioni, ed è una scelta misurata.** Cercandoli a
- * macchina — stessa forma a meno di punteggiatura, oppure metà delle parole in comune — sulle 33
- * frasi escono **zero** doppioni veri e **otto** falsi allarmi, e sei sono le varianti di «Squit!»,
- * che sono volute. Un avviso che grida al lupo sulle cose giuste è peggio di nessun avviso: si
- * impara a ignorarlo. La ricerca fa il lavoro vero — si scrive «squit» e le quattro varianti stanno
- * una sotto l'altra.
+ * macchina — stessa forma a meno di punteggiatura, oppure metà delle parole in comune — sulle
+ * frasi di casa escono **zero** doppioni veri e **otto** falsi allarmi, e sei sono le varianti di
+ * «Squit!», che sono volute. Un avviso che grida al lupo sulle cose giuste è peggio di nessun
+ * avviso: si impara a ignorarlo. La ricerca fa il lavoro vero — si scrive «squit» e le varianti
+ * stanno una sotto l'altra.
  *
  * ⚠️ **Il numero accanto a ogni frase è il suo posto nell'array**, non la riga del risultato: è
  * quello che serve quando si va a modificare `phrases.ts`, e non cambia quando si filtra.
+ *
+ * ⚠️ **Il riquadro che scorre non è `ScrollShadow`, ed è una rinuncia misurata.** Quel componente
+ * ricava la dissolvenza da una scroll timeline CSS; quando dentro non c'è niente da scorrere
+ * l'intervallo è lungo zero e il progresso finisce **a fondo corsa** invece che a inizio, quindi la
+ * maschera vale `transparent 0 → #000 40px` e i primi quaranta pixel del contenuto restano
+ * sbiaditi. Filtrando «ratto» il primo titolo di gruppo cadeva lì dentro. Qui basta un contenitore
+ * che scorre, con la barra di scorrimento vestita da HeroUI — `scrollbar` è una sua utility.
  */
 export function PhraseBrowser({ groups }: { groups: readonly PhraseGroup[] }) {
   const [query, setQuery] = useState('');
+  const [chi, setChi] = useState<string>(TUTTI);
+
+  const parlanti = useMemo(
+    () => [...new Set(groups.flatMap((group) => group.speakers))].sort((a, b) => a.localeCompare(b)),
+    [groups],
+  );
+
+  const visibili = useMemo(
+    () => (chi === TUTTI ? groups : groups.filter((group) => group.speakers.includes(chi))),
+    [chi, groups],
+  );
 
   const esiti = useMemo<readonly Esito[]>(() => {
     const ago = piatto(query.trim());
-    return groups.map((group) => ({
+    return visibili.map((group) => ({
       ...group,
       matches: group.phrases
         .map((phrase, index) => ({ index, phrase }))
         .filter(({ phrase }) => ago === '' || piatto(phrase).includes(ago)),
     }));
-  }, [groups, query]);
+  }, [query, visibili]);
 
-  const totale = groups.reduce((somma, g) => somma + g.phrases.length, 0);
-  const trovate = esiti.reduce((somma, e) => somma + e.matches.length, 0);
+  const totale = visibili.reduce((somma, group) => somma + group.phrases.length, 0);
+  const trovate = esiti.reduce((somma, esito) => somma + esito.matches.length, 0);
+  const tutteLeFrasi = groups.reduce((somma, group) => somma + group.phrases.length, 0);
 
   return (
     <Disclosure className="rounded-lg border border-border">
@@ -69,7 +105,7 @@ export function PhraseBrowser({ groups }: { groups: readonly PhraseGroup[] }) {
               quante33 in 2 elenchi», attaccato. Letto nell'albero di accessibilità, non immaginato. */}
           <span className="font-medium">Le frasi, tutte quante</span>{' '}
           <TechLabel className="text-muted">
-            · {totale} in {groups.length} elenchi
+            · {tutteLeFrasi} in {groups.length} elenchi
           </TechLabel>
           <Disclosure.Indicator className="ml-auto" />
         </Disclosure.Trigger>
@@ -77,6 +113,25 @@ export function PhraseBrowser({ groups }: { groups: readonly PhraseGroup[] }) {
 
       <Disclosure.Content>
         <Disclosure.Body className="flex flex-col gap-3 border-t border-border p-4">
+          <div className="flex flex-wrap items-center gap-3">
+            <TechLabel className="text-muted">le dice</TechLabel>
+            <ToggleButtonGroup
+              selectionMode="single"
+              disallowEmptySelection
+              selectedKeys={[chi]}
+              onSelectionChange={(keys) => setChi(String([...keys][0] ?? TUTTI))}
+              size="sm"
+              aria-label="Filtra per componente"
+            >
+              <ToggleButton id={TUTTI}>chiunque</ToggleButton>
+              {parlanti.map((parlante) => (
+                <ToggleButton key={parlante} id={parlante}>
+                  {parlante}
+                </ToggleButton>
+              ))}
+            </ToggleButtonGroup>
+          </div>
+
           <SearchField
             value={query}
             onChange={setQuery}
@@ -100,22 +155,24 @@ export function PhraseBrowser({ groups }: { groups: readonly PhraseGroup[] }) {
 
           {trovate === 0 ? (
             <EmptyState className="text-sm text-muted">
-              Nessuna frase contiene «{query.trim()}».
+              {query.trim() === ''
+                ? `Nessun elenco è dichiarato fra quelli che ${chi} dice.`
+                : `Nessuna frase contiene «${query.trim()}».`}
             </EmptyState>
           ) : (
-            // Il tetto d'altezza è quello che tiene la pagina governabile con l'elenco aperto; le
-            // ombre ai bordi le mette `ScrollShadow`, e sono l'unica cosa che dice che c'è altro.
-            <ScrollShadow className="max-h-80">
+            // Il tetto d'altezza è quello che tiene la pagina governabile con l'elenco aperto.
+            <div className="scrollbar max-h-80 overflow-y-auto">
               <div className="flex flex-col gap-4">
-                {esiti.map(({ name, phrases, matches }) => (
+                {esiti.map(({ name, phrases, matches, speakers }) => (
                   <section key={name} className="flex flex-col gap-1">
-                    <h3 className="flex items-baseline gap-2">
+                    <h3 className="flex flex-wrap items-baseline gap-2">
                       <TechLabel className="text-brand-ink">{name}</TechLabel>{' '}
                       <TechLabel className="text-muted">
                         {matches.length === phrases.length
                           ? `${phrases.length} frasi`
                           : `${matches.length} su ${phrases.length}`}
-                      </TechLabel>
+                      </TechLabel>{' '}
+                      <TechLabel className="text-muted">· le dice {speakers.join(', ')}</TechLabel>
                     </h3>
 
                     {matches.length === 0 ? (
@@ -137,7 +194,7 @@ export function PhraseBrowser({ groups }: { groups: readonly PhraseGroup[] }) {
                   </section>
                 ))}
               </div>
-            </ScrollShadow>
+            </div>
           )}
         </Disclosure.Body>
       </Disclosure.Content>

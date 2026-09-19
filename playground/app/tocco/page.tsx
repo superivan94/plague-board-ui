@@ -1,3 +1,4 @@
+import Link from 'next/link';
 import {
   CodeIcon,
   DEV_PHRASES,
@@ -117,8 +118,18 @@ export default function TouchPage() {
 
       <section className="flex flex-col gap-3">
         <p className="max-w-2xl text-sm text-muted">
-          Nessun preset di mezzo: gli stessi campi, riempiti a mano. Le parole sono un elenco, la
-          classe è quella della pioggia — geometria e animazione — e il colore arriva da fuori.
+          Nessun preset di mezzo: gli stessi campi, riempiti a mano. Le parole sono un elenco — qui
+          ci sono degli squit, ma ci va qualunque testo: un conto alla rovescia, le lettere di un
+          nome, i versi di un&apos;altra bestia — la classe è quella della pioggia, cioè geometria e
+          animazione, e il colore arriva da fuori.
+        </p>
+        <p className="max-w-2xl text-sm text-muted">
+          Le frasi di casa — quelle che dicono il ratto e lo sviluppatore — si guardano tutte
+          insieme, e si cercano, in fondo a{' '}
+          <Link href="/voce" className="text-brand-ink underline underline-offset-4">
+            La voce
+          </Link>
+          , dove si può anche filtrare per componente.
         </p>
         <div className="flex items-center justify-center rounded-lg border border-border bg-surface px-6 py-20">
           <HoverEmitter effect={SQUIT}>
