@@ -341,8 +341,10 @@ exist in target module» che **non sono veri**. Si guarda la pagina, o si crede 
   ci stanno dentro: col colore del vicino più prossimo la pancia chiara della guancia colava nel
   petto in un blocco a spigoli, e senza escludere il rosa la groppa si ridipingeva di pelle. Un
   **orlo** di 10 px oltre il nucleo resta al tronco, perché il nucleo arrotonda le convessità e
-  senza orlo alla radice si vedeva il fondo. Si verifica **coi fotogrammi**: le parti ruotate agli
-  estremi e rese a 1800 px, ritagliate alle radici, mai a occhio sull'animazione che gira.
+  senza orlo alla radice si vedeva il fondo. Si verifica **coi fotogrammi** — `--anteprime` rende
+  anche `fotogramma-{a,b,c}-<zona>.png`, le parti ruotate agli estremi a 1800 px, ritagliate alle
+  radici — mai a occhio sull'animazione che gira: un cuneo di 10 px sulla reference è un pixel a
+  88px, e passa.
 - ⚠️ **`sharp` ridimensiona prima di comporre, qualunque sia l'ordine delle chiamate.** Una griglia
   di coordinate disegnata alla misura del ritaglio e composta dopo `resize()` finisce **centrata e a
   1:1** sull'immagine ingrandita: le etichette sembrano giuste e sono spostate di decine di pixel.

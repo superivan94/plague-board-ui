@@ -778,5 +778,39 @@ if (ANTEPRIME) {
     const svg = `${testa}${gruppi.join('')}</svg>`;
     await sharp(Buffer.from(svg), { density: 96 }).resize({ width: 900 }).flatten({ background: '#9ca3af' }).png().toFile(join(ANTEPRIME, `ratto-${nome}.png`));
   }
+
+  // I fotogrammi: le parti ruotate agli estremi del passo, come farebbe il CSS, rese a 1800 px e
+  // ritagliate dove le cuciture si vedono — groppa, zampe davanti, le due radici delle lontane.
+  // ⚠️ È qui che si giudica un taglio, non guardando l'animazione che gira: un cuneo di 10 px
+  // sulla reference è un pixel a 88px di altezza, e a occhio passa. Gli angoli sono quelli di
+  // `animations.css`; i figli della coda ruotano nel sistema del padre, come nel componente.
+  const FASI = {
+    a: { legBackNear: -14, legFrontFar: -10, legFrontNear: 14, legBackFar: 10, tailBase: -4, tailMid: 3, tailTip: 8, bottle: 3, dice: -9, pawn: -9, bounce: 0, pitch: 2.5 },
+    b: { bounce: -3, pitch: 0 },
+    c: { legBackNear: 14, legFrontFar: 10, legFrontNear: -14, legBackFar: -10, tailBase: 4, tailMid: -3, tailTip: -8, bottle: -3, dice: 9, pawn: 9, bounce: -6, pitch: -2.5 },
+  };
+  const ZONE = {
+    groppa: { left: 0.0, top: 0.2, width: 0.5, height: 0.8 },
+    'zampe-davanti': { left: 0.55, top: 0.4, width: 0.45, height: 0.6 },
+    'radice-dietro': { left: 300 / 1536, top: 440 / 1024, width: 260 / 1536, height: 240 / 1024 },
+    'radice-davanti': { left: 1130 / 1536, top: 480 / 1024, width: 270 / 1536, height: 240 / 1024 },
+  };
+  const rot = (deg, piv) => (deg ? ` transform="rotate(${deg} ${piv.x} ${piv.y})"` : '');
+  const fotogramma = (f) => {
+    const parte = (p) => `<g${rot(f[p.name] ?? 0, p.pivot)}>${g(p.paths, GRIGIA)}${ART.parts.filter((q) => q.parent === p.name).map(parte).join('')}</g>`;
+    const radici = ART.parts.filter((p) => !p.parent);
+    const pezzo = (q) => `<g${q.pivot ? rot(f[q.name] ?? 0, q.pivot) : ''}>${g(q.paths, {})}</g>`;
+    const kits = [...ART.collar, ...ART.harness, ...ART.skull].map(pezzo).join('');
+    const corpo = `translate(0 ${f.bounce ?? 0}) rotate(${f.pitch ?? 0} ${ART.bodyPivot.x} ${ART.bodyPivot.y})`;
+    return `<svg xmlns="http://www.w3.org/2000/svg" viewBox="${vb.x} ${vb.y} ${vb.width} ${vb.height}" width="1800" height="${Math.round((1800 * vb.height) / vb.width)}"><g transform="${corpo}">${radici.filter((p) => p.behind).map(parte).join('')}${g(ART.torso, GRIGIA)}${radici.filter((p) => !p.behind).map(parte).join('')}${kits}</g></svg>`;
+  };
+  for (const [fase, f] of Object.entries(FASI)) {
+    const png = await sharp(Buffer.from(fotogramma(f)), { density: 96 }).flatten({ background: '#ffffff' }).png().toBuffer();
+    const { width: PW, height: PH } = await sharp(png).metadata();
+    await sharp(png).resize({ width: 900 }).toFile(join(ANTEPRIME, `fotogramma-${fase}.png`));
+    for (const [zona, r] of Object.entries(ZONE)) {
+      await sharp(png).extract({ left: Math.round(r.left * PW), top: Math.round(r.top * PH), width: Math.round(r.width * PW), height: Math.round(r.height * PH) }).resize({ width: 900 }).toFile(join(ANTEPRIME, `fotogramma-${fase}-${zona}.png`));
+    }
+  }
   console.log(`anteprime in ${ANTEPRIME}`);
 }

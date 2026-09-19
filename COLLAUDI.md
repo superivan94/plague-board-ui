@@ -370,9 +370,11 @@ sintetico, cerniere all'uscita, coda in tre segmenti, passo a 0,3 s), tutto come
 
 **Preparazione:** `npm run build`, `npm run playground`, `/corsa` in una **scheda nuova** — la
 console dello strumento è cumulativa, e un errore di un caricamento precedente resta lì. Per le
-cuciture, i **fotogrammi**: `scratchpad/trace/fotogrammi.mjs` rende dal modulo compilato le parti
-ruotate agli estremi (±14° le vicine, ±10° le lontane, coda a S) a 1800 px, e ritaglia groppa,
-zampe davanti e le due radici; `ISOLA=<parte>` ruota una parte sola per attribuire un artefatto.
+cuciture, i **fotogrammi**: `npm run art:ratto -- --anteprime <dir>` rende anche
+`fotogramma-{a,b,c}[-zona].png` — le parti ruotate agli estremi del passo (±14° le vicine, ±10° le
+lontane, coda a S, corpo che sale e beccheggia) a 1800 px, e i ritagli di groppa, zampe davanti e
+le due radici delle lontane. Per attribuire un artefatto a una parte si mette a zero l'angolo delle
+altre in `FASI`.
 
 | Azione | Atteso | Ottenuto |
 |---|---|---|
