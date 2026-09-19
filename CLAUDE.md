@@ -498,6 +498,25 @@ exist in target module» che **non sono veri**. Si guarda la pagina, o si crede 
   calcola, passandole un riquadro finto; e le ricerche nei test vanno fatte sul `document`, non sul
   `container` di `render`. ⚠️ L'altro prezzo, dichiarato: se la pagina scorre durante il volo, le
   cose restano dov'erano sullo schermo — per un secondo, è quello che ci si aspetta.
+- ⚠️ **`target="_blank"` e un'animazione da guardare non stanno insieme.** Il browser porta subito
+  chi ha premuto sulla scheda nuova, e quello che succede su questa non lo vede nessuno —
+  segnalato dall'utente sul comando delle donazioni. La cura è fermare la navigazione
+  (`preventDefault`), far partire l'effetto e aprire **dopo**: ⚠️ `window.open` dentro un
+  `setTimeout` funziona ancora, perché l'attivazione che un clic concede dura qualche secondo e non
+  finisce con la funzione — ma se qualcuno blocca le finestre nuove torna `null`, e lì si va nella
+  stessa scheda invece di non fare niente. ⚠️ **E i clic speciali restano del browser**: ctrl, cmd,
+  shift, alt e il tasto centrale si lasciano passare, o si toglie a chi legge un gesto che si
+  aspetta. ⚠️ Quanto aspettare **non si scrive nel comando**: lo chiede all'effetto, che è l'unico
+  a sapere quante particelle sono e quanto vola la più lenta — `burst()` restituisce i millisecondi,
+  e `0` quando non è partito niente. Misurato: 1728 ms fra il clic e l'apertura.
+- ⚠️ **Una lastra che tocca il bordo dello schermo deve tenere conto degli incavi, e `env()` da
+  solo non basta.** `env(safe-area-inset-*)` vale **zero** finché la pagina non dichiara
+  `viewport-fit=cover` — senza, è il browser a tenere il contenuto lontano dagli incavi, e la
+  lastra non arriva mai al bordo. E il rientro si **somma** a quello della taglia, non lo
+  sostituisce: `calc(var(--spacing)*3 + env(safe-area-inset-top))`, o su un telefono senza incavo
+  il contenuto finirebbe a filo. ⚠️ In un valore arbitrario di Tailwind gli spazi si scrivono
+  `_`, e attorno al `+` di un `calc` gli spazi **servono**: `calc(var(--spacing)*3_+_env(...))`.
+  Verificato nel CSS generato, non supposto — sei regole, tre per lato.
 - ⚠️ **Un colore dentro un portale non si eredita: `currentColor` è quello del `body`.** Le
   particelle uscivano del colore del testo della pagina invece che verdi, pur essendo generate da
   un comando `text-brand-ink`. Il colore va scritto sull'elemento che vola.

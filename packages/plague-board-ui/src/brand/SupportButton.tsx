@@ -1,6 +1,6 @@
 'use client';
 
-import { useRef, type ReactNode } from 'react';
+import { useRef, type MouseEvent, type ReactNode } from 'react';
 
 import { PoisonIcon } from '../icons/PoisonIcon';
 import { ParticleBurst, type ParticleBurstHandle } from './ParticleBurst';
@@ -34,8 +34,11 @@ export interface SupportButtonProps {
  * si nasconde con una container query mentre `aria-label` porta la stessa parola sempre. Un
  * comando che si riduce a un segno senza nome è un comando muto.
  *
- * ⚠️ **Al clic sprigiona i segni della peste** — {@link ParticleBurst}, che è un componente a sé —
- * e la pagina delle donazioni si apre in una scheda nuova: lo scoppio resta da vedere su questa.
+ * ⚠️ **Al clic zampilla, e la pagina delle donazioni si apre _dopo_.** Con `target="_blank"` e
+ * basta, il browser porta subito chi ha premuto sulla scheda nuova e la fontana non la vede
+ * nessuno — segnalato dall'utente. Il comando chiede quindi a {@link ParticleBurst} **quanto dura
+ * il getto**, ferma la navigazione per quel tanto e poi apre. Non è un numero scritto qui: dipende
+ * da quante particelle sono e da quanto vola la più lenta, e a saperlo è solo lei.
  */
 export function SupportButton({
   href,
@@ -44,6 +47,30 @@ export function SupportButton({
   className = '',
 }: SupportButtonProps) {
   const scoppio = useRef<ParticleBurstHandle>(null);
+
+  const vai = (evento: MouseEvent<HTMLAnchorElement>) => {
+    // ⚠️ **I clic speciali restano del browser.** Ctrl o cmd per aprire in una scheda, shift per
+    // una finestra, il tasto centrale: sono gesti che chi legge si aspetta, e intercettarli per
+    // fare una cosa nostra è il modo più veloce di rendere antipatico un collegamento.
+    if (evento.metaKey || evento.ctrlKey || evento.shiftKey || evento.altKey || evento.button !== 0) {
+      return;
+    }
+
+    const durataMs = scoppio.current?.burst() ?? 0;
+    // Niente da guardare — «meno movimento», o una fontana già in corso: si va subito, come un
+    // collegamento qualunque.
+    if (durataMs === 0) return;
+
+    evento.preventDefault();
+    window.setTimeout(() => {
+      // ⚠️ **`window.open` dentro un timer funziona ancora**, perché l'attivazione che il clic
+      // concede dura qualche secondo e non finisce con la funzione. Se però qualcuno blocca le
+      // finestre nuove, `open` torna `null`: lì si va nella stessa scheda, che è meglio di un
+      // comando che non fa niente.
+      const aperta = window.open(href, '_blank', 'noopener,noreferrer');
+      if (!aperta) window.location.href = href;
+    }, durataMs);
+  };
 
   return (
     <ParticleBurst ref={scoppio}>
@@ -55,7 +82,7 @@ export function SupportButton({
         // Un `<a>` risponde a Invio con un `click` vero, quindi qui non serve `usePress`: la
         // pressione lunga su un telefono, che era il motivo di quella scelta sulla mascotte, su un
         // collegamento non è il gesto con cui si apre.
-        onClick={() => scoppio.current?.burst()}
+        onClick={vai}
         className={`flex items-center gap-1.5 rounded-lg border border-brand/40 px-2 py-1 text-sm font-medium text-brand-ink outline-none transition-colors hover:border-brand hover:bg-brand/10 focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-brand-ink ${className}`}
       >
         {icon}

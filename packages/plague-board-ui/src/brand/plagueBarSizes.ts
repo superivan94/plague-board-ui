@@ -40,3 +40,29 @@ export const PLAGUE_BAR_PADDING: Record<PlagueBarSize, string> = {
   medium: 'py-3',
   large: 'py-4',
 };
+
+/**
+ * Lo stesso rientro **più l'incavo del dispositivo**, dal lato in cui la lastra tocca il bordo
+ * dello schermo: in cima l'orecchia della fotocamera, in fondo la barra del gesto.
+ *
+ * ⚠️ **Si somma al rientro, non lo sostituisce.** `env(safe-area-inset-*)` da solo metterebbe il
+ * contenuto a filo della lastra su un telefono senza incavo, dove quel valore è **zero**: il
+ * `calc` tiene la taglia e ci aggiunge quello che serve. Tailwind ordina le utility di un lato
+ * dopo quelle di un asse, quindi questa vince su `py-*` comunque le si scriva.
+ *
+ * ⚠️ **Vale solo se la pagina dichiara `viewport-fit=cover`.** Senza, il browser tiene già il
+ * contenuto lontano dagli incavi e quei valori restano a zero — che non fa danno, ma nemmeno
+ * niente: è il motivo per cui il playground lo dichiara in `layout.tsx`.
+ */
+export const PLAGUE_BAR_SAFE_PADDING: Record<'top' | 'bottom', Record<PlagueBarSize, string>> = {
+  top: {
+    small: 'pt-[calc(var(--spacing)*2_+_env(safe-area-inset-top))]',
+    medium: 'pt-[calc(var(--spacing)*3_+_env(safe-area-inset-top))]',
+    large: 'pt-[calc(var(--spacing)*4_+_env(safe-area-inset-top))]',
+  },
+  bottom: {
+    small: 'pb-[calc(var(--spacing)*2_+_env(safe-area-inset-bottom))]',
+    medium: 'pb-[calc(var(--spacing)*3_+_env(safe-area-inset-bottom))]',
+    large: 'pb-[calc(var(--spacing)*4_+_env(safe-area-inset-bottom))]',
+  },
+};

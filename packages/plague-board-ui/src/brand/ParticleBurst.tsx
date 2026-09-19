@@ -25,12 +25,19 @@ import { EffectLayer } from './effectLayer';
 /** Che cosa si può chiedere a uno scoppio già montato, tenendone il riferimento. */
 export interface ParticleBurstHandle {
   /**
-   * Sprigiona adesso.
+   * Sprigiona adesso, e **dice quanto dura**: i millisecondi da aspettare perché l'ultima
+   * particella sia sparita. Restituisce `0` quando non è partito niente — fontana già in corso,
+   * oppure «meno movimento» — e quello zero è la risposta giusta a chi deve decidere se aspettare.
+   *
+   * ⚠️ **Serve perché il tempo lo sa solo lei.** Chi avvolge vorrebbe far succedere qualcosa a
+   * scoppio finito — cambiare pagina, per esempio — e quel numero dipende da quante particelle
+   * sono, da quanto ritardano l'una sull'altra e da quanto vola la più lenta. Ricopiarlo fuori
+   * vorrebbe dire tenerlo in pari a mano per sempre.
    *
    * ⚠️ **Non fa niente se la fontana sta ancora zampillando**, o con «meno movimento». Due getti
    * sovrapposti non si leggono come due: si leggono come un pasticcio.
    */
-  burst: () => void;
+  burst: () => number;
 }
 
 export interface ParticleBurstProps {
@@ -195,8 +202,8 @@ export function ParticleBurst({
 
   const burst = useCallback(() => {
     const corrente = disegno.current;
-    if (corrente.menoMovimento || corrente.icons.length === 0) return;
-    if (inVolo.current > 0 || !contenitore.current) return;
+    if (corrente.menoMovimento || corrente.icons.length === 0) return 0;
+    if (inVolo.current > 0 || !contenitore.current) return 0;
 
     // Il centro si misura **adesso**, non a ogni render: è un gesto, e a un gesto una lettura del
     // layout si può pagare. Le coordinate sono quelle della finestra, come le vuole `fixed`.
@@ -204,12 +211,14 @@ export function ParticleBurst({
     const partenza = { x: riquadro.left + riquadro.width / 2, y: riquadro.top + riquadro.height / 2 };
 
     const nate: Particella[] = [];
+    let ultima = 0;
     for (let quante = 0; quante < corrente.count; quante += 1) {
       const chiave = prossimaChiave.current;
       prossimaChiave.current += 1;
 
       const { particella, restaMs } = pesca(chiave, corrente, partenza, quante * corrente.staggerMs);
       nate.push(particella);
+      ultima = Math.max(ultima, restaMs);
 
       scadenze.current.set(
         chiave,
@@ -225,6 +234,10 @@ export function ParticleBurst({
     // Un aggiornamento solo per tutto il getto: sedici `setState` di fila sarebbero sedici render,
     // e il primo fotogramma è proprio quello che deve arrivare in tempo.
     setParticelle((vive) => [...vive, ...nate]);
+
+    // ⚠️ La più lunga, non la somma né l'ultima nata: le vite si pescano, quindi una particella
+    // partita prima può sparire dopo una che è partita dopo di lei.
+    return Math.round(ultima);
   }, []);
 
   useImperativeHandle(ref, () => ({ burst }), [burst]);

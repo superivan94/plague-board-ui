@@ -390,6 +390,9 @@ donazioni porta a un indirizzo vero: per provarlo si annulla la navigazione con 
 | Si preme due volte di fila | il secondo getto non parte finché il primo non è finito | 16 particelle e basta: due getti sovrapposti non si leggono come due |
 | Dove stanno le particelle, e i fumetti della firma | fuori dal piede, non tagliati dalla riga che scorre | tutti nel portale sul `body`, `position: fixed`, `z-index` **50**: il fumetto «EVVAI! FUNZIONA!» sta 3 px sopra il bordo del piede e si legge intero |
 | I cenni delle due schede autore | non partono insieme | `animation-delay` **0s** e **2s**: due schede che saltellano allo stesso istante sembrano una cosa sola che pulsa |
+| Si preme l'ampolla e si guarda **quando** cambia pagina | dopo la fontana, non prima | la pagina resta `/barra` e l'apertura parte a **1728 ms** dal clic, cioè la durata che la fontana ha dichiarato |
+| Si scorre a metà pagina | barra **e** piede restano in vista | a `scrollY` 400 tutti e due dentro la finestra: `position: sticky`, `bottom: 0` — e il piede resta nel flusso, quindi non copre niente |
+| Le regole dell'incavo, nel CSS **generato** | sei, tre per lato, che sommano il rientro della taglia | `.pt-[calc(var(--spacing)*2_+_env(safe-area-inset-top))]` e le altre cinque, tutte risolte in `calc(... + env(...))`; il `meta` della pagina porta `viewport-fit=cover`, che è quello che le accende |
 | La versione scritta nel piede | quella vera della libreria, non una copiata a mano | `v0.1.0`, letta dal `package.json` |
 | `next build` | nove pagine ancora **statiche**, col piede in ogni layout | `○` su tutte e nove |
 

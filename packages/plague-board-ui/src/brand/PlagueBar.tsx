@@ -3,7 +3,7 @@
 import { Surface } from '@heroui/react';
 import type { ReactNode } from 'react';
 
-import { PLAGUE_BAR_PADDING, type PlagueBarSize } from './plagueBarSizes';
+import { PLAGUE_BAR_PADDING, PLAGUE_BAR_SAFE_PADDING, type PlagueBarSize } from './plagueBarSizes';
 
 /** A quale estremità della pagina sta la lastra. */
 export type PlagueBarPlacement = 'top' | 'bottom';
@@ -83,7 +83,9 @@ export function PlagueBar({
       render={(props) => (inCima ? <header {...props} /> : <footer {...props} />)}
       className={`dark ${isSticky ? `sticky z-20 ${inCima ? 'top-0' : 'bottom-0'}` : ''} w-full ${
         inCima ? 'border-b' : 'border-t'
-      } border-brand/20 bg-gray-950/90 backdrop-blur-sm ${PLAGUE_BAR_PADDING[size]} ${className}`}
+      } border-brand/20 bg-gray-950/90 backdrop-blur-sm ${PLAGUE_BAR_PADDING[size]} ${
+        PLAGUE_BAR_SAFE_PADDING[placement][size]
+      } ${className}`}
     >
       {children}
     </Surface>

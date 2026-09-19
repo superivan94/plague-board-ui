@@ -1,4 +1,4 @@
-import type { Metadata } from 'next';
+import type { Metadata, Viewport } from 'next';
 import { Poppins, Share_Tech_Mono } from 'next/font/google';
 import {
   CodeIcon,
@@ -60,6 +60,17 @@ export const metadata: Metadata = {
   description: 'I componenti dei Ludoratti, ai tre formati e nei due temi.',
 };
 
+/**
+ * ⚠️ **`viewport-fit=cover` è quello che accende `env(safe-area-inset-*)`.** Senza, il browser
+ * tiene da sé la pagina lontana dagli incavi — l'orecchia della fotocamera in cima, la barra del
+ * gesto in fondo — e quei valori restano a **zero**: le due lastre non arriverebbero mai fino al
+ * bordo dello schermo, e il rientro che `PlagueBar` calcola non servirebbe a niente. Dichiararlo
+ * vuol dire prendersi la responsabilità degli incavi, ed è appunto quello che la lastra fa.
+ */
+export const viewport: Viewport = {
+  viewportFit: 'cover',
+};
+
 // ⚠️ Gira **prima** che la pagina si disegni, quindi chi torna col tema chiaro non vede un lampo
 // scuro. Non può essere un effetto di React: gli effetti partono dopo il primo disegno, ed è lì
 // che il lampo si vede.
@@ -82,13 +93,13 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
         <script dangerouslySetInnerHTML={{ __html: THEME_BOOT }} />
       </head>
       {/* ⚠️ `flex-col` con la pagina che cresce: è quello che tiene il piede **in fondo** anche
-          sulle pagine corte, invece che a metà schermo. Non è appiccicato — `isSticky` è falso —
-          perché su queste pagine si scorre per leggere, e una lastra che copre due righe in fondo
-          a ogni schermata è un ingombro; in un'applicazione vera la scelta è dell'app. */}
+          sulle pagine corte, invece che a metà schermo. E il piede è appiccicato come la barra —
+          resta in vista mentre si scorre — perché `position: sticky` lascia l'elemento **nel
+          flusso**: non copre niente, si limita a non uscire dalla finestra. */}
       <body className="flex min-h-dvh flex-col bg-background text-foreground antialiased">
         <PlaygroundNav />
         <div className="flex-1">{children}</div>
-        <PlagueFootBar authors={AUTORI} version={VERSIONE} supportHref="https://ko-fi.com/superivan94" isSticky={false} />
+        <PlagueFootBar authors={AUTORI} version={VERSIONE} supportHref="https://ko-fi.com/superivan94" />
       </body>
     </html>
   );
