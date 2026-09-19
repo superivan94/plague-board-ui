@@ -24,12 +24,12 @@ const RULES = [
     'RatRun riceve prop esplicite — livrea, kit, lato, altezza, durata — e non sa niente di casualità: una pagina che vuole un ratto preciso lo ottiene. Quanti ne passano, ogni quanto e con che cosa addosso lo decide RatSwarm, che ha il ciclo una volta sola e i numeri come prop: un passaggio fitto e uno raro sono la stessa cosa con parametri diversi.',
   ],
   [
-    'Un tetto ai ratti insieme, che è una rete',
-    'In una scheda in secondo piano il browser sospende le animazioni: animationend non arriva, nessun ratto esce, e i timer intanto continuano. Con maxAlive lo sciame smette di pescare finché qualcuno non è uscito, così tornando sulla scheda non si trova la pagina piena di ratti fermi.',
+    'Non nasce niente che non possa arrivare in fondo',
+    'Con la pagina in secondo piano il browser sospende le animazioni: un ratto nato lì non attraversa, quindi non esce, e resta fermo finché qualcuno non torna. Lo sciame salta il turno e riprende al ritorno. Stessa regola con prefers-reduced-motion, dove la traversata dura un millisecondo: non ne genera nessuno, perché un guizzo invisibile non vale un timer acceso. maxAlive resta una scelta di regia — «uno per volta», «al massimo quattro» — non una rete: senza, non c’è tetto.',
   ],
   [
-    'Chi ha chiesto meno movimento ottiene una pagina ferma',
-    'Con prefers-reduced-motion le zampe si fermano e la traversata dura un millisecondo: un RatRun messo a mano attraversa senza farsi vedere e onDone arriva subito, così nessuno resta con un ratto fermo a metà schermo. Lo sciame va oltre e non ne genera nessuno, perché un guizzo invisibile non vale un timer acceso. Una pagina che vuole spiegarlo legge la preferenza con useReducedMotion: è la differenza fra una decorazione che obbedisce e una che sembra rotta.',
+    'Il millisecondo serve a chi un ratto ce l’ha già',
+    'Sotto prefers-reduced-motion la traversata non si spegne, si accorcia a un millisecondo: chi ha montato un RatRun a mano lo tiene nel proprio stato e aspetta onDone per toglierlo, e con animation: none quell’evento non arriverebbe mai — il ratto resterebbe visibile e fermo sul bordo per sempre. Lo sciame invece il problema non ce l’ha: non lo fa proprio nascere. Chi vuole spiegare a chi guarda perché una decorazione manca legge la preferenza con useReducedMotion.',
   ],
 ];
 

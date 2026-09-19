@@ -36,11 +36,12 @@ export interface RatSwarmProps {
    */
   band?: RatSwarmRange;
   /**
-   * Quanti ratti al massimo insieme.
+   * Quanti ratti al massimo insieme. **Senza, non c'è tetto**: con le attese predefinite ne
+   * passano meno di uno alla volta, e chi vuole una scena affollata non deve chiedere il permesso.
    *
-   * ⚠️ **Non è una preferenza estetica, è una rete.** In una scheda in secondo piano il browser
-   * sospende le animazioni: `animationend` non arriva, nessun ratto esce, e i timer intanto
-   * continuano. Senza tetto, tornando sulla scheda si trova la pagina piena di ratti fermi.
+   * È una scelta di regia — «al massimo quattro», «uno per volta» — non una rete di sicurezza: che
+   * i ratti non si accumulino in una scheda dimenticata lo garantisce il fatto che con la pagina
+   * nascosta non ne nasce nessuno.
    */
   maxAlive?: number;
   /** L'altezza del ratto in pixel, uguale per tutti. */
@@ -94,6 +95,11 @@ const pesca = (key: number, crossingMs: RatSwarmRange, band: RatSwarmRange): Pas
  * Se una pagina deve spiegarlo a chi guarda, la preferenza si legge con {@link useReducedMotion}:
  * è la differenza fra «la libreria obbedisce» e «la libreria è rotta».
  *
+ * ⚠️ **Con la pagina in secondo piano non ne nasce nessuno.** Lì il browser sospende le
+ * animazioni: `animationend` non arriva, nessun ratto esce, e i timer intanto continuano a
+ * scorrere. Generare vorrebbe dire impilare ratti fermi che nessuno vede e nessuno toglie, e
+ * ritrovarseli tutti addosso al ritorno. Chi stava già attraversando resta dov'è e riparte da lì.
+ *
  * ⚠️ **Chi ha finito se ne va, e chi resta sono nodi nuovi.** La fine la dice `animationend`
  * dentro `RatRun`, non un timer; ogni passaggio ha una chiave che non si riusa, perché un
  * contenitore riusato non farebbe ripartire la traversata.
@@ -102,7 +108,7 @@ export function RatSwarm({
   everyMs = [5000, 15000],
   crossingMs = [4000, 6000],
   band = [15, 85],
-  maxAlive = 4,
+  maxAlive = Number.POSITIVE_INFINITY,
   size = 48,
   ref,
 }: RatSwarmProps) {
@@ -143,7 +149,10 @@ export function RatSwarm({
     let attesa: ReturnType<typeof setTimeout>;
     const prossimo = () => {
       attesa = setTimeout(() => {
-        spawn();
+        // ⚠️ Il turno in secondo piano si **salta**, non si rimanda: un ratto nato lì non
+        // attraversa (le animazioni sono sospese), non esce, e nessuno lo toglie. Il giro
+        // successivo si programma comunque, così al ritorno il passaggio riprende da sé.
+        if (!document.hidden) spawn();
         prossimo();
       }, fra([attesaMin, attesaMax]));
     };

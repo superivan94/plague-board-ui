@@ -418,14 +418,24 @@ succede quando la scheda **non è davanti**, perché lì è il browser a sospend
 **Ultima esecuzione:** agente, 2026-09-19 — tutto come atteso.
 
 **Preparazione:** `npm run build`, `npm run playground`, `/corsa` in una **scheda nuova**. I ratti
-vivi si contano con `document.querySelectorAll('.pb-rat-run').length`, campionando ogni 700 ms: la
-fascia di sopra è quella con `maxAlive` a uno, quella di sotto lo sciame da quattro.
+vivi si contano con `document.querySelectorAll('.pb-rat-run').length`, campionando a intervalli di
+un secondo: la fascia di sopra è quella con `maxAlive` a uno, quella di sotto lo sciame senza tetto.
+
+⚠️ **La pagina «in secondo piano» va forzata, non ottenuta mettendo davanti un'altra scheda.** Nel
+riquadro del browser dello strumento una scheda dietro continua ad animare e `document.hidden`
+resta **falso**: misurato il 2026-09-19, dodici letture di seguito con un'altra scheda davanti e i
+ratti che continuavano a passare. Si scrive il flag a mano —
+`Object.defineProperty(document, 'hidden', { value: true, configurable: true })` — e si rimette
+falso alla fine. In un browser vero la sospensione delle animazioni e `hidden` viaggiano insieme:
+è l'API che esiste apposta per dire «questa pagina non la sta disegnando nessuno».
 
 | Azione | Atteso | Ottenuto |
 |---|---|---|
-| Si campiona con la scheda **dietro** a un'altra | i ratti salgono al tetto e **restano**: senza animazioni non arriva nessun `animationend` | 3, 4, 4, 4, 4, 5, 5, 5, 5, 5, 5, 5 (uno è quello della fascia da uno) — è il difetto che `maxAlive` limita, non uno che previene |
-| Si porta la scheda **davanti** e si ricampiona | il numero oscilla: chi arriva esce, e ne entrano altri | 1, 2, 2, 2, 3, 3, 4, 3, 3, 2, 2, 3, 1, 2 con `document.hidden` falso |
-| Si preme «Fai uscire un ratto» otto volte di fila | il comando fa nascere subito, ma il tetto vale anche per lui: quattro, non dodici | 4 nello sciame, e la fascia di sopra resta a **1** — i due sciami non si parlano |
+| Si campiona a pagina visibile | il numero oscilla: chi arriva esce, e ne entrano altri | 1, 2, 2, 2, 3, 3, 4, 3, 3, 2, 2, 3, 1, 2 |
+| Si mette `document.hidden` a vero | **non nasce più nessuno**, e chi è in scena finisce la sua corsa e se ne va | 3, 3, 1, 1, 0, 0, 0, 0, 0, 0 — sei secondi di fascia vuota |
+| Si rimette `document.hidden` a falso | il passaggio riprende da sé, senza ricaricare niente | 0, 2, 3, 3, 2, 3, 2, 3 — il primo ratto entro un secondo |
+| Si preme «Fai uscire un ratto» dieci volte di fila | dieci ratti in più: senza `maxAlive` non c'è nessun tetto | da 2 a **12** insieme, e la fascia di sopra — quella con `maxAlive` a uno — resta a **1** |
+| Si dà `animation: none` a un ratto in scena, come sarebbe la traversata spenta | resta **visibile e fermo** al bordo, e non se ne va più: nessun `animationend`, quindi nessun `onDone` | `x` 456 prima e 456 due secondi dopo, zero `animationend`, ancora nel DOM — è il motivo per cui con meno movimento la traversata dura 1 ms invece di essere spenta |
 | La console, in una scheda nuova | niente errori, e in particolare nessuna idratazione fallita | solo React DevTools e `[HMR] connected`: lo sciame nasce vuoto, quindi server e client rendono lo stesso niente e il `useMontato` della vecchia demo non serve più |
 | `next build` | `/corsa` ancora **statica**, con dentro un componente client | `○ /corsa`, otto pagine statiche su otto |
 | I due temi, con i ratti in scena | testo e fasce leggibili, ratti visibili sui due fondi | così in chiaro e in scuro: il contorno d'inchiostro regge il ratto sul chiaro, le campiture sullo scuro |
@@ -436,6 +446,9 @@ verifica che dopo dieci secondi di timer e un `spawn()` a mano non ci sia **ness
 lettura delle regole in fondo ad `animations.css`.
 
 **Che cosa protegge:** il ciclo che nasce e toglie i ratti, cioè l'unica parte di questa famiglia
-che vive nel tempo. Un `onDone` che non arriva si vede solo contando, e si vede **solo in una
-scheda dietro**: è la condizione in cui un difetto qui resta invisibile fino al giorno in cui
-qualcuno torna su una scheda aperta da un'ora.
+che vive nel tempo. Un `onDone` che non arriva si vede solo contando, e in una pagina che nessuno
+sta guardando non si vede affatto: è la condizione in cui un difetto qui resta invisibile fino al
+giorno in cui qualcuno torna su una scheda aperta da un'ora. ⚠️ **La prima stesura ci era cascata**:
+generava anche a pagina nascosta e si difendeva con un tetto di quattro — misurato il 2026-09-19,
+i ratti salivano a quel tetto e ci restavano (3, 4, 4, 4, 4, 5, 5, 5…). Un tetto limita il danno,
+non lo toglie; la cura è non far nascere ciò che non può arrivare in fondo.

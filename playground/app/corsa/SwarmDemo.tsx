@@ -23,7 +23,7 @@ export function SwarmDemo() {
   return (
     <section className="flex flex-col gap-3">
       <div className="relative h-56 overflow-hidden rounded-lg border border-border bg-surface">
-        <RatSwarm ref={sciame} everyMs={OGNI_MS} crossingMs={[3000, 5000]} band={[12, 70]} maxAlive={4} size={52} />
+        <RatSwarm ref={sciame} everyMs={OGNI_MS} crossingMs={[3000, 5000]} band={[12, 70]} size={52} />
       </div>
 
       <div className="flex flex-wrap items-center gap-3">
@@ -31,7 +31,7 @@ export function SwarmDemo() {
           Fai uscire un ratto
         </Button>
         <TechLabel className="text-muted">
-          uno ogni {OGNI_MS[0] / 1000}–{OGNI_MS[1] / 1000} s · al massimo 4 insieme
+          uno ogni {OGNI_MS[0] / 1000}–{OGNI_MS[1] / 1000} s · senza tetto: premilo più volte
         </TechLabel>
       </div>
 

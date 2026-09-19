@@ -410,10 +410,11 @@ exist in target module» che **non sono veri**. Si guarda la pagina, o si crede 
   ogni 700 ms: con la scheda **dietro** lo sciame sale al tetto e ci resta — 3, 4, 4, 4, 4, 5, 5,
   5… — e appena portata **davanti** la stessa pagina oscilla fra 1 e 4. Non è un difetto della
   fine detta da `animationend`, che è quella giusta: un timer toglierebbe un ratto ancora a metà
-  schermo, e il ratto fermo in una scheda nascosta non lo vede nessuno. È il motivo per cui lo
-  sciame ha un **tetto** (`maxAlive`) e non «quanti ne vuoi»: senza, la scheda dimenticata si
-  riempie e il ritorno è un muro di ratti. L'originale curava lo stesso difetto in modo più
-  brusco, togliendo tutti i ratti al `visibilitychange`.
+  schermo. La cura è **non farne nascere**: `RatSwarm` salta il turno quando `document.hidden` è
+  vero e riprogramma il giro dopo, così al ritorno il passaggio riparte da sé e chi stava già
+  attraversando finisce la sua corsa. ⚠️ **Un tetto ai ratti insieme non è la cura**: limita il
+  danno invece di toglierlo, e per questo `maxAlive` è solo una scelta di regia, senza valore
+  predefinito. L'originale tagliava più corto, togliendo **tutti** i ratti al `visibilitychange`.
 - ⚠️ **Una decorazione che con «meno movimento» non compare è indistinguibile da una rotta, e va
   detto dove si guarda.** `RatSwarm` con `prefers-reduced-motion` non genera niente — la
   traversata lì dura un millisecondo, quindi sarebbe un guizzo invisibile pagato con un timer

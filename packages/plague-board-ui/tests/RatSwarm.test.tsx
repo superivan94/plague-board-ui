@@ -27,6 +27,12 @@ const menoMovimento = (acceso: boolean) => {
     }) as MediaQueryList;
 };
 
+/** Mette la pagina in secondo piano, come una scheda dietro a un'altra. */
+const paginaNascosta = (nascosta: boolean) => {
+  Object.defineProperty(document, 'visibilityState', { value: nascosta ? 'hidden' : 'visible', configurable: true });
+  Object.defineProperty(document, 'hidden', { value: nascosta, configurable: true });
+};
+
 describe('RatSwarm', () => {
   const matchMediaVero = window.matchMedia;
 
@@ -37,6 +43,7 @@ describe('RatSwarm', () => {
   afterEach(() => {
     vi.useRealTimers();
     window.matchMedia = matchMediaVero;
+    paginaNascosta(false);
   });
 
   it('non fa entrare nessuno finché la prima attesa non è scaduta, e la dichiara chi lo monta', () => {
@@ -60,14 +67,35 @@ describe('RatSwarm', () => {
     expect(ratti(container)).toHaveLength(3);
   });
 
-  it('non supera il tetto dei ratti insieme', () => {
-    // ⚠️ Serve davvero: in una scheda in secondo piano il browser sospende le animazioni, quindi
-    // `animationend` non arriva e nessuno esce. Senza tetto, tornando sulla scheda si trova la
-    // pagina piena di ratti fermi.
+  it('senza un tetto dichiarato non c’è nessun tetto', () => {
+    const { container } = render(<RatSwarm everyMs={[1000, 1000]} />);
+
+    // In jsdom nessuno esce, perché `animationend` non lo emette nessuno: è il caso adatto a
+    // verificare che il valore predefinito non stia limitando di nascosto.
+    avanza(12_000);
+    expect(ratti(container)).toHaveLength(12);
+  });
+
+  it('rispetta il tetto quando glielo si dichiara', () => {
     const { container } = render(<RatSwarm everyMs={[1000, 1000]} maxAlive={2} />);
 
     avanza(10_000);
     expect(ratti(container)).toHaveLength(2);
+  });
+
+  it('non genera mentre la pagina è in secondo piano', () => {
+    // ⚠️ È il caso misurato in browser: con la scheda dietro il browser sospende le animazioni,
+    // quindi `animationend` non arriva e nessun ratto esce — ma i timer continuano. Generare lì
+    // vorrebbe dire accumulare ratti fermi che nessuno vede e nessuno toglie.
+    paginaNascosta(true);
+    const { container } = render(<RatSwarm everyMs={[1000, 1000]} />);
+
+    avanza(10_000);
+    expect(ratti(container)).toHaveLength(0);
+
+    paginaNascosta(false);
+    avanza(1000);
+    expect(ratti(container)).toHaveLength(1);
   });
 
   it('toglie il ratto che è uscito dall’altra parte', () => {
