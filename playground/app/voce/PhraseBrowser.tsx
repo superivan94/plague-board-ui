@@ -9,12 +9,13 @@ export interface PhraseGroup {
   readonly name: string;
   readonly phrases: readonly string[];
   /**
-   * Chi le dice, coi nomi veri dei componenti.
+   * **Le voci che lo dicono su questa pagina** — «il ratto, disegnato», «lo sviluppatore» — non i
+   * componenti che le montano.
    *
-   * ⚠️ **Un elenco di frasi non appartiene a nessuno**: è un dato, e lo stesso array può finire in
-   * bocca a componenti diversi — `DEV_PHRASES` le dice la mascotte su questa pagina e l'emettitore
-   * su `/tocco`. Questo campo dice **chi le usa in questo playground**, che è l'unica cosa vera che
-   * si possa scrivere, ed è quello su cui filtra il selettore.
+   * ⚠️ **Un elenco in bocca a due voci non è un elenco duplicato**: è lo stesso array passato a
+   * due mascotte diverse, ed è esattamente il punto di questa pagina. Il primo giro di questo
+   * campo elencava i componenti (`TalkingMascot`, `HoverEmitter`) e leggerlo faceva credere il
+   * contrario, cioè che le frasi dello sviluppatore esistessero in due copie.
    */
   readonly speakers: readonly string[];
 }
@@ -43,10 +44,11 @@ interface Esito extends PhraseGroup {
  * una pagina di demo sono rumore; aperto, è lo strumento per cercare una parola e vedere in un
  * colpo chi la ripete.
  *
- * ⚠️ **Si filtra per componente, e non è un doppione della ricerca.** La ricerca risponde a «chi
- * dice questa parola»; il selettore risponde a «che cosa può dire questo componente», che è la
- * domanda di chi sta per montarne uno e vuole sapere che voce gli esce. Con un elenco solo e due
- * filtri non serve una seconda pagina che rifaccia la stessa cosa per le frasi dello sviluppatore.
+ * ⚠️ **Si filtra per voce, e non è un doppione della ricerca.** La ricerca risponde a «chi dice
+ * questa parola»; il selettore risponde a «che cosa può dire **questa** mascotte», che è la
+ * domanda di chi guarda le tre facce qui sopra e vuole sapere che cosa esce da ognuna. Con un
+ * elenco solo e due filtri non serve una seconda pagina che rifaccia la stessa cosa per le frasi
+ * dello sviluppatore.
  *
  * ⚠️ **Non c'è nessun segnalatore automatico di doppioni, ed è una scelta misurata.** Cercandoli a
  * macchina — stessa forma a meno di punteggiatura, oppure metà delle parole in comune — sulle
@@ -89,6 +91,9 @@ export function PhraseBrowser({ groups }: { groups: readonly PhraseGroup[] }) {
     }));
   }, [query, visibili]);
 
+  /** C'è almeno un elenco che più di una voce dice? È la riga che spiega perché non è un doppione. */
+  const condivisi = visibili.some((group) => group.speakers.length > 1);
+
   const totale = visibili.reduce((somma, group) => somma + group.phrases.length, 0);
   const trovate = esiti.reduce((somma, esito) => somma + esito.matches.length, 0);
   const tutteLeFrasi = groups.reduce((somma, group) => somma + group.phrases.length, 0);
@@ -121,7 +126,7 @@ export function PhraseBrowser({ groups }: { groups: readonly PhraseGroup[] }) {
               selectedKeys={[chi]}
               onSelectionChange={(keys) => setChi(String([...keys][0] ?? TUTTI))}
               size="sm"
-              aria-label="Filtra per componente"
+              aria-label="Filtra per voce"
             >
               <ToggleButton id={TUTTI}>chiunque</ToggleButton>
               {parlanti.map((parlante) => (
@@ -131,6 +136,14 @@ export function PhraseBrowser({ groups }: { groups: readonly PhraseGroup[] }) {
               ))}
             </ToggleButtonGroup>
           </div>
+
+          {condivisi && (
+            <p className="text-xs text-muted">
+              Un elenco in bocca a più voci è{' '}
+              <strong className="text-foreground">lo stesso array</strong>, non una copia per
+              ciascuna: a cambiare è solo la faccia che lo pronuncia.
+            </p>
+          )}
 
           <SearchField
             value={query}
@@ -156,7 +169,7 @@ export function PhraseBrowser({ groups }: { groups: readonly PhraseGroup[] }) {
           {trovate === 0 ? (
             <EmptyState className="text-sm text-muted">
               {query.trim() === ''
-                ? `Nessun elenco è dichiarato fra quelli che ${chi} dice.`
+                ? `Nessun elenco, fra quelli qui sotto, lo dice ${chi}.`
                 : `Nessuna frase contiene «${query.trim()}».`}
             </EmptyState>
           ) : (
@@ -172,7 +185,9 @@ export function PhraseBrowser({ groups }: { groups: readonly PhraseGroup[] }) {
                           ? `${phrases.length} frasi`
                           : `${matches.length} su ${phrases.length}`}
                       </TechLabel>{' '}
-                      <TechLabel className="text-muted">· le dice {speakers.join(', ')}</TechLabel>
+                      <TechLabel className="text-muted">
+                        · {speakers.length > 1 ? 'le dicono' : 'le dice'} {speakers.join(' · ')}
+                      </TechLabel>
                     </h3>
 
                     {matches.length === 0 ? (

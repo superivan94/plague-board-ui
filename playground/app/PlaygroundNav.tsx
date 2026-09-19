@@ -22,9 +22,13 @@ import { ThemeToggle } from './ThemeToggle';
  * sotto al nome di casa. ⚠️ E si aprono **alla pressione, non al passaggio del mouse**: è la
  * stessa regola di `TalkingMascot`, e il motivo è lo stesso — su un telefono «sopra» non esiste.
  */
-const STILE_VOCE = 'text-sm transition-colors cursor-pointer';
-const STILE_CORRENTE = 'text-brand-ink underline decoration-brand/60 underline-offset-8';
-const STILE_ALTRE = 'text-muted hover:text-foreground';
+// ⚠️ **La voce corrente porta una pastiglia, non solo una sottolineatura.** Con sette pagine in
+// fila la sottolineatura bastava; con tre famiglie che si aprono, chi guarda deve capire in un
+// colpo **dove si trova** fra tre nomi quasi uguali di lunghezza. Il fondo verde al 15% sulla
+// lastra scura della barra è il segno che si vede prima di leggere.
+const STILE_VOCE = 'rounded-full px-3 py-1 text-sm transition-colors cursor-pointer';
+const STILE_CORRENTE = 'bg-brand/15 font-medium text-brand-ink';
+const STILE_ALTRE = 'text-muted hover:bg-default/10 hover:text-foreground';
 
 function NavLink({ page, isCurrent }: { page: PlaygroundPage; isCurrent: boolean }) {
   return (
@@ -53,8 +57,11 @@ function FamilyEntry({ page, isCurrent, onGo }: { page: PlaygroundPage; isCurren
       // riga il menù resterebbe aperto sopra la pagina nuova. Un effetto lo farebbe con un
       // `setState` che `react-hooks/set-state-in-effect` rifiuta, e a ragione.
       onClick={onGo}
-      className={`flex flex-col gap-0.5 rounded-lg px-3 py-2 transition-colors hover:bg-default/50 ${
-        isCurrent ? 'bg-default/40' : ''
+      // ⚠️ Tre segni insieme per la pagina corrente — il filo a sinistra, il fondo, e la scritta
+      // «sei qui» — perché uno solo non si notava: il fondo `default/40` da solo era una
+      // differenza di luminosità che su un pannello chiaro si perde.
+      className={`flex flex-col gap-0.5 rounded-lg border-l-2 px-3 py-2 transition-colors ${
+        isCurrent ? 'border-brand-ink bg-brand/10' : 'border-transparent hover:bg-default/50'
       }`}
     >
       {/* ⚠️ `whitespace-nowrap` sul nome: senza, «La voce» si spezzava in due righe per fare posto
@@ -65,6 +72,7 @@ function FamilyEntry({ page, isCurrent, onGo }: { page: PlaygroundPage; isCurren
         <span className={`text-sm font-medium whitespace-nowrap ${isCurrent ? 'text-brand-ink' : ''}`}>
           {page.title}
         </span>
+        {isCurrent && <TechLabel className="text-brand-ink">sei qui</TechLabel>}
         {page.components.length > 0 && (
           <TechLabel className="text-muted">{page.components.join(' · ')}</TechLabel>
         )}

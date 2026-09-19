@@ -14,14 +14,6 @@ import { PhraseBrowser, type PhraseGroup } from './PhraseBrowser';
 
 // ⚠️ `PhraseBrowser` è `'use client'` e questa pagina no: un componente client dentro una pagina
 // server è il caso normale, e passa il confine perché riceve solo dati — array di stringhe.
-// ⚠️ `speakers` dice chi le usa **in questo playground**, non chi le possiede: `DEV_PHRASES` le
-// dice la mascotte qui sotto e l'emettitore su `/tocco`, ed è il punto — un elenco di frasi è un
-// dato, e il selettore serve a chi sta per montare un componente e vuole sapere che voce gli esce.
-const GROUPS: readonly PhraseGroup[] = [
-  { name: 'RAT_PHRASES', phrases: RAT_PHRASES, speakers: ['TalkingMascot'] },
-  { name: 'DEV_PHRASES', phrases: DEV_PHRASES, speakers: ['TalkingMascot', 'HoverEmitter'] },
-];
-
 // ⚠️ Pagina **server**, senza `'use client'`: il cablaggio fra sorteggio e fumetto sta tutto dentro
 // `TalkingMascot`, quindi qui non c'è nessun hook e nessuno stato. È la misura di che cosa fa quel
 // componente — prima questa stessa pagina doveva essere client per intero.
@@ -57,6 +49,23 @@ const VOICES: readonly Voice[] = [
     label: 'Chiedi al collega',
   },
 ];
+
+/**
+ * Gli elenchi da consultare, e **chi li dice ricavato da `VOICES`** invece che scritto una seconda
+ * volta: il confronto è per identità dell'array, quindi una voce nuova compare da sola nel filtro
+ * e non si può dimenticare di aggiornarlo.
+ *
+ * ⚠️ Due voci che dicono `RAT_PHRASES` non sono due copie delle frasi: è **lo stesso array**,
+ * passato a due mascotte diverse. È il punto della pagina, e il motivo per cui il filtro elenca
+ * le voci e non gli elenchi.
+ */
+const GROUPS: readonly PhraseGroup[] = [
+  { name: 'RAT_PHRASES', phrases: RAT_PHRASES },
+  { name: 'DEV_PHRASES', phrases: DEV_PHRASES },
+].map((group) => ({
+  ...group,
+  speakers: VOICES.filter((voice) => voice.phrases === group.phrases).map((voice) => voice.name),
+}));
 
 const RULES = [
   [
