@@ -1,9 +1,10 @@
 'use client';
 
-import { useCallback, useEffect, useRef, useState, type CSSProperties, type PointerEvent, type ReactNode } from 'react';
+import { useCallback, useEffect, useRef, useState, type PointerEvent, type ReactNode } from 'react';
 
 import { useReducedMotion } from '../hooks/useReducedMotion';
-import type { RandomRange } from '../randomRange';
+import { EffectLayer } from './effectLayer';
+import { pesca, type Effimero } from './hoverEmitterPick';
 import type { HoverEffect } from './hoverEffects';
 
 export interface HoverEmitterProps {
@@ -24,80 +25,18 @@ export interface HoverEmitterProps {
    * togliere il dito non interrompe.
    */
   tapMs?: number;
+  /**
+   * Di quanto ritarda il **cenno** rispetto agli altri, in millisecondi.
+   *
+   * ⚠️ **Serve quando ce n'è più di uno vicino.** Due schede affiancate col cenno che parte nello
+   * stesso istante non sembrano due cose vive: sembrano una cosa sola che pulsa, ed è brutto da
+   * guardare — l'ha notato l'utente sulla firma del piede, dove gli autori sono due.
+   * {@link CreditLine} lo distribuisce da sé; chi monta le schede a mano ci pensa lui.
+   */
+  hintDelayMs?: number;
   /** Classi aggiuntive sul contenitore. */
   className?: string;
 }
-
-/** Un elemento in volo: la chiave che ne fa un nodo nuovo, e tutto ciò che serve a dipingerlo. */
-interface Effimero {
-  readonly key: number;
-  readonly content: string;
-  readonly className: string;
-  readonly style: CSSProperties;
-}
-
-const fra = ([min, max]: RandomRange) => min + Math.random() * (max - min);
-
-/**
- * L'altezza del prossimo elemento. Con le corsie sono **altezze fisse**, equidistanti fra i due
- * estremi e percorse a turno — e il turno è la chiave, che cresce di uno alla volta.
- *
- * ⚠️ **Fisse, non pescate dentro la corsia**, ed è una correzione misurata: un elemento è alto, e
- * un'altezza pescata dentro la propria fetta lo fa sbordare in quella accanto. Con i fumetti —
- * corsie da 20 px, fumetti da 18 — il primo giro di corsie a fascia lasciava ancora **dieci**
- * sovrapposizioni su ventiquattro campionamenti. Quanto stare larghi lo decide la taratura,
- * scegliendo gli estremi di `top`.
- */
-const altezza = (top: RandomRange, lanes: number | undefined, giro: number) => {
-  if (lanes === undefined || lanes < 2) return fra(top);
-
-  const [min, max] = top;
-
-  return min + ((max - min) / (lanes - 1)) * (giro % lanes);
-};
-
-/**
- * Quale testo, **senza ripetere quello di prima**. Si pesca fra gli altri — non si ripesca finché
- * non esce diverso, che con un testo solo è un ciclo che non finisce — ed è la stessa scelta di
- * `useRandomPhrase`, fatta con gli indici perché qui il mazzo si ripesca tre volte al secondo.
- */
-const scegli = (contents: readonly string[], ultimo: number) => {
-  if (contents.length < 2 || ultimo < 0) return Math.floor(Math.random() * contents.length);
-
-  const scelto = Math.floor(Math.random() * (contents.length - 1));
-
-  return scelto >= ultimo ? scelto + 1 : scelto;
-};
-
-const pesca = (
-  key: number,
-  effect: HoverEffect,
-  ultimo: number,
-): { effimero: Effimero; vitaMs: number; indice: number } => {
-  const vitaMs = fra(effect.lifeMs);
-  const indice = scegli(effect.contents, ultimo);
-
-  return {
-    vitaMs,
-    indice,
-    effimero: {
-      key,
-      content: effect.contents[indice],
-      className: effect.className,
-      style: {
-        left: `${fra(effect.left).toFixed(1)}%`,
-        top: `${altezza(effect.top, effect.lanes, key).toFixed(1)}%`,
-        // ⚠️ La durata dell'animazione si scrive **sempre**, e non è un di più: `.pb-binary-digit`
-        // dichiara `animation: pb-float-up linear forwards` senza durata, cioè zero secondi — la
-        // cifra salterebbe dritta all'ultimo fotogramma, che è trasparente. Vale anche per il
-        // fumetto, dove coincide con i 2,5 s del foglio di stile: scriverla è ciò che tiene in
-        // pari quanto l'elemento **vive** e quanto **si vede**.
-        animationDuration: `${(vitaMs / 1000).toFixed(2)}s`,
-        ...(effect.fontSizeRem ? { fontSize: `${fra(effect.fontSizeRem).toFixed(2)}rem` } : {}),
-      },
-    },
-  };
-};
 
 /**
  * **L'easter egg che si accende quando qualcuno ti sfiora**: finché il puntatore è sopra, sputa
@@ -143,15 +82,27 @@ const pesca = (
  * guarda, la preferenza si legge con {@link useReducedMotion}: è la differenza fra «la libreria
  * obbedisce» e «la libreria è rotta».
  *
- * ⚠️ **Quello che vola sborda, quindi niente `overflow-hidden` intorno.** I fumetti nascono
- * **sopra** il riquadro — `top` va da −70% a −10% — e le cifre gli escono ai lati: un antenato che
- * taglia li fa sparire a metà. Il contenitore che l'emettitore disegna è `relative` e non taglia
- * niente; il resto della colonna è di chi lo mette.
+ * ⚠️ **Quello che vola non sta qui dentro**, ma nel piano di {@link EffectLayer}: un portale sul
+ * `body`, sopra le due lastre. I fumetti nascono **sopra** il riquadro e le cifre gli escono ai
+ * lati, quindi dentro basterebbe un antenato con `overflow-hidden` per mozzarli — e nella riga di
+ * una barra quell'antenato è obbligatorio, perché senza non scorrerebbe. Misurato il 2026-09-20
+ * nel piede del playground: i fumetti della firma si vedevano a metà. Il prezzo è che `left` e
+ * `top` della taratura, che sono percentuali del riquadro avvolto, diventano pixel della finestra
+ * al momento della nascita.
  */
-export function HoverEmitter({ children, effect, tapMs = 3000, className = '' }: HoverEmitterProps) {
+export function HoverEmitter({
+  children,
+  effect,
+  tapMs = 3000,
+  hintDelayMs,
+  className = '',
+}: HoverEmitterProps) {
   const menoMovimento = useReducedMotion();
   const [effimeri, setEffimeri] = useState<readonly Effimero[]>([]);
   const [attivo, setAttivo] = useState(false);
+  // Il riquadro da cui nascono gli effimeri: si misura a ogni nascita, perché volano in un piano
+  // che non è questo e le loro coordinate sono quelle della finestra.
+  const contenitore = useRef<HTMLSpanElement>(null);
   // La chiave fa due mestieri: rende nuovo ogni nodo, ed è il **turno** con cui si scelgono le
   // corsie. Cresce di uno alla volta e non torna mai indietro, che è quello che serve a entrambi.
   const prossimaChiave = useRef(0);
@@ -173,12 +124,15 @@ export function HoverEmitter({ children, effect, tapMs = 3000, className = '' }:
 
   const sputa = useCallback(() => {
     const corrente = disegno.current;
-    if (corrente.menoMovimento || corrente.effect.contents.length === 0) return;
+    if (corrente.menoMovimento || corrente.effect.contents.length === 0 || !contenitore.current) return;
 
     const chiave = prossimaChiave.current;
     prossimaChiave.current += 1;
 
-    const { effimero, vitaMs, indice } = pesca(chiave, corrente.effect, ultimoTesto.current);
+    // Il riquadro si misura a ogni nascita, non una volta sola: la scheda che avvolge può essersi
+    // spostata — una barra che scorre di lato lo fa mentre l'emettitore sta sputando.
+    const riquadro = contenitore.current.getBoundingClientRect();
+    const { effimero, vitaMs, indice } = pesca(chiave, corrente.effect, ultimoTesto.current, riquadro);
     ultimoTesto.current = indice;
     setEffimeri((vivi) => [...vivi, effimero]);
 
@@ -243,22 +197,30 @@ export function HoverEmitter({ children, effect, tapMs = 3000, className = '' }:
 
   return (
     <span
-      className={`relative inline-flex ${className}`}
+      ref={contenitore}
+      className={`inline-flex ${className}`}
       onPointerEnter={entra}
       onPointerLeave={esce}
       onPointerCancel={esce}
     >
-      {/* Il cenno sta su un involucro suo e non sul contenitore: sul contenitore trascinerebbe con
-          sé anche gli effimeri, che sono posizionati rispetto a lui. */}
-      <span className={attivo ? 'inline-flex' : 'pb-hover-hint inline-flex'}>{children}</span>
-
-      <span aria-hidden className="pointer-events-none absolute inset-0">
-        {effimeri.map((effimero) => (
-          <span key={effimero.key} className={effimero.className} style={effimero.style}>
-            {effimero.content}
-          </span>
-        ))}
+      {/* Il cenno sta su un involucro suo e non sul contenitore, che è il riquadro che si misura:
+          una `transform` addosso a quello sposterebbe anche il punto da cui nascono gli effimeri. */}
+      <span
+        className={attivo ? 'inline-flex' : 'pb-hover-hint inline-flex'}
+        style={hintDelayMs ? { animationDelay: `${hintDelayMs}ms` } : undefined}
+      >
+        {children}
       </span>
+
+      {effimeri.length > 0 && (
+        <EffectLayer>
+          {effimeri.map((effimero) => (
+            <span key={effimero.key} className={effimero.className} style={effimero.style}>
+              {effimero.content}
+            </span>
+          ))}
+        </EffectLayer>
+      )}
     </span>
   );
 }

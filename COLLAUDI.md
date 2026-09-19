@@ -384,15 +384,28 @@ donazioni porta a un indirizzo vero: per provarlo si annulla la navigazione con 
 | A 380 px | «By:», **un autore solo**, la versione, e la sola ampolla | riga alta **38 px**, contenuto 380 su 380: ci sta senza scorrere. Visibili: «By:», Superivan94, v0.1.0, e il comando senza testo |
 | La barra in cima a 380 px | una riga sola che scorre, non tre righe | barra alta **61 px** (prima ~150), riga 348 visibili su **891** di contenuto, `scorre: true` |
 | Si porta il fuoco sull'ultima voce della barra stretta | la riga si porta in vista da sé | `scrollLeft` **543** senza che nessuno l'abbia scritto: è il motivo per cui non c'è nessun `tabIndex` sul contenitore |
-| Si preme l'ampolla | quattordici segni della peste partono dal centro del comando | 14 particelle, ognuna con `--pb-dx`, `--pb-dy`, `--pb-spin` e una durata sua — es. `51.3px / -4.0px / 240deg / 1.17s` |
-| Dove stanno le particelle | fuori dal piede, non tagliate dalla riga che scorre | nel portale sul `body`, `position: fixed`, e **6 su 14** finiscono sopra il bordo del piede |
+| Si preme l'ampolla | sedici segni della peste zampillano dal comando, uno dopo l'altro | 16 particelle, ognuna con `--pb-dx`, `--pb-apex`, `--pb-dy`, `--pb-spin`, una durata e un **ritardo** suoi — es. `−61,1 / −82,6 / +50,5 px, 192°, 0,97 s` |
+| Si mette in pausa una particella e la si porta a mano sui suoi istanti | **una parabola**: sale, si ferma in alto, ricade sotto il punto di partenza | y a 0 → **−55** → −80 → **−83** (apice, al 55%) → −63 → **+12**; la x scorre da −22 a −53 senza fermarsi; opacità 0 → 1 → 0,29 |
+| Il colore dei segni | verde di casa, non quello del testo della pagina | `rgb(163, 230, 53)`, cioè il lime del marchio. ⚠️ Va detto sulla particella: nel portale `currentColor` è quello del `body`, non quello del comando |
+| Si preme due volte di fila | il secondo getto non parte finché il primo non è finito | 16 particelle e basta: due getti sovrapposti non si leggono come due |
+| Dove stanno le particelle, e i fumetti della firma | fuori dal piede, non tagliati dalla riga che scorre | tutti nel portale sul `body`, `position: fixed`, `z-index` **50**: il fumetto «EVVAI! FUNZIONA!» sta 3 px sopra il bordo del piede e si legge intero |
+| I cenni delle due schede autore | non partono insieme | `animation-delay` **0s** e **2s**: due schede che saltellano allo stesso istante sembrano una cosa sola che pulsa |
 | La versione scritta nel piede | quella vera della libreria, non una copiata a mano | `v0.1.0`, letta dal `package.json` |
 | `next build` | nove pagine ancora **statiche**, col piede in ogni layout | `○` su tutte e nove |
 
-⚠️ **Il primo giro le particelle stavano in un `absolute` dentro il comando**, ed è il difetto che
+⚠️ **Il primo giro gli effimeri stavano dentro il riquadro che li genera**, ed è il difetto che
 questo scenario esiste per non far tornare: la riga di una barra **deve** tagliare il traboccamento
-o non scorrerebbe, quindi dentro se ne vedeva un terzo. Non è un difetto che un test in jsdom possa
-vedere — là nessun rettangolo ha misura — e a schermo si nota solo sapendo che cosa cercare.
+o non scorrerebbe, quindi le particelle si vedevano per un terzo e i fumetti della firma a metà.
+Non è un difetto che un test in jsdom possa vedere — là nessun rettangolo ha misura — e a schermo
+si nota solo sapendo che cosa cercare. ⚠️ E il portale ha un prezzo che questo collaudo eredita:
+le posizioni sono **pixel della finestra**, quindi le corsie e il centraggio non si provano più
+leggendo l'elemento. Si provano sulla funzione che li calcola, dandole un riquadro finto; dove
+nascono **davvero** lo dicono le righe qui sopra.
+
+⚠️ **Lo scoppio era uniforme, ed è diventato una fontana** su richiesta dell'utente: le direzioni
+pescate su tutto il giro davano una girandola. Una fontana si riconosce perché ha **un apice** —
+tutto sale rallentando e ricade accelerando — e perché le particelle partono una dopo l'altra:
+sono le due curve di tempo dentro i fotogrammi e i 28 ms di `staggerMs`.
 
 **Che cosa protegge:** il piede è l'unica parte dell'interfaccia che **chiede** qualcosa a chi
 legge, e insieme la prima che si rompe stringendo la finestra: una riga che va a capo si porta via

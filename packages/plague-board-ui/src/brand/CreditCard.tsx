@@ -34,6 +34,8 @@ export interface CreditAuthor {
 }
 
 export interface CreditCardProps extends CreditAuthor {
+  /** Di quanto ritarda il cenno: vedi {@link HoverEmitterProps.hintDelayMs}. */
+  hintDelayMs?: number;
   /** Classi aggiuntive sulla scheda. */
   className?: string;
 }
@@ -53,7 +55,7 @@ export interface CreditCardProps extends CreditAuthor {
  * ⚠️ **Il collegamento esterno apre in una scheda nuova con `rel="noopener noreferrer"`**: senza
  * `noopener`, la pagina che si apre può riscrivere l'indirizzo di quella che l'ha aperta.
  */
-export function CreditCard({ name, icon, href, effect, className = '' }: CreditCardProps) {
+export function CreditCard({ name, icon, href, effect, hintDelayMs, className = '' }: CreditCardProps) {
   const corpo = (
     <span
       className={`flex items-center gap-1.5 rounded-lg border border-border px-2 py-1 text-sm font-medium transition-colors ${className}`}
@@ -78,5 +80,9 @@ export function CreditCard({ name, icon, href, effect, className = '' }: CreditC
 
   if (!effect) return scheda;
 
-  return <HoverEmitter effect={effect}>{scheda}</HoverEmitter>;
+  return (
+    <HoverEmitter effect={effect} hintDelayMs={hintDelayMs}>
+      {scheda}
+    </HoverEmitter>
+  );
 }

@@ -2,6 +2,7 @@ import { act, createEvent, fireEvent, render } from '@testing-library/react';
 import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest';
 
 import { HoverEmitter, binaryRain, comicBubbles, type HoverEffect } from '../src';
+import { pesca } from '../src/brand/hoverEmitterPick';
 import { menoMovimento } from './preferenze';
 
 /** Una taratura da banco: cadenza tonda, vita lunga, niente caso nelle posizioni. */
@@ -19,7 +20,9 @@ const BREVE: HoverEffect = { ...LENTO, lifeMs: [1000, 1000] };
 
 const FRASI = ['Mannaggia perché non va!', 'Ma sono Pr0!'];
 
-const effimeri = (container: HTMLElement, classe = 'pb-prova') => container.querySelectorAll(`.${classe}`);
+// ⚠️ Si cercano nel **documento**: gli effimeri volano in un portale sul `body`, non dentro il
+// riquadro che li genera — è ciò che li salva dal taglio della riga di una barra.
+const effimeri = (classe = 'pb-prova') => document.querySelectorAll(`.${classe}`);
 const avanza = (ms: number) => act(() => void vi.advanceTimersByTime(ms));
 
 /**
@@ -65,28 +68,28 @@ describe('HoverEmitter', () => {
   });
 
   it('da fermo non sputa niente, e fa il cenno', () => {
-    const { container, emettitore } = monta();
+    const { emettitore } = monta();
 
     avanza(5000);
-    expect(effimeri(container)).toHaveLength(0);
+    expect(effimeri()).toHaveLength(0);
     expect(emettitore.querySelector('.pb-hover-hint')).not.toBeNull();
   });
 
   it('al passaggio del puntatore ne esce uno subito, e poi uno a ogni giro', () => {
-    const { container, emettitore } = monta();
+    const { emettitore } = monta();
 
     entra(emettitore);
     // Uno subito: un easter egg che si fa aspettare non l'ha visto nessuno.
-    expect(effimeri(container)).toHaveLength(1);
+    expect(effimeri()).toHaveLength(1);
 
     avanza(99);
-    expect(effimeri(container)).toHaveLength(1);
+    expect(effimeri()).toHaveLength(1);
 
     avanza(1);
-    expect(effimeri(container)).toHaveLength(2);
+    expect(effimeri()).toHaveLength(2);
 
     avanza(200);
-    expect(effimeri(container)).toHaveLength(4);
+    expect(effimeri()).toHaveLength(4);
   });
 
   it('mentre sputa il cenno si ferma, e riprende all’uscita', () => {
@@ -100,73 +103,73 @@ describe('HoverEmitter', () => {
   });
 
   it('all’uscita smette di generarne, ma chi è in volo finisce la sua corsa', () => {
-    const { container, emettitore } = monta(BREVE);
+    const { emettitore } = monta(BREVE);
 
     entra(emettitore);
     avanza(200);
-    expect(effimeri(container)).toHaveLength(3);
+    expect(effimeri()).toHaveLength(3);
 
     esce(emettitore);
     // ⚠️ Nessuno sparisce di colpo: con la pioggia binaria sarebbero una ventina insieme.
     avanza(500);
-    expect(effimeri(container)).toHaveLength(3);
+    expect(effimeri()).toHaveLength(3);
   });
 
   it('ognuno se ne va da sé quando la sua vita è finita', () => {
-    const { container, emettitore } = monta(BREVE);
+    const { emettitore } = monta(BREVE);
 
     entra(emettitore);
     esce(emettitore);
-    expect(effimeri(container)).toHaveLength(1);
+    expect(effimeri()).toHaveLength(1);
 
     avanza(999);
-    expect(effimeri(container)).toHaveLength(1);
+    expect(effimeri()).toHaveLength(1);
 
     avanza(1);
-    expect(effimeri(container)).toHaveLength(0);
+    expect(effimeri()).toHaveLength(0);
   });
 
   it('col dito parte una raffica a tempo, e alzarlo non la interrompe', () => {
-    const { container, emettitore } = monta(LENTO, 300);
+    const { emettitore } = monta(LENTO, 300);
 
     entra(emettitore, 'touch');
     // Il dito si alza subito: su un telefono è tutto quello che succede.
     esce(emettitore, 'touch');
-    expect(effimeri(container)).toHaveLength(1);
+    expect(effimeri()).toHaveLength(1);
 
     avanza(300);
-    expect(effimeri(container).length).toBeGreaterThan(1);
+    expect(effimeri().length).toBeGreaterThan(1);
 
-    const durante = effimeri(container).length;
+    const durante = effimeri().length;
     avanza(2000);
-    expect(effimeri(container)).toHaveLength(durante);
+    expect(effimeri()).toHaveLength(durante);
   });
 
   it('col mouse, invece, l’uscita ferma tutto subito', () => {
-    const { container, emettitore } = monta();
+    const { emettitore } = monta();
 
     entra(emettitore);
     esce(emettitore);
 
     avanza(2000);
-    expect(effimeri(container)).toHaveLength(1);
+    expect(effimeri()).toHaveLength(1);
   });
 
   it('con meno movimento non esce niente, né col mouse né col dito', () => {
     menoMovimento(true);
-    const { container, emettitore } = monta();
+    const { emettitore } = monta();
 
     entra(emettitore);
     avanza(1000);
-    expect(effimeri(container)).toHaveLength(0);
+    expect(effimeri()).toHaveLength(0);
 
     entra(emettitore, 'touch');
     avanza(1000);
-    expect(effimeri(container)).toHaveLength(0);
+    expect(effimeri()).toHaveLength(0);
   });
 
   it('un ridisegno del genitore non rimette la cadenza a zero', () => {
-    const { container, emettitore, rerender } = monta();
+    const { emettitore, rerender } = monta();
 
     entra(emettitore);
     avanza(50);
@@ -179,7 +182,7 @@ describe('HoverEmitter', () => {
     );
 
     avanza(50);
-    expect(effimeri(container)).toHaveLength(2);
+    expect(effimeri()).toHaveLength(2);
   });
 
   it('lo smontaggio spegne la cadenza e tutte le scadenze', () => {
@@ -193,7 +196,7 @@ describe('HoverEmitter', () => {
     expect(vi.getTimerCount()).toBe(0);
   });
 
-  it('comicBubbles porta in pagina i numeri della scheda dello sviluppatore', () => {
+  it('comicBubbles porta in pagina la frase e i suoi tre secondi', () => {
     const { container } = render(
       <HoverEmitter effect={comicBubbles(FRASI)}>
         <span>Superivan94</span>
@@ -201,17 +204,11 @@ describe('HoverEmitter', () => {
     );
 
     entra(container.firstElementChild!);
-    const fumetto = effimeri(container, 'pb-comic-bubble')[0] as HTMLElement;
+    const fumetto = effimeri('pb-comic-bubble')[0] as HTMLElement;
 
     expect(FRASI).toContain(fumetto.textContent);
     // I tre secondi del foglio di stile, riscritti sull'elemento: è la sua vita, non un doppione.
     expect(Number.parseFloat(fumetto.style.animationDuration)).toBe(3);
-    // ⚠️ Stretta attorno alla metà: il fumetto si centra sul punto, e di là sbordava di 81 px.
-    expect(Number.parseFloat(fumetto.style.left)).toBeGreaterThanOrEqual(35);
-    expect(Number.parseFloat(fumetto.style.left)).toBeLessThanOrEqual(65);
-    // Nasce **sopra** il riquadro: è il motivo per cui nessun antenato può tagliare.
-    expect(Number.parseFloat(fumetto.style.top)).toBeLessThanOrEqual(-55);
-    expect(Number.parseFloat(fumetto.style.top)).toBeGreaterThanOrEqual(-100);
   });
 
   it('coi fumetti non ce n’è mai due in scena insieme', () => {
@@ -228,37 +225,51 @@ describe('HoverEmitter', () => {
     let massimo = 0;
     for (let passo = 0; passo < 100; passo += 1) {
       avanza(100);
-      massimo = Math.max(massimo, effimeri(container, 'pb-comic-bubble').length);
+      massimo = Math.max(massimo, effimeri('pb-comic-bubble').length);
     }
 
     expect(massimo).toBe(1);
   });
 
   it('con le corsie nessuno nasce all’altezza del precedente', () => {
-    // ⚠️ Il sorteggio si blocca a metà: senza, spegnere le corsie darebbe tre altezze a caso che
-    // una volta su ventisette cadono lo stesso una per fascia, e il caso sarebbe rosso a giorni
-    // alterni. Con `random` fermo, la corsia è l'**unica** cosa che decide il numero.
-    vi.spyOn(Math, 'random').mockReturnValue(0.5);
-    const { container, emettitore } = monta({ ...LENTO, top: [0, 300], lanes: 3 });
+    // ⚠️ **Il sorteggio si prova sulla funzione, non sulla pagina**, e non è una scorciatoia: da
+    // quando gli effimeri volano in un portale, `left` e `top` sono **pixel della finestra**
+    // calcolati dal riquadro che li genera — e in jsdom ogni rettangolo misura zero, quindi
+    // dall'elemento uscirebbe sempre `0px`. Qui il riquadro glielo si dà finto, e il conto si
+    // vede per intero. Dove nasce davvero un fumetto lo dice il collaudo, in browser.
+    const riquadro = { left: 100, top: 200, width: 140, height: 40 } as DOMRect;
+    const taratura = { ...LENTO, top: [0, 300] as const, lanes: 3 };
 
-    entra(emettitore);
-    avanza(200);
+    const altezze = [0, 1, 2].map((giro) => pesca(giro, taratura, -1, riquadro).effimero.style.top);
 
-    const altezze = [...effimeri(container)].map((n) => (n as HTMLElement).style.top);
-    // I due estremi e la metà: tre altezze **fisse** ed equidistanti, percorse a turno.
-    expect(altezze).toStrictEqual(['0%', '150%', '300%']);
+    // I due estremi e la metà, in percentuale dell'altezza del riquadro: 0, 150% e 300% di 40 px
+    // sommati al suo bordo di sopra. Tre altezze **fisse** ed equidistanti, percorse a turno.
+    expect(altezze).toStrictEqual(['200.0px', '260.0px', '320.0px']);
+  });
+
+  it('il fumetto nasce sopra il riquadro e centrato sulla sua metà', () => {
+    // ⚠️ L'altra metà della prova di sopra: qui contano gli estremi della taratura vera.
+    const riquadro = { left: 100, top: 200, width: 140, height: 40 } as DOMRect;
+    const { effimero } = pesca(0, comicBubbles(FRASI), -1, riquadro);
+
+    // `left` va dal 35% al 65% di 140 px, sommati al bordo sinistro: da 149 a 191.
+    const sinistra = Number.parseFloat(String(effimero.style.left));
+    expect(sinistra).toBeGreaterThanOrEqual(149);
+    expect(sinistra).toBeLessThanOrEqual(191);
+    // La prima corsia è −100% di 40 px: quaranta pixel **sopra** il bordo di sopra.
+    expect(effimero.style.top).toBe('160.0px');
   });
 
   it('non fa mai uscire due volte di fila lo stesso testo', () => {
     // Con due soli testi «non ripetere l'ultimo» vuol dire **alternare**, ed è la prova più
     // stretta: col sorteggio fermo sul primo, senza la regola uscirebbe sempre lo stesso.
     vi.spyOn(Math, 'random').mockReturnValue(0);
-    const { container, emettitore } = monta({ ...LENTO, contents: ['a', 'b'] });
+    const { emettitore } = monta({ ...LENTO, contents: ['a', 'b'] });
 
     entra(emettitore);
     avanza(300);
 
-    expect([...effimeri(container)].map((n) => n.textContent)).toStrictEqual(['a', 'b', 'a', 'b']);
+    expect([...effimeri()].map((n) => n.textContent)).toStrictEqual(['a', 'b', 'a', 'b']);
   });
 
   it('binaryRain porta in pagina i numeri della scheda dell’AI', () => {
@@ -269,7 +280,7 @@ describe('HoverEmitter', () => {
     );
 
     entra(container.firstElementChild!);
-    const cifra = effimeri(container, 'pb-binary-digit')[0] as HTMLElement;
+    const cifra = effimeri('pb-binary-digit')[0] as HTMLElement;
 
     expect(['0', '1']).toContain(cifra.textContent);
     expect(Number.parseFloat(cifra.style.fontSize)).toBeGreaterThanOrEqual(0.5);

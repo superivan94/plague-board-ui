@@ -486,15 +486,30 @@ exist in target module» che **non sono veri**. Si guarda la pagina, o si crede 
   resterebbe aperto sopra la pagina nuova. Si chiude nell'`onClick` del collegamento, non in un
   effetto che guarda il percorso — quello sarebbe un `setState` in un effetto, che
   `react-hooks/set-state-in-effect` rifiuta.
-- ⚠️ **Una decorazione che deve uscire dal suo riquadro va in un portale, non in un `absolute`.**
-  La riga di una barra **deve** tagliare il traboccamento, o non scorrerebbe di lato: qualunque
-  cosa nasca lì dentro e voli via viene mozzata. Misurato il 2026-09-20 sullo scoppio del comando
-  delle donazioni: dentro la riga se ne vedeva sì e no un terzo. La cura è `createPortal` sul
-  `body` con le particelle in `position: fixed`, e il punto di partenza **misurato al gesto** con
-  `getBoundingClientRect` — una lettura del layout per scoppio, che a un clic si paga volentieri.
-  Il prezzo dichiarato: se la pagina scorre durante il volo, le particelle restano dov'erano sullo
-  schermo; per un secondo è quello che ci si aspetta. ⚠️ E i test cercano le particelle nel
-  **documento**, non nel `container` di `render`.
+- ⚠️ **Tutto ciò che vola esce dal suo riquadro, quindi vive in un portale — non in un
+  `absolute`.** La riga di una barra **deve** tagliare il traboccamento, o non scorrerebbe di
+  lato: qualunque cosa nasca lì dentro e voli via viene mozzata. Misurato il 2026-09-20 nel piede
+  del playground: lo scoppio del comando donazioni si vedeva per un terzo, i fumetti della firma a
+  metà. La cura è una sola per tutti — `EffectLayer`, un `createPortal` sul `body` a `z-50`,
+  sopra anche le due lastre che stanno a `z-20` — con gli elementi in `position: fixed` e il punto
+  di partenza **misurato al gesto** con `getBoundingClientRect`. ⚠️ **Il prezzo si paga nei
+  test**: le coordinate diventano pixel della finestra, e in jsdom ogni rettangolo misura **zero**,
+  quindi dall'elemento esce sempre `0px`. Le posizioni si provano sulla **funzione pura** che le
+  calcola, passandole un riquadro finto; e le ricerche nei test vanno fatte sul `document`, non sul
+  `container` di `render`. ⚠️ L'altro prezzo, dichiarato: se la pagina scorre durante il volo, le
+  cose restano dov'erano sullo schermo — per un secondo, è quello che ci si aspetta.
+- ⚠️ **Un colore dentro un portale non si eredita: `currentColor` è quello del `body`.** Le
+  particelle uscivano del colore del testo della pagina invece che verdi, pur essendo generate da
+  un comando `text-brand-ink`. Il colore va scritto sull'elemento che vola.
+- ⚠️ **Una fontana non è un'esplosione, e la differenza è l'apice.** Pescare le direzioni su tutto
+  il giro dà una girandola; una fontana sale rallentando, si ferma un istante in alto e ricade
+  accelerando. Le due curve di tempo stanno **dentro i fotogrammi** (`animation-timing-function`
+  su una keyframe vale per l'intervallo che comincia lì), perché una sola curva sulla classe le
+  sostituirebbe entrambe. ⚠️ E le particelle partono **una dopo l'altra**: senza quei venti-trenta
+  millisecondi di scarto l'una dall'altra, sedici segni che partono insieme tornano a leggersi come
+  uno scoppio. Vale la stessa regola per due cose vicine che fanno lo stesso cenno: uguali e
+  simultanee sembrano una cosa sola che pulsa, ed è il motivo per cui `CreditLine` sfalsa di due
+  secondi il cenno di ogni autore.
 - ⚠️ **Il piede si stringe guardando il suo contenitore, non la finestra, e le container query
   sbagliano nella direzione giusta.** `@lg:` senza nessun `@container` sopra non è un errore: la
   query non si applica e il pezzo resta nella sua forma **lunga**. Vuol dire che un pezzo montato

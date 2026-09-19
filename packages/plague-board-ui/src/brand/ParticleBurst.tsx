@@ -1,6 +1,5 @@
 'use client';
 
-import { createPortal } from 'react-dom';
 import {
   useCallback,
   useEffect,
@@ -21,32 +20,55 @@ import { SkullIcon } from '../icons/SkullIcon';
 import { VirusIcon } from '../icons/VirusIcon';
 import type { IconProps } from '../icons/types';
 import type { RandomRange } from '../randomRange';
+import { EffectLayer } from './effectLayer';
 
 /** Che cosa si può chiedere a uno scoppio già montato, tenendone il riferimento. */
 export interface ParticleBurstHandle {
-  /** Sprigiona adesso. Con «meno movimento» non fa niente. */
+  /**
+   * Sprigiona adesso.
+   *
+   * ⚠️ **Non fa niente se la fontana sta ancora zampillando**, o con «meno movimento». Due getti
+   * sovrapposti non si leggono come due: si leggono come un pasticcio.
+   */
   burst: () => void;
 }
 
 export interface ParticleBurstProps {
-  /** Quello attorno a cui scoppia: un pulsante, una scheda, un numero. */
+  /** Quello attorno a cui zampilla: un pulsante, una scheda, un numero. */
   children: ReactNode;
   /**
    * I segni che volano. Sono **componenti** e non nodi già resi, perché ognuno va creato con la
-   * sua misura e il suo colore: la libreria ne pesca uno a caso per ogni particella.
+   * sua misura: la libreria ne pesca uno a caso per ogni particella.
    */
   icons?: readonly ComponentType<IconProps>[];
-  /** Quante ne partono a ogni scoppio. */
+  /** Quante ne partono a ogni getto. */
   count?: number;
-  /** Quanto lontano arrivano, in pixel dal centro. */
+  /** Quanto si allargano di lato, in pixel: il valore si pesca e poi si tira a destra o a sinistra. */
   spreadPx?: RandomRange;
-  /** Quanto dura il volo, in millisecondi. */
+  /** Quanto salgono prima di ricadere, in pixel. È l'apice della parabola. */
+  risePx?: RandomRange;
+  /** Quanto scendono **sotto** il punto di partenza prima di svanire. */
+  fallPx?: RandomRange;
+  /** Quanto dura il volo di una particella, in millisecondi. */
   lifeMs?: RandomRange;
   /** Il lato del segno, in pixel. */
   sizePx?: RandomRange;
+  /**
+   * Quanto aspetta una particella rispetto alla precedente, in millisecondi. È quello che fa la
+   * **fontana**: senza, partono tutte insieme e si legge come un'esplosione.
+   */
+  staggerMs?: number;
+  /**
+   * Le classi dei segni che volano.
+   *
+   * ⚠️ **Il colore va detto qui e non ereditato**: le particelle vivono in un portale sul `body`,
+   * quindi `currentColor` è quello del corpo della pagina e non quello del comando che le ha
+   * sprigionate — misurato il 2026-09-20, uscivano del colore del testo invece che verdi.
+   */
+  particleClassName?: string;
   /** Classi aggiuntive sul contenitore. */
   className?: string;
-  /** Il riferimento con cui far scoppiare: vedi {@link ParticleBurstHandle}. */
+  /** Il riferimento con cui far zampillare: vedi {@link ParticleBurstHandle}. */
   ref?: Ref<ParticleBurstHandle>;
 }
 
@@ -66,49 +88,56 @@ interface Particella {
   readonly style: CSSProperties;
 }
 
+type Taratura = Required<
+  Pick<ParticleBurstProps, 'icons' | 'spreadPx' | 'risePx' | 'fallPx' | 'lifeMs' | 'sizePx'>
+>;
+
 const fra = ([min, max]: RandomRange) => min + Math.random() * (max - min);
+const destraOSinistra = () => (Math.random() < 0.5 ? 1 : -1);
 
 /**
- * Una particella: un angolo a caso sull'intero giro, una distanza, una rotazione e una vita.
+ * Una particella: una parabola sua, e un ritardo che la fa partire dopo quella di prima.
  *
- * ⚠️ **L'angolo si pesca in tutto il cerchio, non a ventaglio.** Uno scoppio che parte da un
- * comando deve sembrare venire da lì, e un ventaglio verso l'alto sembra invece una cosa che
- * *sale* — che è un altro gesto, quello delle notifiche.
+ * ⚠️ **Non è un angolo sul giro intero: è un getto verso l'alto.** Una fontana si riconosce
+ * perché tutto sale e tutto ricade; le direzioni pescate su 360° danno una girandola, che è un
+ * altro gesto — e con l'apice a mezz'aria nemmeno si vedrebbe.
  */
 const pesca = (
   key: number,
-  props: Required<Pick<ParticleBurstProps, 'icons' | 'spreadPx' | 'lifeMs' | 'sizePx'>>,
+  taratura: Taratura,
   partenza: { readonly x: number; readonly y: number },
+  ritardoMs: number,
 ) => {
-  const angolo = Math.random() * Math.PI * 2;
-  const distanza = fra(props.spreadPx);
-  const vitaMs = fra(props.lifeMs);
+  const vitaMs = fra(taratura.lifeMs);
 
   const particella: Particella = {
     key,
-    Icon: props.icons[Math.floor(Math.random() * props.icons.length)],
-    size: Math.round(fra(props.sizePx)),
+    Icon: taratura.icons[Math.floor(Math.random() * taratura.icons.length)],
+    size: Math.round(fra(taratura.sizePx)),
     style: {
-      // Coordinate della **finestra**: le particelle stanno in un portale sul `body`, e il punto
-      // da cui partono si misura al momento dello scoppio.
+      // Coordinate della **finestra**: le particelle stanno nel portale sopra tutto, e il punto da
+      // cui partono si misura al momento del getto.
       left: `${partenza.x.toFixed(1)}px`,
       top: `${partenza.y.toFixed(1)}px`,
-      // ⚠️ Le tre variabili che i fotogrammi leggono. Vanno scritte **tutte e tre**: un
-      // `@keyframes` con una variabile mancante non è invalido, ripiega sul valore di riserva e
-      // la particella resta ferma al centro senza che niente lo segnali.
-      ['--pb-dx' as string]: `${(Math.cos(angolo) * distanza).toFixed(1)}px`,
-      ['--pb-dy' as string]: `${(Math.sin(angolo) * distanza).toFixed(1)}px`,
-      ['--pb-spin' as string]: `${(Math.random() * 720 - 360).toFixed(0)}deg`,
+      // ⚠️ Le quattro variabili che i fotogrammi leggono. Vanno scritte **tutte**: un `@keyframes`
+      // a cui ne manca una non è invalido, ripiega sul valore di riserva, e la particella fa una
+      // parabola che non è la sua senza che niente lo segnali.
+      ['--pb-dx' as string]: `${(fra(taratura.spreadPx) * destraOSinistra()).toFixed(1)}px`,
+      ['--pb-apex' as string]: `${(-fra(taratura.risePx)).toFixed(1)}px`,
+      ['--pb-dy' as string]: `${fra(taratura.fallPx).toFixed(1)}px`,
+      ['--pb-spin' as string]: `${(Math.random() * 540 - 270).toFixed(0)}deg`,
       animationDuration: `${(vitaMs / 1000).toFixed(2)}s`,
+      animationDelay: `${ritardoMs}ms`,
     },
   };
 
-  return { particella, vitaMs };
+  // Vive quanto il suo ritardo più il suo volo: toglierla prima la farebbe sparire a mezz'aria.
+  return { particella, restaMs: ritardoMs + vitaMs };
 };
 
 /**
- * **Lo scoppio di segni.** Avvolge qualunque cosa e, quando glielo si chiede, sprigiona dal suo
- * centro una manciata di icone che volano via girando e svaniscono.
+ * **La fontana di segni.** Avvolge qualunque cosa e, quando glielo si chiede, fa zampillare dal suo
+ * centro una manciata di icone che salgono, si fermano un istante in alto e ricadono svanendo.
  *
  * È il premio di un gesto che vale la pena festeggiare: il comando delle donazioni lo usa, ma la
  * stessa cosa serve a un livello superato, a un salvataggio riuscito, a un ratto catturato. Per
@@ -117,16 +146,16 @@ const pesca = (
  * deve usare.
  *
  * ⚠️ **Il grilletto è un `ref`, come nello sciame.** Chi avvolge sa **quando** festeggiare — un
- * clic, una risposta del server, la fine di una partita — e lo scoppio non ha modo di indovinarlo
+ * clic, una risposta del server, la fine di una partita — e la fontana non ha modo di indovinarlo
  * ascoltando i clic dei figli: un pulsante dentro potrebbe essere «annulla».
  *
- * ⚠️ **Le particelle non vivono qui dentro: stanno in un portale sul `body`.** Un antenato che
- * nasconde il traboccamento le taglierebbe a metà volo, e non è un caso raro: la riga di una
- * barra **deve** tagliare, o non scorrerebbe di lato. Misurato il 2026-09-20 nel piede del
- * playground, prima del portale se ne vedeva sì e no un terzo. Il prezzo è una lettura del layout
- * per scoppio — `getBoundingClientRect` sul contenitore — che a un gesto si può pagare, e delle
- * coordinate in `fixed`: se la pagina scorre durante il volo, le particelle restano dov'erano
- * sullo schermo. Per un secondo, è quello che ci si aspetta da uno scoppio.
+ * ⚠️ **Un getto alla volta.** Finché l'ultima particella non è svanita, `burst()` non fa niente:
+ * due getti sovrapposti non si leggono come due, si leggono come un pasticcio. È anche il motivo
+ * per cui premere due volte di fila non raddoppia lo spettacolo.
+ *
+ * ⚠️ **Le particelle non vivono qui dentro**, ma nel piano di {@link EffectLayer} — un portale sul
+ * `body`, sopra le due lastre. Dentro le taglierebbe il primo antenato che nasconde il
+ * traboccamento, e nella riga di una barra quell'antenato è obbligatorio.
  *
  * ⚠️ **Con `prefers-reduced-motion` non parte niente.** Senza animazione le particelle
  * comparirebbero **ferme e tutte insieme** attorno al comando, e resterebbero lì il loro secondo:
@@ -137,10 +166,14 @@ const pesca = (
 export function ParticleBurst({
   children,
   icons = SEGNI_DELLA_PESTE,
-  count = 14,
-  spreadPx = [40, 120],
-  lifeMs = [700, 1200],
-  sizePx = [12, 24],
+  count = 16,
+  spreadPx = [6, 70],
+  risePx = [70, 150],
+  fallPx = [30, 90],
+  lifeMs = [900, 1400],
+  sizePx = [12, 22],
+  staggerMs = 28,
+  particleClassName = 'text-brand-ink',
   className = '',
   ref,
 }: ParticleBurstProps) {
@@ -149,17 +182,21 @@ export function ParticleBurst({
   const contenitore = useRef<HTMLSpanElement>(null);
   const prossimaChiave = useRef(0);
   const scadenze = useRef(new Map<number, ReturnType<typeof setTimeout>>());
+  // Quante ne sono ancora per aria. È un riferimento e non lo stato perché `burst` lo legge da una
+  // chiusura che non si ricrea mai.
+  const inVolo = useRef(0);
 
   // Stessa trappola di sempre: `icons`, `spreadPx` e gli altri sono array, e un array scritto in
-  // linea è nuovo a ogni render del genitore. Qui si leggono al momento dello scoppio.
-  const disegno = useRef({ icons, count, spreadPx, lifeMs, sizePx, menoMovimento });
+  // linea è nuovo a ogni render del genitore. Qui si leggono al momento del getto.
+  const disegno = useRef({ icons, count, spreadPx, risePx, fallPx, lifeMs, sizePx, staggerMs, menoMovimento });
   useEffect(() => {
-    disegno.current = { icons, count, spreadPx, lifeMs, sizePx, menoMovimento };
+    disegno.current = { icons, count, spreadPx, risePx, fallPx, lifeMs, sizePx, staggerMs, menoMovimento };
   });
 
   const burst = useCallback(() => {
     const corrente = disegno.current;
-    if (corrente.menoMovimento || corrente.icons.length === 0 || !contenitore.current) return;
+    if (corrente.menoMovimento || corrente.icons.length === 0) return;
+    if (inVolo.current > 0 || !contenitore.current) return;
 
     // Il centro si misura **adesso**, non a ogni render: è un gesto, e a un gesto una lettura del
     // layout si può pagare. Le coordinate sono quelle della finestra, come le vuole `fixed`.
@@ -171,20 +208,22 @@ export function ParticleBurst({
       const chiave = prossimaChiave.current;
       prossimaChiave.current += 1;
 
-      const { particella, vitaMs } = pesca(chiave, corrente, partenza);
+      const { particella, restaMs } = pesca(chiave, corrente, partenza, quante * corrente.staggerMs);
       nate.push(particella);
 
       scadenze.current.set(
         chiave,
         setTimeout(() => {
           scadenze.current.delete(chiave);
+          inVolo.current -= 1;
           setParticelle((vive) => vive.filter((viva) => viva.key !== chiave));
-        }, vitaMs),
+        }, restaMs),
       );
     }
 
-    // Un aggiornamento solo per tutto lo scoppio: quattordici `setState` di fila sarebbero
-    // quattordici render, e il primo fotogramma è proprio quello che deve arrivare in tempo.
+    inVolo.current = nate.length;
+    // Un aggiornamento solo per tutto il getto: sedici `setState` di fila sarebbero sedici render,
+    // e il primo fotogramma è proprio quello che deve arrivare in tempo.
     setParticelle((vive) => [...vive, ...nate]);
   }, []);
 
@@ -202,21 +241,15 @@ export function ParticleBurst({
     <span ref={contenitore} className={`inline-flex ${className}`}>
       {children}
 
-      {/* ⚠️ **Le particelle vanno in un portale sul `body`, non qui dentro.** Qualunque antenato
-          che nasconde il traboccamento le taglierebbe, e nel piede dei Ludoratti quell'antenato
-          esiste per forza: la riga che scorre di lato **deve** tagliare, o non scorrerebbe.
-          Misurato il 2026-09-20 prima del portale, dentro la riga se ne vedeva un terzo. */}
-      {particelle.length > 0 &&
-        createPortal(
-          <span aria-hidden className="pointer-events-none">
-            {particelle.map(({ key, Icon, size, style }) => (
-              <span key={key} className="pb-particle" style={style}>
-                <Icon size={size} />
-              </span>
-            ))}
-          </span>,
-          document.body,
-        )}
+      {particelle.length > 0 && (
+        <EffectLayer>
+          {particelle.map(({ key, Icon, size, style }) => (
+            <span key={key} className={`pb-particle ${particleClassName}`} style={style}>
+              <Icon size={size} />
+            </span>
+          ))}
+        </EffectLayer>
+      )}
     </span>
   );
 }

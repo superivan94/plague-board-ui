@@ -1,5 +1,8 @@
 import { CreditCard, type CreditAuthor } from './CreditCard';
 
+/** Di quanto sfalsa il cenno di un autore rispetto al precedente. Vedi il commento nel corpo. */
+const HINT_STAGGER_MS = 2000;
+
 export interface CreditLineProps {
   /** Chi ha fatto l'applicazione. Il primo è quello che resta quando lo spazio manca. */
   authors: readonly CreditAuthor[];
@@ -40,7 +43,11 @@ export function CreditLine({
 
       {authors.map((author, posto) => (
         <span key={author.name} className={posto === 0 ? 'flex' : 'hidden @lg:flex'}>
-          <CreditCard {...author} />
+          {/* ⚠️ **I cenni non partono insieme**, e il ritardo lo distribuisce la riga invece di
+              chiederlo a chi la usa. Due schede affiancate che saltellano allo stesso istante non
+              sembrano due cose vive: sembrano una cosa sola che pulsa. Due secondi bastano a
+              rompere la simmetria su un ciclo da sei. */}
+          <CreditCard {...author} hintDelayMs={posto * HINT_STAGGER_MS} />
         </span>
       ))}
     </span>

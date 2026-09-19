@@ -291,9 +291,15 @@
  * cenno che fa da fermo, e sta su ciò che avvolge.
  * ───────────────────────────────────────────────────────────────────────────── */
 
+/* ⚠️ **Le due classi qui sotto sono `fixed`, non `absolute`.** Gli effimeri non vivono dentro il
+ * riquadro che li ha generati: ci volano **sopra**, in un portale sul `body`, perché un antenato
+ * che nasconde il traboccamento li mozzerebbe — e nella riga di una barra quell'antenato è
+ * obbligatorio. Chi li genera misura il proprio riquadro al momento e scrive `left`/`top` in
+ * coordinate della finestra. */
+
 /* La cifra binaria che sale dalla scheda dello sviluppatore AI. */
 .pb-binary-digit {
-  position: absolute;
+  position: fixed;
   pointer-events: none;
   font-family: ui-monospace, monospace;
   font-weight: bold;
@@ -311,7 +317,7 @@
  * fumetto. Senza, una frase lunga ancorata a sinistra sborda a destra di ottanta pixel dalla
  * scheda che l'ha detta. */
 .pb-comic-bubble {
-  position: absolute;
+  position: fixed;
   translate: -50% 0;
   min-width: 80px;
   /* ⚠️ 200 e non i 180 di RattInventario: la frase più lunga di là — «SONO UN MAGO DELLA
@@ -383,25 +389,37 @@
  * `ParticleBurst`. Un segno che parte dal centro, vola via e svanisce.
  * ───────────────────────────────────────────────────────────────────────────── */
 
-/* ⚠️ **Dove va lo dice chi lo genera, con tre variabili.** Un `@keyframes` è fisso, e qui ogni
- * particella ha una direzione sua: l'alternativa sarebbe un fotogramma per ogni angolo, cioè
- * niente. Le tre variabili — spostamento in x, in y, e quanto gira — le scrive il componente
- * sull'elemento, e i fotogrammi le leggono.
+/* ⚠️ **È una fontana, non un'esplosione** — chiesto dall'utente il 2026-09-20, e la differenza non
+ * è la velocità: è che una fontana ha **un apice**. La particella sale rallentando, si ferma un
+ * istante in alto, e ricade accelerando; il primo giro le mandava dritte per dritte in tutte le
+ * direzioni e sembrava una girandola.
  *
- * ⚠️ **Lo scatto iniziale è fuori dal moto**: la particella parte piccola e trasparente, si vede
- * al 15% del volo, e da lì in poi rallenta. Il `cubic-bezier` sta nella classe, non qui, perché
- * è il carattere del gesto — uno scoppio, non una risalita. */
-@keyframes pb-particle-fly {
+ * ⚠️ **Le quattro variabili le scrive chi la genera**, perché un `@keyframes` è fisso e ogni
+ * particella ha la sua parabola: quanto va di lato (`--pb-dx`), quanto sale (`--pb-apex`,
+ * negativo), dove finisce (`--pb-dy`, sotto la partenza) e quanto gira (`--pb-spin`). Un
+ * fotogramma per ogni traiettoria non si scrive.
+ *
+ * ⚠️ **Le due curve di tempo stanno nei fotogrammi, non nella classe**: salita che decelera,
+ * caduta che accelera. È l'unica cosa che fa sembrare che ci sia la gravità, e con una curva sola
+ * per tutto il volo non si ottiene. */
+@keyframes pb-particle-fountain {
   0% {
     opacity: 0;
     transform: translate(0, 0) scale(0.4) rotate(0deg);
+    animation-timing-function: cubic-bezier(0.2, 0.7, 0.4, 1);
   }
-  15% {
+  12% {
     opacity: 1;
+  }
+  55% {
+    opacity: 1;
+    transform: translate(calc(var(--pb-dx, 0px) * 0.55), var(--pb-apex, -60px)) scale(1)
+      rotate(calc(var(--pb-spin, 0deg) * 0.55));
+    animation-timing-function: cubic-bezier(0.5, 0, 0.85, 0.5);
   }
   100% {
     opacity: 0;
-    transform: translate(var(--pb-dx, 0px), var(--pb-dy, 0px)) scale(1) rotate(var(--pb-spin, 0deg));
+    transform: translate(var(--pb-dx, 0px), var(--pb-dy, 0px)) scale(0.9) rotate(var(--pb-spin, 0deg));
   }
 }
 
@@ -418,7 +436,10 @@
   position: fixed;
   translate: -50% -50%;
   pointer-events: none;
-  animation: pb-particle-fly cubic-bezier(0.16, 1, 0.3, 1) forwards;
+  /* ⚠️ Niente curva di tempo qui: la mettono i fotogrammi, uno per la salita e uno per la caduta.
+     Una curva scritta sulla classe le sostituirebbe tutte e due, e la fontana tornerebbe a essere
+     un lancio uniforme. */
+  animation: pb-particle-fountain forwards;
   will-change: transform, opacity;
 }
 

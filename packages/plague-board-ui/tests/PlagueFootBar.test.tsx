@@ -64,6 +64,7 @@ describe('ParticleBurst', () => {
       const stile = (particella as HTMLElement).style;
       expect(stile.getPropertyValue('--pb-dx')).toMatch(/px$/);
       expect(stile.getPropertyValue('--pb-dy')).toMatch(/px$/);
+      expect(stile.getPropertyValue('--pb-apex')).toMatch(/^-.*px$/);
       expect(stile.getPropertyValue('--pb-spin')).toMatch(/deg$/);
       expect(Number.parseFloat(stile.animationDuration)).toBeGreaterThan(0);
     }
@@ -72,7 +73,9 @@ describe('ParticleBurst', () => {
   it('ognuna se ne va quando la sua vita è finita', () => {
     const scoppio = createRef<ParticleBurstHandle>();
     render(
-      <ParticleBurst ref={scoppio} count={4} lifeMs={[1000, 1000]}>
+      // ⚠️ `staggerMs` a zero perché qui si guarda **la vita**: col ritardo, ognuna vive quanto il
+      // suo volo più la sua attesa, e i quattro numeri non scadrebbero insieme.
+      <ParticleBurst ref={scoppio} count={4} lifeMs={[1000, 1000]} staggerMs={0}>
         <span>grazie</span>
       </ParticleBurst>,
     );
@@ -85,22 +88,38 @@ describe('ParticleBurst', () => {
     expect(particelle()).toHaveLength(0);
   });
 
-  it('due scoppi si sommano, e ognuno ha le sue chiavi', () => {
+  it('una parte dopo l’altra: è quello che la fa sembrare una fontana', () => {
     const scoppio = createRef<ParticleBurstHandle>();
     render(
-      <ParticleBurst ref={scoppio} count={3} lifeMs={[1000, 1000]}>
+      <ParticleBurst ref={scoppio} count={4} staggerMs={30}>
+        <span>grazie</span>
+      </ParticleBurst>,
+    );
+
+    act(() => scoppio.current?.burst());
+
+    const ritardi = [...particelle()].map((n) => (n as HTMLElement).style.animationDelay);
+    expect(ritardi).toStrictEqual(['0ms', '30ms', '60ms', '90ms']);
+  });
+
+  it('un getto alla volta: finché zampilla, premere di nuovo non fa niente', () => {
+    const scoppio = createRef<ParticleBurstHandle>();
+    render(
+      <ParticleBurst ref={scoppio} count={3} lifeMs={[1000, 1000]} staggerMs={0}>
         <span>grazie</span>
       </ParticleBurst>,
     );
 
     act(() => scoppio.current?.burst());
     avanza(500);
+    // ⚠️ Due getti sovrapposti non si leggono come due: si leggono come un pasticcio.
     act(() => scoppio.current?.burst());
+    expect(particelle()).toHaveLength(3);
 
-    expect(particelle()).toHaveLength(6);
-
-    // Il primo scoppio se ne va per conto suo, e il secondo resta.
+    // Finito il primo, il comando torna a funzionare.
     avanza(500);
+    expect(particelle()).toHaveLength(0);
+    act(() => scoppio.current?.burst());
     expect(particelle()).toHaveLength(3);
   });
 
