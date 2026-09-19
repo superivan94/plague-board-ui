@@ -3,7 +3,7 @@
 import { Popover } from '@heroui/react';
 import Link from 'next/link';
 import { usePathname } from 'next/navigation';
-import { PLAGUE_BAR_MARK_SIZE, PlagueBar, RatIcon, TechLabel, TechRule } from 'plague-board-ui';
+import { BarRow, PLAGUE_BAR_MARK_SIZE, PlagueBar, RatIcon, TechLabel, TechRule } from 'plague-board-ui';
 import { useState } from 'react';
 
 import { PLAYGROUND_FAMILIES, PLAYGROUND_PAGES, type PlaygroundFamilyInfo, type PlaygroundPage } from './pages';
@@ -134,47 +134,52 @@ export function PlaygroundNav() {
     <PlagueBar>
       {/* ⚠️ Niente `py` qui: l'altezza è della barra, che la porta con la sua taglia. Questo
           `<nav>` decide solo quanto è larga la colonna — che è roba della pagina, non della
-          libreria. */}
-      <nav className="mx-auto flex max-w-5xl flex-wrap items-center gap-x-5 gap-y-2 px-4">
-        {/* Il marchio, e batte. ⚠️ Scelto fra cinque candidati il 2026-09-17, e il motivo non è
-            estetico: quel segno a prima vista è un cuore, poi due che si abbracciano, e solo per
-            via delle orecchie il muso di un ratto. Un cuore che batte dice «acceso» raccontando
-            la prima delle sue tre letture, invece di aggiungerne una quarta — che era il difetto
-            del pallino che stava qui prima.
-            ⚠️ La misura non è scritta a mano: la barra è `medium`, e chi mette il segno chiede
-            alla libreria quanto farlo grande per quella taglia. */}
-        <span className="flex items-center gap-2">
-          <RatIcon
-            size={PLAGUE_BAR_MARK_SIZE.medium}
-            className="animate-heartbeat shrink-0 text-brand"
-          />
-          <TechLabel className="text-muted">plague-board-ui</TechLabel>
-        </span>
-
-        {PLAYGROUND_FAMILIES.map((family) => (
-          <FamilyMenu
-            key={family.key}
-            family={family}
-            pages={PLAYGROUND_PAGES.filter((page) => page.family === family.key)}
-            pathname={pathname}
-          />
-        ))}
-
-        {filosofia.length > 0 && (
-          <span className="flex items-center gap-4">
-            {/* ⚠️ Il filo e il nome erano scritti qui a mano. Adesso sono `TechRule`, e non è un
-                riordino: era il segno che divide due categorie di pagine, cioè una cosa che
-                qualunque app dei Ludoratti rifarebbe uguale. Si ricompone, non si copia. */}
-            <TechRule orientation="vertical">filosofia</TechRule>
-            {filosofia.map((page) => (
-              <NavLink key={page.href} page={page} isCurrent={pathname === page.href} />
-            ))}
+          libreria.
+          ⚠️ E dentro c'è `BarRow`, non una flex che va a capo: su un telefono le voci stavano su
+          **tre righe** e la lastra diventava alta il triplo. Una riga sola che scorre di lato è
+          la regola, e vale per la barra come per il piede. */}
+      <nav className="mx-auto w-full max-w-5xl px-4">
+        <BarRow>
+          {/* Il marchio, e batte. ⚠️ Scelto fra cinque candidati il 2026-09-17, e il motivo non è
+              estetico: quel segno a prima vista è un cuore, poi due che si abbracciano, e solo per
+              via delle orecchie il muso di un ratto. Un cuore che batte dice «acceso» raccontando
+              la prima delle sue tre letture, invece di aggiungerne una quarta — che era il difetto
+              del pallino che stava qui prima.
+              ⚠️ La misura non è scritta a mano: la barra è `medium`, e chi mette il segno chiede
+              alla libreria quanto farlo grande per quella taglia. */}
+          <span className="flex items-center gap-2">
+            <RatIcon
+              size={PLAGUE_BAR_MARK_SIZE.medium}
+              className="animate-heartbeat shrink-0 text-brand"
+            />
+            <TechLabel className="text-muted">plague-board-ui</TechLabel>
           </span>
-        )}
 
-        <span className="ml-auto">
-          <ThemeToggle />
-        </span>
+          {PLAYGROUND_FAMILIES.map((family) => (
+            <FamilyMenu
+              key={family.key}
+              family={family}
+              pages={PLAYGROUND_PAGES.filter((page) => page.family === family.key)}
+              pathname={pathname}
+            />
+          ))}
+
+          {filosofia.length > 0 && (
+            <span className="flex items-center gap-4">
+              {/* ⚠️ Il filo e il nome erano scritti qui a mano. Adesso sono `TechRule`, e non è un
+                  riordino: era il segno che divide due categorie di pagine, cioè una cosa che
+                  qualunque app dei Ludoratti rifarebbe uguale. Si ricompone, non si copia. */}
+              <TechRule orientation="vertical">filosofia</TechRule>
+              {filosofia.map((page) => (
+                <NavLink key={page.href} page={page} isCurrent={pathname === page.href} />
+              ))}
+            </span>
+          )}
+
+          <span className="ml-auto">
+            <ThemeToggle />
+          </span>
+        </BarRow>
       </nav>
     </PlagueBar>
   );

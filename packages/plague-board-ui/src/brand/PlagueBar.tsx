@@ -5,13 +5,22 @@ import type { ReactNode } from 'react';
 
 import { PLAGUE_BAR_PADDING, type PlagueBarSize } from './plagueBarSizes';
 
+/** A quale estremità della pagina sta la lastra. */
+export type PlagueBarPlacement = 'top' | 'bottom';
+
 export interface PlagueBarProps {
   /** Quello che la barra contiene: marchio, collegamenti, comandi. Li decide chi la usa. */
   children: ReactNode;
   /** Classi aggiuntive. Si sommano alle sue, non le sostituiscono. */
   className?: string;
-  /** Resta in cima mentre la pagina scorre. Vero di default. */
+  /** Resta attaccata alla sua estremità mentre la pagina scorre. Vero di default. */
   isSticky?: boolean;
+  /**
+   * In cima o in fondo. Cambiano tre cose e nessun'altra: l'elemento — `<header>` di sopra,
+   * `<footer>` di sotto, perché sono due punti di riferimento diversi per chi naviga a salti — il
+   * lato del filo verde, e il lato a cui si appiccica.
+   */
+  placement?: PlagueBarPlacement;
   /** Quanto è alta. `medium` di default: è la barra di un'applicazione. */
   size?: PlagueBarSize;
 }
@@ -59,13 +68,22 @@ export function PlagueBar({
   children,
   className = '',
   isSticky = true,
+  placement = 'top',
   size = 'medium',
 }: PlagueBarProps) {
+  const inCima = placement === 'top';
+
   return (
     <Surface
       variant="transparent"
-      render={(props) => <header {...props} />}
-      className={`dark ${isSticky ? 'sticky top-0 z-20' : ''} w-full border-b border-brand/20 bg-gray-950/90 backdrop-blur-sm ${PLAGUE_BAR_PADDING[size]} ${className}`}
+      // ⚠️ Due elementi e non uno con un `role`: `<header>` e `<footer>` sono `banner` e
+      // `contentinfo`, cioè due punti di riferimento distinti nell'elenco che uno screen reader
+      // offre per saltare. Un piede reso come intestazione sarebbe un secondo `banner`, che è
+      // proprio la cosa che quell'elenco non deve avere.
+      render={(props) => (inCima ? <header {...props} /> : <footer {...props} />)}
+      className={`dark ${isSticky ? `sticky z-20 ${inCima ? 'top-0' : 'bottom-0'}` : ''} w-full ${
+        inCima ? 'border-b' : 'border-t'
+      } border-brand/20 bg-gray-950/90 backdrop-blur-sm ${PLAGUE_BAR_PADDING[size]} ${className}`}
     >
       {children}
     </Surface>

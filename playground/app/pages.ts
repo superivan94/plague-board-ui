@@ -82,8 +82,8 @@ export const PLAYGROUND_PAGES: readonly PlaygroundPage[] = [
   {
     href: '/barra',
     title: 'La barra',
-    components: ['PlagueBar', 'PulseDot'],
-    blurb: 'Le tre altezze di `PlagueBar`, e il segno che non le segue fino in fondo.',
+    components: ['PlagueBar', 'PlagueFootBar', 'BarRow'],
+    blurb: 'Le due lastre — in cima e in fondo — le tre altezze, e la riga che non va a capo.',
     family: 'fondamenta',
   },
   {

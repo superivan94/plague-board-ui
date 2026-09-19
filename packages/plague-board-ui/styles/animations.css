@@ -380,6 +380,49 @@
 }
 
 /* ─────────────────────────────────────────────────────────────────────────────
+ * `ParticleBurst`. Un segno che parte dal centro, vola via e svanisce.
+ * ───────────────────────────────────────────────────────────────────────────── */
+
+/* ⚠️ **Dove va lo dice chi lo genera, con tre variabili.** Un `@keyframes` è fisso, e qui ogni
+ * particella ha una direzione sua: l'alternativa sarebbe un fotogramma per ogni angolo, cioè
+ * niente. Le tre variabili — spostamento in x, in y, e quanto gira — le scrive il componente
+ * sull'elemento, e i fotogrammi le leggono.
+ *
+ * ⚠️ **Lo scatto iniziale è fuori dal moto**: la particella parte piccola e trasparente, si vede
+ * al 15% del volo, e da lì in poi rallenta. Il `cubic-bezier` sta nella classe, non qui, perché
+ * è il carattere del gesto — uno scoppio, non una risalita. */
+@keyframes pb-particle-fly {
+  0% {
+    opacity: 0;
+    transform: translate(0, 0) scale(0.4) rotate(0deg);
+  }
+  15% {
+    opacity: 1;
+  }
+  100% {
+    opacity: 0;
+    transform: translate(var(--pb-dx, 0px), var(--pb-dy, 0px)) scale(1) rotate(var(--pb-spin, 0deg));
+  }
+}
+
+/* ⚠️ Il centraggio è sulla proprietà `translate` e non dentro la `transform`, per lo stesso motivo
+ * del fumetto: le due si compongono, quindi la particella nasce **centrata sul punto** mentre
+ * l'animazione continua a scrivere la sua `transform` fotogramma per fotogramma. */
+/* ⚠️ **`fixed`, perché le particelle non vivono dentro il pezzo che le ha sprigionate.** Lì
+ * sarebbero tagliate dal primo antenato che nasconde il traboccamento — e nel piede dei Ludoratti
+ * quell'antenato c'è di sicuro: la riga che scorre di lato **deve** tagliare, o non scorrerebbe.
+ * Misurato il 2026-09-20: dentro la riga si vedeva sì e no un terzo dello scoppio. Il componente
+ * le mette in un portale sul `body` e scrive qui il punto da cui partono, in coordinate della
+ * finestra. */
+.pb-particle {
+  position: fixed;
+  translate: -50% -50%;
+  pointer-events: none;
+  animation: pb-particle-fly cubic-bezier(0.16, 1, 0.3, 1) forwards;
+  will-change: transform, opacity;
+}
+
+/* ─────────────────────────────────────────────────────────────────────────────
  * La corsa del ratto. Il disegno è un pupazzo articolato — tronco, coda, quattro zampe, e i pezzi
  * che pendono dai kit — e ogni pezzo porta il proprio perno come `transform-origin`, scritto dal
  * componente nelle unità della cornice. Qui c'è solo il **tempo**: che cosa ruota, di quanto, e con
@@ -570,6 +613,7 @@
   .pb-binary-digit,
   .pb-comic-bubble,
   .pb-hover-hint,
+  .pb-particle,
   [class*='animate-'],
   .pb-rat--running .pb-rat-part,
   .pb-rat--running .pb-rat-body,

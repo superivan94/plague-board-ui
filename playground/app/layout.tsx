@@ -1,7 +1,41 @@
 import type { Metadata } from 'next';
 import { Poppins, Share_Tech_Mono } from 'next/font/google';
+import {
+  CodeIcon,
+  DEV_PHRASES,
+  PlagueFootBar,
+  RobotIcon,
+  binaryRain,
+  comicBubbles,
+  type CreditAuthor,
+} from 'plague-board-ui';
+
 import './globals.css';
 import { PlaygroundNav } from './PlaygroundNav';
+import pacchetto from '../../packages/plague-board-ui/package.json';
+
+// ⚠️ La versione si **legge** dal `package.json` della libreria invece di essere scritta a mano:
+// un numero copiato in un piede è un numero che resta indietro, e nessuno se ne accorge.
+const VERSIONE = pacchetto.version;
+
+// ⚠️ I due autori hanno due easter egg **diversi**, come in RattInventario: l'umano pensa, l'AI
+// piove cifre. Sono due tarature passate dall'applicazione, quindi la libreria non ha dovuto
+// decidere quale dei due fosse l'umano.
+// ⚠️ E il colore è il lime grezzo, non `brand-ink`: la lastra del piede è un'isola scura nei due
+// temi, quindi qui dentro vale il contrasto sul nero.
+const AUTORI: readonly CreditAuthor[] = [
+  {
+    name: 'Superivan94',
+    icon: <CodeIcon size={16} className="text-brand" />,
+    href: 'https://ludoratti.it',
+    effect: comicBubbles(DEV_PHRASES),
+  },
+  {
+    name: 'AI-Dev',
+    icon: <RobotIcon size={16} className="text-plague-400" />,
+    effect: { ...binaryRain(), className: 'pb-binary-digit text-plague-400' },
+  },
+];
 
 // I due caratteri che `ludoratti.it` usa davvero, misurati sul sito vivo: `Poppins` per il testo e
 // `Share Tech Mono` per i titoli e le etichette di servizio.
@@ -47,9 +81,14 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
       <head>
         <script dangerouslySetInnerHTML={{ __html: THEME_BOOT }} />
       </head>
-      <body className="min-h-dvh bg-background text-foreground antialiased">
+      {/* ⚠️ `flex-col` con la pagina che cresce: è quello che tiene il piede **in fondo** anche
+          sulle pagine corte, invece che a metà schermo. Non è appiccicato — `isSticky` è falso —
+          perché su queste pagine si scorre per leggere, e una lastra che copre due righe in fondo
+          a ogni schermata è un ingombro; in un'applicazione vera la scelta è dell'app. */}
+      <body className="flex min-h-dvh flex-col bg-background text-foreground antialiased">
         <PlaygroundNav />
-        {children}
+        <div className="flex-1">{children}</div>
+        <PlagueFootBar authors={AUTORI} version={VERSIONE} supportHref="https://ko-fi.com/superivan94" isSticky={false} />
       </body>
     </html>
   );

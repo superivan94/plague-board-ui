@@ -148,6 +148,35 @@ export default function BarPage() {
         </ul>
       </section>
 
+      <TechRule>la stessa lastra, in fondo</TechRule>
+
+      <section className="flex flex-col gap-3">
+        <p className="max-w-2xl text-sm text-muted">
+          Il piede in fondo a questa pagina è la <strong>stessa lastra</strong> con{' '}
+          <code>placement=&quot;bottom&quot;</code>: cambiano l&apos;elemento — <code>footer</code>{' '}
+          invece di <code>header</code>, perché sono due punti di riferimento diversi per chi naviga
+          a salti — il lato del filo verde e il lato a cui si appiccica.
+        </p>
+        <p className="max-w-2xl text-sm text-muted">
+          Dentro c&apos;è <code>PlagueFootBar</code>, che monta la firma, la versione e le donazioni
+          nell&apos;ordine giusto; i suoi pezzi — <code>CreditLine</code>, <code>VersionTag</code>,{' '}
+          <code>SupportButton</code> — restano pubblici per chi lo vuole montare da sé. Stringi la
+          finestra e guarda: «Creato da» diventa «By:», resta un autore solo e il comando delle
+          donazioni si riduce all&apos;ampolla. Non è una media query — è il <em>contenitore</em> a
+          decidere, quindi lo stesso piede dentro una colonna stretta si comporta uguale.
+        </p>
+        <p className="max-w-2xl text-sm text-muted">
+          <strong className="text-foreground">Una riga sola, in cima come in fondo.</strong>{' '}
+          <code>BarRow</code> non manda a capo: se le voci non ci stanno, si scorre di lato. Una
+          seconda riga cambierebbe l&apos;altezza della lastra, e con una lastra appiccicata cambia
+          quanto spazio resta alla pagina.
+        </p>
+        <p className="max-w-2xl text-sm text-muted">
+          E premi l&apos;ampolla: i segni della peste si sprigionano — <code>ParticleBurst</code>,
+          che avvolge qualunque cosa e sprigiona quello che gli si passa.
+        </p>
+      </section>
+
       <TechRule>i vincoli</TechRule>
 
       <section className="flex flex-col gap-3">

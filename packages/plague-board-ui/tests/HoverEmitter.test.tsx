@@ -2,6 +2,7 @@ import { act, createEvent, fireEvent, render } from '@testing-library/react';
 import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest';
 
 import { HoverEmitter, binaryRain, comicBubbles, type HoverEffect } from '../src';
+import { menoMovimento } from './preferenze';
 
 /** Una taratura da banco: cadenza tonda, vita lunga, niente caso nelle posizioni. */
 const LENTO: HoverEffect = {
@@ -39,21 +40,6 @@ const muovi = (nome: 'pointerOver' | 'pointerOut', nodo: Element, pointerType: s
 
 const entra = (nodo: Element, tipo = 'mouse') => muovi('pointerOver', nodo, tipo);
 const esce = (nodo: Element, tipo = 'mouse') => muovi('pointerOut', nodo, tipo);
-
-/** Accende o spegne `prefers-reduced-motion`, che il polyfill di `setup.ts` dice sempre spento. */
-const menoMovimento = (acceso: boolean) => {
-  window.matchMedia = (query: string): MediaQueryList =>
-    ({
-      matches: acceso && query.includes('prefers-reduced-motion'),
-      media: query,
-      onchange: null,
-      addListener: () => {},
-      removeListener: () => {},
-      addEventListener: () => {},
-      removeEventListener: () => {},
-      dispatchEvent: () => false,
-    }) as MediaQueryList;
-};
 
 const monta = (effect: HoverEffect = LENTO, tapMs?: number) => {
   const resa = render(

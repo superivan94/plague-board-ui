@@ -486,6 +486,30 @@ exist in target module» che **non sono veri**. Si guarda la pagina, o si crede 
   resterebbe aperto sopra la pagina nuova. Si chiude nell'`onClick` del collegamento, non in un
   effetto che guarda il percorso — quello sarebbe un `setState` in un effetto, che
   `react-hooks/set-state-in-effect` rifiuta.
+- ⚠️ **Una decorazione che deve uscire dal suo riquadro va in un portale, non in un `absolute`.**
+  La riga di una barra **deve** tagliare il traboccamento, o non scorrerebbe di lato: qualunque
+  cosa nasca lì dentro e voli via viene mozzata. Misurato il 2026-09-20 sullo scoppio del comando
+  delle donazioni: dentro la riga se ne vedeva sì e no un terzo. La cura è `createPortal` sul
+  `body` con le particelle in `position: fixed`, e il punto di partenza **misurato al gesto** con
+  `getBoundingClientRect` — una lettura del layout per scoppio, che a un clic si paga volentieri.
+  Il prezzo dichiarato: se la pagina scorre durante il volo, le particelle restano dov'erano sullo
+  schermo; per un secondo è quello che ci si aspetta. ⚠️ E i test cercano le particelle nel
+  **documento**, non nel `container` di `render`.
+- ⚠️ **Il piede si stringe guardando il suo contenitore, non la finestra, e le container query
+  sbagliano nella direzione giusta.** `@lg:` senza nessun `@container` sopra non è un errore: la
+  query non si applica e il pezzo resta nella sua forma **lunga**. Vuol dire che un pezzo montato
+  fuori da `PlagueFootBar` non si rompe, si comporta come se ci fosse spazio — e che dichiarare
+  `@container` sulla **riga** e non sulla lastra è ciò che fa comportare bene lo stesso piede
+  dentro una colonna stretta.
+- ⚠️ **Una barra che va a capo non è una barra: è tre barre.** Misurato il 2026-09-20 a 380 px di
+  finestra: la barra del playground con le voci in una flex `flex-wrap` occupava **tre righe** e
+  la lastra era alta il triplo — su una lastra appiccicata è spazio tolto alla pagina a ogni
+  schermata. `BarRow` tiene una riga sola e scorre di lato; i figli vogliono `shrink-0` (che la
+  riga mette con la variante `*:`), altrimenti vengono schiacciati invece di traboccare e lo
+  scorrimento non compare mai. ⚠️ **E niente `tabIndex` sul contenitore**: la regola «una regione
+  che scorre dev'essere raggiungibile da tastiera» è per i riquadri di testo. Qui dentro ci sono
+  collegamenti, e il browser porta in vista quello che mette a fuoco — misurato: col fuoco
+  sull'ultima voce la riga si era già portata a `scrollLeft` 543.
 - ⚠️ **Due cose larghe quanto il loro testo non si separano disponendole: si separano nel tempo.**
   I fumetti dell'emettitore sono larghi quanto la frase che contengono — da 80 a 200 px su una
   scheda di 142 — quindi due che convivono si disturbano comunque, e allontanarli in verticale

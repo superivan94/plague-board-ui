@@ -7,12 +7,22 @@
 // superficie pubblica, e un asterisco lo renderebbe una domanda invece che una risposta.
 
 // I segni del marchio: le cose che dicono «Ludoratti» senza essere un'applicazione.
+// La riga che non va a capo: la usano la barra in cima e il piede in fondo, e per questo non sta
+// dentro nessuna delle due.
+export { BarRow, type BarRowProps } from './brand/BarRow';
+export { CreditCard, type CreditAuthor, type CreditCardProps } from './brand/CreditCard';
+export { CreditLine, type CreditLineProps } from './brand/CreditLine';
 export { HoverEmitter, type HoverEmitterProps } from './brand/HoverEmitter';
 // ⚠️ Le tarature stanno in un modulo **senza** `'use client'`, e non per simmetria con
 // `plagueBarSizes.ts`: una pagina server deve poter chiamare `binaryRain()` e passare il risultato
 // all'emettitore, che è client. Per questo dentro non c'è nessuna funzione — solo numeri e parole.
 export { binaryRain, comicBubbles, type HoverEffect } from './brand/hoverEffects';
-export { PlagueBar, type PlagueBarProps } from './brand/PlagueBar';
+// Lo scoppio di segni: sta accanto all'emettitore perché è l'altro modo di far volare qualcosa —
+// quello si accende finché lo sfiori, questo parte una volta sola quando glielo chiedi.
+export { ParticleBurst, type ParticleBurstHandle, type ParticleBurstProps } from './brand/ParticleBurst';
+export { PlagueBar, type PlagueBarPlacement, type PlagueBarProps } from './brand/PlagueBar';
+// Il piede già montato. I suoi pezzi restano pubblici: chi ne vuole uno diverso se lo compone.
+export { PlagueFootBar, type PlagueFootBarProps } from './brand/PlagueFootBar';
 // ⚠️ Le misure **non** escono da `PlagueBar.tsx`, che dichiara `'use client'`: un dato esportato
 // da un modulo client arriva a una pagina server come riferimento, e chi lo indicizza ottiene
 // `undefined` senza che niente diventi rosso. Il perché per esteso sta in `plagueBarSizes.ts`.
@@ -32,9 +42,11 @@ export {
   RAT_MASCOT_WIDTH,
 } from './assets/ratMascotImage';
 export { SpeechBubble, type SpeechBubbleProps } from './brand/SpeechBubble';
+export { SupportButton, type SupportButtonProps } from './brand/SupportButton';
 export { TalkingMascot, type TalkingMascotProps } from './brand/TalkingMascot';
 export { TechLabel, type TechLabelProps } from './brand/TechLabel';
 export { TechRule, type TechRuleProps } from './brand/TechRule';
+export { VersionTag, type VersionTagProps } from './brand/VersionTag';
 
 // Le icone. `IconProps` è pubblico perché è il contratto che deve rispettare chi sostituisce
 // l'icona predefinita di un componente con la propria.

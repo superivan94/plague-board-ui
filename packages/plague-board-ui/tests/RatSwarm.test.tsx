@@ -4,28 +4,11 @@ import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest';
 
 import { RatSwarm, type RatSwarmHandle } from '../src';
 import { fineTraversata } from './animazioni';
+import { menoMovimento } from './preferenze';
 
 const ratti = (container: HTMLElement) => container.querySelectorAll('.pb-rat-run');
 
 const avanza = (ms: number) => act(() => void vi.advanceTimersByTime(ms));
-
-/**
- * Accende o spegne `prefers-reduced-motion`. Il polyfill di `tests/setup.ts` risponde sempre
- * `false`: qui si sostituisce per il tempo di un test, e si rimette com'era.
- */
-const menoMovimento = (acceso: boolean) => {
-  window.matchMedia = (query: string): MediaQueryList =>
-    ({
-      matches: acceso && query.includes('prefers-reduced-motion'),
-      media: query,
-      onchange: null,
-      addListener: () => {},
-      removeListener: () => {},
-      addEventListener: () => {},
-      removeEventListener: () => {},
-      dispatchEvent: () => false,
-    }) as MediaQueryList;
-};
 
 /** Mette la pagina in secondo piano, come una scheda dietro a un'altra. */
 const paginaNascosta = (nascosta: boolean) => {

@@ -365,6 +365,40 @@ parole lunghe in comune — escono **zero** doppioni veri e **otto** falsi allar
 le varianti volute di «Squit!». Un avviso che grida al lupo sulle cose giuste si impara a
 ignorare. La ricerca fa il lavoro: si scrive una parola e chi la ripete finisce in fila.
 
+### Il piede: una riga sola, e lo scoppio che ne esce — 2026-09-20
+
+**Esegue:** agente — `tests/PlagueFootBar.test.tsx` tiene il contratto (quale elemento, quali
+classi, quante particelle, il nome accessibile del comando). Quello che solo un browser vero dice è
+se la riga **sta davvero** su una riga alle due larghezze, e se le particelle si vedono o le taglia
+qualcosa.
+**Ultima esecuzione:** agente, 2026-09-20 — tutto come atteso.
+
+**Preparazione:** `npm run build`, `npm run playground`, una pagina qualunque — il piede sta nel
+layout, quindi c'è su tutte. La larghezza si emula col riquadro (900 e 380). ⚠️ Il comando delle
+donazioni porta a un indirizzo vero: per provarlo si annulla la navigazione con un
+`addEventListener('click', e => e.preventDefault(), { once: true })` prima del clic.
+
+| Azione | Atteso | Ottenuto |
+|---|---|---|
+| A 900 px | firma a sinistra, versione al centro, donazioni a destra, su **una riga** | piede alto **48 px**, riga **39**; «Creato da · Superivan94 · AI-Dev · v0.1.0 · Offrimi una pozione» |
+| A 380 px | «By:», **un autore solo**, la versione, e la sola ampolla | riga alta **38 px**, contenuto 380 su 380: ci sta senza scorrere. Visibili: «By:», Superivan94, v0.1.0, e il comando senza testo |
+| La barra in cima a 380 px | una riga sola che scorre, non tre righe | barra alta **61 px** (prima ~150), riga 348 visibili su **891** di contenuto, `scorre: true` |
+| Si porta il fuoco sull'ultima voce della barra stretta | la riga si porta in vista da sé | `scrollLeft` **543** senza che nessuno l'abbia scritto: è il motivo per cui non c'è nessun `tabIndex` sul contenitore |
+| Si preme l'ampolla | quattordici segni della peste partono dal centro del comando | 14 particelle, ognuna con `--pb-dx`, `--pb-dy`, `--pb-spin` e una durata sua — es. `51.3px / -4.0px / 240deg / 1.17s` |
+| Dove stanno le particelle | fuori dal piede, non tagliate dalla riga che scorre | nel portale sul `body`, `position: fixed`, e **6 su 14** finiscono sopra il bordo del piede |
+| La versione scritta nel piede | quella vera della libreria, non una copiata a mano | `v0.1.0`, letta dal `package.json` |
+| `next build` | nove pagine ancora **statiche**, col piede in ogni layout | `○` su tutte e nove |
+
+⚠️ **Il primo giro le particelle stavano in un `absolute` dentro il comando**, ed è il difetto che
+questo scenario esiste per non far tornare: la riga di una barra **deve** tagliare il traboccamento
+o non scorrerebbe, quindi dentro se ne vedeva un terzo. Non è un difetto che un test in jsdom possa
+vedere — là nessun rettangolo ha misura — e a schermo si nota solo sapendo che cosa cercare.
+
+**Che cosa protegge:** il piede è l'unica parte dell'interfaccia che **chiede** qualcosa a chi
+legge, e insieme la prima che si rompe stringendo la finestra: una riga che va a capo si porta via
+un pezzo di pagina a ogni schermata, e un comando che si riduce a un segno senza nome diventa muto
+per chi non vede lo schermo.
+
 ### La barra a famiglie, e i suoi popover — 2026-09-20
 
 **Esegue:** agente — come sopra, il playground non ha test automatici. Quello che conta qui è la
