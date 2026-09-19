@@ -399,8 +399,29 @@ exist in target module» che **non sono veri**. Si guarda la pagina, o si crede 
   `<script>` del tema, che è una conseguenza del ridisegno e non la causa. La cura non è un
   `setState` in un effetto — `react-hooks/set-state-in-effect` lo rifiuta — ma
   `useSyncExternalStore` con `() => true` sul client e `() => false` sul server: server e
-  idratazione rendono il vuoto, il ratto compare al render successivo. È `useMontato` in
-  `playground/app/corsa/RunDemo.tsx`.
+  idratazione rendono il vuoto, il ratto compare al render successivo. ⚠️ **Ma il giro migliore è
+  non avere niente da pescare al primo render**: `RatSwarm` nasce con la lista vuota e pesca solo
+  dentro un timer, quindi server e idratazione rendono lo stesso identico niente per costruzione —
+  e quando `/corsa` è passata allo sciame, il `useMontato` che serviva alla demo scritta a mano è
+  sparito con lei. Lo stesso `useSyncExternalStore` resta invece dov'è indispensabile: in
+  `useReducedMotion`, che una risposta diversa fra server e client ce l'ha per natura.
+- ⚠️ **In una scheda in secondo piano il browser sospende le animazioni, quindi `animationend` non
+  arriva e nessun ratto esce mai.** Misurato il 2026-09-19 sul playground contando i `.pb-rat-run`
+  ogni 700 ms: con la scheda **dietro** lo sciame sale al tetto e ci resta — 3, 4, 4, 4, 4, 5, 5,
+  5… — e appena portata **davanti** la stessa pagina oscilla fra 1 e 4. Non è un difetto della
+  fine detta da `animationend`, che è quella giusta: un timer toglierebbe un ratto ancora a metà
+  schermo, e il ratto fermo in una scheda nascosta non lo vede nessuno. È il motivo per cui lo
+  sciame ha un **tetto** (`maxAlive`) e non «quanti ne vuoi»: senza, la scheda dimenticata si
+  riempie e il ritorno è un muro di ratti. L'originale curava lo stesso difetto in modo più
+  brusco, togliendo tutti i ratti al `visibilitychange`.
+- ⚠️ **Una decorazione che con «meno movimento» non compare è indistinguibile da una rotta, e va
+  detto dove si guarda.** `RatSwarm` con `prefers-reduced-motion` non genera niente — la
+  traversata lì dura un millisecondo, quindi sarebbe un guizzo invisibile pagato con un timer
+  acceso — e la regola sta in tre posti apposta: il JSDoc del componente, il suo test, e la riga
+  **sempre visibile** sotto la demo di `/corsa`, che la spiega anche quando la preferenza è
+  spenta. La preferenza la dichiara la persona nelle impostazioni del sistema, non la pagina; da
+  JavaScript si legge con `useReducedMotion`, che è l'unico caso in cui serve leggerla — tutto il
+  resto obbedisce da solo con la regola in fondo a `animations.css`.
 
 ## Memoria di sessione
 

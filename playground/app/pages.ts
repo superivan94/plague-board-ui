@@ -41,7 +41,7 @@ export const PLAYGROUND_PAGES: readonly PlaygroundPage[] = [
   {
     href: '/corsa',
     title: 'La corsa',
-    blurb: 'Il ratto che attraversa lo schermo: le zampe a coppie, la coda, e la fine detta da animationend.',
+    blurb: 'Il ratto che attraversa lo schermo, e lo sciame che ne fa passare tanti ogni tanto.',
     kind: 'demo',
   },
   {

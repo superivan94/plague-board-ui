@@ -1,8 +1,9 @@
-import { fireEvent, render, screen } from '@testing-library/react';
+import { render, screen } from '@testing-library/react';
 import { describe, expect, it, vi } from 'vitest';
 
 import { RAT_LIVERIES, Rat, RatRun, type RatLivery } from '../src';
 import { RAT_BODY_PIVOT, RAT_COLLAR, RAT_HARNESS, RAT_PARTS, RAT_SKULL, RAT_TORSO, RAT_VIEW_BOX } from '../src/brand/ratArt';
+import { fineAnimazione } from './animazioni';
 
 const kit = (container: HTMLElement) => ({
   corpo: container.querySelector('.pb-rat-body'),
@@ -14,21 +15,6 @@ const kit = (container: HTMLElement) => ({
 
 const viewBoxDi = (container: HTMLElement) => container.querySelector('svg')?.getAttribute('viewBox');
 const classiDi = (el: Element) => [...(el.getAttribute('class') ?? '').split(/\s+/)].filter(Boolean);
-
-/**
- * ⚠️ jsdom non ha `AnimationEvent`, e la cosa costa due volte. `fireEvent.animationEnd` ripiega su
- * `Event`, che **scarta** `animationName`: l'evento si costruisce a mano, con la proprietà aggiunta
- * sopra. E React, non trovando `AnimationEvent` in `window`, registra `onAnimationEnd` sul nome
- * **col prefisso** — `webkitAnimationEnd`, perché `WebkitAnimation` sta in `style` — quindi un
- * `animationend` liscio non arriva a nessun handler. Misurato con una sonda il 2026-09-18: si
- * emette il nome che React ascolta, deciso come lo decide lui.
- */
-const fineAnimazione = (target: Element, animationName: string) => {
-  const type = 'AnimationEvent' in window ? 'animationend' : 'webkitAnimationEnd';
-  const event = new Event(type, { bubbles: true });
-  Object.defineProperty(event, 'animationName', { value: animationName });
-  fireEvent(target, event);
-};
 
 describe('Rat', () => {
   it('il disegno è quello ricalcato, e ogni percorso è un percorso', () => {

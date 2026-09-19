@@ -392,7 +392,7 @@ l'ampiezza delle altre in `REGOLE`.
 | Il ratto fermo accanto | nessuna animazione | `animationName: none`, `getAnimations()` vuoto |
 | Il contenitore che attraversa | `pb-rat-cross-left` o `-right`, la durata pescata, da destra il disegno ribaltato | `pb-rat-cross-right`, `5.83s`, `top: 59%`, `-scale-x-100` sull'`<svg>` |
 | Si segna il nodo e si aspetta la fine | il nodo dopo è **un altro**, con lato e altezza nuovi | il segno non c'è più; da `left`/`39%` a `right`/`34%` |
-| Si campiona la fascia ogni 100 ms per 11 s | il ratto esce, la fascia resta **vuota** per la pausa, poi ne entra un altro | `presente` 4,51 s → `assente` 828 ms → `presente` 5,72 s → `assente` 828 ms → `presente`; la pausa è quella che, con meno movimento, impedisce alla catena di girare a vuoto |
+| Si campiona la fascia ogni 100 ms per 11 s | il ratto esce, la fascia resta **vuota** per la pausa, poi ne entra un altro | `presente` 4,51 s → `assente` 828 ms → `presente` 5,72 s → `assente` 828 ms → `presente`; quella pausa era della demo scritta a mano, che dal 2026-09-19 è uno `RatSwarm` con `maxAlive` a uno — l'attesa adesso è `everyMs`, e la catena che poteva girare a vuoto non c'è più perché non si rinasce nell'`onDone` |
 | La console, in una scheda nuova | niente errori | solo React DevTools e `[HMR] connected`; prima della cura c'erano «Hydration failed» e l'avviso sullo `<script>` |
 | Ogni testo di `main`, nei due temi | nessuno sotto 4,5 | 23 testi; minimo **6,91** in scuro, **4,58** in chiaro (l'etichetta di `TechRule`) |
 | Le regole sotto `prefers-reduced-motion`, lette dai fogli | zampe senza animazione, traversata a 1 ms | `animation-name: none` sulle parti in corsa, `.pb-rat-run { animation-duration: 1ms }` — il browser dello strumento non emula la preferenza, quindi si leggono le regole e non si guarda |
@@ -409,3 +409,33 @@ scuro. Il modo che risponde è passare il colore a un `<canvas>` di un pixel e l
 `transform-box` perso in `animations.css` — le zampe ruotano attorno a se stesse e il ratto sembra
 disarticolato, e nessun test in jsdom lo vede. E la cura dell'idratazione della demo: un
 `Math.random` nello stato iniziale di un componente client si vede solo in console.
+
+### Lo sciame: quanti insieme, e chi se ne va — 2026-09-19
+
+**Esegue:** agente — il tetto, il comando a mano e il silenzio sotto «meno movimento» li tiene
+`tests/RatSwarm.test.tsx` con i timer finti; quello che solo un browser vero dice è che cosa
+succede quando la scheda **non è davanti**, perché lì è il browser a sospendere le animazioni.
+**Ultima esecuzione:** agente, 2026-09-19 — tutto come atteso.
+
+**Preparazione:** `npm run build`, `npm run playground`, `/corsa` in una **scheda nuova**. I ratti
+vivi si contano con `document.querySelectorAll('.pb-rat-run').length`, campionando ogni 700 ms: la
+fascia di sopra è quella con `maxAlive` a uno, quella di sotto lo sciame da quattro.
+
+| Azione | Atteso | Ottenuto |
+|---|---|---|
+| Si campiona con la scheda **dietro** a un'altra | i ratti salgono al tetto e **restano**: senza animazioni non arriva nessun `animationend` | 3, 4, 4, 4, 4, 5, 5, 5, 5, 5, 5, 5 (uno è quello della fascia da uno) — è il difetto che `maxAlive` limita, non uno che previene |
+| Si porta la scheda **davanti** e si ricampiona | il numero oscilla: chi arriva esce, e ne entrano altri | 1, 2, 2, 2, 3, 3, 4, 3, 3, 2, 2, 3, 1, 2 con `document.hidden` falso |
+| Si preme «Fai uscire un ratto» otto volte di fila | il comando fa nascere subito, ma il tetto vale anche per lui: quattro, non dodici | 4 nello sciame, e la fascia di sopra resta a **1** — i due sciami non si parlano |
+| La console, in una scheda nuova | niente errori, e in particolare nessuna idratazione fallita | solo React DevTools e `[HMR] connected`: lo sciame nasce vuoto, quindi server e client rendono lo stesso niente e il `useMontato` della vecchia demo non serve più |
+| `next build` | `/corsa` ancora **statica**, con dentro un componente client | `○ /corsa`, otto pagine statiche su otto |
+| I due temi, con i ratti in scena | testo e fasce leggibili, ratti visibili sui due fondi | così in chiaro e in scuro: il contorno d'inchiostro regge il ratto sul chiaro, le campiture sullo scuro |
+
+⚠️ **Quello che questo collaudo non prova è `prefers-reduced-motion`**: il browser dello strumento
+non emula la preferenza. Lì valgono il test — che monta lo sciame con `matchMedia` truccato e
+verifica che dopo dieci secondi di timer e un `spawn()` a mano non ci sia **nessun** ratto — e la
+lettura delle regole in fondo ad `animations.css`.
+
+**Che cosa protegge:** il ciclo che nasce e toglie i ratti, cioè l'unica parte di questa famiglia
+che vive nel tempo. Un `onDone` che non arriva si vede solo contando, e si vede **solo in una
+scheda dietro**: è la condizione in cui un difetto qui resta invisibile fino al giorno in cui
+qualcuno torna su una scheda aperta da un'ora.

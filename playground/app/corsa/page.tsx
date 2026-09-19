@@ -1,6 +1,6 @@
-import { Rat, TechLabel, TechRule } from 'plague-board-ui';
+import { Rat, RatSwarm, TechLabel, TechRule } from 'plague-board-ui';
 
-import { RunDemo } from './RunDemo';
+import { SwarmDemo } from './SwarmDemo';
 
 const RULES = [
   [
@@ -20,8 +20,16 @@ const RULES = [
     'onDone arriva quando la traversata è finita, non da un timer: se il browser sospende le animazioni in una scheda nascosta, il ratto non viene tolto prima di essere arrivato. Chi lo mette, lo toglie.',
   ],
   [
-    'Chi ha chiesto meno movimento lo ottiene',
-    'Con prefers-reduced-motion le zampe si fermano e la traversata dura un millisecondo: il ratto attraversa senza farsi vedere, onDone arriva subito, e nessuno resta con un ratto fermo a metà schermo. Per questo chi rimette un ratto nell’onDone del precedente lascia una pausa, o la catena gira a vuoto.',
+    'Il caso sta nello sciame, non nel ratto',
+    'RatRun riceve prop esplicite — livrea, kit, lato, altezza, durata — e non sa niente di casualità: una pagina che vuole un ratto preciso lo ottiene. Quanti ne passano, ogni quanto e con che cosa addosso lo decide RatSwarm, che ha il ciclo una volta sola e i numeri come prop: un passaggio fitto e uno raro sono la stessa cosa con parametri diversi.',
+  ],
+  [
+    'Un tetto ai ratti insieme, che è una rete',
+    'In una scheda in secondo piano il browser sospende le animazioni: animationend non arriva, nessun ratto esce, e i timer intanto continuano. Con maxAlive lo sciame smette di pescare finché qualcuno non è uscito, così tornando sulla scheda non si trova la pagina piena di ratti fermi.',
+  ],
+  [
+    'Chi ha chiesto meno movimento ottiene una pagina ferma',
+    'Con prefers-reduced-motion le zampe si fermano e la traversata dura un millisecondo: un RatRun messo a mano attraversa senza farsi vedere e onDone arriva subito, così nessuno resta con un ratto fermo a metà schermo. Lo sciame va oltre e non ne genera nessuno, perché un guizzo invisibile non vale un timer acceso. Una pagina che vuole spiegarlo legge la preferenza con useReducedMotion: è la differenza fra una decorazione che obbedisce e una che sembra rotta.',
   ],
 ];
 
@@ -32,15 +40,27 @@ export default function RunPage() {
         <h1 className="text-2xl font-semibold">La corsa</h1>
         <p className="text-sm text-muted">
           <code>RatRun</code> è un ratto che attraversa lo schermo da un lato all&apos;altro,
-          correndo, e avvisa quando è uscito. Va in un genitore a tutta larghezza con{' '}
-          <code>overflow-hidden</code>; livrea, kit, lato, altezza e durata li sceglie chi lo mette.
-          Qui sotto ne passa uno alla volta, ogni volta diverso.
+          correndo, e avvisa quando è uscito; <code>RatSwarm</code> è chi ne fa passare tanti, ogni
+          tanto, tutti diversi. Vanno in un genitore a tutta larghezza con{' '}
+          <code>overflow-hidden</code>: il posto lo sceglie chi li mette, il resto lo sanno loro.
         </p>
       </div>
 
       <TechRule>ne passa uno, poi un altro</TechRule>
 
-      <RunDemo />
+      <section className="flex flex-col gap-3">
+        <p className="max-w-2xl text-sm text-muted">
+          Uno sciame con <code>maxAlive</code> a uno: finché il ratto in scena non è uscito non ne
+          entra un altro. Livrea, kit, lato, altezza e passo si pescano a ogni passaggio.
+        </p>
+        <div className="relative h-40 overflow-hidden rounded-lg border border-border bg-surface">
+          <RatSwarm everyMs={[800, 1600]} crossingMs={[3000, 4500]} band={[20, 55]} maxAlive={1} size={56} />
+        </div>
+      </section>
+
+      <TechRule>e adesso tutti insieme</TechRule>
+
+      <SwarmDemo />
 
       <TechRule>la corsa da fermo</TechRule>
 

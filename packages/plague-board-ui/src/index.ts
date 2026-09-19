@@ -16,6 +16,8 @@ export { PulseDot, type PulseDotProps } from './brand/PulseDot';
 // Il personaggio, non il marchio: `RatIcon` è l'emblema, questo è il ratto che cammina.
 export { RAT_LIVERIES, Rat, type RatLivery, type RatProps } from './brand/Rat';
 export { RatRun, type RatRunProps } from './brand/RatRun';
+// Il caso — quanti ratti, ogni quanto, con che cosa addosso — sta qui e non in `RatRun`.
+export { RatSwarm, type RatSwarmHandle, type RatSwarmProps, type RatSwarmRange } from './brand/RatSwarm';
 // La faccia di marca. ⚠️ Il disegno sta in un modulo a parte e pesa 25,8 KB di base64: chi non
 // importa `RatMascot` non se lo porta dietro, perché il pacchetto è `sideEffects: ["*.css"]`.
 export { RatMascot, type RatMascotProps } from './brand/RatMascot';
@@ -45,4 +47,8 @@ export type { IconProps } from './icons/types';
 // Il meccanismo, e i dati che gli si danno da mangiare: due moduli, perché chi vuole la voce dei
 // Ludoratti e chi vuole solo il sorteggio sono due persone diverse.
 export { useRandomPhrase, type RandomPhrase } from './hooks/useRandomPhrase';
+// ⚠️ Quasi tutto rispetta «meno movimento» da solo, con una regola in `animations.css`. Questo
+// gancio è per l'altro caso: decidere **se** mettere al mondo qualcosa — è ciò che fa `RatSwarm` —
+// e poter dire a chi guarda perché una decorazione non c'è.
+export { useReducedMotion } from './hooks/useReducedMotion';
 export { DEV_PHRASES, RAT_PHRASES } from './data/phrases';
