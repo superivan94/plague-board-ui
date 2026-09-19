@@ -472,8 +472,11 @@ dopo un decimo di secondo, che è quanto dura un tocco vero.
 | Azione | Atteso | Ottenuto |
 |---|---|---|
 | Si carica la pagina | tre emettitori fermi, ognuno col suo cenno acceso | 3 nodi `.pb-hover-hint`, animazione `pb-hover-hint` di 6000 ms, iterazioni infinite |
-| Si porta il mouse sulla scheda di Superivan94 | un fumetto ogni 1,2 s, e il cenno di **quella** scheda si spegne | 2 vivi a 2,6 s — il primo è nato a 0 ed è già scaduto a 2,5 — e i cenni passano da 3 a 2; `left: 14%; top: -19.3%; animation-duration: 2.5s` |
-| Si guarda se la frase più lunga sborda dal fumetto | no: `max-width` è 180px e il testo ci sta | il più largo misura **141 px** con `scrollWidth` **139** |
+| Si porta il mouse sulla scheda di Superivan94 | un fumetto ogni 1,2 s, e il cenno di **quella** scheda si spegne | i cenni passano da 3 a 2; `left: 48.4%; top: -135%; animation-duration: 3s` |
+| Si resta fermi dodici secondi e si contano le sovrapposizioni fra i vivi | nessuna: tre corsie, e tre è anche quanti ne vivono insieme | **0** su 62 coppie confrontate, e le altezze sono sempre e solo `-210%`, `-135%`, `-60%` |
+| Si guarda quanto sbordano dalla scheda | poco, e da tutti e due i lati: il fumetto si **centra** sul punto in cui nasce | al massimo **8 px** a destra e **17** a sinistra su una scheda da 142, e il più basso ha il fondo 6 px **sopra** il bordo della scheda |
+| Si guarda se due frasi di fila sono uguali | mai: si pesca fra le altre | **0** ripetizioni su 11 uscite, 10 frasi diverse |
+| Si misura la frase più lunga dentro un fumetto vero | sotto il `max-width`, o si scrive sul niente | «SONO UN MAGO DELLA PROGRAMMAZIONE!» fa **179 px** — sui 180 di RattInventario era a un pixel dal bordo, ed è il motivo dei 200 di adesso. Nessuna delle ventidue supera il riquadro |
 | Si porta il mouse su AI-Dev | la pioggia sale e si assesta | 4, 8, 12, 16, 17, 18 campionando ogni 300 ms: è l'equilibrio fra 80 ms di cadenza e 0,8–1,8 s di vita |
 | Si porta il mouse altrove | smette di generarne, e i diciotto in volo **finiscono la loro corsa** | 18, 10, 5, 3, 1, 0, 0 in due secondi e mezzo — nessuno sparito di colpo, e i tre cenni tornano |
 | Si manda un `pointerover` col dito e lo si alza dopo 120 ms | la raffica continua da sé per tre secondi, poi si spegne | 2, 4, 3, 5, 4, 2, 2, 1, 0 a mezzo secondo l'uno: genera fino ai 3 s di `tapMs`, poi solo drena |
@@ -492,6 +495,17 @@ dipende da `hidden` deve sapere quale dei due sta facendo.
 ⚠️ **Quello che questo collaudo non prova è `prefers-reduced-motion`**: il browser dello strumento
 non emula la preferenza. Lì valgono il test — che monta l'emettitore con `matchMedia` truccato e
 verifica che né il mouse né il dito facciano uscire niente — e la riga letta nel CSS generato.
+
+⚠️ **Cinque numeri di questo scenario sono cambiati il 2026-09-19 dopo la prima esecuzione**, e
+tutti e cinque per cose che l'utente ha visto guardando la pagina e il collaudo non chiedeva. I
+fumetti duravano troppo poco per leggerli (2,5 → 3 s); si accavallavano; uscivano due volte di fila
+uguali; e comparivano «lontani dall'oggetto sorgente» — misurato dopo, **81 px** oltre il bordo
+destro di una scheda larga 142, perché il fumetto ci appoggiava lo spigolo invece di centrarcisi.
+⚠️ E la prima cura delle corsie non bastava: dividere la fascia in tre e **pescare dentro la
+fetta** lasciava dieci sovrapposizioni su ventiquattro campionamenti, perché un fumetto alto 18 px
+nato in fondo alla sua corsia da 20 sborda in quella accanto. Le corsie sono diventate altezze
+**fisse**. È la ragione per cui le righe qui sopra contano le coppie sovrapposte invece di dire
+«sembra a posto».
 
 **Che cosa protegge:** l'unico easter egg della libreria che si comanda con un **gesto**, e che
 quindi ha due modi di essere rotto senza che nessuno se ne accorga. Il primo è quello di

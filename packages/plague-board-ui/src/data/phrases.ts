@@ -43,9 +43,22 @@ export const RAT_PHRASES: readonly string[] = [
 ];
 
 /**
- * Le quattordici dello sviluppatore, dalla scheda autore di RattInventario. Sono la voce **umana**
- * della firma «umano e AI», e servono a `CreditCard`: il ratto dice squit, lo sviluppatore dice
- * che funzionava sul suo computer.
+ * Le frasi dello sviluppatore. Sono la voce **umana** della firma «umano e AI», e servono a
+ * `CreditCard`: il ratto dice squit, lo sviluppatore dice che funzionava sul suo computer.
+ *
+ * ⚠️ **Le prime quattordici vengono dalla scheda autore di RattInventario e non si toccano**; le
+ * otto in fondo sono nuove, chieste dall'utente il 2026-09-19 perché con quattordici sole
+ * l'easter egg si ripeteva sotto gli occhi di chi guardava. Un emettitore ne fa uscire una ogni
+ * 1,2 secondi: chi resta col puntatore fermo dieci secondi ne vede otto, e il mazzo deve essere
+ * abbastanza grosso da non sembrare corto. ⚠️ Sono di casa, non di un'applicazione: parlano del
+ * mestiere, non di manuali o di inventario.
+ *
+ * ⚠️ **E sono corte apposta.** Il fumetto di `comicBubbles` non manda a capo: una frase più larga
+ * del riquadro si scrive sul niente. La più lunga qui dentro è di RattInventario — «SONO UN MAGO
+ * DELLA PROGRAMMAZIONE!» — e misurata sul browser vero occupa **179 px**: sui 180 di là era un
+ * pixel dal bordo, ed è il motivo per cui `.pb-comic-bubble` adesso ne dichiara 200. Una frase
+ * nuova si **misura**, non si conta a occhio; il caso in `useRandomPhrase.test.ts` guarda i
+ * caratteri, che è tutto quello che jsdom può fare.
  */
 export const DEV_PHRASES: readonly string[] = [
   'Mannaggia perché non va!',
@@ -62,4 +75,12 @@ export const DEV_PHRASES: readonly string[] = [
   'SONO UN MAGO DELLA PROGRAMMAZIONE!',
   'Deploy in produzione, YOLO!',
   'Ma perché `null` è un `object`???',
+  'Compila! Non chiedermi perché.',
+  'Non è un bug, è retrocompatibilità.',
+  'Ho solo aggiornato una dipendenza...',
+  "Ce l'ho quasi, manca una cosa sola.",
+  'Tre ore per una virgola.',
+  'Basta un console.log e capiamo tutto.',
+  'Merge senza conflitti. Oggi si vola.',
+  'Rifattorizzo domani, promesso.',
 ];

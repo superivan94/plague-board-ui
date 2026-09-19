@@ -45,6 +45,10 @@ const RULES = [
     'Sette numeri e un elenco di parole: ogni quanto, quanto vive, che cosa c’è scritto, con che classe, dove nasce e quanto è grande. Così passa da una pagina server a un componente client come qualunque altra prop, si stampa a schermo e si ritocca con uno spread. Il prezzo è dichiarato: quello che vola è testo.',
   ],
   [
+    'Due di fila non si somigliano',
+    'L’altezza gira per corsie invece di pescarsi libera: con tante corsie quanti ne vivono insieme — tre, per i fumetti — non se ne sovrappongono mai due. E il testo si pesca fra gli altri, mai quello appena uscito. Sono le due cose che fanno sembrare corto un mazzo di frasi anche quando non lo è. Una pioggia, invece, le corsie non le vuole: lì il disordine è l’effetto.',
+  ],
+  [
     'Da fermo fa un cenno',
     'Un easter egg che si scopre solo passandoci sopra non si scopre affatto. Il contenuto avvolto fa un saltello ogni sei secondi — tutto il movimento sta negli ultimi settecento millisecondi — e si ferma mentre l’emettitore sputa, perché lì il cenno ha già fatto il suo mestiere.',
   ],

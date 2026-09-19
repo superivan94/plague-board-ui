@@ -85,9 +85,27 @@ describe('useRandomPhrase', () => {
 });
 
 describe('le frasi di casa', () => {
-  it('sono quelle di RattInventario, tutte e trentatré', () => {
+  it('portano intatte quelle di RattInventario: diciannove e quattordici', () => {
     expect(RAT_PHRASES).toHaveLength(19);
-    expect(DEV_PHRASES).toHaveLength(14);
+
+    // ⚠️ Le quattordici dello sviluppatore sono le **prime**, e restano quelle: le otto dopo sono
+    // nostre, aggiunte il 2026-09-19 perché con quattordici sole l'emettitore si ripeteva sotto
+    // gli occhi di chi guardava. Il caso guarda dove finiscono quelle di là, non quante siano in
+    // tutto: così il mazzo può crescere ancora senza che nessuno debba aggiornare un numero.
+    expect(DEV_PHRASES.slice(0, 14).at(-1)).toBe('Ma perché `null` è un `object`???');
+    expect(DEV_PHRASES.length).toBeGreaterThan(14);
+  });
+
+  it('sono corte abbastanza da stare nel fumetto', () => {
+    // Il fumetto di `comicBubbles` è largo al massimo 200px e non manda a capo: una frase più
+    // lunga esce dal suo riquadro e resta scritta sul niente. In jsdom la larghezza vera non si
+    // misura — ogni rettangolo è zero — quindi qui si guardano i **caratteri**, che è un proxy:
+    // la più lunga di RattInventario ne ha 34 e misura **179px** sul browser vero, ma è tutta
+    // maiuscola. Trentotto in minuscolo ne fanno meno di 170; trentotto in maiuscolo arriverebbero
+    // al bordo, e una frase urlata più lunga di così va **misurata** prima di entrare qui.
+    const troppoLunghe = DEV_PHRASES.filter((frase) => frase.length > 38);
+
+    expect(troppoLunghe).toStrictEqual([]);
   });
 
   it('non hanno doppioni', () => {

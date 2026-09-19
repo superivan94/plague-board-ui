@@ -74,6 +74,7 @@ describe('HoverEmitter', () => {
 
   afterEach(() => {
     vi.useRealTimers();
+    vi.restoreAllMocks();
     window.matchMedia = matchMediaVero;
   });
 
@@ -217,13 +218,41 @@ describe('HoverEmitter', () => {
     const fumetto = effimeri(container, 'pb-comic-bubble')[0] as HTMLElement;
 
     expect(FRASI).toContain(fumetto.textContent);
-    // I 2,5 s del foglio di stile, riscritti sull'elemento: è la sua vita, non un doppione.
-    expect(Number.parseFloat(fumetto.style.animationDuration)).toBe(2.5);
-    expect(Number.parseFloat(fumetto.style.left)).toBeGreaterThanOrEqual(-15);
-    expect(Number.parseFloat(fumetto.style.left)).toBeLessThanOrEqual(85);
+    // I tre secondi del foglio di stile, riscritti sull'elemento: è la sua vita, non un doppione.
+    expect(Number.parseFloat(fumetto.style.animationDuration)).toBe(3);
+    // ⚠️ Stretta attorno alla metà: il fumetto si centra sul punto, e di là sbordava di 81 px.
+    expect(Number.parseFloat(fumetto.style.left)).toBeGreaterThanOrEqual(25);
+    expect(Number.parseFloat(fumetto.style.left)).toBeLessThanOrEqual(75);
     // Nasce **sopra** il riquadro: è il motivo per cui nessun antenato può tagliare.
-    expect(Number.parseFloat(fumetto.style.top)).toBeLessThanOrEqual(-10);
-    expect(Number.parseFloat(fumetto.style.top)).toBeGreaterThanOrEqual(-70);
+    expect(Number.parseFloat(fumetto.style.top)).toBeLessThanOrEqual(-60);
+    expect(Number.parseFloat(fumetto.style.top)).toBeGreaterThanOrEqual(-210);
+  });
+
+  it('con le corsie nessuno nasce all’altezza del precedente', () => {
+    // ⚠️ Il sorteggio si blocca a metà: senza, spegnere le corsie darebbe tre altezze a caso che
+    // una volta su ventisette cadono lo stesso una per fascia, e il caso sarebbe rosso a giorni
+    // alterni. Con `random` fermo, la corsia è l'**unica** cosa che decide il numero.
+    vi.spyOn(Math, 'random').mockReturnValue(0.5);
+    const { container, emettitore } = monta({ ...LENTO, top: [0, 300], lanes: 3 });
+
+    entra(emettitore);
+    avanza(200);
+
+    const altezze = [...effimeri(container)].map((n) => (n as HTMLElement).style.top);
+    // I due estremi e la metà: tre altezze **fisse** ed equidistanti, percorse a turno.
+    expect(altezze).toStrictEqual(['0%', '150%', '300%']);
+  });
+
+  it('non fa mai uscire due volte di fila lo stesso testo', () => {
+    // Con due soli testi «non ripetere l'ultimo» vuol dire **alternare**, ed è la prova più
+    // stretta: col sorteggio fermo sul primo, senza la regola uscirebbe sempre lo stesso.
+    vi.spyOn(Math, 'random').mockReturnValue(0);
+    const { container, emettitore } = monta({ ...LENTO, contents: ['a', 'b'] });
+
+    entra(emettitore);
+    avanza(300);
+
+    expect([...effimeri(container)].map((n) => n.textContent)).toStrictEqual(['a', 'b', 'a', 'b']);
   });
 
   it('binaryRain porta in pagina i numeri della scheda dell’AI', () => {

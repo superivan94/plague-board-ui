@@ -38,18 +38,55 @@ interface Effimero {
 
 const fra = ([min, max]: RandomRange) => min + Math.random() * (max - min);
 
-const pesca = (key: number, effect: HoverEffect): { effimero: Effimero; vitaMs: number } => {
+/**
+ * L'altezza del prossimo elemento. Con le corsie sono **altezze fisse**, equidistanti fra i due
+ * estremi e percorse a turno — e il turno è la chiave, che cresce di uno alla volta.
+ *
+ * ⚠️ **Fisse, non pescate dentro la corsia**, ed è una correzione misurata: un elemento è alto, e
+ * un'altezza pescata dentro la propria fetta lo fa sbordare in quella accanto. Con i fumetti —
+ * corsie da 20 px, fumetti da 18 — il primo giro di corsie a fascia lasciava ancora **dieci**
+ * sovrapposizioni su ventiquattro campionamenti. Quanto stare larghi lo decide la taratura,
+ * scegliendo gli estremi di `top`.
+ */
+const altezza = (top: RandomRange, lanes: number | undefined, giro: number) => {
+  if (lanes === undefined || lanes < 2) return fra(top);
+
+  const [min, max] = top;
+
+  return min + ((max - min) / (lanes - 1)) * (giro % lanes);
+};
+
+/**
+ * Quale testo, **senza ripetere quello di prima**. Si pesca fra gli altri — non si ripesca finché
+ * non esce diverso, che con un testo solo è un ciclo che non finisce — ed è la stessa scelta di
+ * `useRandomPhrase`, fatta con gli indici perché qui il mazzo si ripesca tre volte al secondo.
+ */
+const scegli = (contents: readonly string[], ultimo: number) => {
+  if (contents.length < 2 || ultimo < 0) return Math.floor(Math.random() * contents.length);
+
+  const scelto = Math.floor(Math.random() * (contents.length - 1));
+
+  return scelto >= ultimo ? scelto + 1 : scelto;
+};
+
+const pesca = (
+  key: number,
+  effect: HoverEffect,
+  ultimo: number,
+): { effimero: Effimero; vitaMs: number; indice: number } => {
   const vitaMs = fra(effect.lifeMs);
+  const indice = scegli(effect.contents, ultimo);
 
   return {
     vitaMs,
+    indice,
     effimero: {
       key,
-      content: effect.contents[Math.floor(Math.random() * effect.contents.length)],
+      content: effect.contents[indice],
       className: effect.className,
       style: {
         left: `${fra(effect.left).toFixed(1)}%`,
-        top: `${fra(effect.top).toFixed(1)}%`,
+        top: `${altezza(effect.top, effect.lanes, key).toFixed(1)}%`,
         // ⚠️ La durata dell'animazione si scrive **sempre**, e non è un di più: `.pb-binary-digit`
         // dichiara `animation: pb-float-up linear forwards` senza durata, cioè zero secondi — la
         // cifra salterebbe dritta all'ultimo fotogramma, che è trasparente. Vale anche per il
@@ -87,6 +124,12 @@ const pesca = (key: number, effect: HoverEffect): { effimero: Effimero; vitaMs: 
  * non anima niente non lascia in giro elementi per sempre — e non costringe l'emettitore a sapere
  * come si chiama l'animazione di una classe che gli arriva da fuori.
  *
+ * ⚠️ **Due elementi di fila non si somigliano.** L'altezza gira per corsie — `lanes` nella
+ * taratura — invece di pescarsi libera, così con tante corsie quanti ne vivono insieme non se ne
+ * sovrappongono mai due; e il testo si pesca **fra gli altri**, mai quello appena uscito. Sono le
+ * due cose che fanno sembrare corto un mazzo di frasi anche quando non lo è, e si vedono solo
+ * restando col puntatore fermo per una decina di secondi.
+ *
  * ⚠️ **Da fermo fa un cenno, ed è l'altra metà della portabilità.** Un easter egg che si scopre
  * solo passandoci sopra non si scopre affatto: chi guarda non ha motivo di provare. Il contenuto
  * avvolto porta quindi `pb-hover-hint` — un saltello di tre pixel ogni sei secondi — che si spegne
@@ -109,7 +152,10 @@ export function HoverEmitter({ children, effect, tapMs = 3000, className = '' }:
   const menoMovimento = useReducedMotion();
   const [effimeri, setEffimeri] = useState<readonly Effimero[]>([]);
   const [attivo, setAttivo] = useState(false);
+  // La chiave fa due mestieri: rende nuovo ogni nodo, ed è il **turno** con cui si scelgono le
+  // corsie. Cresce di uno alla volta e non torna mai indietro, che è quello che serve a entrambi.
   const prossimaChiave = useRef(0);
+  const ultimoTesto = useRef(-1);
 
   // ⚠️ La taratura si legge da un riferimento e non dalle dipendenze di un effetto: `effect` è un
   // oggetto, e un oggetto scritto in linea è **nuovo a ogni render del genitore**. È la stessa
@@ -132,7 +178,8 @@ export function HoverEmitter({ children, effect, tapMs = 3000, className = '' }:
     const chiave = prossimaChiave.current;
     prossimaChiave.current += 1;
 
-    const { effimero, vitaMs } = pesca(chiave, corrente.effect);
+    const { effimero, vitaMs, indice } = pesca(chiave, corrente.effect, ultimoTesto.current);
+    ultimoTesto.current = indice;
     setEffimeri((vivi) => [...vivi, effimero]);
 
     scadenze.current.set(

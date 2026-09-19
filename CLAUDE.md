@@ -455,6 +455,23 @@ exist in target module» che **non sono veri**. Si guarda la pagina, o si crede 
   `pb-bubble-pop` è già trasparente. In cambio, il timer arriva anche dove l'animazione non c'è, e
   non costringe il componente a sapere come si chiama l'animazione di una classe che riceve da
   fuori.
+- ⚠️ **`translate` e `transform` si compongono, e sono la via per centrare un elemento che sta già
+  animando la sua `transform`.** Il browser applica prima `translate`, poi `rotate`, `scale` e
+  infine `transform`: `translate: -50% 0` sposta l'elemento di mezza **sua** larghezza e lascia
+  l'animazione libera di scrivere la `transform` fotogramma per fotogramma. Le due vie che vengono
+  in mente per prime non funzionano, e vale la pena saperlo: scritto dentro i `@keyframes` avrebbe
+  spostato anche chi li condivide — `pb-bubble-pop` la usa pure `SpeechBubble` — e `margin-left:
+  -50%` è mezza larghezza **del contenitore**, che non c'entra niente. Serviva perché un fumetto
+  ancorato col proprio spigolo sinistro, largo 179 px su una scheda da 142, sbordava di **81 px** a
+  destra e sembrava il fumetto di qualcun altro. ⚠️ E quel 179 è l'altra misura da non perdere: la
+  frase più lunga di RattInventario stava dentro i suoi 180 px di `max-width` **per un pixel**.
+- ⚠️ **Una «corsia» che è una fascia dentro cui si pesca non impedisce le sovrapposizioni.**
+  L'altezza sorteggiata è il **bordo di sopra** dell'elemento, e l'elemento scende: uno nato in
+  fondo alla sua corsia da 20 px, se è alto 18, entra per sedici in quella accanto. Misurato il
+  2026-09-19 sui fumetti: dieci sovrapposizioni su ventiquattro campionamenti, con le corsie già
+  attive. Le corsie giuste sono **altezze fisse ed equidistanti** — `min + k·(max−min)/(n−1)` — e
+  quanto stare larghi lo decide chi scrive la taratura, perché quanto è alto ciò che nasce
+  l'emettitore non lo sa. Con tante corsie quanti elementi vivono insieme, due non si toccano mai.
 - ⚠️ **Nel riquadro del browser dello strumento, `document.hidden` è vero quando il riquadro non è
   in primo piano** — mentre una **scheda** dietro a un'altra lo lascia falso (misurato il
   2026-09-19, sono due cose diverse e si erano misurate a un'ora di distanza). Chi campiona

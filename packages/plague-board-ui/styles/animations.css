@@ -275,11 +275,24 @@
   z-index: 5;
 }
 
-/* Il fumetto minuscolo che compare sopra la scheda dell'autore umano. */
+/* Il fumetto minuscolo che compare sopra la scheda dell'autore umano.
+ *
+ * ⚠️ **Si centra sul punto in cui nasce**, e per farlo usa `translate` e non `transform`: le due
+ * proprietà si compongono — prima `translate`, poi `transform` — quindi lo spostamento di mezza
+ * larghezza convive con la `transform` che l'animazione scrive fotogramma per fotogramma. Scritto
+ * dentro `pb-bubble-pop` avrebbe spostato anche `SpeechBubble`, che quei fotogrammi li condivide;
+ * scritto come `margin-left: -50%` sarebbe stata mezza larghezza **del contenitore**, non del
+ * fumetto. Senza, una frase lunga ancorata a sinistra sborda a destra di ottanta pixel dalla
+ * scheda che l'ha detta. */
 .pb-comic-bubble {
   position: absolute;
+  translate: -50% 0;
   min-width: 80px;
-  max-width: 180px;
+  /* ⚠️ 200 e non i 180 di RattInventario: la frase più lunga di là — «SONO UN MAGO DELLA
+     PROGRAMMAZIONE!» — misurata sul browser vero ne occupa **179**, cioè aveva un pixel di
+     margine. Il fumetto non manda a capo, quindi una frase più larga del riquadro si scrive sul
+     niente; i venti pixel in più sono il posto dove sta il guard sulla lunghezza delle frasi. */
+  max-width: 200px;
   padding: 2px 6px;
   border: 1px solid rgb(255 255 255 / 0.3);
   border-radius: 6px;
@@ -289,7 +302,10 @@
   text-align: center;
   white-space: nowrap;
   pointer-events: none;
-  animation: pb-bubble-pop 2.5s ease-out forwards;
+  /* Tre secondi, quanto `comicBubbles` dà di vita a un fumetto: chi genera l'elemento riscrive
+     comunque la durata qui sopra, e questa riga serve a non mentire a chi legge il foglio. La
+     utility `animate-bubble-pop` resta a 2,5 s, perché quella la usa `SpeechBubble`. */
+  animation: pb-bubble-pop 3s ease-out forwards;
   z-index: 20;
 }
 
