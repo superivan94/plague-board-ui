@@ -6,8 +6,9 @@ import { useEffect, useRef, useState } from 'react';
 
 const LIVREE = Object.keys(RAT_LIVERIES) as RatLivery[];
 type Kit = 'skull' | 'collar' | 'vial';
-/** Il passo dura 0,3 s e si alterna: il ciclo intero è 0,6 s. */
-const CICLO_MS = 600;
+/** Il mezzo passo di `animations.css`, in millisecondi; il ciclo intero è il doppio. */
+const MEZZO_PASSO_MS = 300;
+const CICLO_MS = MEZZO_PASSO_MS * 2;
 
 /**
  * Le tinte del pupazzo: un colore per pezzo, l'inchiostro lasciato stare. ⚠️ Il selettore
@@ -43,14 +44,20 @@ export function Lente() {
   /** L'istante del ciclo a cui il ratto è fermo, in millisecondi; conta solo quando non corre. */
   const [fase, setFase] = useState(0);
   const [corre, setCorre] = useState(true);
+  /** Quante volte più veloce del foglio di stile: 1 è com'è scritto in `animations.css`. */
+  const [velocita, setVelocita] = useState(1);
   const cornice = useRef<HTMLDivElement>(null);
 
-  // Le animazioni del ratto si fermano e si portano alla fase scelta, o si rilasciano. È l'unico
-  // posto che tocca il DOM del ratto, e lo fa a ogni render perché il ratto cambia con le prop.
+  // Le animazioni del ratto si fermano e si portano alla fase scelta, o si rilasciano, e vanno alla
+  // velocità scelta. È l'unico posto che tocca il DOM del ratto, e lo fa a ogni render perché il
+  // ratto cambia con le prop. ⚠️ `playbackRate` scala **tutte** le animazioni insieme — zampe,
+  // coda, sobbalzo, pendagli — che è l'unico modo sensato di provare un passo più veloce: i
+  // rapporti fra i cicli (i pendagli al doppio, i ritardi della coda) restano quelli.
   useEffect(() => {
     const svg = cornice.current?.querySelector('svg');
     if (!svg) return;
     for (const a of svg.getAnimations({ subtree: true })) {
+      a.playbackRate = velocita;
       if (corre) a.play();
       else { a.pause(); a.currentTime = fase; }
     }
@@ -92,13 +99,24 @@ export function Lente() {
             {corre ? 'ferma' : 'riprendi'}
           </button>
         </label>
+        <label className="flex items-center gap-3">
+          <TechLabel className="text-muted">velocità</TechLabel>
+          <input type="range" min={0.5} max={3} step={0.1} value={velocita} onChange={(e) => setVelocita(Number(e.target.value))} className="w-48 accent-brand-ink" aria-label="Velocità del passo rispetto al foglio di stile" />
+          <span className="w-44 tabular-nums text-muted">
+            ×{velocita.toFixed(1)} · mezzo passo {Math.round(MEZZO_PASSO_MS / velocita)} ms
+          </span>
+        </label>
       </div>
 
       {/* ⚠️ Il fondo è la superficie del tema, non un colore fisso: si guarda il ratto anche in scuro. */}
       <div ref={cornice} className={`overflow-auto rounded-lg border border-border bg-surface p-6 ${tinte ? 'lente-tinte' : ''}`}>
         <Rat livery={livrea} size={altezza} isRunning hasSkull={kit.has('skull')} hasCollar={kit.has('collar')} hasVial={kit.has('vial')} title="Il ratto sotto la lente" />
       </div>
-      <p className="text-xs text-muted">Il ratto corre sempre; con la fase ferma si legge un istante del ciclo di 0,6 secondi. Con «tinte dei pezzi» ogni parte ha un colore suo e l&apos;inchiostro resta inchiostro.</p>
+      <p className="text-xs text-muted">
+        Con la fase ferma si legge un istante del ciclo di 0,6 secondi. La velocità moltiplica tutte le animazioni insieme
+        e dice il mezzo passo che ne risulta: è il numero da riportare in <code>animations.css</code>. Con «tinte dei pezzi»
+        ogni parte ha un colore suo e l&apos;inchiostro resta inchiostro.
+      </p>
     </div>
   );
 }
