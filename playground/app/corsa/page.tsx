@@ -5,7 +5,7 @@ import { RunDemo } from './RunDemo';
 const RULES = [
   [
     'Il ratto è un pupazzo, non un disegno',
-    'Tronco, quattro zampe e una coda in tre segmenti sono pezzi con un perno sull’articolazione, e ogni giunto è un disco: ruotando, il suo bordo resta dov’è. Le zampe lontane e la coda stanno dietro al tronco, le vicine davanti, e dove una zampa copre la pancia il tronco ha pelo sotto: muovendola non si apre un buco.',
+    'Tronco, quattro zampe e una coda in cinque segmenti sono pezzi con un perno sull’articolazione, e ogni giunto è un disco: ruotando, il suo bordo resta dov’è. Zampe e coda stanno tutte dietro al tronco, che nasconde la metà interna di ogni giunto; la metà esterna riempie il cuneo che una zampa apre oscillando.',
   ],
   [
     'Il tempo sta nel foglio di stile',
@@ -13,7 +13,7 @@ const RULES = [
   ],
   [
     'Un galoppo a coppie diagonali, e il corpo che ondeggia',
-    'Posteriore vicina con anteriore lontana, e viceversa: due coppie, stessa animazione, una dritta e una al contrario, mezzo passo in 0,3 secondi. Il corpo sale e beccheggia col passo; i tre segmenti della coda oscillano con ampiezza crescente e un decimo di secondo di ritardo l’uno sull’altro, che è l’onda; i pendagli vanno al doppio, perché sono pesi.',
+    'Posteriore vicina con anteriore lontana, e viceversa: due coppie, stessa animazione, una dritta e una al contrario, mezzo passo in 0,3 secondi. Il corpo sale e beccheggia col passo; i cinque segmenti della coda oscillano di 3,5 gradi ciascuno con 45 millisecondi di ritardo l’uno sull’altro, che è l’onda; i pendagli vanno al doppio, perché sono pesi.',
   ],
   [
     'La fine la dice animationend',

@@ -43,62 +43,61 @@ describe('Rat', () => {
     expect(RAT_TORSO.length).toBeGreaterThan(20);
   });
 
-  it('è un pupazzo: sette parti con un perno dentro la cornice, davanti o dietro al tronco', () => {
+  it('è un pupazzo: nove parti con un perno dentro la cornice, tutte dietro al tronco', () => {
     const nomi = RAT_PARTS.map((p) => p.name).sort();
-    expect(nomi).toEqual(['legBackFar', 'legBackNear', 'legFrontFar', 'legFrontNear', 'tailBase', 'tailMid', 'tailTip']);
+    expect(nomi).toEqual(['legBackFar', 'legBackNear', 'legFrontFar', 'legFrontNear', 'tail1', 'tail2', 'tail3', 'tail4', 'tail5']);
 
     // ⚠️ Un perno fuori dalla cornice è un perno sbagliato: la zampa ruoterebbe attorno a un punto
-    // nel vuoto e uscirebbe dal corpo. E le parti lontane stanno dietro, le vicine davanti.
+    // nel vuoto e uscirebbe dal corpo. E **tutto** sta dietro al tronco, anche le zampe vicine: è il
+    // tronco che nasconde la metà interna del giunto tondo di ogni pezzo.
     for (const p of RAT_PARTS) {
       expect(p.pivot.x).toBeGreaterThan(RAT_VIEW_BOX.x);
       expect(p.pivot.x).toBeLessThan(RAT_VIEW_BOX.x + RAT_VIEW_BOX.width);
       expect(p.pivot.y).toBeGreaterThan(RAT_VIEW_BOX.y);
       expect(p.pivot.y).toBeLessThan(RAT_VIEW_BOX.y + RAT_VIEW_BOX.height);
-      expect(p.behind).toBe(p.name.startsWith('tail') || p.name.endsWith('Far'));
+      expect(p.behind).toBe(true);
     }
     // Il perno del corpo intero sta dentro il ratto, non in un angolo della cornice.
     expect(RAT_BODY_PIVOT.x).toBeGreaterThan(RAT_VIEW_BOX.x + RAT_VIEW_BOX.width / 4);
     expect(RAT_BODY_PIVOT.y).toBeGreaterThan(RAT_VIEW_BOX.y + RAT_VIEW_BOX.height / 4);
   });
 
-  it('la coda è una catena: mezzo dentro base, punta dentro mezzo, e i perni si spostano col padre', () => {
-    // ⚠️ I tre segmenti sono **annidati**, non fratelli: così ruotare la base porta con sé mezzo e
-    // punta, e il perno del figlio è un punto del sistema del padre. Da fratelli, ogni segmento
+  it('la coda è una catena di cinque segmenti, ognuno dentro il precedente, e i perni si spostano col padre', () => {
+    // ⚠️ I segmenti sono **annidati**, non fratelli: così ruotare la base porta con sé tutto il
+    // resto, e il perno del figlio è un punto del sistema del padre. Da fratelli, ogni segmento
     // ruoterebbe attorno a un perno fisso e la coda si spezzerebbe ai giunti.
-    expect(RAT_PARTS.find((p) => p.name === 'tailBase')?.parent).toBeUndefined();
-    expect(RAT_PARTS.find((p) => p.name === 'tailMid')?.parent).toBe('tailBase');
-    expect(RAT_PARTS.find((p) => p.name === 'tailTip')?.parent).toBe('tailMid');
+    expect(RAT_PARTS.find((p) => p.name === 'tail1')?.parent).toBeUndefined();
+    for (const k of [2, 3, 4, 5]) expect(RAT_PARTS.find((p) => p.name === `tail${k}`)?.parent).toBe(`tail${k - 1}`);
     for (const p of RAT_PARTS) if (!p.name.startsWith('tail')) expect(p.parent).toBeUndefined();
 
     const { container } = render(<Rat />);
-    const base = container.querySelector('.pb-rat-tail-base')!;
-    const mezzo = base.querySelector(':scope > .pb-rat-tail-mid')!;
-    expect(mezzo).not.toBeNull();
-    expect(mezzo.querySelector(':scope > .pb-rat-tail-tip')).not.toBeNull();
-    // Il figlio viene **dopo** i percorsi del padre, quindi sopra: il suo giunto tondo copre il taglio.
-    expect(base.lastElementChild).toBe(mezzo);
+    let gruppo = container.querySelector('.pb-rat-tail-1')!;
+    for (const k of [2, 3, 4, 5]) {
+      const figlio = gruppo.querySelector(`:scope > .pb-rat-tail-${k}`);
+      expect(figlio).not.toBeNull();
+      // Il figlio viene **dopo** i percorsi del padre, quindi sopra: il suo giunto tondo copre il taglio.
+      expect(gruppo.lastElementChild).toBe(figlio);
+      gruppo = figlio!;
+    }
   });
 
-  it('le parti dietro stanno prima del tronco nel DOM, quelle davanti dopo', () => {
+  it('tutte le parti stanno prima del tronco nel DOM', () => {
     const { container } = render(<Rat />);
     const figli = [...kit(container).corpo!.children].map((el) => classiDi(el));
     const indiceTronco = figli.findIndex((c) => c.includes('pb-rat-torso'));
 
     // ⚠️ In SVG chi viene dopo copre chi viene prima: è l'unico z-order che c'è. Coda e zampe
-    // lontane devono stare **prima** del tronco, le zampe vicine **dopo**, o la coda passa sopra
-    // la groppa.
+    // stanno **prima** del tronco, che copre la metà interna dei loro giunti; dopo il tronco ci
+    // sono solo i kit.
     expect(indiceTronco).toBeGreaterThan(0);
-    for (const [i, c] of figli.entries()) {
-      if (c.includes('pb-rat-tail-base') || c.includes('pb-rat-leg-back-far') || c.includes('pb-rat-leg-front-far')) expect(i).toBeLessThan(indiceTronco);
-      if (c.includes('pb-rat-leg-back-near') || c.includes('pb-rat-leg-front-near')) expect(i).toBeGreaterThan(indiceTronco);
-    }
+    for (const [i, c] of figli.entries()) if (c.includes('pb-rat-part')) expect(i).toBeLessThan(indiceTronco);
   });
 
   it('ogni parte porta il suo perno come transform-origin, nelle unità della cornice', () => {
     const { container } = render(<Rat hasCollar hasVial />);
 
     for (const p of RAT_PARTS) {
-      const nome = p.name.replace(/[A-Z]/g, (c) => `-${c.toLowerCase()}`);
+      const nome = p.name.replace(/[A-Z]/g, (c) => `-${c.toLowerCase()}`).replace(/(\d+)$/, '-$1');
       const g = container.querySelector(`.pb-rat-${nome}`) as HTMLElement | null;
       // ⚠️ Senza `transform-origin` ogni rotazione partirebbe dall'angolo in alto a sinistra del
       // `viewBox`, e la zampa descriverebbe un arco enorme invece di oscillare sull'anca. Il valore è
@@ -246,7 +245,7 @@ describe('RatRun', () => {
     // ⚠️ Le zampe emettono un `animationend` a ogni ciclo, e risale fino al contenitore: senza il
     // filtro sul nome dell'animazione il ratto verrebbe tolto al primo passo. Qui si simula prima
     // un passo, poi la traversata.
-    fineAnimazione(corsa.querySelector('.pb-rat-tail-tip')!, 'pb-rat-wave-tip');
+    fineAnimazione(corsa.querySelector('.pb-rat-tail-5')!, 'pb-rat-wave');
     expect(onDone).not.toHaveBeenCalled();
 
     fineAnimazione(corsa, 'pb-rat-cross-left');

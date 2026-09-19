@@ -327,24 +327,27 @@ exist in target module» che **non sono veri**. Si guarda la pagina, o si crede 
   perché non si veda.** Il primo giro tagliava zampe e coda con poligoni dritti: a 14° un punto a
   100 px dal perno si sposta di 24, e sul ratto in corsa si vedevano spigoli in mezzo al pelo, cunei
   bianchi dietro la coscia e monconi rettangolari delle zampe lontane — «molti artefatti», ha detto
-  l'utente. La forma che regge sta in `scripts/genera-ratto.mjs` e ha quattro ingredienti misurati:
+  l'utente. La forma che regge sta in `scripts/genera-ratto.mjs` e ha tre ingredienti misurati:
   la **sporgenza** — la zampa fuori dal **nucleo**, l'apertura morfologica (erosione e dilatazione
-  di 35 px) della sagoma in cui ciò che è più stretto di 70 px sparisce; il **giunto tondo** — un
-  disco centrato sul perno, l'unica forma che una rotazione attorno al suo centro manda in sé
-  stessa, quindi il suo bordo non si sposta mai; l'**arto sintetico** dietro le zampe lontane — una
-  capsula d'ombra col suo anello d'inchiostro, disegnata da zero perché dietro il corpo la reference
-  non ha niente, col raggio **minore** della mezza zampa (col raggio pari sbucava un nodo nero alla
-  radice già da fermo); e la **cerniera all'uscita** per le zampe vicine — perno dove la zampa
-  lascia il corpo, non all'anca, perché nella reference coscia e spalla *sono* la groppa e il petto,
-  e un disco all'anca tagliava l'arco d'inchiostro della coscia che a ogni passo si spezzava sul suo
-  bordo. Sotto il giunto il tronco si ridipinge col colore di **maggioranza dei pixel del pelo** che
-  ci stanno dentro: col colore del vicino più prossimo la pancia chiara della guancia colava nel
-  petto in un blocco a spigoli, e senza escludere il rosa la groppa si ridipingeva di pelle. Un
-  **orlo** di 10 px oltre il nucleo resta al tronco, perché il nucleo arrotonda le convessità e
-  senza orlo alla radice si vedeva il fondo. Si verifica **coi fotogrammi** — `--anteprime` rende
-  anche `fotogramma-{a,b,c}-<zona>.png`, le parti ruotate agli estremi a 1800 px, ritagliate alle
-  radici — mai a occhio sull'animazione che gira: un cuneo di 10 px sulla reference è un pixel a
-  88px, e passa.
+  di 35 px) della sagoma in cui ciò che è più stretto di 70 px sparisce — con un **orlo** di 10 px
+  che resta al tronco, perché il nucleo arrotonda le convessità e senza orlo alla radice si vedeva
+  il fondo; il **giunto sintetico dietro al tronco** — una capsula dal perno all'uscita con
+  l'anello d'inchiostro e il colore della radice, disegnata da zero, che per le lontane è un arto
+  d'ombra prolungato dentro il corpo e per le vicine un **disco** sul punto in cui lo stinco
+  attraversa il contorno: un disco è l'unica forma che una rotazione attorno al suo centro manda in
+  sé stessa, il tronco ne nasconde la metà interna e la metà esterna riempie il cuneo che lo stinco
+  apre oscillando; e la **coda in cinque segmenti** tagliati fra un anello e l'altro del disegno,
+  col **padre che prosegue sotto il figlio** per il raggio del giunto. ⚠️ Tre cose provate e
+  scartate: le zampe vicine **davanti** al tronco (niente nasconde il giunto, e fra stinco e pancia
+  si apriva un cuneo bianco a ogni passo — con l'anca come perno, per di più, il disco tagliava
+  l'arco d'inchiostro della coscia); il raggio del giunto **pari** alla mezza zampa (l'anello sbuca
+  da fermo) o più largo dello stinco (un nodo nero sotto la zampa); tre segmenti di coda con un
+  decimo di ritardo (15° fra due segmenti vicini, e ai tagli fessure bianche perché il padre finiva
+  di netto sulla colonna). Si verifica **col ciclo**, non a occhio sull'animazione che gira:
+  `--anteprime` rende `ciclo-<zona>.png`, dodici istanti del passo con gli angoli che
+  `animations.css` dà davvero — durata, ritardo, `alternate`, `ease-in-out` — perché l'angolo
+  relativo peggiore fra due pezzi capita **in mezzo**, non agli estremi scelti a mano. Un cuneo di
+  10 px sulla reference è un pixel a 88px, e passa.
 - ⚠️ **`sharp` ridimensiona prima di comporre, qualunque sia l'ordine delle chiamate.** Una griglia
   di coordinate disegnata alla misura del ritaglio e composta dopo `resize()` finisce **centrata e a
   1:1** sull'immagine ingrandita: le etichette sembrano giuste e sono spostate di decine di pixel.

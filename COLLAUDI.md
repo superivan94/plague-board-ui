@@ -365,25 +365,27 @@ ignorare. La ricerca fa il lavoro: si scrive una parola e chi la ripete finisce 
 
 **Esegue:** agente — in jsdom le animazioni non girano: il test tiene il contratto (classi, perni
 come stile, filtro di `onDone`), qui si misura che il browser faccia il resto.
-**Ultima esecuzione:** agente, 2026-09-19 — dopo il secondo giro del pupazzo (giunti tondi, arto
-sintetico, cerniere all'uscita, coda in tre segmenti, passo a 0,3 s), tutto come atteso.
+**Ultima esecuzione:** agente, 2026-09-19 — dopo il terzo giro del pupazzo (tutte le parti dietro
+al tronco con giunto sintetico, coda in cinque segmenti fra gli anelli, padre sotto il figlio),
+tutto come atteso sui dodici istanti del ciclo.
 
 **Preparazione:** `npm run build`, `npm run playground`, `/corsa` in una **scheda nuova** — la
 console dello strumento è cumulativa, e un errore di un caricamento precedente resta lì. Per le
-cuciture, i **fotogrammi**: `npm run art:ratto -- --anteprime <dir>` rende anche
-`fotogramma-{a,b,c}[-zona].png` — le parti ruotate agli estremi del passo (±14° le vicine, ±10° le
-lontane, coda a S, corpo che sale e beccheggia) a 1800 px, e i ritagli di groppa, zampe davanti e
-le due radici delle lontane. Per attribuire un artefatto a una parte si mette a zero l'angolo delle
-altre in `FASI`.
+cuciture, il **ciclo**: `npm run art:ratto -- --anteprime <dir>` rende `ciclo-{coda,groppa,zampe-davanti,intero}.png`,
+tavole 4×3 con dodici istanti del passo (0,6 s ogni 50 ms) e le parti agli angoli che
+`animations.css` dà in quel momento. ⚠️ Tre fotogrammi «agli estremi» scelti a mano non bastavano:
+coi ritardi fra le parti l'angolo relativo peggiore capita in mezzo, e l'utente vedeva artefatti
+che i fotogrammi non mostravano. Per attribuire un artefatto a una parte si mette a zero
+l'ampiezza delle altre in `REGOLE`.
 
 | Azione | Atteso | Ottenuto |
 |---|---|---|
-| `getComputedStyle` sulle parti del ratto in corsa | `transform-origin` uguale al perno scritto dal generatore, `transform-box: view-box` | posteriore vicina `142px 170px` e anteriore vicina `298px 165px` (le cerniere all'uscita), lontane `125px 138px` e `300px 145px`, coda base/mezzo/punta `137px 110px` / `95px 115px` / `50px 81px`, corpo `231px 123px`, pedina `287px 139px`, dado `216px 116px`, ampolla `211px 57px`; cinghie ferme |
-| `getAnimations()` sulle stesse | galoppo a coppie a 0,3 s: vicine `pb-rat-gallop`, lontane `pb-rat-gallop-far`, una `alternate` e l'altra al contrario; coda `pb-rat-wave-*` con ritardi 0 / −0,1 / −0,2 s; corpo `pb-rat-bob`; pendagli 0,6 s | tutto così; ampolla `pb-rat-tilt` −0,1 s al contrario, pedina e dado `pb-rat-sway` −0,2 s |
-| La coda nel DOM | tre gruppi **annidati**, punta dentro mezzo dentro base | `.pb-rat-tail-base > .pb-rat-tail-mid > .pb-rat-tail-tip` presente |
-| I fotogrammi agli estremi, sulla groppa | nessun cuneo bianco, nessuno spigolo nel pelo, il contorno della coscia intero | così; col primo taglio a poligoni c'erano tutti e tre, e col giunto all'anca l'arco della coscia si spezzava sul bordo del disco |
-| I fotogrammi alle radici delle zampe lontane | l'arto che esce da dietro il corpo ha contorno e ombra, niente moncone né nodo nero | così; col raggio pari alla zampa il nodo c'era già da fermo |
-| I fotogrammi sul petto | niente blocco chiaro sotto la zampa anteriore | così; col riempimento «vicino più prossimo» la pancia della guancia colava nel petto |
+| `getComputedStyle` sulle parti del ratto in corsa | `transform-origin` uguale al perno scritto dal generatore, `transform-box: view-box` | posteriore vicina `140px 173px` e anteriore vicina `298px 165px` (i dischi sull'uscita), coda `137px 110px` → `51px 80px` sui cinque segmenti, corpo `231px 123px`, pedina `287px 139px`, dado `216px 116px`, ampolla `211px 57px`; cinghie ferme |
+| `getAnimations()` sulle stesse | galoppo a coppie a 0,3 s: vicine `pb-rat-gallop`, lontane `pb-rat-gallop-far`, una `alternate` e l'altra al contrario; coda `pb-rat-wave` sui cinque segmenti con ritardi 0 / −45 / −90 / −135 / −180 ms; corpo `pb-rat-bob`; pendagli 0,6 s | tutto così; 13 animazioni sul ratto nudo |
+| La coda e le zampe nel DOM | cinque gruppi **annidati** in catena; **tutte** le parti prima del tronco, dopo solo i kit | `.pb-rat-tail-1 > … > .pb-rat-tail-5` presente; nessuna `pb-rat-part` dopo il tronco |
+| Il ciclo, tavola `coda` | nessuna fessura ai giunti, anelli interi, onda che corre verso la punta | così sui dodici istanti; con tre segmenti e un decimo di ritardo si aprivano fessure bianche sulle colonne dei tagli |
+| Il ciclo, tavola `groppa` | lo stinco posteriore esce da sotto la pancia e oscilla senza cuneo né nodo; la lontana esce da dietro con contorno e ombra | così; con la zampa vicina **davanti** al tronco fra stinco e pancia si apriva un cuneo bianco a ogni passo, e col disco più largo dello stinco restava un nodo nero sotto |
+| Il ciclo, tavola `zampe-davanti` | niente cuneo fra lo stinco anteriore e il petto, niente blocco chiaro, la lontana con contorno | così; il disco doveva arrivare al contorno superiore dello stinco (raggio 32), con 29 restava un cuneo |
 | Il ratto fermo accanto | nessuna animazione | `animationName: none`, `getAnimations()` vuoto |
 | Il contenitore che attraversa | `pb-rat-cross-left` o `-right`, la durata pescata, da destra il disegno ribaltato | `pb-rat-cross-right`, `5.83s`, `top: 59%`, `-scale-x-100` sull'`<svg>` |
 | Si segna il nodo e si aspetta la fine | il nodo dopo è **un altro**, con lato e altezza nuovi | il segno non c'è più; da `left`/`39%` a `right`/`34%` |

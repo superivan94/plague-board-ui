@@ -437,47 +437,43 @@ const PERNO_DADO = [880 + T_BIANCO[0], 490 + T_BIANCO[1]];
 
 // ── Le parti del corpo, per l'animazione ─────────────────────────────────────────────────────────
 // Il ricalco dà livelli per colore; per far correre il ratto servono zampe e coda come pezzi con un
-// perno. Un pezzo ritagliato da un disegno piatto ha tre problemi, e qui ha tre ingredienti:
+// perno. Un pezzo ritagliato da un disegno piatto si scopre quando ruota, e il taglio va disegnato
+// perché non si veda. Gli ingredienti, ognuno nato da un artefatto misurato sui fotogrammi:
 //
 // - la **sporgenza**: la zampa fuori dalla sagoma del corpo. È il poligono della parte, letto
-//   sulla griglia numerata della reference, **meno il nucleo** — la sagoma piena erosa di 35 px e
+//   sulla reference con la sonda per colonna, **meno il nucleo** — la sagoma piena erosa di 35 px e
 //   ridilatata, un'apertura morfologica in cui coda e zampe (spesse meno di 70) spariscono e resta
 //   il blocco tronco+testa. Dentro il nucleo il poligono non conta niente: può essere generoso.
-// - il **giunto tondo**: un disco centrato sul perno. Un disco è l'unica forma che una rotazione
-//   attorno al suo centro manda in sé stessa: il suo bordo non si sposta mai, e la cucitura fra
-//   pezzo e tronco resta dov'era a qualunque angolo. ⚠️ Un taglio dritto invece si scopre: a 14°
-//   un punto a 100 px dal perno si sposta di 24, e il primo giro mostrava spigoli di poligono in
-//   mezzo al pelo, cunei bianchi dietro la coscia e monconi rettangolari delle zampe lontane.
-// - il **corridoio**: una capsula dal perno all'**uscita**, il punto in cui la zampa lascia la
-//   sagoma, larga quanto la zampa. Per una zampa **vicina** è la coscia disegnata sul corpo, e il
-//   pezzo prende i pixel della reference; sotto, il tronco viene **ridipinto** col colore del pixel
-//   più vicino fuori dal corridoio — pelo dove c'è pelo, pancia dove c'è pancia — perché nella
-//   reference dietro la coscia non c'è niente, ed è il «completare le parti nascoste» delle note
-//   dell'utente. Per una zampa **lontana** il corridoio è **sintetico**: un arto di ombra col suo
-//   anello d'inchiostro, disegnato da zero, perché dietro il corpo la reference non ha nulla e
-//   quando la zampa oscilla ne deve uscire qualcosa che sembri una zampa e non un moncone.
-//
-// La coda è **tre segmenti concatenati** — base, mezzo, punta — tagliati per colonna e uniti da
-// giunti tondi sul filo della coda: ognuno ruota nel sistema del padre, e uno sfasamento fra i tre
-// fa l'onda. Il perno di un segmento figlio è il centro della colonna in cui si taglia.
-const PARTI = [
-  { nome: 'tailBase', coda: { daX: 380 }, perno: [548, 438], dietro: true },
-  { nome: 'tailMid', coda: { daX: 200, aX: 380 }, genitore: 'tailBase', dietro: true },
-  { nome: 'tailTip', coda: { aX: 200 }, genitore: 'tailMid', dietro: true },
-  // ⚠️ Per una zampa lontana perno e uscita stanno **sull'asse della zampa**, prolungato dentro il
-  // corpo, e il raggio è **meno** della mezza larghezza della zampa: l'arto sintetico deve restare
-  // nascosto dentro quella vera alla radice. Col raggio pari alla zampa il suo anello d'inchiostro
-  // sbucava attorno alla radice come un nodo nero, già da fermo.
-  { nome: 'legBackFar', poligono: [[520, 480], [520, 660], [232, 660], [232, 500]], perno: [500, 552], uscita: [455, 557], raggio: 27, dietro: true },
-  { nome: 'legFrontFar', poligono: [[1240, 545], [1480, 550], [1480, 690], [1275, 695], [1240, 640]], perno: [1201, 581], uscita: [1245, 588], raggio: 28, dietro: true },
-  // ⚠️ Le zampe vicine sono incernierate **dove lasciano il corpo**, non all'anca o alla spalla:
-  // nella reference coscia e spalla sono la groppa e il petto stessi, e un disco all'anca tagliava
-  // l'arco d'inchiostro della coscia, che a ogni passo si spezzava sul bordo del disco. Col perno
-  // all'uscita il disco sta nel pelo sotto l'arco e oscillano stinco e zampa, che è ciò che si vede.
-  { nome: 'legBackNear', poligono: [[520, 640], [620, 640], [620, 720], [575, 830], [400, 830], [400, 700]], perno: [568, 680], uscita: [568, 680], raggio: 28, dietro: false },
-  { nome: 'legFrontNear', poligono: [[1170, 625], [1250, 625], [1380, 690], [1380, 800], [1180, 800], [1170, 730]], perno: [1192, 660], uscita: [1192, 660], raggio: 27, dietro: false },
+// - il **giunto sintetico**, dietro al tronco: una capsula dal perno all'**uscita** — il punto in
+//   cui la zampa lascia la sagoma — con l'anello d'inchiostro e il colore della zampa alla radice,
+//   disegnata da zero. Per le zampe lontane è un arto d'ombra prolungato dentro il corpo; per le
+//   vicine perno e uscita coincidono e la capsula è un **disco** sull'uscita, del colore dello
+//   stinco. Un disco è l'unica forma che una rotazione attorno al suo centro manda in sé stessa: la
+//   metà dentro il corpo resta nascosta dal tronco, la metà fuori riempie il cuneo che lo stinco
+//   apre quando oscilla. ⚠️ Per questo **tutte** le zampe stanno dietro al tronco, anche le vicine:
+//   una zampa davanti non ha niente che le nasconda il giunto, e a ogni passo fra stinco e pancia
+//   si apriva un cuneo bianco. Il raggio è **meno** della mezza zampa, o l'anello sbuca da fermo.
+// - la **coda** è cinque segmenti concatenati, tagliati per colonna **fra un anello e l'altro** del
+//   disegno — così nessun anello si spezza — e uniti da giunti tondi sul filo della coda: il figlio
+//   ruota nel sistema del padre, e il **padre prosegue sotto il figlio** per il raggio del giunto.
+//   Senza quel prolungamento il padre finiva di netto sulla colonna del taglio e, appena il figlio
+//   ruotava, fra i due restava una fessura bianca che nessuno riempiva. Un ritardo crescente fra i
+//   segmenti fa l'onda.
+const PARTI_ZAMPE = [
+  // ⚠️ Perno e uscita stanno **sull'asse della zampa**, letto con la sonda per colonna: se la
+  // capsula punta altrove, alla radice sbuca un nodo. Per le lontane il perno è prolungato dentro il
+  // corpo quanto la groppa permette senza che il disco esca dal contorno.
+  { nome: 'legBackFar', poligono: [[520, 480], [520, 660], [232, 660], [232, 500]], perno: [488, 540], uscita: [455, 548], raggio: 28, tinta: 'greyShade' },
+  { nome: 'legFrontFar', poligono: [[1225, 545], [1480, 550], [1480, 690], [1275, 695], [1225, 640]], perno: [1190, 583], uscita: [1228, 596], raggio: 29, tinta: 'greyShade' },
+  // Le vicine: il perno è dove lo stinco attraversa il contorno del corpo, e la tinta è la sua.
+  { nome: 'legBackNear', poligono: [[520, 640], [620, 640], [620, 720], [575, 830], [400, 830], [400, 700]], perno: [558, 690], uscita: [558, 690], raggio: 20, tinta: 'pink' },
+  // ⚠️ Il disco deve arrivare al contorno **superiore** dello stinco (y 629 a x 1200), o quando lo
+  // stinco scende fra il suo bordo e il petto resta un cuneo bianco: raggio 32, centro a 659.
+  { nome: 'legFrontNear', poligono: [[1170, 625], [1250, 625], [1380, 690], [1380, 800], [1180, 800], [1170, 730]], perno: [1192, 659], uscita: [1192, 659], raggio: 32, tinta: 'greyFur' },
 ];
 const RECINTO_CODA = { x0: 30, y0: 270, x1: 578, y1: 578 };
+const PERNO_CODA = [548, 438];
+const TAGLI_CODA_DESIDERATI = [470, 380, 290, 200]; // dove vorremmo i giunti: ognuno va sul mezzo fra due anelli
 const NUCLEO_RAGGIO = 35;
 const INCHIOSTRO_SINTETICO = 12; // lo spessore del contorno nelle reference, in pixel
 
@@ -507,7 +503,7 @@ function capsula(m, W, H, [ax, ay], [bx, by], r) {
 const erodi = (m, W, H, r) => dilata(m.map((v) => (v ? 0 : 1)), W, H, r).map((v) => (v ? 0 : 1));
 const nucleo = dilata(erodi(grigio.pieno, grigio.W, grigio.H, NUCLEO_RAGGIO), grigio.W, grigio.H, NUCLEO_RAGGIO);
 
-// La coda intera, per colore, come prima: rosa e la sua ombra nel recinto, dilatati sull'inchiostro.
+// La coda intera, per colore: rosa e la sua ombra nel recinto, dilatati sull'inchiostro.
 const codaIntera = (() => {
   const { W, H, idx } = grigio;
   const semi = new Set(['pink', 'pinkShade'].map((n) => NOMI.indexOf(n)));
@@ -515,6 +511,42 @@ const codaIntera = (() => {
   for (let y = RECINTO_CODA.y0; y < RECINTO_CODA.y1; y++) for (let x = RECINTO_CODA.x0; x < RECINTO_CODA.x1; x++) if (semi.has(idx[y * W + x])) a[y * W + x] = 1;
   return dilata(a, W, H, RAGGIO).map((v, i) => (v && idx[i] >= 0 ? 1 : 0));
 })();
+
+// Gli anelli della coda: le colonne in cui l'inchiostro attraversa la banda **dentro**, non sul
+// contorno. Si contano le righe d'inchiostro nella fascia interna (via 12 px sopra e sotto) e le
+// colonne con più di un quarto d'inchiostro, raggruppate, sono anelli. Vale dove la coda corre quasi
+// orizzontale (x ≥ 150): nel ricciolo della punta una colonna la taglierebbe per il lungo.
+function anelliCoda() {
+  const { W, H, idx } = grigio;
+  const INK = NOMI.indexOf('ink');
+  const anelli = [];
+  let inizio = -1;
+  for (let x = 150; x <= RECINTO_CODA.x1; x++) {
+    let y0 = H, y1 = -1, interni = 0;
+    for (let y = 0; y < H; y++) if (codaIntera[y * W + x]) { if (y < y0) y0 = y; if (y > y1) y1 = y; }
+    let anello = false;
+    if (y1 - y0 > 30) {
+      for (let y = y0 + 12; y <= y1 - 12; y++) if (idx[y * W + x] === INK) interni++;
+      anello = interni / (y1 - y0 - 24) > 0.25;
+    }
+    if (anello && inizio < 0) inizio = x;
+    if (!anello && inizio >= 0) { anelli.push(Math.round((inizio + x - 1) / 2)); inizio = -1; }
+  }
+  return anelli;
+}
+// I tagli: per ogni posizione desiderata, il punto di mezzo fra due anelli consecutivi più vicino.
+function tagliCoda() {
+  const anelli = anelliCoda();
+  const mezzi = anelli.slice(1).map((a, i) => Math.round((anelli[i] + a) / 2));
+  const tagli = [];
+  for (const t of TAGLI_CODA_DESIDERATI) {
+    const m = mezzi.filter((v) => !tagli.includes(v)).sort((a, b) => Math.abs(a - t) - Math.abs(b - t))[0];
+    tagli.push(m ?? t);
+  }
+  tagli.sort((a, b) => b - a);
+  console.log(`coda: anelli a ${anelli.join(', ')} → tagli a ${tagli.join(', ')}`);
+  return tagli;
+}
 // Il centro e la mezza altezza della coda in una colonna: il giunto di un segmento figlio.
 function giuntoCoda(x) {
   const { W, H } = grigio;
@@ -522,94 +554,86 @@ function giuntoCoda(x) {
   for (let y = 0; y < H; y++) if (codaIntera[y * W + x]) { if (y < y0) y0 = y; if (y > y1) y1 = y; }
   return { perno: [x, Math.round((y0 + y1) / 2)], raggio: Math.ceil((y1 - y0) / 2) + 8 };
 }
+// I cinque segmenti, dalla radice alla punta, ognuno figlio del precedente.
+const segmentiCoda = (() => {
+  const tagli = tagliCoda();
+  return Array.from({ length: tagli.length + 1 }, (_, k) => ({
+    nome: `tail${k + 1}`,
+    coda: { daX: tagli[k], aX: tagli[k - 1] },
+    dietro: true,
+    ...(k === 0 ? { perno: PERNO_CODA } : { genitore: `tail${k}` }),
+  }));
+})();
+// Tutto sta dietro al tronco: prima la coda, poi le lontane, poi le vicine.
+const PARTI = [...segmentiCoda, ...PARTI_ZAMPE.map((p) => ({ ...p, dietro: true }))];
 
 // Le zone di una parte, sul raster del grigio: la **sporgenza** (ciò che il tronco perde), il
-// giunto e il corridoio, e il **pezzo** — i pixel della reference che la parte prende. La coda ha il
-// suo tratto di colonne più il giunto tondo sul taglio verso il padre; dal tronco perde solo ciò che
-// sta fuori dal nucleo, perché dentro la groppa il tronco la copre com'è.
+// **corridoio** del giunto sintetico, e il **pezzo** — i pixel della reference che la parte prende.
+// Un segmento di coda prende il suo tratto di colonne più il prolungamento sotto il padre e il
+// giunto tondo sul taglio verso il padre; dal tronco perde solo ciò che sta fuori dal nucleo.
 function zoneParte(parte) {
   const { W, H } = grigio;
   const sporgenza = new Uint8Array(W * H), giunto = new Uint8Array(W * H), pezzo = new Uint8Array(W * H);
   if (parte.coda) {
     const { daX = 0, aX = W } = parte.coda;
-    for (let i = 0; i < W * H; i++) if (codaIntera[i] && i % W >= daX && i % W < aX) { pezzo[i] = 1; if (!nucleo[i]) sporgenza[i] = 1; }
+    const estensione = daX > 0 ? giuntoCoda(daX).raggio : 0;
+    for (let i = 0; i < W * H; i++) {
+      if (!codaIntera[i]) continue;
+      const x = i % W;
+      if (x >= daX && x < aX && !nucleo[i]) sporgenza[i] = 1;
+      if (x >= daX - estensione && x < aX) pezzo[i] = 1;
+    }
     if (parte.genitore) {
       const j = giuntoCoda(aX);
       parte.perno = j.perno;
       capsula(giunto, W, H, j.perno, j.perno, j.raggio);
       for (let i = 0; i < W * H; i++) if (giunto[i] && codaIntera[i]) pezzo[i] = 1;
     }
-    return { sporgenza, giunto, corridoio: giunto, pezzo };
+    return { sporgenza, corridoio: giunto, pezzo };
   }
   for (let y = 0; y < H; y++) for (let x = 0; x < W; x++) {
     const i = y * W + x;
-    if (grigio.pieno[i] && !nucleo[i] && dentroPoligono(x, y, parte.poligono)) sporgenza[i] = 1;
+    if (grigio.pieno[i] && !nucleo[i] && dentroPoligono(x, y, parte.poligono)) { sporgenza[i] = 1; pezzo[i] = 1; }
   }
   const corridoio = capsula(new Uint8Array(W * H), W, H, parte.perno, parte.uscita, parte.raggio);
-  capsula(giunto, W, H, parte.perno, parte.perno, parte.raggio);
-  for (let i = 0; i < W * H; i++) if (grigio.pieno[i] && (sporgenza[i] || (!parte.dietro && (giunto[i] || corridoio[i])))) pezzo[i] = 1;
-  return { sporgenza, giunto, corridoio, pezzo };
+  return { sporgenza, corridoio, pezzo };
 }
 
-// L'immagine di una parte, pronta per il ricalco: i pixel della reference nel pezzo. Per una zampa
-// **lontana**, prima l'arto sintetico — inchiostro nel corridoio, ombra del pelo nel corridoio
-// ristretto dello spessore del contorno — e sopra i pixel veri della sporgenza.
+// L'immagine di una parte, pronta per il ricalco: per una zampa prima il giunto sintetico —
+// inchiostro nel corridoio, la tinta della radice nel corridoio ristretto dello spessore del
+// contorno — e sopra i pixel veri del pezzo.
 function immagineParte(parte, zone) {
   const { W, H } = grigio;
   const px = new Uint8ClampedArray(W * H * 4);
   const idx = new Int8Array(W * H).fill(-1);
   const scrivi = (i, k) => { idx[i] = k; [px[i * 4], px[i * 4 + 1], px[i * 4 + 2]] = RGB[k]; px[i * 4 + 3] = 255; };
-  if (parte.dietro && !parte.coda) {
-    const INK = NOMI.indexOf('ink'), OMBRA = NOMI.indexOf('greyShade');
+  if (!parte.coda) {
+    const INK = NOMI.indexOf('ink'), TINTA = NOMI.indexOf(parte.tinta);
     const dentro = capsula(new Uint8Array(W * H), W, H, parte.perno, parte.uscita, parte.raggio - INCHIOSTRO_SINTETICO);
-    for (let i = 0; i < W * H; i++) if (zone.corridoio[i]) scrivi(i, dentro[i] ? OMBRA : INK);
+    for (let i = 0; i < W * H; i++) if (zone.corridoio[i]) scrivi(i, dentro[i] ? TINTA : INK);
   }
   for (let i = 0; i < W * H; i++) if (zone.pezzo[i]) scrivi(i, grigio.idx[i]);
   return { W, H, px, idx, pieno: idx.map((v) => (v >= 0 ? 1 : 0)) };
 }
 
-// Il tronco: il corpo senza le sporgenze, e **ridipinto** sotto giunto e corridoio delle zampe
-// vicine, col colore di **maggioranza** dei pixel che stanno lì dentro — pelo sotto una coscia di
-// pelo — saltando l'inchiostro. L'inchiostro del bordo esterno (a meno di 6 px dal trasparente)
-// resta com'è: è il pezzo di contorno che, quando la zampa si scosta, continua la sagoma.
-// ⚠️ Un primo giro prendeva per ogni pixel il colore del pixel più vicino **fuori** dalla zona: il
-// corridoio della zampa anteriore tocca la guancia, e la pancia chiara della guancia colava dentro
-// il petto in un blocco a spigoli, che si vedeva a ogni passo. Il colore giusto lo dicono i pixel
-// dentro, non i vicini. ⚠️ Le sporgenze si tolgono per **tutte** le parti, anche quelle dietro:
-// altrimenti resterebbe una copia ferma della zampa sotto quella che si muove.
+// Il tronco: il corpo senza le sporgenze. Tutto ciò che si muove sta dietro, quindi il tronco non
+// si ridipinge: dove nella reference lo stinco copriva la pancia quei pixel restano al tronco,
+// fermi, e lo stinco che oscilla ci passa sotto. ⚠️ Le sporgenze si tolgono per tutte le parti,
+// o resterebbe una copia ferma della zampa sotto quella che si muove — ma con un **orlo** di 10 px
+// oltre il nucleo: il nucleo arrotonda le convessità del corpo, e senza orlo alla radice si vedeva
+// il fondo.
 function tronco(zone) {
   const { W, H } = grigio;
   const px = new Uint8ClampedArray(grigio.px);
   const idx = new Int8Array(grigio.idx);
-  const INK = NOMI.indexOf('ink');
-  const bordo = dilata(grigio.pieno.map((v) => (v ? 0 : 1)), W, H, 6);
-  // ⚠️ Il nucleo arrotonda le convessità del corpo: dove il petto o la groppa sporgono di poco, la
-  // sagoma vera sta qualche pixel fuori. Il tronco tiene quindi un **orlo** di 10 px oltre il
-  // nucleo: sono i primi pixel della radice di ogni parte, e restano fermi come un pezzo di corpo.
-  // Senza, quando la zampa si scosta, lì sotto si vedeva il fondo — un cuneo bianco alla radice.
   const orlo = dilata(nucleo, W, H, 10);
-  const PELLE = new Set(['pink', 'pinkShade'].map((n) => NOMI.indexOf(n)));
-  let ridipinti = 0;
-  for (const [k, parte] of PARTI.entries()) {
-    const daRidipingere = [];
-    const conteggio = new Map();
-    for (let i = 0; i < W * H; i++) {
-      if (zone[k].sporgenza[i] && !orlo[i]) { azzera(px, i); idx[i] = -1; continue; }
-      if (!parte.dietro && idx[i] >= 0 && (zone[k].corridoio[i] || zone[k].giunto[i]) && !(idx[i] === INK && bordo[i])) {
-        daRidipingere.push(i);
-        // Sotto la zampa c'è corpo: si contano solo i colori del pelo, non la pelle rosa della zampa.
-        if (idx[i] !== INK && !PELLE.has(idx[i])) conteggio.set(idx[i], (conteggio.get(idx[i]) ?? 0) + 1);
-      }
-    }
-    if (!daRidipingere.length) continue;
-    const colore = [...conteggio.entries()].sort((a, b) => b[1] - a[1])[0]?.[0] ?? NOMI.indexOf('greyFur');
-    for (const i of daRidipingere) { idx[i] = colore; [px[i * 4], px[i * 4 + 1], px[i * 4 + 2]] = RGB[colore]; ridipinti++; }
-    console.log(`tronco: sotto ${parte.nome} ${daRidipingere.length} px ridipinti di ${NOMI[colore]}`);
+  let tolti = 0;
+  for (const [k] of PARTI.entries()) {
+    for (let i = 0; i < W * H; i++) if (zone[k].sporgenza[i] && !orlo[i] && idx[i] >= 0) { azzera(px, i); idx[i] = -1; tolti++; }
   }
-  console.log(`tronco: ${ridipinti} px ridipinti in tutto`);
+  console.log(`tronco: ${tolti} px di sporgenze tolti`);
   return { W, H, px, idx, pieno: idx.map((v) => (v >= 0 ? 1 : 0)) };
 }
-
 const zoneParti = PARTI.map(zoneParte);
 const troncoImg = tronco(zoneParti);
 const partiRicalcate = PARTI.map((p, k) => ({
@@ -761,7 +785,7 @@ if (ANTEPRIME) {
   const testa = `<svg xmlns="http://www.w3.org/2000/svg" viewBox="${vb.x} ${vb.y} ${vb.width} ${vb.height}" width="${vb.width * 2}" height="${vb.height * 2}">`;
   // Le parti, ognuna con una tinta sua, per controllare i tagli: la coda azzurra, le zampe lontane
   // gialle, le vicine rosse, il tronco com'è.
-  const TINTE = { tailBase: '#38bdf8', tailMid: '#0ea5e9', tailTip: '#6366f1', legBackFar: '#facc15', legFrontFar: '#fde047', legBackNear: '#ef4444', legFrontNear: '#f97316' };
+  const TINTE = { tail1: '#38bdf8', tail2: '#0ea5e9', tail3: '#6366f1', tail4: '#38bdf8', tail5: '#0ea5e9', legBackFar: '#facc15', legFrontFar: '#fde047', legBackNear: '#ef4444', legFrontNear: '#f97316' };
   const tinta = (percorsi, colore) => `<g>${percorsi.map((p) => `<path fill="${p.c === 'ink' ? '#100020' : colore}" d="${p.d}"/>`).join('')}</g>`;
   const dietro = ART.parts.filter((p) => p.behind), davanti = ART.parts.filter((p) => !p.behind);
   const kit = (pezzi) => pezzi.map((q) => g(q.paths, {})).join('');
@@ -779,38 +803,67 @@ if (ANTEPRIME) {
     await sharp(Buffer.from(svg), { density: 96 }).resize({ width: 900 }).flatten({ background: '#9ca3af' }).png().toFile(join(ANTEPRIME, `ratto-${nome}.png`));
   }
 
-  // I fotogrammi: le parti ruotate agli estremi del passo, come farebbe il CSS, rese a 1800 px e
-  // ritagliate dove le cuciture si vedono — groppa, zampe davanti, le due radici delle lontane.
+  // Il ciclo: dodici istanti del passo (0,6 s, ogni 50 ms) con le parti agli angoli che
+  // `animations.css` dà in quel momento — durata, ritardo, alternanza, `ease-in-out` — resi a
+  // 1800 px e composti in tavole 4×3 per zona: coda, groppa, zampe davanti, intero.
   // ⚠️ È qui che si giudica un taglio, non guardando l'animazione che gira: un cuneo di 10 px
-  // sulla reference è un pixel a 88px di altezza, e a occhio passa. Gli angoli sono quelli di
-  // `animations.css`; i figli della coda ruotano nel sistema del padre, come nel componente.
-  const FASI = {
-    a: { legBackNear: -14, legFrontFar: -10, legFrontNear: 14, legBackFar: 10, tailBase: -4, tailMid: 3, tailTip: 8, bottle: 3, dice: -9, pawn: -9, bounce: 0, pitch: 2.5 },
-    b: { bounce: -3, pitch: 0 },
-    c: { legBackNear: 14, legFrontFar: 10, legFrontNear: -14, legBackFar: -10, tailBase: 4, tailMid: -3, tailTip: -8, bottle: -3, dice: 9, pawn: 9, bounce: -6, pitch: -2.5 },
+  // sulla reference è un pixel a 88px di altezza, e a occhio passa; e tre fotogrammi «agli
+  // estremi» scelti a mano non bastano, perché i ritardi fra le parti fanno sì che l'angolo
+  // relativo peggiore capiti in mezzo. Le regole vanno tenute uguali a quelle del foglio di stile.
+  const REGOLE = {
+    legBackNear: { A: 14, D: 0.3, d: 0, rev: false }, legFrontFar: { A: 10, D: 0.3, d: 0, rev: false },
+    legFrontNear: { A: 14, D: 0.3, d: 0, rev: true }, legBackFar: { A: 10, D: 0.3, d: 0, rev: true },
+    tail1: { A: 3.5, D: 0.3, d: 0, rev: false }, tail2: { A: 3.5, D: 0.3, d: -0.045, rev: false }, tail3: { A: 3.5, D: 0.3, d: -0.09, rev: false },
+    tail4: { A: 3.5, D: 0.3, d: -0.135, rev: false }, tail5: { A: 3.5, D: 0.3, d: -0.18, rev: false },
+    pawn: { A: 9, D: 0.6, d: -0.2, rev: false }, dice: { A: 9, D: 0.6, d: -0.2, rev: false }, bottle: { A: 3, D: 0.6, d: -0.1, rev: true },
+    bob: { A: 1, D: 0.3, d: 0, rev: false },
   };
-  const ZONE = {
-    groppa: { left: 0.0, top: 0.2, width: 0.5, height: 0.8 },
-    'zampe-davanti': { left: 0.55, top: 0.4, width: 0.45, height: 0.6 },
-    'radice-dietro': { left: 300 / 1536, top: 440 / 1024, width: 260 / 1536, height: 240 / 1024 },
-    'radice-davanti': { left: 1130 / 1536, top: 480 / 1024, width: 270 / 1536, height: 240 / 1024 },
+  // cubic-bezier(0.42, 0, 0.58, 1): x(s) risolto per bisezione, poi y(s).
+  const bez = (p) => {
+    const x = (s) => 3 * (1 - s) ** 2 * s * 0.42 + 3 * (1 - s) * s ** 2 * 0.58 + s ** 3;
+    const y = (s) => 3 * (1 - s) * s ** 2 + s ** 3;
+    let lo = 0, hi = 1;
+    for (let i = 0; i < 40; i++) { const m = (lo + hi) / 2; if (x(m) < p) lo = m; else hi = m; }
+    return y((lo + hi) / 2);
   };
-  const rot = (deg, piv) => (deg ? ` transform="rotate(${deg} ${piv.x} ${piv.y})"` : '');
-  const fotogramma = (f) => {
+  // Il valore in [-A, A] all'istante t, come `alternate` / `alternate-reverse`.
+  const valore = (r, t) => {
+    const tau = t - r.d, i = Math.floor(tau / r.D);
+    let p = (tau - i * r.D) / r.D;
+    if (r.rev ? i % 2 === 0 : i % 2 === 1) p = 1 - p;
+    return -r.A + 2 * r.A * bez(p);
+  };
+  const rot = (deg, piv) => ` transform="rotate(${deg.toFixed(2)} ${piv.x} ${piv.y})"`;
+  const fotogramma = (t) => {
+    const f = Object.fromEntries(Object.entries(REGOLE).map(([k, r]) => [k, valore(r, t)]));
     const parte = (p) => `<g${rot(f[p.name] ?? 0, p.pivot)}>${g(p.paths, GRIGIA)}${ART.parts.filter((q) => q.parent === p.name).map(parte).join('')}</g>`;
     const radici = ART.parts.filter((p) => !p.parent);
     const pezzo = (q) => `<g${q.pivot ? rot(f[q.name] ?? 0, q.pivot) : ''}>${g(q.paths, {})}</g>`;
     const kits = [...ART.collar, ...ART.harness, ...ART.skull].map(pezzo).join('');
-    const corpo = `translate(0 ${f.bounce ?? 0}) rotate(${f.pitch ?? 0} ${ART.bodyPivot.x} ${ART.bodyPivot.y})`;
+    const u = (f.bob + 1) / 2;
+    const corpo = `translate(0 ${(-6 * u).toFixed(2)}) rotate(${(2.5 - 5 * u).toFixed(2)} ${ART.bodyPivot.x} ${ART.bodyPivot.y})`;
     return `<svg xmlns="http://www.w3.org/2000/svg" viewBox="${vb.x} ${vb.y} ${vb.width} ${vb.height}" width="1800" height="${Math.round((1800 * vb.height) / vb.width)}"><g transform="${corpo}">${radici.filter((p) => p.behind).map(parte).join('')}${g(ART.torso, GRIGIA)}${radici.filter((p) => !p.behind).map(parte).join('')}${kits}</g></svg>`;
   };
-  for (const [fase, f] of Object.entries(FASI)) {
-    const png = await sharp(Buffer.from(fotogramma(f)), { density: 96 }).flatten({ background: '#ffffff' }).png().toBuffer();
-    const { width: PW, height: PH } = await sharp(png).metadata();
-    await sharp(png).resize({ width: 900 }).toFile(join(ANTEPRIME, `fotogramma-${fase}.png`));
-    for (const [zona, r] of Object.entries(ZONE)) {
-      await sharp(png).extract({ left: Math.round(r.left * PW), top: Math.round(r.top * PH), width: Math.round(r.width * PW), height: Math.round(r.height * PH) }).resize({ width: 900 }).toFile(join(ANTEPRIME, `fotogramma-${fase}-${zona}.png`));
+  const ZONE = {
+    coda: { left: 0.0, top: 0.1, width: 0.42, height: 0.62 },
+    groppa: { left: 0.08, top: 0.3, width: 0.42, height: 0.7 },
+    'zampe-davanti': { left: 0.58, top: 0.35, width: 0.42, height: 0.65 },
+    intero: { left: 0, top: 0, width: 1, height: 1 },
+  };
+  const ISTANTI = Array.from({ length: 12 }, (_, i) => i * 0.05);
+  const fotogrammi = [];
+  for (const t of ISTANTI) fotogrammi.push(await sharp(Buffer.from(fotogramma(t)), { density: 96 }).flatten({ background: '#ffffff' }).png().toBuffer());
+  const { width: PW, height: PH } = await sharp(fotogrammi[0]).metadata();
+  for (const [zona, r] of Object.entries(ZONE)) {
+    const cw = Math.round(r.width * PW), ch = Math.round(r.height * PH);
+    const tw = 450, th = Math.round((tw * ch) / cw);
+    const celle = [];
+    for (const [i, png] of fotogrammi.entries()) {
+      const cella = await sharp(png).extract({ left: Math.round(r.left * PW), top: Math.round(r.top * PH), width: cw, height: ch }).resize({ width: tw }).png().toBuffer();
+      const etichetta = Buffer.from(`<svg xmlns="http://www.w3.org/2000/svg" width="${tw}" height="${th}"><text x="6" y="18" font-size="16" font-family="sans-serif" fill="#dc2626">t=${Math.round(ISTANTI[i] * 1000)} ms</text><rect x="0" y="0" width="${tw}" height="${th}" fill="none" stroke="#9ca3af"/></svg>`);
+      celle.push({ input: await sharp(cella).composite([{ input: etichetta }]).png().toBuffer(), left: (i % 4) * tw, top: Math.floor(i / 4) * th });
     }
+    await sharp({ create: { width: tw * 4, height: th * 3, channels: 3, background: '#ffffff' } }).composite(celle).png().toFile(join(ANTEPRIME, `ciclo-${zona}.png`));
   }
   console.log(`anteprime in ${ANTEPRIME}`);
 }

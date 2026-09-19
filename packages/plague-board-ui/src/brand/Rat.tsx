@@ -66,8 +66,11 @@ export interface RatProps {
   title?: string;
 }
 
-/** Da `legBackFar` a `leg-back-far`: le classi seguono l'idioma del CSS, i dati quello di TypeScript. */
-const kebab = (name: string) => name.replace(/[A-Z]/g, (c) => `-${c.toLowerCase()}`);
+/**
+ * Da `legBackFar` a `leg-back-far` e da `tail1` a `tail-1`: le classi seguono l'idioma del CSS, i
+ * dati quello di TypeScript. Il numero si stacca perché `animations.css` scrive `.pb-rat-tail-1`.
+ */
+const kebab = (name: string) => name.replace(/[A-Z]/g, (c) => `-${c.toLowerCase()}`).replace(/(\d+)$/, '-$1');
 
 /**
  * ⚠️ Il perno è `transform-origin` in **unità della cornice**, e l'`svg` in CSS lo permette perché
