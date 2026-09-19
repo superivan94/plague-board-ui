@@ -415,16 +415,34 @@ const PERNO_PEDINA = [1130 + T_BRUNO[0], 535 + T_BRUNO[1]];
 // 14 px a destra e in basso): fuori dai semi e fuori dal filtro, il tappo usciva mozzato su quel
 // lato. Segnalato dall'utente. Ha il suo rettangolo — x 820–980, y 80–210 — coi tre colori come
 // semi, e nel ricalco il bruno si legge oro. Nel disegno bianco il bruno non sta da nessun'altra parte.
-const RECINTO_TAPPO = { x0: 820, y0: 80, x1: 980, y1: 210 };
+// ⚠️ Tappo e collo stanno **nell'aria**, sopra il dorso: lì la dilatazione può essere generosa, e
+// deve — il contorno è spesso 12 px e agli angoli tondi dista fino a 15 dal colore che lo semina.
+// Con 9 il cappuccio sinistro dell'anello di vetro e l'angolo del tappo uscivano tagliati di netto.
+const RAGGIO_IN_ARIA = 15;
+const RECINTO_TAPPO = { x0: 880, y0: 80, x1: 1000, y1: 210 };
 const COLORI_TAPPO = ['gold', 'brownFur', 'brownShade'];
 const TAPPO_IN_ORO = { brownFur: 'gold', brownShade: 'gold' };
-const mTappo = maschera(bianco, COLORI_TAPPO, RAGGIO, RECINTO_TAPPO);
+const mTappo = maschera(bianco, COLORI_TAPPO, RAGGIO_IN_ARIA, RECINTO_TAPPO);
+const mCollo = maschera(bianco, ['glass', 'whiteShade'], RAGGIO_IN_ARIA, { x0: 770, y0: 80, x1: 1000, y1: 340 });
+// ⚠️ Le cinghie hanno una metà in ombra che quantizza a **inchiostro**: il loro bordo sinistro è
+// una banda scura di 25–35 px, e con la dilatazione a 9 dal cuoio ne restava un terzo — il laccio
+// posteriore usciva più stretto, con una tacca in basso dove l'ombra è più larga. Segnalato
+// dall'utente. Cuoio e oro si dilatano di 15; il vetro e il verde della bottiglia restano a 9, perché
+// la bottiglia posa sul dorso e a 15 si porterebbe dietro il contorno della schiena del donatore.
+// ⚠️ Ma a 15 la cinghia si porterebbe dietro anche il **contorno del corpo** del donatore, dove lo
+// attraversa: un blocco d'inchiostro a spigoli accanto al laccio. L'anello fra 9 e 15 prende quindi
+// solo l'inchiostro **interno** — a più di 6 px dal fondo — che è l'ombra della cinghia e non la
+// sagoma; il contorno proprio della cinghia, dove pende fuori dal corpo, sta entro i 9 e resta.
+const RAGGIO_CINGHIE = 15;
+const RECINTO_IMBRACATURA = { x0: 690, y0: 80, x1: 1010, y1: 740 };
+const bordoBianco = dilata(bianco.pieno.map((v) => (v ? 0 : 1)), bianco.W, bianco.H, 6);
+const cuoio = (recinto) => unisci(
+  maschera(bianco, ['leather', 'gold'], RAGGIO, recinto),
+  maschera(bianco, ['leather', 'gold'], RAGGIO_CINGHIE, recinto).map((v, i) => (v && !bordoBianco[i] ? 1 : 0)),
+);
 const mImbracatura = unisci(
   unisci(
-    unisci(
-      maschera(bianco, ['leather', 'green', 'greenLight', 'cream', 'gold'], RAGGIO, { x0: 690, y0: 80, x1: 1010, y1: 740 }),
-      maschera(bianco, ['glass', 'whiteShade'], RAGGIO, { x0: 770, y0: 80, x1: 980, y1: 340 }),
-    ),
+    unisci(unisci(cuoio(RECINTO_IMBRACATURA), maschera(bianco, ['green', 'greenLight', 'cream'], RAGGIO, RECINTO_IMBRACATURA)), mCollo),
     mTappo,
   ),
   attorno(bianco, dado, RAGGIO),
@@ -433,14 +451,11 @@ const imbracatura = ricalca(bianco, mImbracatura, new Set(['leather', 'green', '
 // L'imbracatura in tre pezzi che si muovono da soli: le cinghie con le fibbie stanno ferme, la
 // bottiglia dondola sul perno dove le cinghie la reggono, il dado pende dall'anello sotto la fibbia.
 const mBottiglia = unisci(
-  unisci(
-    maschera(bianco, ['green', 'greenLight', 'cream'], RAGGIO, { x0: 690, y0: 80, x1: 1010, y1: 470 }),
-    maschera(bianco, ['glass', 'whiteShade'], RAGGIO, { x0: 770, y0: 80, x1: 980, y1: 340 }),
-  ),
+  unisci(maschera(bianco, ['green', 'greenLight', 'cream'], RAGGIO, { x0: 690, y0: 80, x1: 1010, y1: 470 }), mCollo),
   mTappo,
 );
 const bottiglia = ricalca(bianco, mBottiglia, new Set(['green', 'greenLight', 'cream', 'glass', 'gold', 'ink']), { whiteFur: 'cream', greyBelly: 'cream', whiteShade: 'glass', ...TAPPO_IN_ORO }, 48);
-const mCinghie = maschera(bianco, ['leather', 'gold'], RAGGIO, { x0: 690, y0: 200, x1: 1010, y1: 740 });
+const mCinghie = cuoio({ x0: 690, y0: 200, x1: 1010, y1: 740 });
 const cinghie = ricalca(bianco, mCinghie, new Set(['leather', 'gold', 'ink']), {}, 48);
 const dadoRicalcato = ricalca(bianco, attorno(bianco, dado, RAGGIO), new Set(['cream', 'ink']), { whiteFur: 'cream', greyBelly: 'cream', whiteShade: 'cream' }, 48);
 const PERNO_BOTTIGLIA = [860 + T_BIANCO[0], 255 + T_BIANCO[1]];
@@ -474,15 +489,25 @@ const PARTI_ZAMPE = [
   // ⚠️ Perno e uscita stanno **sull'asse della zampa**, letto con la sonda per colonna: se la
   // capsula punta altrove, alla radice sbuca un nodo. Per le lontane il perno è prolungato dentro il
   // corpo quanto la groppa permette senza che il disco esca dal contorno.
-  { nome: 'legBackFar', poligono: [[520, 480], [520, 660], [232, 660], [232, 500]], perno: [488, 540], uscita: [455, 548], raggio: 28, tinta: 'greyShade' },
-  { nome: 'legFrontFar', poligono: [[1225, 545], [1480, 550], [1480, 690], [1275, 695], [1225, 640]], perno: [1190, 583], uscita: [1228, 596], raggio: 29, tinta: 'greyShade' },
+  // ⚠️ Il poligono scende fino a y 700 e parte da x 200: le dita del piede arrivano a y 662 e con il
+  // bordo a 660 il loro inchiostro più basso restava al tronco, fermo — un trattino nero sotto il
+  // piede appena il piede saliva. Segnalato dall'utente con le tinte della lente.
+  { nome: 'legBackFar', poligono: [[520, 480], [520, 700], [200, 700], [200, 500]], perno: [488, 540], uscita: [455, 548], raggio: 28, tinta: 'greyShade' },
+  // ⚠️ Il bordo basso del poligono segue il solco fra le due zampe anteriori, letto con la sonda per
+  // colonna (x 1290 → y 652, x 1330 → y 675): con il bordo a 695 la cima dello stinco vicino finiva
+  // nella lontana e, quando questa saliva, sotto restava una copia dello stinco. Segnalato dall'utente.
+  { nome: 'legFrontFar', poligono: [[1225, 545], [1480, 550], [1480, 690], [1330, 675], [1290, 652], [1225, 640]], perno: [1190, 583], uscita: [1228, 596], raggio: 29, tinta: 'greyShade' },
   // Le vicine: il perno è dove lo stinco attraversa il contorno del corpo, e la tinta è la sua.
   { nome: 'legBackNear', poligono: [[520, 640], [620, 640], [620, 720], [575, 830], [400, 830], [400, 700]], perno: [558, 690], uscita: [558, 690], raggio: 20, tinta: 'pink' },
   // ⚠️ Il disco deve arrivare al contorno **superiore** dello stinco (y 629 a x 1200), o quando lo
   // stinco scende fra il suo bordo e il petto resta un cuneo bianco: raggio 32, centro a 659.
   { nome: 'legFrontNear', poligono: [[1170, 625], [1250, 625], [1380, 690], [1380, 800], [1180, 800], [1170, 730]], perno: [1192, 659], uscita: [1192, 659], raggio: 32, tinta: 'greyFur' },
 ];
-const RECINTO_CODA = { x0: 30, y0: 270, x1: 578, y1: 578 };
+// ⚠️ Il recinto della coda finisce a y 520: il piede della zampa posteriore lontana è rosa come la
+// coda e comincia a y 560 — con il recinto a 578 la sua fetta alta finiva nel primo segmento, e
+// da fermo stava nascosta sotto la zampa, ma appena la zampa saliva spuntavano un pezzo rosa e due
+// triangoli d'inchiostro. Segnalato dall'utente con le tinte della lente.
+const RECINTO_CODA = { x0: 30, y0: 270, x1: 578, y1: 520 };
 const PERNO_CODA = [548, 438];
 const TAGLI_CODA_DESIDERATI = [470, 380, 290, 200]; // dove vorremmo i giunti: ognuno va sul mezzo fra due anelli
 const NUCLEO_RAGGIO = 35;
@@ -624,6 +649,22 @@ function immagineParte(parte, zone) {
     for (let i = 0; i < W * H; i++) if (zone.corridoio[i]) scrivi(i, dentro[i] ? TINTA : INK);
   }
   for (let i = 0; i < W * H; i++) if (zone.pezzo[i]) scrivi(i, grigio.idx[i]);
+  // ⚠️ Via le briciole: una componente connessa sotto i 250 px in un pezzo è un frammento preso
+  // per sbaglio da un poligono o da un recinto — una fetta di piede, un pezzo di contorno d'altri —
+  // e da fermo non si vede, perché sta sotto a chi gliel'ha lasciata; si vede appena il pezzo si
+  // muove. Zampe e coda non hanno niente di così piccolo che sia loro.
+  const visitato = new Uint8Array(W * H);
+  let briciole = 0;
+  for (let s = 0; s < W * H; s++) {
+    if (idx[s] < 0 || visitato[s]) continue;
+    const coda = [s]; visitato[s] = 1;
+    for (let t = 0; t < coda.length; t++) {
+      const i = coda[t];
+      for (const d of [-1, 1, -W, W]) { const j = i + d; if (j >= 0 && j < W * H && idx[j] >= 0 && !visitato[j] && Math.abs((j % W) - (i % W)) <= 1) { visitato[j] = 1; coda.push(j); } }
+    }
+    if (coda.length < 250) { for (const i of coda) { azzera(px, i); idx[i] = -1; } briciole += coda.length; }
+  }
+  if (briciole) console.log(`${parte.nome}: tolte briciole per ${briciole} px`);
   return { W, H, px, idx, pieno: idx.map((v) => (v >= 0 ? 1 : 0)) };
 }
 

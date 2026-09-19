@@ -40,8 +40,9 @@ export function Lente() {
   const [kit, setKit] = useState<Set<Kit>>(() => new Set<Kit>(['vial']));
   const [altezza, setAltezza] = useState(420);
   const [tinte, setTinte] = useState(false);
-  /** `null` = corre; un numero = ferma a quell'istante del ciclo, in millisecondi. */
-  const [fase, setFase] = useState<number | null>(null);
+  /** L'istante del ciclo a cui il ratto è fermo, in millisecondi; conta solo quando non corre. */
+  const [fase, setFase] = useState(0);
+  const [corre, setCorre] = useState(true);
   const cornice = useRef<HTMLDivElement>(null);
 
   // Le animazioni del ratto si fermano e si portano alla fase scelta, o si rilasciano. È l'unico
@@ -50,10 +51,14 @@ export function Lente() {
     const svg = cornice.current?.querySelector('svg');
     if (!svg) return;
     for (const a of svg.getAnimations({ subtree: true })) {
-      if (fase === null) a.play();
+      if (corre) a.play();
       else { a.pause(); a.currentTime = fase; }
     }
   });
+
+  // ⚠️ Muovere il cursore ferma il ratto: è l'unico gesto sensato, e senza questo l'istante zero
+  // non si poteva scegliere — il cursore era già lì e non cambiava valore.
+  const scegliFase = (ms: number) => { setFase(ms); setCorre(false); };
 
   return (
     <div className="flex flex-col gap-6">
@@ -81,13 +86,11 @@ export function Lente() {
         </label>
         <label className="flex items-center gap-3">
           <TechLabel className="text-muted">fase</TechLabel>
-          <input type="range" min={0} max={CICLO_MS} step={10} value={fase ?? 0} onChange={(e) => setFase(Number(e.target.value))} className="w-64 accent-brand-ink" aria-label="Istante del passo" />
-          <span className="w-20 tabular-nums text-muted">{fase === null ? 'corre' : `${fase} ms`}</span>
-          {fase !== null && (
-            <button type="button" onClick={() => setFase(null)} className="rounded-md border border-border px-2 py-1 text-xs text-brand-ink hover:bg-surface">
-              riprendi
-            </button>
-          )}
+          <input type="range" min={0} max={CICLO_MS} step={10} value={fase} onChange={(e) => scegliFase(Number(e.target.value))} className="w-64 accent-brand-ink" aria-label="Istante del passo" />
+          <span className="w-20 tabular-nums text-muted">{corre ? 'corre' : `${fase} ms`}</span>
+          <button type="button" onClick={() => (corre ? scegliFase(fase) : setCorre(true))} className="rounded-md border border-border px-2 py-1 text-xs text-brand-ink hover:bg-surface">
+            {corre ? 'ferma' : 'riprendi'}
+          </button>
         </label>
       </div>
 
