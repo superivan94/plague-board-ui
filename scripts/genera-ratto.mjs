@@ -411,14 +411,25 @@ const PERNO_PEDINA = [1130 + T_BRUNO[0], 535 + T_BRUNO[1]];
 // L'imbracatura: cinghie, fibbie, liquido, bolle, etichetta e tappo per colore nel loro
 // rettangolo; il vetro del collo — che non tocca il verde e somiglia all'ombra del pelo bianco — nel
 // suo rettangolo stretto; il dado per riempimento, perché non ha un colore suo.
+// ⚠️ Il tappo di sughero è oro con l'ombra che quantizza a **pelo bruno** (`brownFur`, una fascia di
+// 14 px a destra e in basso): fuori dai semi e fuori dal filtro, il tappo usciva mozzato su quel
+// lato. Segnalato dall'utente. Ha il suo rettangolo — x 820–980, y 80–210 — coi tre colori come
+// semi, e nel ricalco il bruno si legge oro. Nel disegno bianco il bruno non sta da nessun'altra parte.
+const RECINTO_TAPPO = { x0: 820, y0: 80, x1: 980, y1: 210 };
+const COLORI_TAPPO = ['gold', 'brownFur', 'brownShade'];
+const TAPPO_IN_ORO = { brownFur: 'gold', brownShade: 'gold' };
+const mTappo = maschera(bianco, COLORI_TAPPO, RAGGIO, RECINTO_TAPPO);
 const mImbracatura = unisci(
   unisci(
-    maschera(bianco, ['leather', 'green', 'greenLight', 'cream', 'gold'], RAGGIO, { x0: 690, y0: 80, x1: 1010, y1: 740 }),
-    maschera(bianco, ['glass', 'whiteShade'], RAGGIO, { x0: 770, y0: 80, x1: 980, y1: 340 }),
+    unisci(
+      maschera(bianco, ['leather', 'green', 'greenLight', 'cream', 'gold'], RAGGIO, { x0: 690, y0: 80, x1: 1010, y1: 740 }),
+      maschera(bianco, ['glass', 'whiteShade'], RAGGIO, { x0: 770, y0: 80, x1: 980, y1: 340 }),
+    ),
+    mTappo,
   ),
   attorno(bianco, dado, RAGGIO),
 );
-const imbracatura = ricalca(bianco, mImbracatura, new Set(['leather', 'green', 'greenLight', 'cream', 'glass', 'gold', 'ink']), { whiteFur: 'cream', greyBelly: 'cream', whiteShade: 'glass' }, 48);
+const imbracatura = ricalca(bianco, mImbracatura, new Set(['leather', 'green', 'greenLight', 'cream', 'glass', 'gold', 'ink']), { whiteFur: 'cream', greyBelly: 'cream', whiteShade: 'glass', ...TAPPO_IN_ORO }, 48);
 // L'imbracatura in tre pezzi che si muovono da soli: le cinghie con le fibbie stanno ferme, la
 // bottiglia dondola sul perno dove le cinghie la reggono, il dado pende dall'anello sotto la fibbia.
 const mBottiglia = unisci(
@@ -426,9 +437,9 @@ const mBottiglia = unisci(
     maschera(bianco, ['green', 'greenLight', 'cream'], RAGGIO, { x0: 690, y0: 80, x1: 1010, y1: 470 }),
     maschera(bianco, ['glass', 'whiteShade'], RAGGIO, { x0: 770, y0: 80, x1: 980, y1: 340 }),
   ),
-  maschera(bianco, ['gold'], RAGGIO, { x0: 820, y0: 80, x1: 930, y1: 200 }),
+  mTappo,
 );
-const bottiglia = ricalca(bianco, mBottiglia, new Set(['green', 'greenLight', 'cream', 'glass', 'gold', 'ink']), { whiteFur: 'cream', greyBelly: 'cream', whiteShade: 'glass' }, 48);
+const bottiglia = ricalca(bianco, mBottiglia, new Set(['green', 'greenLight', 'cream', 'glass', 'gold', 'ink']), { whiteFur: 'cream', greyBelly: 'cream', whiteShade: 'glass', ...TAPPO_IN_ORO }, 48);
 const mCinghie = maschera(bianco, ['leather', 'gold'], RAGGIO, { x0: 690, y0: 200, x1: 1010, y1: 740 });
 const cinghie = ricalca(bianco, mCinghie, new Set(['leather', 'gold', 'ink']), {}, 48);
 const dadoRicalcato = ricalca(bianco, attorno(bianco, dado, RAGGIO), new Set(['cream', 'ink']), { whiteFur: 'cream', greyBelly: 'cream', whiteShade: 'cream' }, 48);

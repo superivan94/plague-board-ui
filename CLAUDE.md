@@ -348,6 +348,20 @@ exist in target module» che **non sono veri**. Si guarda la pagina, o si crede 
   `animations.css` dà davvero — durata, ritardo, `alternate`, `ease-in-out` — perché l'angolo
   relativo peggiore fra due pezzi capita **in mezzo**, non agli estremi scelti a mano. Un cuneo di
   10 px sulla reference è un pixel a 88px, e passa.
+- ⚠️ **La cornice del ratto è misurata da fermo, e correndo il disegno la sborda.** Il corpo sale
+  di sei unità e i piedi scendono oltre il bordo, e un `<svg>` taglia ciò che esce dal `viewBox`:
+  il tappo dell'ampolla spariva in cima al sobbalzo. `.pb-rat { overflow: visible }` in
+  `animations.css` lascia sbordare il disegno senza allargare la cornice, che resta quella del
+  ratto fermo. ⚠️ E il tappo stesso usciva mozzato **da fermo**: la sua ombra quantizza a `brownFur`
+  — pelo bruno, in un disegno che di bruno non ha altro — e stava fuori sia dai semi sia dal filtro
+  del kit. È la stessa lezione del teschio: i colori dentro la maschera si **contano**, la
+  tavolozza non basta. Segnalato dall'utente il 2026-09-19.
+- ⚠️ **Le cuciture si guardano sulla pagina `/lente` del playground, non sulla demo.** Il ratto da
+  solo, alto fino a 1200 px, **fermo a un istante qualunque** del ciclo — `getAnimations()` messe in
+  pausa e portate a `currentTime` — e con un colore per pezzo (`[fill="#100020"]` esclude
+  l'inchiostro, perché i percorsi non hanno classi ma hanno il colore come attributo). A 96 px un
+  artefatto di 10 px sulla reference è un pixel, e la demo non lo mostra; l'utente li vedeva
+  ingrandendo. È il gemello a schermo delle tavole `ciclo-*.png` del generatore.
 - ⚠️ **`sharp` ridimensiona prima di comporre, qualunque sia l'ordine delle chiamate.** Una griglia
   di coordinate disegnata alla misura del ritaglio e composta dopo `resize()` finisce **centrata e a
   1:1** sull'immagine ingrandita: le etichette sembrano giuste e sono spostate di decine di pixel.

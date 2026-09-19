@@ -45,6 +45,12 @@ export const PLAYGROUND_PAGES: readonly PlaygroundPage[] = [
     kind: 'demo',
   },
   {
+    href: '/lente',
+    title: 'La lente',
+    blurb: 'Il ratto da solo, ingrandito e fermo a un istante del passo: per guardare le cuciture.',
+    kind: 'demo',
+  },
+  {
     href: '/stile',
     title: 'La direzione',
     blurb: 'Il bersaglio: come deve venire una schermata vestita da Ludoratti.',

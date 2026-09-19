@@ -403,6 +403,13 @@
   }
 }
 
+/* ⚠️ La cornice è misurata sul ratto **fermo**: correndo, il corpo sale di sei unità e i piedi
+ * scendono oltre il bordo, e l'`<svg>` per default taglia ciò che esce dal `viewBox` — il tappo
+ * dell'ampolla sparisce in cima al sobbalzo, le dita in fondo al passo. Il disegno può sbordare. */
+.pb-rat {
+  overflow: visible;
+}
+
 /* ⚠️ `transform-box: view-box` è ciò che fa valere il perno nelle unità del disegno. È il valore
  * predefinito degli elementi SVG, scritto perché è la riga da cui dipende tutto. */
 .pb-rat-body,

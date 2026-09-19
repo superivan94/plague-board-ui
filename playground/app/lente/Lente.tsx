@@ -1,0 +1,101 @@
+'use client';
+
+import { ToggleButton, ToggleButtonGroup } from '@heroui/react';
+import { RAT_LIVERIES, Rat, TechLabel, type RatLivery } from 'plague-board-ui';
+import { useEffect, useRef, useState } from 'react';
+
+const LIVREE = Object.keys(RAT_LIVERIES) as RatLivery[];
+type Kit = 'skull' | 'collar' | 'vial';
+/** Il passo dura 0,3 s e si alterna: il ciclo intero è 0,6 s. */
+const CICLO_MS = 600;
+
+/**
+ * Le tinte del pupazzo: un colore per pezzo, l'inchiostro lasciato stare. ⚠️ Il selettore
+ * `[fill="#100020"]` è l'inchiostro della livrea: i percorsi non hanno classi, ma hanno il colore
+ * come attributo, e il CSS sull'attributo lo può escludere.
+ */
+const TINTE: Record<string, string> = {
+  'tail-1': '#38bdf8', 'tail-2': '#0ea5e9', 'tail-3': '#6366f1', 'tail-4': '#38bdf8', 'tail-5': '#0ea5e9',
+  'leg-back-far': '#facc15', 'leg-front-far': '#fde047', 'leg-back-near': '#ef4444', 'leg-front-near': '#f97316',
+  torso: '#a3a3a3',
+};
+const CSS_TINTE = Object.entries(TINTE)
+  .map(([parte, colore]) => `.lente-tinte .pb-rat-${parte} > path:not([fill="#100020"]) { fill: ${colore}; }`)
+  .join('\n');
+
+/**
+ * La lente: il ratto **da solo**, grande quanto si vuole, fermo a un istante qualunque del passo.
+ *
+ * Serve a guardare le cuciture del pupazzo — i giunti, le radici delle zampe, la coda — senza il
+ * resto della pagina attorno e a una scala in cui un pixel della reference è un pixel a schermo.
+ * La fase si sceglie col cursore: **mette in pausa tutte le animazioni** del ratto e le porta a
+ * quell'istante con `currentTime`, che è ciò che il browser fa da sé mentre corrono; «riprendi» le
+ * rilascia. Le tinte colorano ogni pezzo con un colore suo, così si vede dove finisce uno e comincia
+ * l'altro.
+ *
+ * ⚠️ È uno strumento del playground, non della libreria: il ratto non sa di essere osservato.
+ */
+export function Lente() {
+  const [livrea, setLivrea] = useState<RatLivery>('grey');
+  const [kit, setKit] = useState<Set<Kit>>(() => new Set<Kit>(['vial']));
+  const [altezza, setAltezza] = useState(420);
+  const [tinte, setTinte] = useState(false);
+  /** `null` = corre; un numero = ferma a quell'istante del ciclo, in millisecondi. */
+  const [fase, setFase] = useState<number | null>(null);
+  const cornice = useRef<HTMLDivElement>(null);
+
+  // Le animazioni del ratto si fermano e si portano alla fase scelta, o si rilasciano. È l'unico
+  // posto che tocca il DOM del ratto, e lo fa a ogni render perché il ratto cambia con le prop.
+  useEffect(() => {
+    const svg = cornice.current?.querySelector('svg');
+    if (!svg) return;
+    for (const a of svg.getAnimations({ subtree: true })) {
+      if (fase === null) a.play();
+      else { a.pause(); a.currentTime = fase; }
+    }
+  });
+
+  return (
+    <div className="flex flex-col gap-6">
+      <style>{CSS_TINTE}</style>
+
+      <div className="flex flex-wrap items-center gap-4">
+        <ToggleButtonGroup size="sm" selectionMode="single" disallowEmptySelection selectedKeys={[livrea]} onSelectionChange={(k) => { const v = [...k][0] as RatLivery | undefined; if (v) setLivrea(v); }} aria-label="Livrea">
+          {LIVREE.map((l) => <ToggleButton key={l} id={l}><TechLabel>{l}</TechLabel></ToggleButton>)}
+        </ToggleButtonGroup>
+        <ToggleButtonGroup size="sm" selectionMode="multiple" selectedKeys={[...kit]} onSelectionChange={(k) => setKit(new Set([...k] as Kit[]))} aria-label="Kit">
+          <ToggleButton id="skull"><TechLabel>teschio</TechLabel></ToggleButton>
+          <ToggleButton id="collar"><TechLabel>collare</TechLabel></ToggleButton>
+          <ToggleButton id="vial"><TechLabel>ampolla</TechLabel></ToggleButton>
+        </ToggleButtonGroup>
+        <ToggleButtonGroup size="sm" selectionMode="multiple" selectedKeys={tinte ? ['tinte'] : []} onSelectionChange={(k) => setTinte([...k].includes('tinte'))} aria-label="Aspetto">
+          <ToggleButton id="tinte"><TechLabel>tinte dei pezzi</TechLabel></ToggleButton>
+        </ToggleButtonGroup>
+      </div>
+
+      <div className="flex flex-wrap items-center gap-6 text-sm">
+        <label className="flex items-center gap-3">
+          <TechLabel className="text-muted">altezza</TechLabel>
+          <input type="range" min={120} max={1200} step={20} value={altezza} onChange={(e) => setAltezza(Number(e.target.value))} className="w-48 accent-brand-ink" aria-label="Altezza del ratto in pixel" />
+          <span className="w-16 tabular-nums text-muted">{altezza} px</span>
+        </label>
+        <label className="flex items-center gap-3">
+          <TechLabel className="text-muted">fase</TechLabel>
+          <input type="range" min={0} max={CICLO_MS} step={10} value={fase ?? 0} onChange={(e) => setFase(Number(e.target.value))} className="w-64 accent-brand-ink" aria-label="Istante del passo" />
+          <span className="w-20 tabular-nums text-muted">{fase === null ? 'corre' : `${fase} ms`}</span>
+          {fase !== null && (
+            <button type="button" onClick={() => setFase(null)} className="rounded-md border border-border px-2 py-1 text-xs text-brand-ink hover:bg-surface">
+              riprendi
+            </button>
+          )}
+        </label>
+      </div>
+
+      {/* ⚠️ Il fondo è la superficie del tema, non un colore fisso: si guarda il ratto anche in scuro. */}
+      <div ref={cornice} className={`overflow-auto rounded-lg border border-border bg-surface p-6 ${tinte ? 'lente-tinte' : ''}`}>
+        <Rat livery={livrea} size={altezza} isRunning hasSkull={kit.has('skull')} hasCollar={kit.has('collar')} hasVial={kit.has('vial')} title="Il ratto sotto la lente" />
+      </div>
+      <p className="text-xs text-muted">Il ratto corre sempre; con la fase ferma si legge un istante del ciclo di 0,6 secondi. Con «tinte dei pezzi» ogni parte ha un colore suo e l&apos;inchiostro resta inchiostro.</p>
+    </div>
+  );
+}
