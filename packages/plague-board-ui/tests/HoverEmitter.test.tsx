@@ -221,11 +221,31 @@ describe('HoverEmitter', () => {
     // I tre secondi del foglio di stile, riscritti sull'elemento: è la sua vita, non un doppione.
     expect(Number.parseFloat(fumetto.style.animationDuration)).toBe(3);
     // ⚠️ Stretta attorno alla metà: il fumetto si centra sul punto, e di là sbordava di 81 px.
-    expect(Number.parseFloat(fumetto.style.left)).toBeGreaterThanOrEqual(25);
-    expect(Number.parseFloat(fumetto.style.left)).toBeLessThanOrEqual(75);
+    expect(Number.parseFloat(fumetto.style.left)).toBeGreaterThanOrEqual(35);
+    expect(Number.parseFloat(fumetto.style.left)).toBeLessThanOrEqual(65);
     // Nasce **sopra** il riquadro: è il motivo per cui nessun antenato può tagliare.
-    expect(Number.parseFloat(fumetto.style.top)).toBeLessThanOrEqual(-60);
-    expect(Number.parseFloat(fumetto.style.top)).toBeGreaterThanOrEqual(-210);
+    expect(Number.parseFloat(fumetto.style.top)).toBeLessThanOrEqual(-55);
+    expect(Number.parseFloat(fumetto.style.top)).toBeGreaterThanOrEqual(-100);
+  });
+
+  it('coi fumetti non ce n’è mai due in scena insieme', () => {
+    const { container } = render(
+      <HoverEmitter effect={comicBubbles(FRASI)}>
+        <span>Superivan94</span>
+      </HoverEmitter>,
+    );
+
+    entra(container.firstElementChild!);
+
+    // ⚠️ Un decimo alla volta per dieci secondi: il momento in cui due si toccherebbero è quello
+    // del cambio, e campionare più largo se lo perderebbe.
+    let massimo = 0;
+    for (let passo = 0; passo < 100; passo += 1) {
+      avanza(100);
+      massimo = Math.max(massimo, effimeri(container, 'pb-comic-bubble').length);
+    }
+
+    expect(massimo).toBe(1);
   });
 
   it('con le corsie nessuno nasce all’altezza del precedente', () => {

@@ -45,8 +45,12 @@ const RULES = [
     'Sette numeri e un elenco di parole: ogni quanto, quanto vive, che cosa c’è scritto, con che classe, dove nasce e quanto è grande. Così passa da una pagina server a un componente client come qualunque altra prop, si stampa a schermo e si ritocca con uno spread. Il prezzo è dichiarato: quello che vola è testo.',
   ],
   [
+    'Una frase si legge da sola',
+    'Un fumetto è largo quanto la frase che contiene, quindi due insieme si coprono comunque li si disponga: la cadenza dei fumetti è la loro vita più due decimi, e il successivo nasce a scena vuota. Entra in un quarto di secondo, resta fermo due secondi e mezzo, esce in un altro quarto. Una pioggia non ha questo problema — una cifra è larga un carattere — e infatti ne vivono venti insieme.',
+  ],
+  [
     'Due di fila non si somigliano',
-    'L’altezza gira per corsie invece di pescarsi libera: con tante corsie quanti ne vivono insieme — tre, per i fumetti — non se ne sovrappongono mai due. E il testo si pesca fra gli altri, mai quello appena uscito. Sono le due cose che fanno sembrare corto un mazzo di frasi anche quando non lo è. Una pioggia, invece, le corsie non le vuole: lì il disordine è l’effetto.',
+    'L’altezza non si pesca libera: gira per corsie, che sono altezze fisse percorse a turno, così ogni fumetto compare da un’altra parte. E il testo si pesca fra gli altri, mai quello appena uscito. Sono le due cose che fanno sembrare corto un mazzo di frasi anche quando non lo è.',
   ],
   [
     'Da fermo fa un cenno',
@@ -84,8 +88,9 @@ export default function TouchPage() {
 
       <section className="flex flex-col gap-3">
         <p className="max-w-2xl text-sm text-muted">
-          Passaci sopra col mouse, o toccale da telefono. Sono le due tarature di RattInventario,
-          numero per numero: un pensiero ogni 1,2 s da una parte, una cifra ogni 80 ms dall&apos;altra.
+          Passaci sopra col mouse, o toccale da telefono. Due tarature lontanissime dello stesso
+          meccanismo: un pensiero per volta da una parte — entra, si legge, esce, e solo dopo ne
+          arriva un altro da un&apos;altra parte — una cifra ogni 80 ms dall&apos;altra.
         </p>
         <div className="flex flex-wrap items-center justify-center gap-10 rounded-lg border border-border bg-surface px-6 py-20">
           <HoverEmitter effect={comicBubbles(DEV_PHRASES)}>

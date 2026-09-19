@@ -465,6 +465,14 @@ exist in target module» che **non sono veri**. Si guarda la pagina, o si crede 
   ancorato col proprio spigolo sinistro, largo 179 px su una scheda da 142, sbordava di **81 px** a
   destra e sembrava il fumetto di qualcun altro. ⚠️ E quel 179 è l'altra misura da non perdere: la
   frase più lunga di RattInventario stava dentro i suoi 180 px di `max-width` **per un pixel**.
+- ⚠️ **Due cose larghe quanto il loro testo non si separano disponendole: si separano nel tempo.**
+  I fumetti dell'emettitore sono larghi quanto la frase che contengono — da 80 a 200 px su una
+  scheda di 142 — quindi due che convivono si disturbano comunque, e allontanarli in verticale
+  vuol dire mandarli **così in alto da staccarli** da ciò che li ha detti. Sono due giri persi a
+  cercare la disposizione giusta prima di capire che la cura era un'altra: **uno per volta**, con
+  la cadenza pari alla vita più un respiro, così il successivo nasce a scena vuota. Le corsie sono
+  rimaste, ma a fare un altro mestiere — far comparire ogni fumetto da un'altra parte — e la
+  pioggia binaria, dove una cifra è larga un carattere, di ventine insieme non soffre affatto.
 - ⚠️ **Una «corsia» che è una fascia dentro cui si pesca non impedisce le sovrapposizioni.**
   L'altezza sorteggiata è il **bordo di sopra** dell'elemento, e l'elemento scende: uno nato in
   fondo alla sua corsia da 20 px, se è alto 18, entra per sedici in quella accanto. Misurato il

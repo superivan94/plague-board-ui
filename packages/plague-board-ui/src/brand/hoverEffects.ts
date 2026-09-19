@@ -66,28 +66,33 @@ export interface HoverEffect {
 }
 
 /**
- * **I fumetti dello sviluppatore**: un pensiero ogni 1,2 secondi, sopra a ciò che si sta
- * sfiorando, che si gonfia e svanisce in tre secondi.
+ * **I fumetti dello sviluppatore**: un pensiero per volta, appena sopra a ciò che si sta
+ * sfiorando. Entra in un quarto di secondo, resta fermo due secondi e mezzo, esce in un altro
+ * quarto — e solo dopo, con due decimi di respiro, ne nasce un altro da un'altra parte.
  *
  * Le frasi si passano — `DEV_PHRASES` è la voce umana della firma «umano e AI» — perché una
  * taratura è un meccanismo e le parole sono di chi firma.
  *
- * ⚠️ **Tre numeri non sono quelli di RattInventario, e sono correzioni misurate il 2026-09-19.**
- * La vita passa da 2,5 a 3 secondi perché a leggerle davvero le frasi lunghe non si facevano in
- * tempo. La fascia di `left` si stringe attorno alla metà — di là va da −15% a 85% e il fumetto
- * ci appoggia lo spigolo, quindi una frase da 143 px su una scheda da 142 sbordava di **81 px** a
- * destra, e sembrava appartenere a qualcos'altro. E `top` si allarga a 150 punti per fare spazio a
- * **tre corsie** distanti 28 px l'una dall'altra: in una fascia da 23 px, tre fumetti alti 18 si
- * coprivano a vicenda. Tre è anche quanti ne vivono insieme — tre secondi di vita, uno ogni 1,2 —
- * quindi due fumetti non si sovrappongono mai.
+ * ⚠️ **Dei numeri di RattInventario non ne resta quasi nessuno, e sono tutte correzioni chieste
+ * dall'utente guardando la pagina.** Di là ne esce uno ogni 1,2 secondi e ne vivono tre insieme:
+ * si accavallavano, e nessuna disposizione li salva, perché un fumetto è largo quanto la frase che
+ * contiene. **Uno per volta** è la cura vera — `everyMs` è la vita più due decimi, quindi il
+ * successivo nasce a scena vuota — e le tre corsie servono a farlo comparire ogni volta da
+ * un'altra parte, non più a tenerli separati.
+ *
+ * ⚠️ **E stanno vicini alla scheda.** `left` si stringe attorno alla metà e il fumetto ci si
+ * **centra** — di là ci appoggia lo spigolo, quindi una frase da 179 px su una scheda da 142
+ * sbordava di 81 px a destra — mentre `top` tiene il fondo del fumetto fra i 2 e i 20 px sopra il
+ * bordo, che è dove la sua punta indica qualcosa. Il primo giro li mandava a 80 px di altezza:
+ * «più in alto del dovuto», ed era vero.
  */
 export const comicBubbles = (phrases: readonly string[]): HoverEffect => ({
-  everyMs: 1200,
+  everyMs: 3200,
   lifeMs: [3000, 3000],
   contents: phrases,
   className: 'pb-comic-bubble',
-  left: [25, 75],
-  top: [-210, -60],
+  left: [35, 65],
+  top: [-100, -55],
   lanes: 3,
 });
 

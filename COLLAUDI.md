@@ -472,9 +472,11 @@ dopo un decimo di secondo, che è quanto dura un tocco vero.
 | Azione | Atteso | Ottenuto |
 |---|---|---|
 | Si carica la pagina | tre emettitori fermi, ognuno col suo cenno acceso | 3 nodi `.pb-hover-hint`, animazione `pb-hover-hint` di 6000 ms, iterazioni infinite |
-| Si porta il mouse sulla scheda di Superivan94 | un fumetto ogni 1,2 s, e il cenno di **quella** scheda si spegne | i cenni passano da 3 a 2; `left: 48.4%; top: -135%; animation-duration: 3s` |
-| Si resta fermi dodici secondi e si contano le sovrapposizioni fra i vivi | nessuna: tre corsie, e tre è anche quanti ne vivono insieme | **0** su 62 coppie confrontate, e le altezze sono sempre e solo `-210%`, `-135%`, `-60%` |
-| Si guarda quanto sbordano dalla scheda | poco, e da tutti e due i lati: il fumetto si **centra** sul punto in cui nasce | al massimo **8 px** a destra e **17** a sinistra su una scheda da 142, e il più basso ha il fondo 6 px **sopra** il bordo della scheda |
+| Si porta il mouse sulla scheda di Superivan94 | un fumetto per volta, e il cenno di **quella** scheda si spegne | i cenni passano da 3 a 2; `left: 48.4%; top: -77.5%; animation-duration: 3s` |
+| Si campiona ogni 120 ms per undici secondi e si conta quanti ce ne sono insieme | **mai più di uno**, e fra l'uno e l'altro la scena resta vuota | `maxN` **1** su 90 letture, 5 delle quali a scena vuota; nascite a 2860, 3115 e 3240 ms l'una dall'altra, cioè i 3200 dichiarati |
+| Si guarda dove nascono, uno dopo l'altro | ogni volta da un'altra parte: tre altezze a turno | `-77,5%`, `-55%`, `-100%`, in giro — e il fondo del fumetto sta fra **6 e 23 px** sopra il bordo della scheda, cioè dove la sua punta indica qualcosa |
+| Si guarda quanto sbordano dalla scheda | poco, e da tutti e due i lati: il fumetto si **centra** sul punto in cui nasce | mai oltre il bordo destro (**−13 px** il più sporgente) e al massimo **24 px** oltre il sinistro, su una scheda larga 142 |
+| Si mette in pausa l'animazione di un fumetto e la si porta a mano sui suoi istanti | entrata 0,25 s, due secondi e mezzo fermo, uscita 0,25 s | opacità **0 → 1 fra 0 e 180 ms** (con lo sbalzo a `scale(1.08)`), posato a `scale(1)` a **250**, fermo e opaco fino a **2750**, poi 0,32 a 2875 e **0** a 2999 |
 | Si guarda se due frasi di fila sono uguali | mai: si pesca fra le altre | **0** ripetizioni su 11 uscite, 10 frasi diverse |
 | Si misura la frase più lunga dentro un fumetto vero | sotto il `max-width`, o si scrive sul niente | «SONO UN MAGO DELLA PROGRAMMAZIONE!» fa **179 px** — sui 180 di RattInventario era a un pixel dal bordo, ed è il motivo dei 200 di adesso. Nessuna delle ventidue supera il riquadro |
 | Si porta il mouse su AI-Dev | la pioggia sale e si assesta | 4, 8, 12, 16, 17, 18 campionando ogni 300 ms: è l'equilibrio fra 80 ms di cadenza e 0,8–1,8 s di vita |
@@ -501,11 +503,16 @@ tutti e cinque per cose che l'utente ha visto guardando la pagina e il collaudo 
 fumetti duravano troppo poco per leggerli (2,5 → 3 s); si accavallavano; uscivano due volte di fila
 uguali; e comparivano «lontani dall'oggetto sorgente» — misurato dopo, **81 px** oltre il bordo
 destro di una scheda larga 142, perché il fumetto ci appoggiava lo spigolo invece di centrarcisi.
-⚠️ E la prima cura delle corsie non bastava: dividere la fascia in tre e **pescare dentro la
-fetta** lasciava dieci sovrapposizioni su ventiquattro campionamenti, perché un fumetto alto 18 px
-nato in fondo alla sua corsia da 20 sborda in quella accanto. Le corsie sono diventate altezze
-**fisse**. È la ragione per cui le righe qui sopra contano le coppie sovrapposte invece di dire
-«sembra a posto».
+⚠️ E la cura delle sovrapposizioni ha richiesto **due** giri sbagliati prima di quello buono, che
+è la parte da ricordare. Primo: dividere la fascia in tre corsie e **pescare dentro la fetta** —
+restavano dieci sovrapposizioni su ventiquattro campionamenti, perché un fumetto alto 18 px nato in
+fondo alla sua corsia da 20 sborda in quella accanto. Secondo: corsie ad altezze **fisse** —
+niente sovrapposizioni misurate, ma l'utente guardando la pagina ha detto «non ci siamo», e aveva
+ragione: **un fumetto è largo quanto la frase che contiene**, quindi due che convivono si
+disturbano comunque li si disponga, e per separarli bisognava mandarli così in alto da staccarli
+dalla scheda — «più in alto del dovuto». La cura vera è **uno per volta**: la cadenza è la vita più
+due decimi, e le corsie sono rimaste solo per farlo comparire ogni volta da un'altra parte. È la
+ragione per cui le righe qui sopra contano quanti ce n'è insieme invece di dire «sembra a posto».
 
 **Che cosa protegge:** l'unico easter egg della libreria che si comanda con un **gesto**, e che
 quindi ha due modi di essere rotto senza che nessuno se ne accorga. Il primo è quello di
