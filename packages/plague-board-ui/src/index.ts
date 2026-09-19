@@ -7,6 +7,11 @@
 // superficie pubblica, e un asterisco lo renderebbe una domanda invece che una risposta.
 
 // I segni del marchio: le cose che dicono «Ludoratti» senza essere un'applicazione.
+export { HoverEmitter, type HoverEmitterProps } from './brand/HoverEmitter';
+// ⚠️ Le tarature stanno in un modulo **senza** `'use client'`, e non per simmetria con
+// `plagueBarSizes.ts`: una pagina server deve poter chiamare `binaryRain()` e passare il risultato
+// all'emettitore, che è client. Per questo dentro non c'è nessuna funzione — solo numeri e parole.
+export { binaryRain, comicBubbles, type HoverEffect } from './brand/hoverEffects';
 export { PlagueBar, type PlagueBarProps } from './brand/PlagueBar';
 // ⚠️ Le misure **non** escono da `PlagueBar.tsx`, che dichiara `'use client'`: un dato esportato
 // da un modulo client arriva a una pagina server come riferimento, e chi lo indicizza ottiene
@@ -17,7 +22,7 @@ export { PulseDot, type PulseDotProps } from './brand/PulseDot';
 export { RAT_LIVERIES, Rat, type RatLivery, type RatProps } from './brand/Rat';
 export { RatRun, type RatRunProps } from './brand/RatRun';
 // Il caso — quanti ratti, ogni quanto, con che cosa addosso — sta qui e non in `RatRun`.
-export { RatSwarm, type RatSwarmHandle, type RatSwarmProps, type RatSwarmRange } from './brand/RatSwarm';
+export { RatSwarm, type RatSwarmHandle, type RatSwarmProps } from './brand/RatSwarm';
 // La faccia di marca. ⚠️ Il disegno sta in un modulo a parte e pesa 25,8 KB di base64: chi non
 // importa `RatMascot` non se lo porta dietro, perché il pacchetto è `sideEffects: ["*.css"]`.
 export { RatMascot, type RatMascotProps } from './brand/RatMascot';
@@ -52,3 +57,7 @@ export { useRandomPhrase, type RandomPhrase } from './hooks/useRandomPhrase';
 // e poter dire a chi guarda perché una decorazione non c'è.
 export { useReducedMotion } from './hooks/useReducedMotion';
 export { DEV_PHRASES, RAT_PHRASES } from './data/phrases';
+
+// Gli estremi fra cui si pesca: uno solo per tutta la libreria, perché lo sciame e l'emettitore
+// fanno la stessa cosa con numeri diversi.
+export type { RandomRange } from './randomRange';

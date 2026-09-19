@@ -423,6 +423,43 @@ exist in target module» che **non sono veri**. Si guarda la pagina, o si crede 
   spenta. La preferenza la dichiara la persona nelle impostazioni del sistema, non la pagina; da
   JavaScript si legge con `useReducedMotion`, che è l'unico caso in cui serve leggerla — tutto il
   resto obbedisce da solo con la regola in fondo a `animations.css`.
+- ⚠️ **React non ascolta `pointerenter`: se lo fabbrica da `pointerover` e `pointerout`.** Quelli
+  registrati sulla radice sono solo i secondi due, quindi in un test un `fireEvent.pointerEnter`
+  non arriva a nessun handler — si manda `pointerOver`. ⚠️ E `pointerType` va scritto a mano:
+  jsdom non ha `PointerEvent`, `@testing-library` ripiega su `Event`, ed `Event` di quel campo non
+  sa niente e lo **butta** — esattamente come fa con `animationName`. Senza, un tocco è
+  indistinguibile da un mouse e metà dei casi passano per il motivo sbagliato.
+- ⚠️ **Su un telefono «sopra» non esiste, e un easter egg appeso all'entrata e all'uscita del
+  puntatore ne mostra uno solo.** Col dito il browser manda `pointerenter` **prima** di
+  `pointerdown` e `pointerleave` **dopo** `pointerup`: il tocco apre e chiude nello stesso gesto.
+  La cura non è ascoltare un altro evento, è cambiare il modo: al tocco parte una **raffica a
+  tempo** che si spegne da sé e che alzare il dito non interrompe. ⚠️ E resta il problema di
+  prima: un easter egg che si scopre solo passandoci sopra non si scopre affatto — in
+  RattInventario le schede della firma non danno **nessun** segno di essere vive. Per questo
+  `HoverEmitter` fa un cenno da fermo (`pb-hover-hint`, un saltello ogni sei secondi), e lo spegne
+  mentre sputa.
+- ⚠️ **Una prop che deve arrivare a un componente client da una pagina server si progetta come
+  dato, non come funzione.** È il terzo lato del confine, dopo `render` e i dati esportati da un
+  modulo `'use client'`: un oggetto con dentro una funzione **non si serializza**, e il prerender
+  muore. La taratura di `HoverEmitter` è per questo fatta di soli numeri e stringhe — ogni quanto,
+  quanto vive, che cosa c'è scritto, dove nasce — invece di portare un `emit()` che dipinge. Il
+  prezzo è dichiarato (quello che vola è testo), il guadagno è che `binaryRain()` si può chiamare
+  da una pagina server, stampare a schermo e ritoccare con uno spread. Lo prova `next build`:
+  `/tocco` resta statica.
+- ⚠️ **`.pb-binary-digit` dichiara l'animazione senza durata, cioè a zero secondi.** Con
+  `forwards`, una cifra senza `animationDuration` scritto addosso salterebbe dritta all'ultimo
+  fotogramma, che è trasparente: presente nel DOM e invisibile. La durata la scrive chi genera
+  l'elemento, ed è **lo stesso numero** della sua vita — così non si possono disallineare. È anche
+  il motivo per cui lì la rimozione è un **timer** e non `animationend`, al contrario di `RatRun`:
+  un ratto tolto in anticipo sparisce a metà schermo e si vede, un fumetto alla fine di
+  `pb-bubble-pop` è già trasparente. In cambio, il timer arriva anche dove l'animazione non c'è, e
+  non costringe il componente a sapere come si chiama l'animazione di una classe che riceve da
+  fuori.
+- ⚠️ **Nel riquadro del browser dello strumento, `document.hidden` è vero quando il riquadro non è
+  in primo piano** — mentre una **scheda** dietro a un'altra lo lascia falso (misurato il
+  2026-09-19, sono due cose diverse e si erano misurate a un'ora di distanza). Chi campiona
+  qualcosa che dipende da `hidden` deve sapere quale dei due casi sta producendo: con il riquadro
+  dietro, `/corsa` non fa passare **nessun** ratto — che è il comportamento giusto — e sembra rotta.
 
 ## Memoria di sessione
 

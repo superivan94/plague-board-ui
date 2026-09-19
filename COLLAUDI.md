@@ -453,3 +453,48 @@ giorno in cui qualcuno torna su una scheda aperta da un'ora. ⚠️ **La prima s
 generava anche a pagina nascosta e si difendeva con un tetto di quattro — misurato il 2026-09-19,
 i ratti salivano a quel tetto e ci restavano (3, 4, 4, 4, 4, 5, 5, 5…). Un tetto limita il danno,
 non lo toglie; la cura è non far nascere ciò che non può arrivare in fondo.
+
+### L'emettitore: sfiorare, toccare, e chi arriva in fondo — 2026-09-19
+
+**Esegue:** agente — la cadenza, la raffica del tocco, il cenno e il silenzio sotto «meno
+movimento» li tiene `tests/HoverEmitter.test.tsx` coi timer finti; quello che solo un browser vero
+dice è che i pointer event **veri** arrivino come quelli costruiti a mano, che niente venga
+tagliato dai riquadri, e che una taratura costruita da una pagina server attraversi il confine.
+**Ultima esecuzione:** agente, 2026-09-19 — tutto come atteso.
+
+**Preparazione:** `npm run build`, `npm run playground`, `/tocco`. Gli elementi in volo si contano
+con `document.querySelectorAll('.pb-binary-digit').length` — o `.pb-comic-bubble` — campionando a
+intervalli regolari. ⚠️ **Il tocco nel riquadro dello strumento non si può fare**: si manda a mano
+sul nodo che porta `pb-hover-hint`, col tipo scritto dentro —
+`new PointerEvent('pointerover', { bubbles: true, pointerType: 'touch' })` — e poi `pointerout`
+dopo un decimo di secondo, che è quanto dura un tocco vero.
+
+| Azione | Atteso | Ottenuto |
+|---|---|---|
+| Si carica la pagina | tre emettitori fermi, ognuno col suo cenno acceso | 3 nodi `.pb-hover-hint`, animazione `pb-hover-hint` di 6000 ms, iterazioni infinite |
+| Si porta il mouse sulla scheda di Superivan94 | un fumetto ogni 1,2 s, e il cenno di **quella** scheda si spegne | 2 vivi a 2,6 s — il primo è nato a 0 ed è già scaduto a 2,5 — e i cenni passano da 3 a 2; `left: 14%; top: -19.3%; animation-duration: 2.5s` |
+| Si guarda se la frase più lunga sborda dal fumetto | no: `max-width` è 180px e il testo ci sta | il più largo misura **141 px** con `scrollWidth` **139** |
+| Si porta il mouse su AI-Dev | la pioggia sale e si assesta | 4, 8, 12, 16, 17, 18 campionando ogni 300 ms: è l'equilibrio fra 80 ms di cadenza e 0,8–1,8 s di vita |
+| Si porta il mouse altrove | smette di generarne, e i diciotto in volo **finiscono la loro corsa** | 18, 10, 5, 3, 1, 0, 0 in due secondi e mezzo — nessuno sparito di colpo, e i tre cenni tornano |
+| Si manda un `pointerover` col dito e lo si alza dopo 120 ms | la raffica continua da sé per tre secondi, poi si spegne | 2, 4, 3, 5, 4, 2, 2, 1, 0 a mezzo secondo l'uno: genera fino ai 3 s di `tapMs`, poi solo drena |
+| Il colore della pioggia nei due temi | segue `plague-ink`, che cambia col tema | `#15803d` in chiaro, `#4ade80` in scuro, su fasce leggibili in tutti e due |
+| Le tre regole nel CSS **generato** | ci sono tutte: fotogrammi, classe, e la riga di «meno movimento» | `@keyframes pb-hover-hint`, `.pb-hover-hint { …6s…infinite… }`, e `.pb-hover-hint` dentro `@media (prefers-reduced-motion: reduce)` |
+| `next build` | `/tocco` **statica**, pur costruendo tre tarature e passandole a un componente client | `○ /tocco`, nove pagine statiche su nove |
+
+⚠️ **Il campionamento è avvenuto con `document.hidden` vero**, perché il riquadro dello strumento
+non era in primo piano — e l'emettitore ha funzionato e si è ripulito lo stesso. Non è una
+distrazione: è esattamente la differenza con lo sciame. Lì la fine la dice `animationend`, che in
+una pagina nascosta non arriva mai, e quindi non si genera; qui la dice un timer, che scorre
+comunque. ⚠️ E completa la nota del collaudo qui sopra: una **scheda** dietro a un'altra lascia
+`hidden` falso, ma il **riquadro** non in primo piano lo mette vero. Chi misura una cosa che
+dipende da `hidden` deve sapere quale dei due sta facendo.
+
+⚠️ **Quello che questo collaudo non prova è `prefers-reduced-motion`**: il browser dello strumento
+non emula la preferenza. Lì valgono il test — che monta l'emettitore con `matchMedia` truccato e
+verifica che né il mouse né il dito facciano uscire niente — e la riga letta nel CSS generato.
+
+**Che cosa protegge:** l'unico easter egg della libreria che si comanda con un **gesto**, e che
+quindi ha due modi di essere rotto senza che nessuno se ne accorga. Il primo è quello di
+RattInventario, dove tutto è appeso a `onMouseEnter`: su un telefono non succede niente, e non c'è
+messaggio d'errore da nessuna parte. Il secondo è più sottile — un elemento che nasce e non muore —
+e si vede solo contando: le due colonne del drenaggio qui sopra sono lì apposta.

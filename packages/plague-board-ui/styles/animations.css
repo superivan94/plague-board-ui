@@ -260,8 +260,9 @@
 }
 
 /* ─────────────────────────────────────────────────────────────────────────────
- * Le due classi che non sono utility: sono **elementi effimeri** che un emettitore sputa in
- * pagina, e portano con sé geometria e animazione insieme.
+ * `HoverEmitter`. Le prime due classi non sono utility: sono **elementi effimeri** che
+ * l'emettitore sputa in pagina, e portano con sé geometria e animazione insieme. La terza è il
+ * cenno che fa da fermo, e sta su ciò che avvolge.
  * ───────────────────────────────────────────────────────────────────────────── */
 
 /* La cifra binaria che sale dalla scheda dello sviluppatore AI. */
@@ -304,6 +305,37 @@
   border-top: 4px solid rgb(0 0 0 / 0.9);
   border-right: 4px solid transparent;
   border-left: 4px solid transparent;
+}
+
+/* Il cenno che dice «qui c'è qualcosa»: un saltello con lo stiracchiamento di chi si sgranchisce,
+ * e poi cinque secondi e mezzo di immobilità. Un easter egg che si scopre solo passandoci sopra
+ * non si scopre affatto — in RattInventario le due schede in fondo alla pagina non danno **nessun**
+ * segno di essere vive — e su un telefono, dove «sopra» non esiste, è l'unica cosa che invita a
+ * toccare. ⚠️ Tutto il movimento sta negli ultimi 700 ms del ciclo: è il rapporto fra i due tempi
+ * a renderlo poco invaso, non l'ampiezza. */
+@keyframes pb-hover-hint {
+  0%,
+  88%,
+  100% {
+    transform: translateY(0) scale(1, 1);
+  }
+  91% {
+    transform: translateY(-3px) scale(0.97, 1.05);
+  }
+  95% {
+    transform: translateY(0) scale(1.04, 0.95);
+  }
+  98% {
+    transform: translateY(0) scale(1, 1);
+  }
+}
+
+/* ⚠️ È una classe e non un'utility `animate-*` di proposito: la scrive la libreria su un nodo
+ * suo, e un'utility esiste solo se il Tailwind di chi installa ha scandagliato il `dist` del
+ * pacchetto. Con la classe il cenno funziona comunque. */
+.pb-hover-hint {
+  transform-origin: bottom center;
+  animation: pb-hover-hint 6s ease-in-out infinite;
 }
 
 /* ─────────────────────────────────────────────────────────────────────────────
@@ -496,6 +528,7 @@
 @media (prefers-reduced-motion: reduce) {
   .pb-binary-digit,
   .pb-comic-bubble,
+  .pb-hover-hint,
   [class*='animate-'],
   .pb-rat--running .pb-rat-part,
   .pb-rat--running .pb-rat-body,

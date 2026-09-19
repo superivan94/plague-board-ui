@@ -3,11 +3,9 @@
 import { useCallback, useEffect, useImperativeHandle, useRef, useState, type Ref } from 'react';
 
 import { useReducedMotion } from '../hooks/useReducedMotion';
+import type { RandomRange } from '../randomRange';
 import { RAT_LIVERIES, type RatLivery } from './Rat';
 import { RatRun, type RatRunProps } from './RatRun';
-
-/** Gli estremi fra cui si pesca, compresi. Scriverli uguali vuol dire «sempre questo». */
-export type RatSwarmRange = readonly [number, number];
 
 /** Che cosa si può chiedere a uno sciame già montato, tenendone il riferimento. */
 export interface RatSwarmHandle {
@@ -27,14 +25,14 @@ export interface RatSwarmProps {
    * Il valore predefinito è quello di tre dei quattro posti di RattInventario; la prop c'è perché
    * la stessa pagina può volerne una frequenza diversa in punti diversi.
    */
-  everyMs?: RatSwarmRange;
+  everyMs?: RandomRange;
   /** Quanto dura una traversata, in millisecondi: 4–6 secondi, come i ratti di RattInventario. */
-  crossingMs?: RatSwarmRange;
+  crossingMs?: RandomRange;
   /**
    * La fascia in cui passano, in percentuale dell'altezza del contenitore. Si stringe quando il
    * contenitore è basso, o i ratti in fondo escono per metà dal bordo.
    */
-  band?: RatSwarmRange;
+  band?: RandomRange;
   /**
    * Quanti ratti al massimo insieme. **Senza, non c'è tetto**: con le attese predefinite ne
    * passano meno di uno alla volta, e chi vuole una scena affollata non deve chiedere il permesso.
@@ -58,10 +56,10 @@ interface Passaggio {
 
 const LIVREE = Object.keys(RAT_LIVERIES) as RatLivery[];
 
-const fra = ([min, max]: RatSwarmRange) => min + Math.random() * (max - min);
+const fra = ([min, max]: RandomRange) => min + Math.random() * (max - min);
 const testaOCroce = () => Math.random() < 0.5;
 
-const pesca = (key: number, crossingMs: RatSwarmRange, band: RatSwarmRange): Passaggio => ({
+const pesca = (key: number, crossingMs: RandomRange, band: RandomRange): Passaggio => ({
   key,
   ratto: {
     livery: LIVREE[Math.floor(Math.random() * LIVREE.length)],

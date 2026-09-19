@@ -45,6 +45,12 @@ export const PLAYGROUND_PAGES: readonly PlaygroundPage[] = [
     kind: 'demo',
   },
   {
+    href: '/tocco',
+    title: 'Il tocco',
+    blurb: 'L’easter egg che si accende quando lo sfiori, e che su un telefono si tocca.',
+    kind: 'demo',
+  },
+  {
     href: '/lente',
     title: 'La lente',
     blurb: 'Il ratto da solo, ingrandito e fermo a un istante del passo: per guardare le cuciture.',
