@@ -368,7 +368,12 @@ exist in target module» che **non sono veri**. Si guarda la pagina, o si crede 
   prende l'inchiostro fino a 20 px **solo fuori dal corpo**; ogni parte scarta le componenti sotto
   i 250 px (`briciole`). E i buchi lungo gli anelli della coda non erano movimento: filetti di
   antialiasing quantizzati a pelo che il ricalco scarta — si **fondono** a rosa nel tratto in aria,
-  prima del ricalco, come l'etichetta dell'ampolla.
+  prima del ricalco, come l'etichetta dell'ampolla. ⚠️ **Ma una fusione a rettangolo è un
+  colpo di rullo**: il rettangolo della coda toccava l'angolo della groppa e ne ha fatto rosa un
+  triangolo di pelo, nel tronco e nella coda insieme — visibile anche da fermo, e trovato
+  dall'utente. Una fusione che cura l'antialiasing vale **a ridosso del colore vero** (`accanto`,
+  3 px), non in tutto il rettangolo; e ogni fusione nuova si controlla coi riquadri dei percorsi per
+  colore (`bbox.mjs` nello scratchpad: quale parte ha un percorso rosa dove rosa non ci va).
 - ⚠️ **Le cuciture si guardano sulla pagina `/lente` del playground, non sulla demo.** Il ratto da
   solo, alto fino a 1200 px, **fermo a un istante qualunque** del ciclo — `getAnimations()` messe in
   pausa e portate a `currentTime` — e con un colore per pezzo (`[fill="#100020"]` esclude

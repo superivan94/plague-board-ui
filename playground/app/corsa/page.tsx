@@ -13,7 +13,7 @@ const RULES = [
   ],
   [
     'Un galoppo a coppie diagonali, e il corpo che ondeggia',
-    'Posteriore vicina con anteriore lontana, e viceversa: due coppie, stessa animazione, una dritta e una al contrario, mezzo passo in 0,3 secondi. Il corpo sale e beccheggia col passo; i cinque segmenti della coda oscillano di 3,5 gradi ciascuno con 45 millisecondi di ritardo l’uno sull’altro, che è l’onda; i pendagli vanno al doppio, perché sono pesi.',
+    'Posteriore vicina con anteriore lontana, e viceversa: due coppie, stessa animazione, una dritta e una al contrario, mezzo passo in 0,2 secondi. Il corpo sale e beccheggia col passo; i cinque segmenti della coda oscillano di 3,5 gradi ciascuno con 30 millisecondi di ritardo l’uno sull’altro, che è l’onda; i pendagli vanno al doppio, perché sono pesi.',
   ],
   [
     'La fine la dice animationend',

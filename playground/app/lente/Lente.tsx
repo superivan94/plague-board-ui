@@ -7,7 +7,7 @@ import { useEffect, useRef, useState } from 'react';
 const LIVREE = Object.keys(RAT_LIVERIES) as RatLivery[];
 type Kit = 'skull' | 'collar' | 'vial';
 /** Il mezzo passo di `animations.css`, in millisecondi; il ciclo intero è il doppio. */
-const MEZZO_PASSO_MS = 300;
+const MEZZO_PASSO_MS = 200;
 const CICLO_MS = MEZZO_PASSO_MS * 2;
 
 /**
@@ -113,7 +113,7 @@ export function Lente() {
         <Rat livery={livrea} size={altezza} isRunning hasSkull={kit.has('skull')} hasCollar={kit.has('collar')} hasVial={kit.has('vial')} title="Il ratto sotto la lente" />
       </div>
       <p className="text-xs text-muted">
-        Con la fase ferma si legge un istante del ciclo di 0,6 secondi. La velocità moltiplica tutte le animazioni insieme
+        Con la fase ferma si legge un istante del ciclo di 0,4 secondi. La velocità moltiplica tutte le animazioni insieme
         e dice il mezzo passo che ne risulta: è il numero da riportare in <code>animations.css</code>. Con «tinte dei pezzi»
         ogni parte ha un colore suo e l&apos;inchiostro resta inchiostro.
       </p>

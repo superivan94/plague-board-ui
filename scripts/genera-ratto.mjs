@@ -118,9 +118,23 @@ async function carica(nome, fusioni = []) {
     idx[i] = piuVicino(px[i * 4], px[i * 4 + 1], px[i * 4 + 2]);
   }
 
+  // ⚠️ Con `accanto`, la fusione vale solo entro `raggio` pixel da quel colore: serve per i filetti
+  // di antialiasing, che stanno **addosso** al colore vero. Senza, il rettangolo della coda
+  // arrivava sull'angolo della groppa (x 490–520, y 490–520) e ne faceva rosa un triangolo di pelo
+  // — nel tronco e nella coda insieme, quindi visibile anche da fermo. Segnalato dall'utente.
   for (const f of fusioni) {
     const da = NOMI.indexOf(f.da), a = NOMI.indexOf(f.a);
-    for (let y = f.y0; y < f.y1; y++) for (let x = f.x0; x < f.x1; x++) if (idx[y * W + x] === da) idx[y * W + x] = a;
+    let vicino = null;
+    if (f.accanto) {
+      const seme = NOMI.indexOf(f.accanto);
+      const m = new Uint8Array(W * H);
+      for (let y = f.y0; y < f.y1; y++) for (let x = f.x0; x < f.x1; x++) if (idx[y * W + x] === seme) m[y * W + x] = 1;
+      vicino = dilata(m, W, H, f.raggio ?? 3);
+    }
+    for (let y = f.y0; y < f.y1; y++) for (let x = f.x0; x < f.x1; x++) {
+      const i = y * W + x;
+      if (idx[i] === da && (!vicino || vicino[i])) idx[i] = a;
+    }
   }
 
   // ⚠️ Despeckle: filtro di maggioranza 3×3 sull'indice, **una** passata, e **l'inchiostro non si
@@ -254,8 +268,9 @@ function trasforma(d, dx, dy) {
 // ⚠️ Lungo gli anelli della coda l'antialiasing fra rosa e inchiostro quantizza a pelo (`fur`,
 // `shade`, `belly`): filetti da uno o due pixel che il ricalco scarta (`pathomit`) e che restano
 // **buchi** — fessure chiare lungo ogni anello, ferme anche da fermo. Nel tratto di coda in aria
-// (x < 520: dal 540 in su c'è la groppa) si leggono come rosa prima del ricalco.
-const CODA_IN_ARIA = { x0: 30, y0: 270, x1: 520, y1: 520 };
+// si leggono come rosa prima del ricalco, ma **solo a ridosso del rosa** (`accanto`, 3 px): il
+// rettangolo tocca l'angolo della groppa, e senza quel vincolo un triangolo di pelo diventava rosa.
+const CODA_IN_ARIA = { x0: 30, y0: 270, x1: 520, y1: 520, accanto: 'pink', raggio: 3 };
 const grigio = await carica('ludoratto-grigio', [
   { ...CODA_IN_ARIA, da: 'greyFur', a: 'pink' },
   { ...CODA_IN_ARIA, da: 'greyShade', a: 'pinkShade' },
@@ -505,10 +520,13 @@ const PARTI_ZAMPE = [
   // ⚠️ Perno e uscita stanno **sull'asse della zampa**, letto con la sonda per colonna: se la
   // capsula punta altrove, alla radice sbuca un nodo. Per le lontane il perno è prolungato dentro il
   // corpo quanto la groppa permette senza che il disco esca dal contorno.
-  // ⚠️ Il poligono scende fino a y 700 e parte da x 200: le dita del piede arrivano a y 662 e con il
-  // bordo a 660 il loro inchiostro più basso restava al tronco, fermo — un trattino nero sotto il
-  // piede appena il piede saliva. Segnalato dall'utente con le tinte della lente.
-  { nome: 'legBackFar', poligono: [[520, 480], [520, 700], [200, 700], [200, 500]], perno: [488, 540], uscita: [455, 548], raggio: 28, tinta: 'greyShade' },
+  // ⚠️ Il bordo basso scende a 700 solo sotto il piede (x < 380), dove le dita arrivano a y 662 e
+  // con il bordo a 660 il loro inchiostro restava al tronco — un trattino nero sotto il piede
+  // appena saliva. Verso la groppa (x > 440) risale a 660: lì sotto passa lo **stinco della vicina**
+  // (inchiostro da y 689 a x 519, 707 a x 490), e con il bordo a 700 la lontana se ne prendeva la
+  // cima — un triangolino rosa che spuntava sul pelo appena le due zampe si scostavano. Entrambi
+  // segnalati dall'utente con la lente.
+  { nome: 'legBackFar', poligono: [[520, 480], [520, 660], [440, 660], [380, 700], [200, 700], [200, 500]], perno: [488, 540], uscita: [455, 548], raggio: 28, tinta: 'greyShade' },
   // ⚠️ Il bordo basso del poligono segue il solco fra le due zampe anteriori, letto con la sonda per
   // colonna (x 1290 → y 652, x 1330 → y 675): con il bordo a 695 la cima dello stinco vicino finiva
   // nella lontana e, quando questa saliva, sotto restava una copia dello stinco. Segnalato dall'utente.
@@ -886,7 +904,7 @@ if (ANTEPRIME) {
     await sharp(Buffer.from(svg), { density: 96 }).resize({ width: 900 }).flatten({ background: '#9ca3af' }).png().toFile(join(ANTEPRIME, `ratto-${nome}.png`));
   }
 
-  // Il ciclo: dodici istanti del passo (0,6 s, ogni 50 ms) con le parti agli angoli che
+  // Il ciclo: dodici istanti del passo (0,4 s, ogni 33 ms) con le parti agli angoli che
   // `animations.css` dà in quel momento — durata, ritardo, alternanza, `ease-in-out` — resi a
   // 1800 px e composti in tavole 4×3 per zona: coda, groppa, zampe davanti, intero.
   // ⚠️ È qui che si giudica un taglio, non guardando l'animazione che gira: un cuneo di 10 px
@@ -894,12 +912,12 @@ if (ANTEPRIME) {
   // estremi» scelti a mano non bastano, perché i ritardi fra le parti fanno sì che l'angolo
   // relativo peggiore capiti in mezzo. Le regole vanno tenute uguali a quelle del foglio di stile.
   const REGOLE = {
-    legBackNear: { A: 14, D: 0.3, d: 0, rev: false }, legFrontFar: { A: 10, D: 0.3, d: 0, rev: false },
-    legFrontNear: { A: 14, D: 0.3, d: 0, rev: true }, legBackFar: { A: 10, D: 0.3, d: 0, rev: true },
-    tail1: { A: 3.5, D: 0.3, d: 0, rev: false }, tail2: { A: 3.5, D: 0.3, d: -0.045, rev: false }, tail3: { A: 3.5, D: 0.3, d: -0.09, rev: false },
-    tail4: { A: 3.5, D: 0.3, d: -0.135, rev: false }, tail5: { A: 3.5, D: 0.3, d: -0.18, rev: false },
-    pawn: { A: 9, D: 0.6, d: -0.2, rev: false }, dice: { A: 9, D: 0.6, d: -0.2, rev: false }, bottle: { A: 3, D: 0.6, d: -0.1, rev: true },
-    bob: { A: 1, D: 0.3, d: 0, rev: false },
+    legBackNear: { A: 14, D: 0.2, d: 0, rev: false }, legFrontFar: { A: 10, D: 0.2, d: 0, rev: false },
+    legFrontNear: { A: 14, D: 0.2, d: 0, rev: true }, legBackFar: { A: 10, D: 0.2, d: 0, rev: true },
+    tail1: { A: 3.5, D: 0.2, d: 0, rev: false }, tail2: { A: 3.5, D: 0.2, d: -0.03, rev: false }, tail3: { A: 3.5, D: 0.2, d: -0.06, rev: false },
+    tail4: { A: 3.5, D: 0.2, d: -0.09, rev: false }, tail5: { A: 3.5, D: 0.2, d: -0.12, rev: false },
+    pawn: { A: 9, D: 0.4, d: -0.133, rev: false }, dice: { A: 9, D: 0.4, d: -0.133, rev: false }, bottle: { A: 3, D: 0.4, d: -0.067, rev: true },
+    bob: { A: 1, D: 0.2, d: 0, rev: false },
   };
   // cubic-bezier(0.42, 0, 0.58, 1): x(s) risolto per bisezione, poi y(s).
   const bez = (p) => {
@@ -933,7 +951,7 @@ if (ANTEPRIME) {
     'zampe-davanti': { left: 0.58, top: 0.35, width: 0.42, height: 0.65 },
     intero: { left: 0, top: 0, width: 1, height: 1 },
   };
-  const ISTANTI = Array.from({ length: 12 }, (_, i) => i * 0.05);
+  const ISTANTI = Array.from({ length: 12 }, (_, i) => (i * 0.4) / 12);
   const fotogrammi = [];
   for (const t of ISTANTI) fotogrammi.push(await sharp(Buffer.from(fotogramma(t)), { density: 96 }).flatten({ background: '#ffffff' }).png().toBuffer());
   const { width: PW, height: PH } = await sharp(fotogrammi[0]).metadata();

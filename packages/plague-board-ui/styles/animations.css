@@ -315,8 +315,9 @@
  * ⚠️ **Il passo è fluido, non a scatti**: rotazioni continue con `ease-in-out` e `alternate`,
  * decisione dell'utente. Le zampe vanno a coppie diagonali — posteriore vicina con anteriore
  * lontana, e viceversa — come un galoppo: le due coppie sono la stessa animazione, una dritta e una
- * `alternate-reverse`. Mezzo passo dura 0,3 s (era 0,42: «più veloce», chiesto dall'utente); i
- * pendagli vanno al doppio, 0,6 s, perché sono pesi che oscillano, non arti che spingono.
+ * `alternate-reverse`. Mezzo passo dura **0,2 s** — scelto dall'utente col cursore della velocità
+ * della lente, a ×1,5 dei 0,3 di prima (e 0,42 all'inizio); i pendagli vanno al doppio, 0,4 s,
+ * perché sono pesi che oscillano, non arti che spingono.
  *
  * ⚠️ **Il corpo ondeggia, non solo sobbalza**: il gruppo che contiene tutto — kit compresi, così
  * l'ampolla sale e scende col dorso — sale di sei unità e **beccheggia** di ±2,5° attorno al
@@ -421,56 +422,56 @@
 }
 
 .pb-rat--running .pb-rat-leg-back-near {
-  animation: pb-rat-gallop 0.3s ease-in-out infinite alternate;
+  animation: pb-rat-gallop 0.2s ease-in-out infinite alternate;
 }
 
 .pb-rat--running .pb-rat-leg-front-far {
-  animation: pb-rat-gallop-far 0.3s ease-in-out infinite alternate;
+  animation: pb-rat-gallop-far 0.2s ease-in-out infinite alternate;
 }
 
 .pb-rat--running .pb-rat-leg-front-near {
-  animation: pb-rat-gallop 0.3s ease-in-out infinite alternate-reverse;
+  animation: pb-rat-gallop 0.2s ease-in-out infinite alternate-reverse;
 }
 
 .pb-rat--running .pb-rat-leg-back-far {
-  animation: pb-rat-gallop-far 0.3s ease-in-out infinite alternate-reverse;
+  animation: pb-rat-gallop-far 0.2s ease-in-out infinite alternate-reverse;
 }
 
-/* L'onda della coda: stessa oscillazione su cinque segmenti, ognuno 45 ms dopo quello prima. Il
- * ritardo piccolo tiene sotto i 4° l'angolo fra due segmenti vicini, che è ciò che il giunto
+/* L'onda della coda: stessa oscillazione su cinque segmenti, ognuno 30 ms dopo quello prima. Il
+ * ritardo piccolo (un sesto del mezzo passo) tiene sotto i 4° l'angolo fra due segmenti vicini, che il giunto
  * nasconde; con tre segmenti e un decimo di ritardo si arrivava a 15°, e le fessure si vedevano. */
 .pb-rat--running .pb-rat-tail-1 {
-  animation: pb-rat-wave 0.3s ease-in-out infinite alternate;
+  animation: pb-rat-wave 0.2s ease-in-out infinite alternate;
 }
 
 .pb-rat--running .pb-rat-tail-2 {
-  animation: pb-rat-wave 0.3s ease-in-out -0.045s infinite alternate;
+  animation: pb-rat-wave 0.2s ease-in-out -0.03s infinite alternate;
 }
 
 .pb-rat--running .pb-rat-tail-3 {
-  animation: pb-rat-wave 0.3s ease-in-out -0.09s infinite alternate;
+  animation: pb-rat-wave 0.2s ease-in-out -0.06s infinite alternate;
 }
 
 .pb-rat--running .pb-rat-tail-4 {
-  animation: pb-rat-wave 0.3s ease-in-out -0.135s infinite alternate;
+  animation: pb-rat-wave 0.2s ease-in-out -0.09s infinite alternate;
 }
 
 .pb-rat--running .pb-rat-tail-5 {
-  animation: pb-rat-wave 0.3s ease-in-out -0.18s infinite alternate;
+  animation: pb-rat-wave 0.2s ease-in-out -0.12s infinite alternate;
 }
 
 .pb-rat--running .pb-rat-body {
-  animation: pb-rat-bob 0.3s ease-in-out infinite alternate;
+  animation: pb-rat-bob 0.2s ease-in-out infinite alternate;
 }
 
 /* I pendagli vanno in ritardo sul passo — è il movimento secondario che li fa sembrare pesanti. */
 .pb-rat--running .pb-rat-collar-pawn,
 .pb-rat--running .pb-rat-vial-dice {
-  animation: pb-rat-sway 0.6s ease-in-out -0.2s infinite alternate;
+  animation: pb-rat-sway 0.4s ease-in-out -0.133s infinite alternate;
 }
 
 .pb-rat--running .pb-rat-vial-bottle {
-  animation: pb-rat-tilt 0.6s ease-in-out -0.1s infinite alternate-reverse;
+  animation: pb-rat-tilt 0.4s ease-in-out -0.067s infinite alternate-reverse;
 }
 
 /* Il contenitore che attraversa. La durata la scrive `RatRun` in linea, perché è una prop. */
