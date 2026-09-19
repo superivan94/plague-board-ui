@@ -5,15 +5,15 @@ import { RunDemo } from './RunDemo';
 const RULES = [
   [
     'Il ratto è un pupazzo, non un disegno',
-    'Tronco, coda e quattro zampe sono pezzi con un perno sull’articolazione. Le zampe lontane e la coda stanno dietro al tronco, le vicine davanti, e dove una zampa copre la pancia il tronco ha pelo sotto: muovendola non si apre un buco.',
+    'Tronco, quattro zampe e una coda in tre segmenti sono pezzi con un perno sull’articolazione, e ogni giunto è un disco: ruotando, il suo bordo resta dov’è. Le zampe lontane e la coda stanno dietro al tronco, le vicine davanti, e dove una zampa copre la pancia il tronco ha pelo sotto: muovendola non si apre un buco.',
   ],
   [
     'Il tempo sta nel foglio di stile',
     'Il componente possiede pelo, perni e ordine dei livelli. Che cosa ruota, di quanto e con che sfasamento sta in animations.css, acceso da una classe sola: da fermo niente si muove, e si spegne da lì.',
   ],
   [
-    'Un galoppo a coppie diagonali',
-    'Posteriore vicina con anteriore lontana, e viceversa: due coppie, stessa animazione, una dritta e una al contrario. Il ciclo è 0,42 secondi; coda e pendagli vanno al doppio, perché sono pesi che oscillano.',
+    'Un galoppo a coppie diagonali, e il corpo che ondeggia',
+    'Posteriore vicina con anteriore lontana, e viceversa: due coppie, stessa animazione, una dritta e una al contrario, mezzo passo in 0,3 secondi. Il corpo sale e beccheggia col passo; i tre segmenti della coda oscillano con ampiezza crescente e un decimo di secondo di ritardo l’uno sull’altro, che è l’onda; i pendagli vanno al doppio, perché sono pesi.',
   ],
   [
     'La fine la dice animationend',
@@ -47,7 +47,8 @@ export default function RunPage() {
       <section className="flex flex-col gap-3">
         <p className="max-w-2xl text-sm text-muted">
           Lo stesso ratto con <code>isRunning</code> e senza spostarsi: si vedono le zampe a coppie,
-          la coda, il sobbalzo, e il dado e la pedina che pendono in ritardo sul passo.
+          l&apos;onda della coda, il corpo che beccheggia, e il dado e la pedina che pendono in ritardo
+          sul passo.
         </p>
         <div className="flex flex-wrap items-end gap-10 rounded-lg border border-border bg-surface p-6">
           <span className="flex flex-col items-center gap-2">

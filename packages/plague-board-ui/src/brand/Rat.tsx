@@ -1,6 +1,9 @@
 import type { CSSProperties } from 'react';
 
+import type { ReactNode } from 'react';
+
 import {
+  RAT_BODY_PIVOT,
   RAT_COLLAR,
   RAT_HARNESS,
   RAT_KIT_COLORS,
@@ -11,6 +14,7 @@ import {
   type RatBodySlot,
   type RatKitColor,
   type RatKitPiece,
+  type RatPart,
   type RatPath,
   type RatPivot,
 } from './ratArt';
@@ -77,18 +81,36 @@ function Layer<C extends string>({
   colors,
   className,
   pivot,
+  children,
 }: {
   paths: readonly RatPath<C>[];
   colors: Record<C, string>;
   className: string;
   pivot?: RatPivot;
+  children?: ReactNode;
 }) {
   return (
     <g className={className} style={pivot === undefined ? undefined : origin(pivot)}>
       {paths.map((p, i) => (
         <path key={i} fill={colors[p.c]} d={p.d} />
       ))}
+      {children}
     </g>
+  );
+}
+
+/**
+ * Una parte con dentro i suoi figli: i tre segmenti della coda sono annidati, così il perno del
+ * segmento figlio si sposta col padre e la rotazione di uno si somma a quella dell'altro. ⚠️ Il
+ * figlio sta **dopo** i percorsi del padre, quindi sopra: il suo giunto tondo copre il taglio.
+ */
+function Part({ part, colors }: { part: RatPart; colors: Record<RatBodySlot, string> }) {
+  return (
+    <Layer className={`pb-rat-part pb-rat-${kebab(part.name)}`} paths={part.paths} colors={colors} pivot={part.pivot}>
+      {RAT_PARTS.filter((p) => p.parent === part.name).map((p) => (
+        <Part key={p.name} part={p} colors={colors} />
+      ))}
+    </Layer>
   );
 }
 
@@ -141,8 +163,9 @@ export function Rat({
   title,
 }: RatProps) {
   const colors = RAT_LIVERIES[livery];
-  const behind = RAT_PARTS.filter((p) => p.behind);
-  const front = RAT_PARTS.filter((p) => !p.behind);
+  const roots = RAT_PARTS.filter((p) => p.parent === undefined);
+  const behind = roots.filter((p) => p.behind);
+  const front = roots.filter((p) => !p.behind);
 
   return (
     <svg
@@ -156,14 +179,15 @@ export function Rat({
       aria-label={title}
     >
       {title !== undefined && <title>{title}</title>}
-      {/* Il gruppo che sobbalza: tutto il ratto, kit compresi, così l'ampolla sale e scende col dorso. */}
-      <g className="pb-rat-body">
+      {/* Il gruppo che sobbalza e beccheggia attorno al baricentro: tutto il ratto, kit compresi,
+          così l'ampolla sale e scende col dorso. */}
+      <g className="pb-rat-body" style={origin(RAT_BODY_PIVOT)}>
         {behind.map((p) => (
-          <Layer key={p.name} className={`pb-rat-part pb-rat-${kebab(p.name)}`} paths={p.paths} colors={colors} pivot={p.pivot} />
+          <Part key={p.name} part={p} colors={colors} />
         ))}
         <Layer className="pb-rat-torso" paths={RAT_TORSO} colors={colors} />
         {front.map((p) => (
-          <Layer key={p.name} className={`pb-rat-part pb-rat-${kebab(p.name)}`} paths={p.paths} colors={colors} pivot={p.pivot} />
+          <Part key={p.name} part={p} colors={colors} />
         ))}
         {/* Il collare sta sotto l'imbracatura, e il teschio sopra a tutto: copre il bordo dell'orecchio. */}
         {hasCollar && <Kit name="collar" pieces={RAT_COLLAR} />}

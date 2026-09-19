@@ -365,15 +365,23 @@ ignorare. La ricerca fa il lavoro: si scrive una parola e chi la ripete finisce 
 
 **Esegue:** agente — in jsdom le animazioni non girano: il test tiene il contratto (classi, perni
 come stile, filtro di `onDone`), qui si misura che il browser faccia il resto.
-**Ultima esecuzione:** agente, 2026-09-18 — tutto come atteso.
+**Ultima esecuzione:** agente, 2026-09-19 — dopo il secondo giro del pupazzo (giunti tondi, arto
+sintetico, cerniere all'uscita, coda in tre segmenti, passo a 0,3 s), tutto come atteso.
 
 **Preparazione:** `npm run build`, `npm run playground`, `/corsa` in una **scheda nuova** — la
-console dello strumento è cumulativa, e un errore di un caricamento precedente resta lì.
+console dello strumento è cumulativa, e un errore di un caricamento precedente resta lì. Per le
+cuciture, i **fotogrammi**: `scratchpad/trace/fotogrammi.mjs` rende dal modulo compilato le parti
+ruotate agli estremi (±14° le vicine, ±10° le lontane, coda a S) a 1800 px, e ritaglia groppa,
+zampe davanti e le due radici; `ISOLA=<parte>` ruota una parte sola per attribuire un artefatto.
 
 | Azione | Atteso | Ottenuto |
 |---|---|---|
-| `getComputedStyle` sulle parti del ratto in corsa | `transform-origin` uguale al perno scritto dal generatore, `transform-box: view-box` | posteriore vicina `166px 153px`, anteriore lontana `290px 143px`, coda `137px 110px`, pedina `287px 139px`, dado `216px 116px`, ampolla `211px 57px`; cinghie ferme |
-| `getAnimations()` sulle stesse | galoppo a coppie: una `alternate`, l'altra `alternate-reverse`, 0,42 s; coda e pendagli 0,84 s con ritardi diversi | posteriore vicina e anteriore lontana `alternate`, anteriore vicina `alternate-reverse`; coda `pb-rat-wag` 0,84 s; pedina e dado `pb-rat-sway` −0,25 s; ampolla `pb-rat-wag` −0,15 s al contrario; corpo `pb-rat-bounce` |
+| `getComputedStyle` sulle parti del ratto in corsa | `transform-origin` uguale al perno scritto dal generatore, `transform-box: view-box` | posteriore vicina `142px 170px` e anteriore vicina `298px 165px` (le cerniere all'uscita), lontane `125px 138px` e `300px 145px`, coda base/mezzo/punta `137px 110px` / `95px 115px` / `50px 81px`, corpo `231px 123px`, pedina `287px 139px`, dado `216px 116px`, ampolla `211px 57px`; cinghie ferme |
+| `getAnimations()` sulle stesse | galoppo a coppie a 0,3 s: vicine `pb-rat-gallop`, lontane `pb-rat-gallop-far`, una `alternate` e l'altra al contrario; coda `pb-rat-wave-*` con ritardi 0 / −0,1 / −0,2 s; corpo `pb-rat-bob`; pendagli 0,6 s | tutto così; ampolla `pb-rat-tilt` −0,1 s al contrario, pedina e dado `pb-rat-sway` −0,2 s |
+| La coda nel DOM | tre gruppi **annidati**, punta dentro mezzo dentro base | `.pb-rat-tail-base > .pb-rat-tail-mid > .pb-rat-tail-tip` presente |
+| I fotogrammi agli estremi, sulla groppa | nessun cuneo bianco, nessuno spigolo nel pelo, il contorno della coscia intero | così; col primo taglio a poligoni c'erano tutti e tre, e col giunto all'anca l'arco della coscia si spezzava sul bordo del disco |
+| I fotogrammi alle radici delle zampe lontane | l'arto che esce da dietro il corpo ha contorno e ombra, niente moncone né nodo nero | così; col raggio pari alla zampa il nodo c'era già da fermo |
+| I fotogrammi sul petto | niente blocco chiaro sotto la zampa anteriore | così; col riempimento «vicino più prossimo» la pancia della guancia colava nel petto |
 | Il ratto fermo accanto | nessuna animazione | `animationName: none`, `getAnimations()` vuoto |
 | Il contenitore che attraversa | `pb-rat-cross-left` o `-right`, la durata pescata, da destra il disegno ribaltato | `pb-rat-cross-right`, `5.83s`, `top: 59%`, `-scale-x-100` sull'`<svg>` |
 | Si segna il nodo e si aspetta la fine | il nodo dopo è **un altro**, con lato e altezza nuovi | il segno non c'è più; da `left`/`39%` a `right`/`34%` |

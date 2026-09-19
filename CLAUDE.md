@@ -323,15 +323,32 @@ exist in target module» che **non sono veri**. Si guarda la pagina, o si crede 
   delle demo. Il lime grezzo va **dentro** la barra, che è un'isola scura; sul fondo della pagina
   ci va `brand-ink`. Lo scenario sta in [`COLLAUDI.md`](COLLAUDI.md), decorazioni dichiarate
   comprese.
-- ⚠️ **Tagliare le parti di un pupazzo con un poligono si porta via anche il tronco che ci sta
-  dentro, e tenerlo lascia la parte due volte.** Il poligono di una zampa contiene pixel della
-  zampa **e** pixel della groppa su cui poggia: toglierli tutti dal tronco apre un buco quando la
-  zampa ruota, non toglierne nessuno lascia una zampa fantasma ferma sotto quella che si muove. Il
-  criterio che li distingue è morfologico: il **nucleo** del tronco è un'apertura — erosione di 35
-  px, poi dilatazione di 35 — della sagoma piena: ciò che sporge di meno di 35 px, coda e zampe,
-  sparisce, e ciò che resta è tronco. Dentro il nucleo la parte è **sopra** il tronco e il tronco si
-  completa col pelo; fuori è la parte e basta. Sta in `tronco()` di `scripts/genera-ratto.mjs`, e
-  l'anteprima `ratto-parti.png` colora ogni pezzo per vedere i tagli.
+- ⚠️ **Un pezzo ritagliato da un disegno piatto si scopre quando ruota, e il taglio va disegnato
+  perché non si veda.** Il primo giro tagliava zampe e coda con poligoni dritti: a 14° un punto a
+  100 px dal perno si sposta di 24, e sul ratto in corsa si vedevano spigoli in mezzo al pelo, cunei
+  bianchi dietro la coscia e monconi rettangolari delle zampe lontane — «molti artefatti», ha detto
+  l'utente. La forma che regge sta in `scripts/genera-ratto.mjs` e ha quattro ingredienti misurati:
+  la **sporgenza** — la zampa fuori dal **nucleo**, l'apertura morfologica (erosione e dilatazione
+  di 35 px) della sagoma in cui ciò che è più stretto di 70 px sparisce; il **giunto tondo** — un
+  disco centrato sul perno, l'unica forma che una rotazione attorno al suo centro manda in sé
+  stessa, quindi il suo bordo non si sposta mai; l'**arto sintetico** dietro le zampe lontane — una
+  capsula d'ombra col suo anello d'inchiostro, disegnata da zero perché dietro il corpo la reference
+  non ha niente, col raggio **minore** della mezza zampa (col raggio pari sbucava un nodo nero alla
+  radice già da fermo); e la **cerniera all'uscita** per le zampe vicine — perno dove la zampa
+  lascia il corpo, non all'anca, perché nella reference coscia e spalla *sono* la groppa e il petto,
+  e un disco all'anca tagliava l'arco d'inchiostro della coscia che a ogni passo si spezzava sul suo
+  bordo. Sotto il giunto il tronco si ridipinge col colore di **maggioranza dei pixel del pelo** che
+  ci stanno dentro: col colore del vicino più prossimo la pancia chiara della guancia colava nel
+  petto in un blocco a spigoli, e senza escludere il rosa la groppa si ridipingeva di pelle. Un
+  **orlo** di 10 px oltre il nucleo resta al tronco, perché il nucleo arrotonda le convessità e
+  senza orlo alla radice si vedeva il fondo. Si verifica **coi fotogrammi**: le parti ruotate agli
+  estremi e rese a 1800 px, ritagliate alle radici, mai a occhio sull'animazione che gira.
+- ⚠️ **`sharp` ridimensiona prima di comporre, qualunque sia l'ordine delle chiamate.** Una griglia
+  di coordinate disegnata alla misura del ritaglio e composta dopo `resize()` finisce **centrata e a
+  1:1** sull'immagine ingrandita: le etichette sembrano giuste e sono spostate di decine di pixel.
+  Misurato il 2026-09-19 leggendo coordinate sbagliate della coscia. La griglia si disegna alla
+  scala d'uscita e si compone su un buffer già ridimensionato; e le coordinate che contano si
+  leggono con la **sonda per colonna**, che stampa i tratti di colore riga per riga.
 - ⚠️ **jsdom non ha `AnimationEvent`, e la cosa costa due volte.** `fireEvent.animationEnd` ripiega
   su `Event` e **scarta** `animationName`. E React, non trovando `AnimationEvent` in `window`,
   registra `onAnimationEnd` sul nome **col prefisso** — `webkitAnimationEnd`, perché

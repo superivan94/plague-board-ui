@@ -2,7 +2,7 @@ import { fireEvent, render, screen } from '@testing-library/react';
 import { describe, expect, it, vi } from 'vitest';
 
 import { RAT_LIVERIES, Rat, RatRun, type RatLivery } from '../src';
-import { RAT_COLLAR, RAT_HARNESS, RAT_PARTS, RAT_SKULL, RAT_TORSO, RAT_VIEW_BOX } from '../src/brand/ratArt';
+import { RAT_BODY_PIVOT, RAT_COLLAR, RAT_HARNESS, RAT_PARTS, RAT_SKULL, RAT_TORSO, RAT_VIEW_BOX } from '../src/brand/ratArt';
 
 const kit = (container: HTMLElement) => ({
   corpo: container.querySelector('.pb-rat-body'),
@@ -43,9 +43,9 @@ describe('Rat', () => {
     expect(RAT_TORSO.length).toBeGreaterThan(20);
   });
 
-  it('è un pupazzo: cinque parti con un perno dentro la cornice, davanti o dietro al tronco', () => {
+  it('è un pupazzo: sette parti con un perno dentro la cornice, davanti o dietro al tronco', () => {
     const nomi = RAT_PARTS.map((p) => p.name).sort();
-    expect(nomi).toEqual(['legBackFar', 'legBackNear', 'legFrontFar', 'legFrontNear', 'tail']);
+    expect(nomi).toEqual(['legBackFar', 'legBackNear', 'legFrontFar', 'legFrontNear', 'tailBase', 'tailMid', 'tailTip']);
 
     // ⚠️ Un perno fuori dalla cornice è un perno sbagliato: la zampa ruoterebbe attorno a un punto
     // nel vuoto e uscirebbe dal corpo. E le parti lontane stanno dietro, le vicine davanti.
@@ -54,8 +54,29 @@ describe('Rat', () => {
       expect(p.pivot.x).toBeLessThan(RAT_VIEW_BOX.x + RAT_VIEW_BOX.width);
       expect(p.pivot.y).toBeGreaterThan(RAT_VIEW_BOX.y);
       expect(p.pivot.y).toBeLessThan(RAT_VIEW_BOX.y + RAT_VIEW_BOX.height);
-      expect(p.behind).toBe(p.name === 'tail' || p.name.endsWith('Far'));
+      expect(p.behind).toBe(p.name.startsWith('tail') || p.name.endsWith('Far'));
     }
+    // Il perno del corpo intero sta dentro il ratto, non in un angolo della cornice.
+    expect(RAT_BODY_PIVOT.x).toBeGreaterThan(RAT_VIEW_BOX.x + RAT_VIEW_BOX.width / 4);
+    expect(RAT_BODY_PIVOT.y).toBeGreaterThan(RAT_VIEW_BOX.y + RAT_VIEW_BOX.height / 4);
+  });
+
+  it('la coda è una catena: mezzo dentro base, punta dentro mezzo, e i perni si spostano col padre', () => {
+    // ⚠️ I tre segmenti sono **annidati**, non fratelli: così ruotare la base porta con sé mezzo e
+    // punta, e il perno del figlio è un punto del sistema del padre. Da fratelli, ogni segmento
+    // ruoterebbe attorno a un perno fisso e la coda si spezzerebbe ai giunti.
+    expect(RAT_PARTS.find((p) => p.name === 'tailBase')?.parent).toBeUndefined();
+    expect(RAT_PARTS.find((p) => p.name === 'tailMid')?.parent).toBe('tailBase');
+    expect(RAT_PARTS.find((p) => p.name === 'tailTip')?.parent).toBe('tailMid');
+    for (const p of RAT_PARTS) if (!p.name.startsWith('tail')) expect(p.parent).toBeUndefined();
+
+    const { container } = render(<Rat />);
+    const base = container.querySelector('.pb-rat-tail-base')!;
+    const mezzo = base.querySelector(':scope > .pb-rat-tail-mid')!;
+    expect(mezzo).not.toBeNull();
+    expect(mezzo.querySelector(':scope > .pb-rat-tail-tip')).not.toBeNull();
+    // Il figlio viene **dopo** i percorsi del padre, quindi sopra: il suo giunto tondo copre il taglio.
+    expect(base.lastElementChild).toBe(mezzo);
   });
 
   it('le parti dietro stanno prima del tronco nel DOM, quelle davanti dopo', () => {
@@ -68,7 +89,7 @@ describe('Rat', () => {
     // la groppa.
     expect(indiceTronco).toBeGreaterThan(0);
     for (const [i, c] of figli.entries()) {
-      if (c.includes('pb-rat-tail') || c.includes('pb-rat-leg-back-far') || c.includes('pb-rat-leg-front-far')) expect(i).toBeLessThan(indiceTronco);
+      if (c.includes('pb-rat-tail-base') || c.includes('pb-rat-leg-back-far') || c.includes('pb-rat-leg-front-far')) expect(i).toBeLessThan(indiceTronco);
       if (c.includes('pb-rat-leg-back-near') || c.includes('pb-rat-leg-front-near')) expect(i).toBeGreaterThan(indiceTronco);
     }
   });
@@ -84,6 +105,8 @@ describe('Rat', () => {
       // in `px` perché `transform-box: view-box` li legge come unità del disegno.
       expect(g?.style.transformOrigin).toBe(`${p.pivot.x}px ${p.pivot.y}px`);
     }
+    // Il corpo intero beccheggia attorno al baricentro.
+    expect((kit(container).corpo as HTMLElement).style.transformOrigin).toBe(`${RAT_BODY_PIVOT.x}px ${RAT_BODY_PIVOT.y}px`);
     // E i pendagli dei kit: pedina e dado oscillano, cinghie e collare no.
     expect((container.querySelector('.pb-rat-collar-pawn') as HTMLElement).style.transformOrigin).not.toBe('');
     expect((container.querySelector('.pb-rat-vial-dice') as HTMLElement).style.transformOrigin).not.toBe('');
@@ -223,7 +246,7 @@ describe('RatRun', () => {
     // ⚠️ Le zampe emettono un `animationend` a ogni ciclo, e risale fino al contenitore: senza il
     // filtro sul nome dell'animazione il ratto verrebbe tolto al primo passo. Qui si simula prima
     // un passo, poi la traversata.
-    fineAnimazione(corsa.querySelector('.pb-rat-tail')!, 'pb-rat-wag');
+    fineAnimazione(corsa.querySelector('.pb-rat-tail-tip')!, 'pb-rat-wave-tip');
     expect(onDone).not.toHaveBeenCalled();
 
     fineAnimazione(corsa, 'pb-rat-cross-left');

@@ -315,38 +315,79 @@
  * ⚠️ **Il passo è fluido, non a scatti**: rotazioni continue con `ease-in-out` e `alternate`,
  * decisione dell'utente. Le zampe vanno a coppie diagonali — posteriore vicina con anteriore
  * lontana, e viceversa — come un galoppo: le due coppie sono la stessa animazione, una dritta e una
- * `alternate-reverse`. Il ciclo è 0,42 s; coda e pendagli vanno al doppio, 0,84 s, perché sono
- * pesi che oscillano, non arti che spingono.
+ * `alternate-reverse`. Mezzo passo dura 0,3 s (era 0,42: «più veloce», chiesto dall'utente); i
+ * pendagli vanno al doppio, 0,6 s, perché sono pesi che oscillano, non arti che spingono.
  *
- * ⚠️ **Il sobbalzo è sul gruppo che contiene tutto**, kit compresi: l'ampolla deve salire e
- * scendere col dorso, o galleggia. Le unità sono quelle del `viewBox` — il ratto è alto 176 — e
- * tre unità sono un pixel e mezzo a 88px di altezza.
+ * ⚠️ **Il corpo ondeggia, non solo sobbalza**: il gruppo che contiene tutto — kit compresi, così
+ * l'ampolla sale e scende col dorso — sale di sei unità e **beccheggia** di ±2,5° attorno al
+ * baricentro, in fase col passo. E la coda è **tre segmenti annidati**, ognuno col suo giunto:
+ * la stessa oscillazione con ampiezza crescente verso la punta e un ritardo a ogni segmento, che è
+ * ciò che fa un'onda che corre lungo la coda invece di una coda rigida che dondola. Le unità sono
+ * quelle del `viewBox` — il ratto è alto 176 — e sei unità sono tre pixel a 88px di altezza.
  * ───────────────────────────────────────────────────────────────────────────── */
 
 @keyframes pb-rat-gallop {
   from {
-    transform: rotate(-16deg);
+    transform: rotate(-14deg);
   }
   to {
-    transform: rotate(16deg);
+    transform: rotate(14deg);
   }
 }
 
-@keyframes pb-rat-wag {
+/* Le zampe lontane oscillano meno: sono dietro, e la loro radice è un arto disegnato da zero. */
+@keyframes pb-rat-gallop-far {
   from {
-    transform: rotate(-5deg);
+    transform: rotate(-10deg);
   }
   to {
-    transform: rotate(5deg);
+    transform: rotate(10deg);
   }
 }
 
-@keyframes pb-rat-bounce {
+/* I tre segmenti della coda: la base poco, la punta molto. */
+@keyframes pb-rat-wave-base {
   from {
-    transform: translateY(0);
+    transform: rotate(-4deg);
   }
   to {
-    transform: translateY(-3px);
+    transform: rotate(4deg);
+  }
+}
+
+@keyframes pb-rat-wave-mid {
+  from {
+    transform: rotate(-6deg);
+  }
+  to {
+    transform: rotate(6deg);
+  }
+}
+
+@keyframes pb-rat-wave-tip {
+  from {
+    transform: rotate(-9deg);
+  }
+  to {
+    transform: rotate(9deg);
+  }
+}
+
+@keyframes pb-rat-bob {
+  from {
+    transform: translateY(0) rotate(2.5deg);
+  }
+  to {
+    transform: translateY(-6px) rotate(-2.5deg);
+  }
+}
+
+@keyframes pb-rat-tilt {
+  from {
+    transform: rotate(-3deg);
+  }
+  to {
+    transform: rotate(3deg);
   }
 }
 
@@ -382,6 +423,7 @@
 
 /* ⚠️ `transform-box: view-box` è ciò che fa valere il perno nelle unità del disegno. È il valore
  * predefinito degli elementi SVG, scritto perché è la riga da cui dipende tutto. */
+.pb-rat-body,
 .pb-rat-part,
 .pb-rat-collar-pawn,
 .pb-rat-vial-bottle,
@@ -389,32 +431,47 @@
   transform-box: view-box;
 }
 
-.pb-rat--running .pb-rat-leg-back-near,
+.pb-rat--running .pb-rat-leg-back-near {
+  animation: pb-rat-gallop 0.3s ease-in-out infinite alternate;
+}
+
 .pb-rat--running .pb-rat-leg-front-far {
-  animation: pb-rat-gallop 0.42s ease-in-out infinite alternate;
+  animation: pb-rat-gallop-far 0.3s ease-in-out infinite alternate;
 }
 
-.pb-rat--running .pb-rat-leg-front-near,
+.pb-rat--running .pb-rat-leg-front-near {
+  animation: pb-rat-gallop 0.3s ease-in-out infinite alternate-reverse;
+}
+
 .pb-rat--running .pb-rat-leg-back-far {
-  animation: pb-rat-gallop 0.42s ease-in-out infinite alternate-reverse;
+  animation: pb-rat-gallop-far 0.3s ease-in-out infinite alternate-reverse;
 }
 
-.pb-rat--running .pb-rat-tail {
-  animation: pb-rat-wag 0.84s ease-in-out infinite alternate;
+/* L'onda della coda: ogni segmento parte un decimo di secondo dopo quello prima. */
+.pb-rat--running .pb-rat-tail-base {
+  animation: pb-rat-wave-base 0.3s ease-in-out infinite alternate;
+}
+
+.pb-rat--running .pb-rat-tail-mid {
+  animation: pb-rat-wave-mid 0.3s ease-in-out -0.1s infinite alternate;
+}
+
+.pb-rat--running .pb-rat-tail-tip {
+  animation: pb-rat-wave-tip 0.3s ease-in-out -0.2s infinite alternate;
 }
 
 .pb-rat--running .pb-rat-body {
-  animation: pb-rat-bounce 0.42s ease-in-out infinite alternate;
+  animation: pb-rat-bob 0.3s ease-in-out infinite alternate;
 }
 
 /* I pendagli vanno in ritardo sul passo — è il movimento secondario che li fa sembrare pesanti. */
 .pb-rat--running .pb-rat-collar-pawn,
 .pb-rat--running .pb-rat-vial-dice {
-  animation: pb-rat-sway 0.84s ease-in-out -0.25s infinite alternate;
+  animation: pb-rat-sway 0.6s ease-in-out -0.2s infinite alternate;
 }
 
 .pb-rat--running .pb-rat-vial-bottle {
-  animation: pb-rat-wag 0.84s ease-in-out -0.15s infinite alternate-reverse;
+  animation: pb-rat-tilt 0.6s ease-in-out -0.1s infinite alternate-reverse;
 }
 
 /* Il contenitore che attraversa. La durata la scrive `RatRun` in linea, perché è una prop. */

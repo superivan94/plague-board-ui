@@ -24,7 +24,7 @@ const pesca = (key: number): Passaggio => ({
     hasVial: caso(),
     from: caso() ? 'left' : 'right',
     top: `${15 + Math.floor(Math.random() * 45)}%`,
-    duration: 4 + Math.random() * 2,
+    duration: 3 + Math.random() * 1.5,
   },
 });
 
