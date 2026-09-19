@@ -356,6 +356,19 @@ exist in target module» che **non sono veri**. Si guarda la pagina, o si crede 
   — pelo bruno, in un disegno che di bruno non ha altro — e stava fuori sia dai semi sia dal filtro
   del kit. È la stessa lezione del teschio: i colori dentro la maschera si **contano**, la
   tavolozza non basta. Segnalato dall'utente il 2026-09-19.
+- ⚠️ **Un frammento preso da un poligono o da un recinto sbagliato non si vede da fermo: si vede
+  quando il pezzo si muove.** Con le tinte della lente l'utente ha trovato quattro pezzi di
+  contorno «che non dovevano esserci», e ognuno era un pixel **di un'altra parte** finito nel
+  pezzo o lasciato nel tronco: la fetta alta del piede lontano nel recinto della coda (rosa come
+  la coda); le dita del piede oltre il bordo del poligono; il contorno inferiore della zampa
+  lontana nel poligono della vicina, perché il bordo era dritto e il solco fra le due è obliquo; la
+  fascia esterna del contorno della coda, spesso 15–20 px in punta contro i 9 della dilatazione,
+  rimasta al tronco. Le regole che ne sono uscite: i **poligoni confinanti condividono i vertici
+  lungo il solco**, letti con la sonda per colonna, così un pixel va a uno solo dei due; la coda
+  prende l'inchiostro fino a 20 px **solo fuori dal corpo**; ogni parte scarta le componenti sotto
+  i 250 px (`briciole`). E i buchi lungo gli anelli della coda non erano movimento: filetti di
+  antialiasing quantizzati a pelo che il ricalco scarta — si **fondono** a rosa nel tratto in aria,
+  prima del ricalco, come l'etichetta dell'ampolla.
 - ⚠️ **Le cuciture si guardano sulla pagina `/lente` del playground, non sulla demo.** Il ratto da
   solo, alto fino a 1200 px, **fermo a un istante qualunque** del ciclo — `getAnimations()` messe in
   pausa e portate a `currentTime` — e con un colore per pezzo (`[fill="#100020"]` esclude

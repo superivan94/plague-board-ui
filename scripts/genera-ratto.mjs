@@ -251,7 +251,17 @@ function trasforma(d, dx, dy) {
 }
 
 // ── Montaggio ────────────────────────────────────────────────────────────────────────────────────
-const grigio = await carica('ludoratto-grigio');
+// ⚠️ Lungo gli anelli della coda l'antialiasing fra rosa e inchiostro quantizza a pelo (`fur`,
+// `shade`, `belly`): filetti da uno o due pixel che il ricalco scarta (`pathomit`) e che restano
+// **buchi** — fessure chiare lungo ogni anello, ferme anche da fermo. Nel tratto di coda in aria
+// (x < 520: dal 540 in su c'è la groppa) si leggono come rosa prima del ricalco.
+const CODA_IN_ARIA = { x0: 30, y0: 270, x1: 520, y1: 520 };
+const grigio = await carica('ludoratto-grigio', [
+  { ...CODA_IN_ARIA, da: 'greyFur', a: 'pink' },
+  { ...CODA_IN_ARIA, da: 'greyShade', a: 'pinkShade' },
+  { ...CODA_IN_ARIA, da: 'greyBelly', a: 'pink' },
+  { ...CODA_IN_ARIA, da: 'greyBellyShade', a: 'pinkShade' },
+]);
 const bruno = await carica('ludoratto-bruno-teschio');
 
 // Traslazioni misurate sugli occhi: grigio (1223,393), bruno (1205,371), bianco (1240,421). I kit
@@ -440,9 +450,15 @@ const cuoio = (recinto) => unisci(
   maschera(bianco, ['leather', 'gold'], RAGGIO, recinto),
   maschera(bianco, ['leather', 'gold'], RAGGIO_CINGHIE, recinto).map((v, i) => (v && !bordoBianco[i] ? 1 : 0)),
 );
+// ⚠️ Il capo del laccio sinistro — il nodo che poggia sul dorso — arriva a x 672, e il recinto
+// dell'imbracatura comincia a 690: usciva tagliato in verticale. Segnalato dall'utente. Ha il suo
+// rettangolo, e lì l'inchiostro di **bordo** si esclude: sopra il nodo passa il contorno della
+// schiena del donatore, che non è del laccio.
+const RECINTO_CAPO_LACCIO = { x0: 655, y0: 330, x1: 700, y1: 410 };
+const capoLaccio = maschera(bianco, ['leather'], RAGGIO, RECINTO_CAPO_LACCIO).map((v, i) => (v && !(bianco.idx[i] === NOMI.indexOf('ink') && bordoBianco[i]) ? 1 : 0));
 const mImbracatura = unisci(
   unisci(
-    unisci(unisci(cuoio(RECINTO_IMBRACATURA), maschera(bianco, ['green', 'greenLight', 'cream'], RAGGIO, RECINTO_IMBRACATURA)), mCollo),
+    unisci(unisci(unisci(cuoio(RECINTO_IMBRACATURA), capoLaccio), maschera(bianco, ['green', 'greenLight', 'cream'], RAGGIO, RECINTO_IMBRACATURA)), mCollo),
     mTappo,
   ),
   attorno(bianco, dado, RAGGIO),
@@ -455,7 +471,7 @@ const mBottiglia = unisci(
   mTappo,
 );
 const bottiglia = ricalca(bianco, mBottiglia, new Set(['green', 'greenLight', 'cream', 'glass', 'gold', 'ink']), { whiteFur: 'cream', greyBelly: 'cream', whiteShade: 'glass', ...TAPPO_IN_ORO }, 48);
-const mCinghie = cuoio({ x0: 690, y0: 200, x1: 1010, y1: 740 });
+const mCinghie = unisci(cuoio({ x0: 690, y0: 200, x1: 1010, y1: 740 }), capoLaccio);
 const cinghie = ricalca(bianco, mCinghie, new Set(['leather', 'gold', 'ink']), {}, 48);
 const dadoRicalcato = ricalca(bianco, attorno(bianco, dado, RAGGIO), new Set(['cream', 'ink']), { whiteFur: 'cream', greyBelly: 'cream', whiteShade: 'cream' }, 48);
 const PERNO_BOTTIGLIA = [860 + T_BIANCO[0], 255 + T_BIANCO[1]];
@@ -501,7 +517,11 @@ const PARTI_ZAMPE = [
   { nome: 'legBackNear', poligono: [[520, 640], [620, 640], [620, 720], [575, 830], [400, 830], [400, 700]], perno: [558, 690], uscita: [558, 690], raggio: 20, tinta: 'pink' },
   // ⚠️ Il disco deve arrivare al contorno **superiore** dello stinco (y 629 a x 1200), o quando lo
   // stinco scende fra il suo bordo e il petto resta un cuneo bianco: raggio 32, centro a 659.
-  { nome: 'legFrontNear', poligono: [[1170, 625], [1250, 625], [1380, 690], [1380, 800], [1180, 800], [1170, 730]], perno: [1192, 659], uscita: [1192, 659], raggio: 32, tinta: 'greyFur' },
+  // ⚠️ Anche il bordo **alto** della vicina segue il solco, con gli stessi vertici della lontana:
+  // con il bordo dritto a y 625 la vicina si prendeva il contorno inferiore della lontana (ink
+  // 621–633 a x 1230–1250), e quando le due zampe andavano in versi opposti quel contorno seguiva la
+  // vicina e restava a mezz'aria sotto la lontana. Segnalato dall'utente a 80 ms.
+  { nome: 'legFrontNear', poligono: [[1170, 625], [1200, 626], [1225, 636], [1250, 643], [1290, 652], [1330, 675], [1380, 690], [1380, 800], [1180, 800], [1170, 730]], perno: [1192, 659], uscita: [1192, 659], raggio: 32, tinta: 'greyFur' },
 ];
 // ⚠️ Il recinto della coda finisce a y 520: il piede della zampa posteriore lontana è rosa come la
 // coda e comincia a y 560 — con il recinto a 578 la sua fetta alta finiva nel primo segmento, e
@@ -540,12 +560,24 @@ const erodi = (m, W, H, r) => dilata(m.map((v) => (v ? 0 : 1)), W, H, r).map((v)
 const nucleo = dilata(erodi(grigio.pieno, grigio.W, grigio.H, NUCLEO_RAGGIO), grigio.W, grigio.H, NUCLEO_RAGGIO);
 
 // La coda intera, per colore: rosa e la sua ombra nel recinto, dilatati sull'inchiostro.
+// ⚠️ L'**orlo**: il nucleo più 10 px. Il nucleo arrotonda le convessità del corpo, e l'orlo è ciò
+// che resta al tronco anche dentro il poligono di una parte — la radice, ferma come un pezzo di corpo.
+const orlo = dilata(nucleo, grigio.W, grigio.H, 10);
+
+// ⚠️ La coda si prende con due anelli: 9 px attorno al rosa per tutto, e fino a 20 px per il **solo
+// inchiostro fuori dal corpo**. Il contorno della coda è spesso 9–11 px lungo il dorso ma 15–20 in
+// punta, dov'è disegnato più grosso: con i 9 soli la fascia esterna restava al tronco, che sta
+// sopra — a riposo coincideva con la coda, e appena la punta ondeggiava spuntava un triangolino
+// nero. Segnalato dall'utente a 80 ms con le tinte della lente. Fuori dal corpo (fuori dall'orlo)
+// entro 20 px dal rosa c'è solo la coda, quindi l'anello largo non prende altro.
 const codaIntera = (() => {
   const { W, H, idx } = grigio;
+  const INK = NOMI.indexOf('ink');
   const semi = new Set(['pink', 'pinkShade'].map((n) => NOMI.indexOf(n)));
   const a = new Uint8Array(W * H);
   for (let y = RECINTO_CODA.y0; y < RECINTO_CODA.y1; y++) for (let x = RECINTO_CODA.x0; x < RECINTO_CODA.x1; x++) if (semi.has(idx[y * W + x])) a[y * W + x] = 1;
-  return dilata(a, W, H, RAGGIO).map((v, i) => (v && idx[i] >= 0 ? 1 : 0));
+  const stretta = dilata(a, W, H, RAGGIO), larga = dilata(a, W, H, 20);
+  return stretta.map((v, i) => (idx[i] >= 0 && (v || (larga[i] && idx[i] === INK && !orlo[i])) ? 1 : 0));
 })();
 
 // Gli anelli della coda: le colonne in cui l'inchiostro attraversa la banda **dentro**, non sul
@@ -678,7 +710,6 @@ function tronco(zone) {
   const { W, H } = grigio;
   const px = new Uint8ClampedArray(grigio.px);
   const idx = new Int8Array(grigio.idx);
-  const orlo = dilata(nucleo, W, H, 10);
   let tolti = 0;
   for (const [k] of PARTI.entries()) {
     for (let i = 0; i < W * H; i++) if (zone[k].sporgenza[i] && !orlo[i] && idx[i] >= 0) { azzera(px, i); idx[i] = -1; tolti++; }
