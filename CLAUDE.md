@@ -639,6 +639,39 @@ exist in target module» che **non sono veri**. Si guarda la pagina, o si crede 
   2026-09-19, sono due cose diverse e si erano misurate a un'ora di distanza). Chi campiona
   qualcosa che dipende da `hidden` deve sapere quale dei due casi sta producendo: con il riquadro
   dietro, `/corsa` non fa passare **nessun** ratto — che è il comportamento giusto — e sembra rotta.
+- ⚠️ **`ToggleButtonGroup` con `selectionMode="single"` *è* un `radiogroup`, e non serve cercare
+  altro.** Misurato sul DOM il 2026-09-20: rende `role="radiogroup"` coi figli `role="radio"` e
+  `aria-checked`, mentre con `"multiple"` diventa `role="toolbar"` con `aria-pressed` — e un
+  `onSelectionChange` che consegna l'insieme **con dentro anche la scelta di prima**. Quindi la
+  scelta fra poche cose che si escludono si veste così, che è anche l'idioma che il playground già
+  usava. ⚠️ **E il `RadioGroup` di HeroUI non è l'alternativa**: `<Radio>` senza i suoi sotto-pezzi
+  composti (`Radio.Content`, `Radio.Control`, `Radio.Indicator`) rende dei `<div>` **senza nessun
+  ruolo** — un gruppo che a un lettore di schermo non esiste, e che a occhio sembra a posto.
+- ⚠️ **I colori che HeroUI ricava da `--accent` sono tarati su un accento scuro, e il nostro lime
+  non lo è.** `--accent-soft-foreground` è un `color-mix(in oklab, accent 70%, foreground 30%)`:
+  col lime esce `#75a238`, che sul suo stesso fondo — lime al 15% sul chiaro — fa **2,76**. È il
+  testo che dice **quale** opzione si è scelta in un `ToggleButtonGroup`, quindi l'unico che conta
+  davvero. Ridichiarato in `theme.css` nei due blocchi: lime-800 in chiaro (**6,11**) e il lime
+  pieno in scuro (**11,02**). ⚠️ In chiaro serve un gradino **più giù** di `--pb-brand-ink`, perché
+  il fondo non è il bianco ma il bianco già tinto: il lime-700 lì si ferma a 4,31. Misurato il
+  2026-09-20 su `/atmosfera`, e la stessa riga ha sistemato il filtro di `/voce`.
+- ⚠️ **Un `translateY` in percentuale conta l'altezza dell'elemento, non del contenitore — e la
+  cura è una colonna alta quanto il contenitore.** Una bolla da 40 px che sale del «100%» si sposta
+  di 40 px. Mettendo la bolla in fondo a un `<span>` `absolute top-0 bottom-0`, invece, `-100%` è
+  esattamente l'altezza del riquadro: dentro una scheda come su una pagina intera, senza container
+  query e senza misurare niente in JavaScript. Lo usano le bolle (`pb-toxic-rise`) e le gocce
+  (`--pb-drip-distance: 100%`), che per di più con `transform-origin: top` si **allungano** cadendo
+  invece di spostarsi.
+- ⚠️ **`getComputedStyle` oggi risponde in `lab()` e `oklab()`, e una regex sui numeri dà contrasti
+  falsi e plausibili.** `lab(96.5432 -0.0000596046 0)` letto come RGB non lancia niente: dà solo un
+  1,81 al posto di un 7,09, e un 1,16 al posto di un 14,52. Un colore CSS si risolve dipingendolo su
+  un canvas 1×1 e leggendo il pixel. ⚠️ E lo sfondo va **composto**: gli strati traslucidi sopra
+  quello opaco si sommano, e un'opzione selezionata con un velo al 15% non ha il colore della
+  pagina sotto. Misurato il 2026-09-20 sbagliandolo due volte di fila.
+- ⚠️ **Il tema si commuta ricaricando, non scrivendo la classe sulla radice da console.** Cambiando
+  `documentElement.classList` a mano, su `/atmosfera` metà dei token di HeroUI seguivano e metà no —
+  un'opzione non scelta misurava 1,16 in scuro, quando ricaricando ne fa 14,52. Si scrive
+  `pb-playground-theme` in `localStorage` e si ricarica, che è la via che usa la pagina.
 
 ## Memoria di sessione
 

@@ -671,3 +671,52 @@ quindi ha due modi di essere rotto senza che nessuno se ne accorga. Il primo è 
 RattInventario, dove tutto è appeso a `onMouseEnter`: su un telefono non succede niente, e non c'è
 messaggio d'errore da nessuna parte. Il secondo è più sottile — un elemento che nasce e non muore —
 e si vede solo contando: le due colonne del drenaggio qui sopra sono lì apposta.
+
+### L'atmosfera: quattro livelli, e un fondale che sta dietro — 2026-09-20
+
+**Esegue:** agente — `tests/PlagueBackground.test.tsx` e `tests/ToxicLevel.test.tsx` tengono il
+contratto (quanti pezzi per livello, il tetto delle bolle, chi se ne va e quando, il `radiogroup`).
+Quello che solo un browser vero dice è **dove finisce** quello che si muove: se le bolle passano
+sopra il contenuto, se escono dal riquadro, e se il testo dell'opzione scelta si legge nei due temi.
+**Ultima esecuzione:** agente, 2026-09-20 — tutto come atteso, tranne un contrasto che il collaudo
+ha trovato e che è stato corretto in `theme.css` (ultime due righe).
+
+**Preparazione:** `npm run build`, `npm run playground`, `/atmosfera`. Il riferimento sta in
+un'altra scheda: `rattinventario.ludoratti.it/progettoE`, che è la pagina da cui il fondale viene.
+⚠️ Le bolle di là si vedono solo dopo qualche secondo, perché nascono al ritmo del livello.
+
+| Azione | Atteso | Ottenuto |
+|---|---|---|
+| **Il riferimento**: si guarda dove stanno le bolle di RattInventario rispetto al pannello | dietro, come un fondale | **davanti**: il loro riquadro è `fixed z-10`, il pannello è `relative` con `z-index: auto`, e il testo sotto una bolla non si legge |
+| Il riferimento, contati i pezzi a livello `high` | — | **6 bolle** vive, da 46,5 a 81 px, salita 5,0–6,9 s |
+| `/atmosfera` a livello `medio`, dopo 10 s | bolle dietro il pannello, dentro il riquadro | 2 colonne alte **416 px** — cioè l'altezza del fondale, non della finestra — con pelli da **26** e **31 px** e salita 7,8 e 5,7 s |
+| Si sceglie `alto` | più di tutto | 6 icone che galleggiano, 3 gocce, bolle fino a 16, velo al 100% |
+| Si sceglie `spento` | **niente**, non «meno» | 0 bolle, 0 gocce, 0 icone, velo a `opacity: 0`; resta il fondo e il pannello |
+| La goccia, misurata | cade per l'altezza del fondale, e si allunga | `--pb-drip-distance: 100%` su una colonna `h-full`, `transform-origin: 3px 0px`, `pb-drip` a 7 s |
+| A 375 px di larghezza | nessuno scorrimento laterale, niente che esce | `scrollWidth − clientWidth = 0`; **0** bolle oltre i bordi; lo strato è `overflow: hidden` |
+| Console | nessun errore, nessun avviso di idratazione | nessun messaggio |
+| Contrasti in **tema chiaro** | tutto sopra 4,5 | prosa e tabella **7,09**, etichette 4,58, dentro il fondale 12,61 / 19,01 / 7,42 / **5,02** |
+| Contrasti in **tema scuro** | idem | prosa e tabella **7,90**, etichette 13,43, opzioni non scelte 14,52 |
+| Il testo dell'**opzione scelta** del selettore, in chiaro | ≥ 4,5 | **2,76** ❌ — `#75a238` su lime al 15%: HeroUI lo ricava da `--accent` con `color-mix(… accent 70%, foreground 30%)`, e quella ricetta vuole un accento scuro |
+| Dopo aver ridichiarato `--accent-soft-foreground` nei due blocchi | ≥ 4,5 nei due temi | **6,11** in chiaro (lime-800; il lime-700 si fermava a 4,31 perché il fondo è bianco già tinto) e **11,02** in scuro |
+| `/voce`, che usa lo stesso gruppo per filtrare le frasi | migliora con la stessa riga | il filtro scelto passa da **2,76** a **6,11** senza toccare la pagina |
+
+⚠️ **Il contrasto si misura risolvendo il colore su una tela, non leggendo la stringa.** Oggi
+`getComputedStyle` restituisce `lab(96.5432 -0.0000596046 0)` e `oklab(0.657609 …)`: una regex che
+pesca i numeri e li tratta come RGB **risponde comunque**, e risponde numeri plausibili e falsi —
+il primo giro di questo collaudo dava 1,81 alla prosa e 1,16 a un'opzione che sta a 14,52. Si
+dipinge il colore su un canvas 1×1 e si legge il pixel.
+
+⚠️ **E il tema si commuta ricaricando, non scrivendo la classe sulla radice a mano.** Cambiandola
+da console, in questa pagina metà dei token seguivano e metà no, e ne usciva un 1,16 che non esiste.
+Si scrive `pb-playground-theme` in `localStorage` e si ricarica, che è la via che usa la pagina.
+
+⚠️ **Quello che questo collaudo non prova è `prefers-reduced-motion`**: il riquadro del browser non
+emula la preferenza. Lì vale il test, che monta le bolle con `matchMedia` truccato e verifica che a
+livello `alto` dopo un minuto non ne sia nata nessuna.
+
+**Che cosa protegge:** un fondale ha un solo modo di essere rotto che conta, ed è **stare davanti**.
+Di là succede, e non se ne accorge nessuno perché il testo torna leggibile appena la bolla passa.
+La riga del riferimento in cima alla tabella è lì per ricordare che il difetto è quello, e le due
+righe sui contrasti perché un comando che dice **quale** livello si è scelto, se quel testo non si
+legge, non dice niente.
