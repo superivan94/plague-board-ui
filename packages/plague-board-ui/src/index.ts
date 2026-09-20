@@ -102,8 +102,17 @@ export { VersionTag, type VersionTagProps } from './brand/VersionTag';
 
 // Le icone. `IconProps` è pubblico perché è il contratto che deve rispettare chi sostituisce
 // l'icona predefinita di un componente con la propria.
+// ⚠️ I due batteri, e **nessuno dei due si chiama `BacteriaIcon`**: hanno due forme, quindi un
+// nome generico dovrebbe sceglierne una e chi lo importasse si ritroverebbe l'altra. Il bacillo ha
+// un verso e si mette accanto a una parola; il cocco non ce l'ha e galleggia in un fondale.
+export { BacillusIcon } from './icons/BacillusIcon';
 export { BiohazardIcon } from './icons/BiohazardIcon';
+// La cappa di smog dell'aggregatore: si usa grande e tenue, dietro tutto, non accanto a un testo.
+export { CloudIcon } from './icons/CloudIcon';
+export { CoccusIcon } from './icons/CoccusIcon';
 export { CodeIcon } from './icons/CodeIcon';
+// L'unica icona della libreria che non parla di malattia: è il terzo termine, il gioco.
+export { DiceIcon } from './icons/DiceIcon';
 // ⚠️ L'unica icona che non è quadrata, e l'unica che porta un'altezza sua: una goccia è alta due
 // volte e mezzo tanto, e cadendo si allunga ancora.
 export { DripIcon, type DripIconProps } from './icons/DripIcon';

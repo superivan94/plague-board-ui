@@ -774,6 +774,34 @@ exist in target module» che **non sono veri**. Si guarda la pagina, o si crede 
   invisibile in basso. Un velo del **colore del marchio** tinge invece nei due temi. ⚠️ E vale
   la pena saperlo: `surface` contro pagina fa 1,09 in chiaro e 1,14 in scuro, perché a staccare
   una scheda in HeroUI è **l'ombra**, non il fondo.
+- ⚠️ **Un cerchio vuoto con dei raggi dritti attorno è l'icona della luminosità, non un germe.**
+  Il `BacteriaIcon` di `ludoratti.it` è esattamente quello, e a 64px dentro un fondale verde passa
+  per un batterio solo grazie al contesto: portato a 24 accanto a una parola è un sole. È la
+  seconda volta dopo il biohazard che un disegno dell'aggregatore non dice quello che il suo nome
+  promette, e si scopre nello stesso modo — **affiancandolo alle altre alla misura vera**, non
+  guardandolo da solo. Le due cure, misurate a occhio il 2026-09-20: i pili **curvi e tutti nello
+  stesso verso** (i raggi di un sole sono dritti e speculari) e **tre** granuli dentro il corpo —
+  due soli, simmetrici, si leggono come due occhi. Stessa regola per il bacillo: tre flagelli tutti
+  da una parte sono lo scappamento di un razzo, due per polo sono peli.
+- ⚠️ **HeroUI 3 non esporta nessuna icona.** Le sue diciassette — `CloseIcon`, `SearchIcon`,
+  `DangerIcon`… — vivono **dentro** i componenti e non toccano `index.d.ts`: un `grep` su
+  `Icon` lì dentro dà **zero**. Il `@heroui/shared-icons` coi 45 glifi che il censimento cita era
+  della 2 e in questo repository non è installato affatto. Vuol dire che la regola «prima si cerca
+  in HeroUI» sulle icone **si esaurisce subito**, e che ogni segno di questa libreria è per forza
+  disegnato qui.
+- ⚠️ **Un disegno che tocca i bordi del suo riquadro, alla stessa `size`, sembra più grande degli
+  altri.** La nuvola di Material — quella che `ludoratti.it` usa — misura **0 → 24** in larghezza;
+  le icone di casa stanno fra 1,5 e 22,5, il dado fra 3 e 21. È il motivo tecnico per cui un glifo
+  di Material non si porta dentro e basta, oltre alla regola che Material non entra: in una riga di
+  segni affiancati la differenza si vede, e non c'è nessuna prop per correggerla. Il riquadro vero
+  si legge con `getBBox()` su un `<path>` montato fuori schermo — ⚠️ **che però non conta il
+  tratto**: per un disegno a `stroke` va aggiunta mezza larghezza per lato.
+- ⚠️ **Un `<svg>` con la larghezza scritta nell'attributo si lascia schiacciare lo stesso.** In una
+  colonna `minmax(0, 1fr)` o in un flex, `width="56"` non è un pavimento: nella tabella dei segni
+  del playground, a 375px le colonne valevano **20,9 px** e la riga etichettata «56PX» rendeva
+  icone da ventuno, con l'attributo ancora addosso. Non somiglia a un difetto, somiglia a una
+  tabella stretta. La misura va scritta nelle **colonne** — `repeat(n, 3.5rem)` — e l'involucro
+  lasciato traboccare con `overflow-x-auto`.
 - ⚠️ **Il colore letto dalla tela 1×1 esce premoltiplicato per l'alfa.** È la seconda metà del
   metodo dei contrasti: su un colore opaco il pixel è il colore, su uno **traslucido** è già
   `colore × alfa`, e ricomporlo sul fondo moltiplicando di nuovo lo scurisce due volte. Misurato

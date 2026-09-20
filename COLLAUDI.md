@@ -848,3 +848,48 @@ HeroUI invece di essere scritti da zero, e il modo in cui si rompono è che il v
 una classe che non vince sulla sua, un token che nel tema chiaro vale il colore della pagina, un
 verde che in scuro c'è e in chiaro no. Nessuna di queste cose fa un errore: fanno una scheda che
 sembra di qualcun altro.
+
+### I quattro segni nuovi, e la riga che non si stringe più — 2026-09-20
+
+**Esegue:** agente — sono misure di geometria e di colore, e in jsdom `getBBox` non esiste e ogni
+rettangolo vale zero.
+**Ultima esecuzione:** agente, 2026-09-20.
+
+**Preparazione:** `npm run build`, poi **riavviare** il dev server (`npm run playground`) — Tailwind
+non riscandaglia `dist/` quando `tsc` lo riscrive. Pagina: `http://localhost:3100/`, sezioni «i
+segni» e «il gioco e la cappa». Il tema si commuta scrivendo `pb-playground-theme` in
+`localStorage` e **ricaricando**; la misura del riquadro di un tracciato si prende montando un
+`<path>` in un `<svg>` fuori schermo e leggendo `getBBox()`.
+
+| Azione | Atteso | Ottenuto |
+|---|---|---|
+| Riquadro della cappa | dentro le 24 unità, coi margini che hanno tutte | x **1,5 → 22,5**, y **4 → 19** |
+| Riquadro della nuvola di Material, per confronto | — | x **0 → 24**, y 4 → 20: tocca i due bordi |
+| Riquadro del dado | centrato, margine uguale sui quattro lati | **3 → 21** su tutti e due gli assi |
+| Riquadro del bacillo (geometria, senza tratto) | dentro, col tratto che ne aggiunge uno per lato | x 2,6 → 21,8, y 3 → 20,3 → dipinto **1,6 → 22,8** |
+| Riquadro del cocco (geometria, senza tratto) | idem | x 1,89 → 20,45, y 2,2 → 21,41 → dipinto **0,89 → 21,45** |
+| Il dado a 56, 24, 16 | i cinque punti restano buchi | tre misure leggibili; a 16 i punti sono **2 px** ed è il suo limite |
+| I due batteri a 16 | si impastano, ed è dichiarato | pili e flagelli saldati al corpo: due macchie |
+| La cappa a 160 px al 20% — scuro / chiaro | tenue in tutti e due, nessun testo sopra | **1,44** / **1,30**: decorazione dichiarata, il senso lo porta l'etichetta accanto |
+| La tabella dei segni a 375 px | la pagina non scorre di lato | `scrollWidth` **375** = `innerWidth`; l'involucro della tabella scorre da solo, 624 su 343 |
+| Le icone della riga «56PX» a 375 px | 56 px davvero | **56**, e le altre due righe **24** e **16** |
+
+⚠️ **Il batterio di `ludoratti.it`, portato a 24, è l'icona della luminosità.** È un cerchio vuoto
+con sei raggi **dritti**: a 64px dentro un fondale verde passa per un germe, tirato fuori e messo
+accanto a una parola no. È la seconda volta dopo il biohazard che un disegno dell'aggregatore non
+dice quello che il suo nome promette, e la forma del difetto è la stessa — si vede solo
+**affiancandolo** alle altre alla misura vera. Le due cure sono state misurate a occhio, grandi e
+alle quattro misure: i **pili curvi tutti nello stesso verso** (i raggi di un sole sono dritti e
+speculari) e **tre granuli** dentro il corpo. Due granuli soli, simmetrici, si leggono come **due
+occhi**; tre flagelli tutti da una parte fanno uno scappamento di razzo.
+
+⚠️ **Un `<svg>` con la larghezza scritta nell'attributo si lascia schiacciare lo stesso.** Nella
+tabella dei segni le colonne erano `minmax(0, 1fr)`: a 375 px valevano **20,9 px** l'una, e la riga
+etichettata «56PX» mostrava icone da ventuno — con l'attributo `width="56"` ancora addosso. Non
+somiglia a un difetto, somiglia a una tabella stretta. Si cura scrivendo la misura nelle colonne
+(`repeat(n, 3.5rem)`) e lasciando traboccare l'involucro, che scorre.
+
+**Che cosa protegge:** i quattro disegni nuovi sono l'ultimo giro di icone della libreria, e il modo in
+cui si rompono non è un errore: è un disegno che alla misura vera dice un'altra cosa — un sole, una
+pillola, un razzo, una nuvoletta del meteo — oppure una tabella che mostra una misura e ne rende
+un'altra. Nessuna di queste cose fa un test rosso.

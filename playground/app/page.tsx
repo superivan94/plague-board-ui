@@ -1,8 +1,12 @@
 import { Button } from '@heroui/react';
 import { Fragment } from 'react';
 import {
+  BacillusIcon,
   BiohazardIcon,
+  CloudIcon,
+  CoccusIcon,
   CodeIcon,
+  DiceIcon,
   MoleculeIcon,
   PoisonIcon,
   PotionMugIcon,
@@ -22,12 +26,18 @@ const icons = [
   { name: 'PotionMugIcon', Icon: PotionMugIcon },
   { name: 'SkullIcon', Icon: SkullIcon },
   { name: 'MoleculeIcon', Icon: MoleculeIcon },
+  { name: 'BacillusIcon', Icon: BacillusIcon },
+  { name: 'CoccusIcon', Icon: CoccusIcon },
   { name: 'BiohazardIcon', Icon: BiohazardIcon },
   { name: 'VirusIcon', Icon: VirusIcon },
 ];
 
-const ICON_GRID = 'grid items-end gap-3';
-const iconGridColumns = { gridTemplateColumns: `5rem repeat(${icons.length}, minmax(0, 1fr))` };
+// ⚠️ Le colonne sono **larghe quanto l'icona più grande**, non `1fr`: con `minmax(0, 1fr)` a 375px
+// ognuna si stringeva a 21px, e la riga scritta «56PX» mostrava icone da ventuno. Un `<svg>` con la
+// larghezza nell'attributo è comunque un figlio di flex, e si lascia schiacciare in silenzio. Con
+// la misura scritta, la tabella trabocca e il suo involucro la fa scorrere di lato.
+const ICON_GRID = 'grid w-max items-end gap-3';
+const iconGridColumns = { gridTemplateColumns: `5rem repeat(${icons.length}, 3.5rem)` };
 
 const swatches = [
   ['brand', 'bg-brand'],
@@ -129,34 +139,103 @@ export default function Home() {
       <section className="flex flex-col gap-4">
         <p className="text-sm text-muted">
           Le tre misure sono quelle vere: <strong>56</strong> in un fondale, <strong>24</strong>{' '}
-          accanto a un testo, <strong>16</strong> dentro una riga di stato. La riga dei 16 dice da
-          sola perché i contagi sono due icone e non una — <code>MoleculeIcon</code> regge,{' '}
-          <code>BiohazardIcon</code> si chiude in una macchia e non va sotto i 32.
+          accanto a un testo, <strong>16</strong> dentro una riga di stato. Le righe dicono da sole
+          perché i contagi sono quattro segni e non uno: <strong>ognuno ha la sua misura
+          minima</strong>, e sotto quella non si rompe — si impasta, che è peggio, perché continua
+          a sembrare un&apos;icona. <code>MoleculeIcon</code> regge a <strong>16</strong>, perché i
+          suoi dischi sono staccati; <code>BacillusIcon</code> a <strong>20</strong>, perché il suo
+          corpo è una massa sola; <code>CoccusIcon</code> e <code>BiohazardIcon</code> non scendono
+          sotto i <strong>32</strong> — i pili dell&apos;uno si saldano al corpo, i lobi
+          dell&apos;altro si chiudono fra loro. Dove serve un segno piccolo della peste si prende
+          quello che ci sta, non quello che piace di più.
         </p>
 
-        <div className={`${ICON_GRID} text-plague-ink`} style={iconGridColumns}>
-          <span />
-          {icons.map(({ name }) => (
-            <TechLabel key={name} className="text-center text-muted">
-              {name.replace('Icon', '')}
-            </TechLabel>
-          ))}
+        <p className="text-sm text-muted">
+          E i quattro non si sovrappongono: <code>VirusIcon</code> è il <strong>virione</strong>,{' '}
+          <code>MoleculeIcon</code> la <strong>molecola</strong>, <code>BiohazardIcon</code> il{' '}
+          <strong>cartello di pericolo</strong>. I batteri sono gli unici <strong>vivi</strong>, e
+          sono due perché hanno due mestieri: il bacillo ha un verso e si mette accanto a una
+          parola, il cocco non ce l&apos;ha e per questo galleggia in un fondale senza sembrare
+          storto. ⚠️ Nessuno dei due si chiama <code>BacteriaIcon</code>: un nome generico dovrebbe
+          scegliere una delle due forme, e chi lo importasse si ritroverebbe l&apos;altra.
+        </p>
 
-          {[56, 24, 16].map((size) => (
-            <Fragment key={size}>
-              <TechLabel className="text-muted">{size}px</TechLabel>
-              {icons.map(({ name, Icon }) => (
-                <span key={name} className="flex justify-center">
-                  <Icon size={size} />
-                </span>
-              ))}
-            </Fragment>
-          ))}
+        <div className="overflow-x-auto">
+          <div className={`${ICON_GRID} text-plague-ink`} style={iconGridColumns}>
+            <span />
+            {icons.map(({ name }) => (
+              <TechLabel key={name} className="text-center text-muted">
+                {name.replace('Icon', '')}
+              </TechLabel>
+            ))}
+
+            {[56, 24, 16].map((size) => (
+              <Fragment key={size}>
+                <TechLabel className="text-muted">{size}px</TechLabel>
+                {icons.map(({ name, Icon }) => (
+                  <span key={name} className="flex justify-center">
+                    <Icon size={size} />
+                  </span>
+                ))}
+              </Fragment>
+            ))}
+          </div>
         </div>
 
         <p className="text-sm text-muted">
           Nessuna icona ha un colore addosso: prendono quello del testo che le contiene, ed è
           quello che permette di sostituirle dentro un comando senza sapere in che tema finiranno.
+        </p>
+      </section>
+
+      <TechRule>il gioco e la cappa</TechRule>
+
+      <section className="flex flex-col gap-6">
+        <p className="text-sm text-muted">
+          Due segni che di malattia non parlano. <code>DiceIcon</code> è il{' '}
+          <strong>terzo termine</strong> — peste, ratti, <strong>gioco</strong> — e sta dove si
+          nomina quello che qui dentro si fa davvero; senza di lui la famiglia dice solo chi siamo.
+        </p>
+
+        <div className="flex flex-wrap items-end gap-8 text-plague-ink">
+          {[56, 24, 16].map((size) => (
+            <span key={size} className="flex flex-col items-center gap-2">
+              <DiceIcon size={size} />
+              <TechLabel className="text-muted">{size}px</TechLabel>
+            </span>
+          ))}
+        </div>
+
+        <p className="text-sm text-muted">
+          I cinque punti sono <strong>buchi nel corpo</strong>, non dischi dipinti: da lì si vede
+          quello che c&apos;è dietro, quindi il dado vale su una pagina chiara, su una scura e
+          dentro una pastiglia colorata senza cambiare niente. A <strong>16</strong> è al suo
+          limite — i punti sono larghi due pixel — e sotto resta un quadrato stondato.
+        </p>
+
+        <p className="text-sm text-muted">
+          <code>CloudIcon</code> invece <strong>non è un&apos;icona da mettere accanto a un
+          testo</strong>: è la cappa di smog che sta sopra la città, e la sua misura vera comincia
+          dove quella di un&apos;icona finisce. Si usa grande e tenue, dietro tutto il resto.
+        </p>
+
+        <div className="flex flex-wrap items-center gap-10 text-plague-ink">
+          <span className="flex flex-col items-center gap-2">
+            <CloudIcon size={24} />
+            <TechLabel className="text-muted">24px · una nuvoletta</TechLabel>
+          </span>
+          <span className="flex flex-col items-center gap-2">
+            <CloudIcon size={160} className="opacity-20" />
+            <TechLabel className="text-muted">160px al 20% · un cielo</TechLabel>
+          </span>
+        </div>
+
+        <p className="text-sm text-muted">
+          La base è <strong>piatta</strong>, e non è un dettaglio: un cumulo ha il fondo smerlato
+          come la cima, una cappa poggia su una linea. E come tutte le altre sta{' '}
+          <strong>dentro</strong> il suo riquadro coi margini di famiglia — un disegno che ne tocca
+          i bordi, alla stessa <code>size</code>, sembra più grande di quelli che gli stanno
+          accanto.
         </p>
       </section>
 

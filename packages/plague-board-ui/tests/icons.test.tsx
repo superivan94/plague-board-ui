@@ -3,8 +3,12 @@ import type { ComponentType } from 'react';
 import { describe, expect, it } from 'vitest';
 
 import {
+  BacillusIcon,
   BiohazardIcon,
+  CloudIcon,
+  CoccusIcon,
   CodeIcon,
+  DiceIcon,
   DripIcon,
   MoleculeIcon,
   type IconProps,
@@ -43,7 +47,23 @@ const icons: readonly IconEntry[] = [
   { name: 'RatIcon', Icon: RatIcon, paint: 'stroke' },
   { name: 'SkullPhonesIcon', Icon: SkullPhonesIcon, paint: 'fill' },
   { name: 'SkullPhonesOffIcon', Icon: SkullPhonesOffIcon, paint: 'fill' },
+  { name: 'BacillusIcon', Icon: BacillusIcon, paint: 'stroke' },
+  { name: 'CoccusIcon', Icon: CoccusIcon, paint: 'stroke' },
+  { name: 'CloudIcon', Icon: CloudIcon, paint: 'fill' },
+  { name: 'DiceIcon', Icon: DiceIcon, paint: 'fill' },
 ];
+
+/**
+ * Quanti pezzi staccati ha un tracciato: ogni `M` ne comincia uno.
+ *
+ * ⚠️ È l'unica misura di un disegno che jsdom concede — `getBBox` lì non esiste, e ogni
+ * rettangolo misura zero — quindi la sagoma, i margini e le proporzioni stanno in `COLLAUDI.md`.
+ * Quello che si prova qui è che i pezzi ci siano **tutti**: un tracciato che ne perde uno in un
+ * copia e incolla continua a disegnare qualcosa di plausibile.
+ */
+function pezzi(d: string | null | undefined): number {
+  return (d?.match(/M/g) ?? []).length;
+}
 
 it('il marchio del ratto si tinge tutto, tratto e orecchie insieme', () => {
   const { container } = render(<RatIcon color="#a3e635" />);
@@ -191,5 +211,50 @@ describe('DripIcon', () => {
     const { container } = render(<DripIcon />);
 
     expect(container.querySelector('svg')).toHaveAttribute('aria-hidden', 'true');
+  });
+});
+
+describe('DiceIcon', () => {
+  it('i cinque punti sono buchi nel corpo, non dischi dipinti', () => {
+    const { container } = render(<DiceIcon />);
+
+    const tracciato = container.querySelector('svg path');
+    // ⚠️ Senza `evenodd` il dado non si rompe: si riempie. I cinque cerchi si sommano al corpo
+    // invece di forarlo, e resta un quadrato stondato pieno — verde in ogni test che guarda le
+    // prop, e sbagliato in pagina. È l'unica riga che difende il disegno.
+    expect(tracciato).toHaveAttribute('fill-rule', 'evenodd');
+    expect(pezzi(tracciato?.getAttribute('d'))).toBe(6);
+  });
+});
+
+describe.each([
+  { nome: 'CoccusIcon', Icon: CoccusIcon, appendici: 6 },
+  { nome: 'BacillusIcon', Icon: BacillusIcon, appendici: 4 },
+])('$nome', ({ Icon, appendici }) => {
+  it('è un corpo, le sue appendici, e tre granuli dentro', () => {
+    const { container } = render(<Icon />);
+
+    const [corpo, code] = [...container.querySelectorAll('svg path')];
+    expect(pezzi(corpo?.getAttribute('d'))).toBe(1);
+    expect(pezzi(code?.getAttribute('d'))).toBe(appendici);
+
+    // ⚠️ I granuli non sono decorazione: sono quello che toglie l'altro disegno di mezzo. Senza,
+    // il cocco torna a essere un sole e il bacillo diventa una pillola — due segni che in una
+    // libreria della peste non c'entrano niente, e che nessun test sulle prop vedrebbe mai.
+    // E devono essere **tre**: due, simmetrici dentro un corpo, si leggono come due occhi.
+    expect(container.querySelectorAll('circle[fill="currentColor"]')).toHaveLength(3);
+  });
+});
+
+describe('CloudIcon', () => {
+  it('è tre lobi più la base piatta, che è ciò che la rende una cappa', () => {
+    const { container } = render(<CloudIcon />);
+
+    const tracciato = container.querySelector('svg path');
+    expect(pezzi(tracciato?.getAttribute('d'))).toBe(4);
+    // ⚠️ E **non** porta `evenodd`, al contrario del dado: lì i pezzi si forano, qui si sommano.
+    // Con la regola sbagliata i tre lobi si buchererebbero a vicenda dove si sovrappongono, e la
+    // nuvola diventerebbe un intreccio di spicchi.
+    expect(tracciato).not.toHaveAttribute('fill-rule');
   });
 });
