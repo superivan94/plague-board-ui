@@ -104,6 +104,20 @@
    * specifica. Scritto solo qui, questo `:root` spegnerebbe pure il grigio del tema scuro, che
    * crollerebbe a 2,62: misurato, sbagliandolo. */
   --muted: #52525b; /* zinc-600 — 7,46 sul fondo chiaro di HeroUI */
+
+  /* ⚠️ **Il testo di una superficie con l'accento tenue, ridichiarato per lo stesso motivo del
+   * grigio.** HeroUI lo ricava da `--accent` con un `color-mix(in oklab, accent 70%, foreground
+   * 30%)`, e quella ricetta è tarata su un accento **scuro**: col nostro lime esce `#75a238` su un
+   * fondo che è lime al 15% sul chiaro, cioè **2,76**. Misurato il 2026-09-20 sull'opzione scelta
+   * di un `ToggleButtonGroup`, che è la forma con cui la libreria fa scegliere fra poche cose — e
+   * quindi è il testo che dice **quale** si è scelto.
+   *
+   * ⚠️ In chiaro scende **un gradino più giù di `--pb-brand-ink`**, e non per gusto: il fondo qui
+   * non è il bianco ma il bianco già tinto di lime al 15%, quindi il lime-700 che sul bianco fa
+   * 4,99 lì si ferma a 4,31. Il valore è scritto per esteso e non con una `var()`: una `var()`
+   * dentro una proprietà personalizzata si risolve sull'elemento che la dichiara, quindi su
+   * un'isola `.dark` dentro una pagina chiara resterebbe congelata sul valore del chiaro. */
+  --accent-soft-foreground: #3f6212; /* lime-800 — 6,11 sul lime al 15% del fondo chiaro; il lime-700 di `--pb-brand-ink` lì si ferma a 4,31 */
 }
 
 .dark,
@@ -111,6 +125,7 @@
   --pb-brand-ink: #a3e635; /* il lime del marchio — 13,35 sul nero */
   --pb-plague-ink: #4ade80; /* plague-400 — 11,55 sul nero, ed è il verde del testo di là */
   --muted: #a1a1aa; /* zinc-400 — 6,50 sul fondo scuro di HeroUI */
+  --accent-soft-foreground: #a3e635; /* il lime pieno — 12,74 sul lime al 15% del fondo scuro */
 }
 
 /* ─────────────────────────────────────────────────────────────────────────────
