@@ -668,6 +668,21 @@ exist in target module» che **non sono veri**. Si guarda la pagina, o si crede 
   un canvas 1×1 e leggendo il pixel. ⚠️ E lo sfondo va **composto**: gli strati traslucidi sopra
   quello opaco si sommano, e un'opzione selezionata con un velo al 15% non ha il colore della
   pagina sotto. Misurato il 2026-09-20 sbagliandolo due volte di fila.
+- ⚠️ **Dopo aver aggiunto una classe ai sorgenti della libreria, il dev server va riavviato.** La
+  regola nota è che il playground consuma `dist/` e va ricostruito; questa è la sua seconda metà, e
+  costa di più perché **non assomiglia a un difetto di stile**. Tailwind scandaglia `dist/` per via
+  dell'`@source` in `globals.css`, ma non lo **riscandaglia** quando `tsc` lo riscrive: le classi
+  nuove non generano nessuna regola. Misurato il 2026-09-20 sulla città del fondale — quattro
+  `.pb-city-block` nel DOM, `0×0` a schermo, perché `inset-x-0`, `h-[28%]`, `bg-gray-900/80` e
+  `text-brand/70` non esistevano. Si riconosce cercando la classe fra le `cssRules` della pagina:
+  se non c'è, non è il componente.
+- ⚠️ **Una bolla di sapone e una sacca di gas tossico si distinguono per due cose, e nessuna delle
+  due è il colore.** Il primo disegno era verde in ogni sua parte e l'utente l'ha letto come
+  sapone: perché aveva il **riflesso quasi bianco** — il lampo speculare è il vocabolario del vetro
+  — e perché era una **sfera perfetta**. Un gas fa luce da dentro invece di rifletterla, quindi il
+  nucleo si accende (in `toxic`, con l'opacità) e il riflesso diventa verde; e una sacca di gas in
+  un liquido si deforma, quindi il `border-radius` oscilla. Il cerchio resta come ripiego di «meno
+  movimento», che è il caso in cui la deformazione non c'è.
 - ⚠️ **Il tema si commuta ricaricando, non scrivendo la classe sulla radice da console.** Cambiando
   `documentElement.classList` a mano, su `/atmosfera` metà dei token di HeroUI seguivano e metà no —
   un'opzione non scelta misurava 1,16 in scuro, quando ricaricando ne fa 14,52. Si scrive

@@ -700,6 +700,13 @@ un'altra scheda: `rattinventario.ludoratti.it/progettoE`, che è la pagina da cu
 | Il testo dell'**opzione scelta** del selettore, in chiaro | ≥ 4,5 | **2,76** ❌ — `#75a238` su lime al 15%: HeroUI lo ricava da `--accent` con `color-mix(… accent 70%, foreground 30%)`, e quella ricetta vuole un accento scuro |
 | Dopo aver ridichiarato `--accent-soft-foreground` nei due blocchi | ≥ 4,5 nei due temi | **6,11** in chiaro (lime-800; il lime-700 si fermava a 4,31 perché il fondo è bianco già tinto) e **11,02** in scuro |
 | `/voce`, che usa lo stesso gruppo per filtrare le frasi | migliora con la stessa riga | il filtro scelto passa da **2,76** a **6,11** senza toccare la pagina |
+| **Secondo giro** — la città distopica di `ludoratti.it`, portata | quattro sagome col loro skyline, a qualunque misura del riquadro | fascia **736×116** su un fondale da 416, palazzi 48 / 80 / 64 / 32 px di larghezza e 36 / 71 / 47 / 24 % della fascia |
+| A livello `spento` | la città resta, al buio | **4 palazzi**, **0 finestre** accese, 0 gocce, 0 icone, 0 bolle |
+| A `alto` | tutte le finestre accese | **7 su 7**, ognuna col suo ritardo |
+| A 375 px | niente esce dal riquadro | 4 palazzi e 2 gocce dentro, `scrollWidth − clientWidth = 0` |
+| Le tre gocce | tre misure diverse, e una sagoma di goccia | **8×32, 12×48, 8×24**, `viewBox="0 0 8 20"` e `preserveAspectRatio="none"`, colore `oklab(…/0.7)` cioè `brand` al 70% |
+| Una bolla, guardata da vicino a 40 / 90 / 150 px | un gas che brilla, non una bolla di sapone | riflesso **verde** (`bef264`, niente bianco), nucleo in `toxic` al 24%, alone da `0,34 × diametro`, e `border-radius` che oscilla — `52% 48% 46% 54% / 50% 46% 54% 50%` al primo fotogramma |
+| Le animazioni di una pelle di bolla | tre, e le due lente in fase | `pb-toxic-sway, pb-toxic-wobble, pb-toxic-swell` a `3s, 3s, 6s` |
 
 ⚠️ **Il contrasto si misura risolvendo il colore su una tela, non leggendo la stringa.** Oggi
 `getComputedStyle` restituisce `lab(96.5432 -0.0000596046 0)` e `oklab(0.657609 …)`: una regex che
@@ -711,9 +718,24 @@ dipinge il colore su un canvas 1×1 e si legge il pixel.
 da console, in questa pagina metà dei token seguivano e metà no, e ne usciva un 1,16 che non esiste.
 Si scrive `pb-playground-theme` in `localStorage` e si ricarica, che è la via che usa la pagina.
 
+⚠️ **Dopo aver aggiunto classi ai sorgenti della libreria, il dev server va riavviato.** Tailwind
+scandaglia `dist/` per via dell'`@source` in `globals.css`, ma non lo **riscandaglia** quando `tsc`
+lo riscrive: al secondo giro di questo collaudo la città era nel DOM — quattro `.pb-city-block`
+contati — e misurava **0×0**, perché `inset-x-0`, `h-[28%]`, `bg-gray-900/80`, `bg-brand/50` e
+`text-brand/70` non erano mai state generate. Si riconosce così: il markup c'è, i `getComputedStyle`
+danno valori iniziali, e cercando la classe fra le `cssRules` non si trova.
+
 ⚠️ **Quello che questo collaudo non prova è `prefers-reduced-motion`**: il riquadro del browser non
 emula la preferenza. Lì vale il test, che monta le bolle con `matchMedia` truccato e verifica che a
 livello `alto` dopo un minuto non ne sia nata nessuna.
+
+⚠️ **Tre cose del primo giro sono state rifatte al secondo, tutte segnalate dall'utente guardando
+la pagina.** Le bolle «sembravano di sapone»: il riflesso quasi bianco e la sfera perfetta sono il
+vocabolario del vetro, e nessun verde le avrebbe salvate finché restavano quelli. Le gocce erano
+tre rettangoli identici col bordo **dritto in cima** — un taglio netto si legge come un pezzo
+mancante, non come liquido — e ora sono la sagoma di `DripIcon` in tre misure. E mancava la città:
+è in fondo a `ludoratti.it`, cioè nella pagina che decide come si veste un fondale dei Ludoratti, e
+questo collaudo era stato scritto guardando solo RattInventario.
 
 **Che cosa protegge:** un fondale ha un solo modo di essere rotto che conta, ed è **stare davanti**.
 Di là succede, e non se ne accorge nessuno perché il testo torna leggibile appena la bolla passa.
