@@ -23,20 +23,26 @@ export function ChipsSection() {
           un manuale, gli autori, chi l’ha inserito.
         </p>
 
+        <p className="text-sm text-muted">
+          Le tre strisce verdi qui sotto <strong>sforano il limite</strong>, l’ultima no — e il
+          colore è una scelta di questa demo, non qualcosa che il componente fa: lui conta e
+          nasconde, il colore delle pastiglie resta di chi le passa.
+        </p>
+
         <div className="flex flex-col gap-4 rounded-xl border border-border p-6">
           {[3, 1, 0].map((visible) => (
             <div key={visible} className="flex flex-col gap-2">
-              {/* ⚠️ Tutte le strisce usano lo **stesso** colore, e non è pigrizia: con le prime
-                  tre in `accent` e l'ultima no, la differenza di colore sembrava dire qualcosa —
-                  «queste sono sopra il limite» — mentre l'unica variabile qui è `visible`.
-                  Segnalato dall'utente il 2026-09-20. */}
+              {/* ⚠️ Il colore marca le strisce che **sforano**, e va detto: è una scelta di questa
+                  demo, non una cosa che il componente fa. L'etichetta qui sotto lo dichiara. */}
               <CountedChips visible={visible}>
                 {TAG.map((tag) => (
-                  <ThematicBadge key={tag}>{tag}</ThematicBadge>
+                  <ThematicBadge key={tag} color="accent">
+                    {tag}
+                  </ThematicBadge>
                 ))}
               </CountedChips>
               <TechLabel className="text-muted">
-                visible={`{${visible}}`} · {TAG.length} voci
+                visible={`{${visible}}`} · {TAG.length} voci · sopra il limite
               </TechLabel>
             </div>
           ))}

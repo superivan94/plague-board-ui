@@ -954,6 +954,18 @@ exist in target module» che **non sono veri**. Si guarda la pagina, o si crede 
   ⚠️ **E quello che non si vede non è nella pagina**: le pastiglie chiuse non esistono nel DOM
   invece di essere nascoste con una classe, come l'interruttore di `GlitchText` e per la stessa
   ragione — la ricerca del browser, la selezione e chi copia le troverebbero lo stesso.
+- ⚠️ **Il colore di un `Chip` di HeroUI vive solo nel testo, e in tema chiaro quei testi sono tutti
+  scuri: il colore smette di dire qualcosa.** La sua variante predefinita cambia `--chip-fg` e
+  lascia il fondo su `--default`. In scuro funziona, perché quei testi sono tinte **sature**
+  accanto a un bianco; in chiaro sono un oliva, un bosco, un marrone e un mattone, tutti dentro un
+  paio di gradini dal quasi-nero di `default` — misurato il 2026-09-20: **2,50** fra `accent` e
+  `default` in chiaro, contro due tinte lontanissime in scuro. Il difetto sta quindi **in un tema
+  solo**, ed è per questo che nessuno lo vede: chi lavora in scuro non ha niente da notare. La cura
+  non si scrive a mano — la variante **`soft`** di HeroUI tinge anche il fondo (`--accent-soft` e
+  compagne) e fa leggere la pastiglia come verde o rossa nei due temi, col testo che resta sopra
+  **5,07** su tutti e cinque i colori. ⚠️ E il bordo `border-current/40` che sembrava fare quel
+  lavoro non lo fa: vale 2,90 e 1,97 in scuro, 1,88 in chiaro — è una rifinitura.
+  Segnalato dall'utente guardando il playground, che è l'unico posto dove i due temi stanno vicini.
 
 ## Memoria di sessione
 

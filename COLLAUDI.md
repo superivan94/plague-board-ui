@@ -1101,3 +1101,38 @@ sono indipendenti e servono tutt'e due — una fa comparire l'anello, l'altra lo
 si trova. È anche la cosa che nessuno guarda: si prova col mouse, si vede che «funziona», e nessun
 test sulle prop la sfiora. Il guard `tests/focusRing.test.ts` tiene la combinazione fuori dai
 sorgenti; questo scenario tiene i numeri.
+
+### Il colore di una pastiglia, nei due temi — 2026-09-20
+
+**Esegue:** agente
+
+**Ultima esecuzione:** agente, 2026-09-20
+
+**Preparazione:** `http://localhost:3100/profilo`, sezioni «il grado» e «i chip che si contano».
+⚠️ **Va guardato in tutt'e due i temi**, e il tema si commuta scrivendo `pb-playground-theme` in
+`localStorage` e ricaricando: il difetto sta in **uno solo** dei due, quindi chi lavora in scuro
+non ha niente da notare.
+
+| Azione | Atteso | Ottenuto |
+|---|---|---|
+| I cinque colori, **scuro**, variante predefinita | si distinguono | tinte sature accanto a un bianco: lime, sage, ambra, corallo |
+| Gli stessi, **chiaro**, variante predefinita | si distinguono | ⚠️ tutti testi scuri su pastiglia grigia — oliva, bosco, marrone, mattone |
+| `accent` contro `default`, chiaro | — | ⚠️ **2,50**: a colpo d'occhio la stessa pastiglia |
+| Il bordo `border-current/40` | è lui a distinguerli, diceva la nota | ⚠️ no: **2,90** per `accent` e **1,97** per `danger` in scuro, **1,88** in chiaro — è una rifinitura |
+| La variante `soft` di HeroUI | tinge anche il fondo | `--accent-soft` e compagne: il fondo prende il velo del colore |
+| Il testo su fondo tinto, **chiaro** | ≥ 4,5 | default 15,54 · accent 6,61 · success 6,93 · warning 5,16 · danger **5,07** |
+| Lo stesso, **scuro** | ≥ 4,5 | default 17,44 · accent 8,97 · success 6,14 · warning 9,21 · danger 6,47 |
+| La demo dei chip, chiaro | le tre strisce che sforano si distinguono dalla quarta | pastiglie verde chiaro contro grigie: si vede |
+| La demo dei chip, scuro | idem | pastiglie con velo verde scuro e testo lime contro grigie: si vede |
+| Gate | verde | build, typecheck, lint 0/0, **476 test** |
+
+⚠️ **Un difetto che vive in un tema solo non lo trova chi lavora sempre nell'altro.** Il colore
+delle pastiglie è nato e si è collaudato in scuro, dove i testi di HeroUI sono tinte sature e la
+differenza salta all'occhio; in chiaro gli stessi token diventano quattro colori scuri tutti
+vicini al nero, e la pastiglia «colorata» è indistinguibile da quella neutra. Non lo prende la
+passata sui contrasti — ognuno dei cinque sta sopra 5,7 sul fondo, quindi sono tutti *leggibili* —
+perché la domanda non è «si legge» ma «si distingue da quella accanto». L'ha trovato l'utente
+guardando il playground, che è il posto dove i due temi stanno a un clic di distanza.
+
+**Che cosa protegge:** il colore di una pastiglia è l'unica cosa che dice, prima di leggerla, che
+quel grado è diverso dagli altri. Se il colore non arriva, resta una parola in un riquadro grigio.

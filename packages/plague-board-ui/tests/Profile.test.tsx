@@ -106,6 +106,17 @@ describe('ThematicBadge', () => {
     expect(container.querySelector('[data-slot="chip"]')).toHaveClass('chip--danger');
   });
 
+  it('il colore tinge anche il fondo, o in tema chiaro non si vede', () => {
+    // ⚠️ Nella variante predefinita di HeroUI il colore vive **solo** nel testo, e in tema chiaro
+    // quei testi sono tutti scuri e vicini fra loro: fra l'oliva di `accent` e il quasi-nero di
+    // `default` ci sono 2,50, cioè a colpo d'occhio la stessa pastiglia. In scuro invece sono
+    // tinte sature accanto a un bianco, e si vedono benissimo — per questo il difetto stava solo
+    // da una parte, e l'ha trovato l'utente guardando il playground.
+    const { container } = render(<ThematicBadge color="danger">Untore</ThematicBadge>);
+
+    expect(container.querySelector('[data-slot="chip"]')).toHaveClass('chip--soft');
+  });
+
   it('porta un segno prima del nome, e il segno non si annuncia', () => {
     const { container } = render(<ThematicBadge icon={<svg aria-hidden="true" />}>Untore</ThematicBadge>);
     const chip = container.querySelector('[data-slot="chip"]');
