@@ -103,8 +103,8 @@ export const PLAYGROUND_PAGES: readonly PlaygroundPage[] = [
   {
     href: '/profilo',
     title: 'La scheda',
-    components: ['PlagueAvatar', 'ThematicBadge', 'PlaguePanel'],
-    blurb: 'I tre pezzi della scheda profilo: il ritratto con l’anello, il grado, e la superficie.',
+    components: ['PlagueAvatar', 'ThematicBadge', 'PlaguePanel', 'CountedChips'],
+    blurb: 'Il ritratto con l’anello, il grado, la superficie, e le pastiglie che si contano.',
     family: 'fondamenta',
   },
   {

@@ -10,6 +10,9 @@
 // La riga che non va a capo: la usano la barra in cima e il piede in fondo, e per questo non sta
 // dentro nessuna delle due.
 export { BarRow, type BarRowProps } from './brand/BarRow';
+// La riga di pastiglie che ne mostra poche e si apre. ⚠️ Non disegna niente: le pastiglie gliele
+// passa chi lo monta, perché il colore di un tag è dell'applicazione. Lui conta e nasconde.
+export { CountedChips, type CountedChipsProps } from './brand/CountedChips';
 export { CreditCard, type CreditAuthor, type CreditCardProps } from './brand/CreditCard';
 export { CreditLine, type CreditLineProps } from './brand/CreditLine';
 // Il disturbo sul nome: il terzo pezzo del registro «futuro distopico» dell'aggregatore, dopo la
