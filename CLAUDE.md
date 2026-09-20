@@ -966,6 +966,45 @@ exist in target module» che **non sono veri**. Si guarda la pagina, o si crede 
   **5,07** su tutti e cinque i colori. ⚠️ E il bordo `border-current/40` che sembrava fare quel
   lavoro non lo fa: vale 2,90 e 1,97 in scuro, 1,88 in chiaro — è una rifinitura.
   Segnalato dall'utente guardando il playground, che è l'unico posto dove i due temi stanno vicini.
+- ⚠️ **Il dente di un pezzo di puzzle non si fa con una Bézier, si fa con un arco maggiore.** Un
+  dente vero ha il collo più stretto del bulbo, e la curva cubica quel sottosquadro non lo forma:
+  all'inizio domina il termine `(1−t)³` del punto di partenza, quindi spingere i punti di controllo
+  fuori dal riquadro allarga il bozzo invece di stringere il collo — misurato, con i controlli a
+  x = 22,2 la curva risaliva di un'unità sola sopra l'attacco. Un arco di raggio 2,6 fra due punti
+  distanti 2,6 ha invece il centro a **2,25 oltre il bordo** e percorre 240°: collo 2,6, bulbo 5,2,
+  sporgenza **4,85**. ⚠️ E i flag non si tirano a indovinare: la specifica sceglie il centro col
+  segno `−` quando `large-arc` e `sweep` sono **uguali** e col segno `+` quando sono **diversi**,
+  quindi su un contorno orario il dente che esce li vuole uguali (`1 1`) e l'incavo che rientra
+  diversi (`1 0`). Con la coppia sbagliata non si rompe niente: il dente diventa una tacca.
+- ⚠️ **Con `evenodd` due sagome affiancate non si sommano: si contano insieme.** La regola
+  pari/dispari conta gli incroci di un raggio, e chi sta dentro la prima incrocia anche i **due**
+  bordi della seconda: il conto torna solo se i bordi che combaciano stanno esattamente sulla stessa
+  x, e uno scarto di un decimo spegne una delle due o ci apre una fessura. Per questo il palazzo di
+  `PublisherIcon` è un **contorno a gradino** in un pezzo solo, e non una torre più un corpo basso.
+  Il problema non esiste con `nonzero`, dove due sagome dello stesso verso si saldano e basta.
+- ⚠️ **Un'icona si giudica ingrandita e si usa piccola, e servono tutte e due le passate.** A 56px
+  dentro la tabella del playground il pezzo di puzzle sembrava a posto; è a **168** che si è visto
+  che il dente era un bozzo e che le fiamme della torta erano due punte di matita. E quel difetto a
+  16px non si vede affatto — il segno dice semplicemente un'altra cosa, e chi guarda non sa di aver
+  letto la cosa sbagliata. È la stessa forma del batterio che era un sole. La sonda: clonare gli
+  `<svg>` della riga più grande in un riquadro fisso e renderli a 168.
+- ⚠️ **Una fiamma si legge se è larga circa il doppio della sua candela, e una torta senza piatto è
+  una scatola.** Misurato il 2026-09-20 sul primo giro di `AgeIcon`: fiamma 2,4 contro candela 1,8,
+  cioè quattro decimi di sporgenza per lato, e a 168px erano due matite. Con 3,45 contro 1,6 la
+  fiamma torna una fiamma. Il piatto è l'altra metà: una massa orizzontale con due bastoncini sopra
+  è una scatola con delle antenne, e la barra larga alla base è anche l'unico pezzo che resta
+  visibile a 12px.
+- ⚠️ **I sette segni degli attributi di gioco sono nominati per il mestiere, non per il disegno.**
+  `DurationIcon` rende un cronometro e `RatingIcon` una stella: è l'unico gruppo della libreria così,
+  perché è l'unico in cui il segno esiste per **marcare un campo**, e chi lo monta cerca «l'icona
+  della durata». Sono anche tutti a **campitura**: alla misura a cui si usano — 16px in una scheda —
+  un tratto da 2 su 24 è un pixel e un terzo, e i disegni a tratto di questa libreria sono infatti
+  quelli col limite più basso (bacillo 20, cocco 24).
+- ⚠️ **Lo stesso animale non può avere due mestieri nello stesso pacchetto.** In RattInventario «i
+  seguiti» sono l'emoji 🐭, ed era la battuta giusta; ma qui il ratto è già `RatIcon`, cioè
+  l'**emblema**, e riusarlo per un attributo è la strada per cui di là sono finiti tre teschi
+  disegnati tre volte. `FollowedIcon` è un'**impronta** — quattro dita, che è la zampa anteriore di
+  un ratto — e tiene la battuta senza pestare i piedi al marchio: seguire è stare sulle tracce.
 
 ## Memoria di sessione
 

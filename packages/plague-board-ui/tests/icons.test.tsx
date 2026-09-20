@@ -1,73 +1,27 @@
 import { render, screen } from '@testing-library/react';
-import type { ComponentType } from 'react';
 import { describe, expect, it } from 'vitest';
 
 import {
   BacillusIcon,
-  BiohazardIcon,
   CloudIcon,
   CoccusIcon,
-  CodeIcon,
   DiceIcon,
   DripIcon,
-  MoleculeIcon,
-  type IconProps,
   PoisonIcon,
-  PotionMugIcon,
   RatIcon,
-  RobotIcon,
   SkullIcon,
   SkullPhonesIcon,
   SkullPhonesOffIcon,
-  SparklesIcon,
   VirusIcon,
 } from '../src';
+import { icons, pezzi } from './icone';
 
-// Si importa dal punto d'ingresso pubblico e non dai file: quello che non passa da `src/index.ts`
-// non esiste per chi installa, quindi un'icona dimenticata lì dev'essere un test rosso.
+// Il contratto comune di ogni icona — misura, colore, classe, come si annuncia — e poi un blocco
+// per ogni disegno che ha qualcosa di suo da difendere.
 //
-// `paint` non è un dettaglio del disegno: un'icona a tratto porta il colore su `stroke` e ha
-// `fill="none"`, e chi le scambia ottiene una macchia nera o un'icona invisibile.
-//
-// ⚠️ Due icone non stanno in tabella, e non è una dimenticanza: `DripIcon` non è quadrata e ha il
-// suo blocco in fondo a questo file, `GoogleIcon` non si tinge e sta in `Login.test.tsx` con gli
-// altri pezzi della schermata di accesso.
-interface IconEntry {
-  readonly name: string;
-  readonly Icon: ComponentType<IconProps>;
-  readonly paint: 'fill' | 'stroke';
-}
-
-const icons: readonly IconEntry[] = [
-  { name: 'PoisonIcon', Icon: PoisonIcon, paint: 'fill' },
-  { name: 'PotionMugIcon', Icon: PotionMugIcon, paint: 'fill' },
-  { name: 'SkullIcon', Icon: SkullIcon, paint: 'fill' },
-  { name: 'BiohazardIcon', Icon: BiohazardIcon, paint: 'fill' },
-  { name: 'MoleculeIcon', Icon: MoleculeIcon, paint: 'fill' },
-  { name: 'VirusIcon', Icon: VirusIcon, paint: 'fill' },
-  { name: 'RobotIcon', Icon: RobotIcon, paint: 'fill' },
-  { name: 'CodeIcon', Icon: CodeIcon, paint: 'stroke' },
-  { name: 'SparklesIcon', Icon: SparklesIcon, paint: 'stroke' },
-  { name: 'RatIcon', Icon: RatIcon, paint: 'stroke' },
-  { name: 'SkullPhonesIcon', Icon: SkullPhonesIcon, paint: 'fill' },
-  { name: 'SkullPhonesOffIcon', Icon: SkullPhonesOffIcon, paint: 'fill' },
-  { name: 'BacillusIcon', Icon: BacillusIcon, paint: 'stroke' },
-  { name: 'CoccusIcon', Icon: CoccusIcon, paint: 'stroke' },
-  { name: 'CloudIcon', Icon: CloudIcon, paint: 'fill' },
-  { name: 'DiceIcon', Icon: DiceIcon, paint: 'fill' },
-];
-
-/**
- * Quanti pezzi staccati ha un tracciato: ogni `M` ne comincia uno.
- *
- * ⚠️ È l'unica misura di un disegno che jsdom concede — `getBBox` lì non esiste, e ogni
- * rettangolo misura zero — quindi la sagoma, i margini e le proporzioni stanno in `COLLAUDI.md`.
- * Quello che si prova qui è che i pezzi ci siano **tutti**: un tracciato che ne perde uno in un
- * copia e incolla continua a disegnare qualcosa di plausibile.
- */
-function pezzi(d: string | null | undefined): number {
-  return (d?.match(/M/g) ?? []).length;
-}
+// ⚠️ L'elenco delle icone e la funzione che conta i pezzi di un tracciato stanno in `icone.ts`,
+// perché li legge anche `gameIcons.test.tsx`: quella tabella è il solo posto che vede **tutte** le
+// icone insieme, ed è quello che regge il controllo sui doppioni.
 
 it('il marchio del ratto si tinge tutto, tratto e orecchie insieme', () => {
   const { container } = render(<RatIcon color="#a3e635" />);
@@ -180,9 +134,9 @@ it('il teschio con le cuffie porta il nostro cranio, non un secondo teschio', ()
 });
 
 describe('DripIcon', () => {
-  // ⚠️ Non sta nella tabella qui sopra, e il primo caso dice perché: è l'unica icona che quadrata
-  // non è. `IconProps` promette un lato solo perché tutte le altre lo sono, e chi sostituisce
-  // l'icona di un componente continua a vedere solo quel contratto.
+  // ⚠️ Non sta nella tabella di `icone.ts`, e il primo caso dice perché: è l'unica icona che
+  // quadrata non è. `IconProps` promette un lato solo perché tutte le altre lo sono, e chi
+  // sostituisce l'icona di un componente continua a vedere solo quel contratto.
   it('è alta due volte e mezzo la sua larghezza, che è la proporzione del disegno', () => {
     const { container } = render(<DripIcon />);
 

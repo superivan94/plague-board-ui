@@ -1136,3 +1136,37 @@ guardando il playground, che è il posto dove i due temi stanno a un clic di dis
 
 **Che cosa protegge:** il colore di una pastiglia è l'unica cosa che dice, prima di leggerla, che
 quel grado è diverso dagli altri. Se il colore non arriva, resta una parola in un riquadro grigio.
+
+### I sette segni degli attributi di un gioco, alla misura vera — 2026-09-20
+
+**Esegue:** agente
+
+**Ultima esecuzione:** agente, 2026-09-20
+
+**Preparazione:** `http://localhost:3100/`, sezione «gli attributi di un gioco». Le sette icone si
+guardano **ingrandite** — la sonda clona gli `<svg>` della riga da 56 e li rende a 168px su fondo
+scuro — e poi **alla misura vera**, che è la riga da 16. Il tema si commuta scrivendo
+`pb-playground-theme` in `localStorage` e ricaricando.
+
+| Azione | Atteso | Ottenuto |
+|---|---|---|
+| I sette a 168px, primo giro | ognuno dice quello che è | cinque sì; ⚠️ `DifficultyIcon` sembrava un'etichetta, `AgeIcon` due matite su una scatola |
+| Il dente del puzzle, prima | bulbo con collo stretto | ⚠️ bozzo largo e basso: due Bézier non fanno il sottosquadro |
+| Il dente del puzzle, dopo | idem | arco maggiore r 2,6, collo 2,6, sporgenza **4,85** — si legge «incastro» |
+| La fiamma, prima | più larga della candela | ⚠️ 2,4 contro 1,8: quattro decimi per lato, cioè una punta temperata |
+| La fiamma, dopo | idem | 3,45 contro 1,6, più il **piatto** sotto la torta |
+| I sette a 16px | la sagoma si riconosce | sì, tutti e sette |
+| I sette a 12px | idem | sagome giuste; chiudono il dettaglio interno `Players`, `Publisher`, `Duration` |
+| Il verde dei segni, **chiaro** | ≥ 3 (grafica che porta significato) | `plague-ink` **4,60** · `brand-ink` **4,58** sul fondo `#f5f5f5` |
+| Lo stesso, **scuro** | ≥ 3 | `plague-ink` **11,62** · `brand-ink` **13,43** |
+| La tabella per misura a 375px | scorre di lato, la pagina no | `scrollWidth` 375 = `clientWidth`: nessun traboccamento della pagina |
+| Gate | verde | build, typecheck, lint 0/0, **541 test**, dodici pagine statiche |
+
+⚠️ **Un'icona si giudica ingrandita e si usa piccola, e servono tutte e due le passate.** A 56px
+dentro la tabella il pezzo di puzzle sembrava a posto: è a 168 che si è visto che il dente era un
+bozzo, e quel difetto a 16px non si vede affatto — semplicemente il segno dice «etichetta» invece
+di «puzzle», e chi guarda non sa di aver letto la cosa sbagliata. È la stessa forma del batterio
+che era un sole: il nome del file non è il disegno.
+
+**Che cosa protegge:** i sette segni sono l'unica cosa che dice a che campo appartiene un valore
+in una riga di dati. Un segno che dice un'altra cosa non si rompe, mente — e mente in silenzio.

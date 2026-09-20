@@ -75,8 +75,8 @@ export const PLAYGROUND_PAGES: readonly PlaygroundPage[] = [
   {
     href: '/',
     title: 'Tavolozza',
-    components: ['colori', 'icone'],
-    blurb: 'I colori, i due che il tema cambia, e le icone alle misure vere.',
+    components: ['colori', 'icone', 'attributi di gioco'],
+    blurb: 'I colori, i due che il tema cambia, e i segni — della peste e del gioco — alle misure vere.',
     family: 'fondamenta',
   },
   {
