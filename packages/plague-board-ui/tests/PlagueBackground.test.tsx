@@ -13,21 +13,15 @@ import {
 // monta da fuori, quindi da `src/index.ts` non esce. Qui servono i suoi numeri per non riscriverli.
 import { CITTA, FINESTRE_TOTALI } from '../src/brand/plagueCityscape';
 import { fineAnimazione } from './animazioni';
-import { menoMovimento } from './preferenze';
+import { menoMovimento, paginaNascosta } from './preferenze';
 
 const avanza = (ms: number) => act(() => void vi.advanceTimersByTime(ms));
-
-/** Mette la pagina in secondo piano, come una scheda dietro a un'altra. */
-const paginaNascosta = (nascosta: boolean) => {
-  Object.defineProperty(document, 'visibilityState', { value: nascosta ? 'hidden' : 'visible', configurable: true });
-  Object.defineProperty(document, 'hidden', { value: nascosta, configurable: true });
-};
 
 const gocce = (container: HTMLElement) => container.querySelectorAll('.animate-drip');
 const galleggianti = (container: HTMLElement) => container.querySelectorAll('.animate-float');
 const bolle = (container: HTMLElement) => container.querySelectorAll('.pb-toxic-bubble');
 const palazzi = (container: HTMLElement) => container.querySelectorAll('.pb-city-block');
-const finestre = (container: HTMLElement) => container.querySelectorAll('.pb-city-block .animate-pulse');
+const finestre = (container: HTMLElement) => container.querySelectorAll('.pb-city-window');
 
 const conFondale = (level: ToxicLevel) =>
   render(
@@ -58,29 +52,36 @@ describe('PlagueBackground', () => {
 
       expect(gocce(container)).toHaveLength(TOXIC_LEVEL_SETTINGS[livello].drips);
       expect(galleggianti(container)).toHaveLength(TOXIC_LEVEL_SETTINGS[livello].floaters);
-      expect(finestre(container)).toHaveLength(TOXIC_LEVEL_SETTINGS[livello].windows);
 
       unmount();
     }
   });
 
-  it('la città c’è a ogni livello, anche spento: a cambiare sono le finestre accese', () => {
-    // ⚠️ È la riga che tiene ferma la distinzione: il livello governa quello che **si muove**, e
-    // una città non si muove. Facendo sparire i palazzi, «spento» direbbe che la città è fatta di
-    // gas — e una schermata che perde il suo skyline abbassando le emissioni sembra rotta.
+  it('la città non dipende dal livello: c’è tutta, accesa, anche a spento', () => {
+    // ⚠️ È la riga che tiene ferma la distinzione, scelta dall'utente: il livello dice quanto gas
+    // c'è in giro, e la corrente di una città non c'entra. Facendo dipendere i palazzi — o le loro
+    // luci — dal livello, «spento» direbbe che la città è fatta di gas.
     for (const livello of ['off', 'low', 'medium', 'high'] as const) {
       const { container, unmount } = conFondale(livello);
 
       expect(palazzi(container)).toHaveLength(CITTA.length);
+      expect(finestre(container)).toHaveLength(FINESTRE_TOTALI);
       unmount();
     }
   });
 
-  it('accende le finestre in ordine, senza sfondare il tetto della città', () => {
+  it('ogni finestra cala di tensione per conto suo', () => {
+    // Sette finestre con lo stesso ciclo calano insieme, e insieme non sono sette luci: sono un
+    // temporale. Il caso guarda che nessuna coppia condivida durata **e** ritardo.
     const { container } = conFondale('high');
 
-    expect(finestre(container)).toHaveLength(FINESTRE_TOTALI);
-    expect(TOXIC_LEVEL_SETTINGS.high.windows).toBeLessThanOrEqual(FINESTRE_TOTALI);
+    const tempi = [...finestre(container)].map((finestra) => {
+      const stile = (finestra as HTMLElement).style;
+      return `${stile.getPropertyValue('--pb-window-duration')}/${stile.getPropertyValue('--pb-window-delay')}`;
+    });
+
+    expect(tempi).toHaveLength(FINESTRE_TOTALI);
+    expect(new Set(tempi).size).toBe(FINESTRE_TOTALI);
   });
 
   it('le tre gocce sono di tre misure diverse', () => {

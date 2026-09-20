@@ -1,11 +1,19 @@
 import { IconBase } from './IconBase';
 import type { IconProps } from './types';
 
-/** La sagoma: appuntita in cima, tonda in fondo. È una goccia che **cade**, non che pende. */
-const DRIP_PATH = 'M4 20C4 20 8 13.68 8 8.82C8 3.96 4 0 4 0C4 0 0 3.96 0 8.82C0 13.68 4 20 4 20Z';
+/**
+ * La sagoma: una punta in cima e un bulbo tondo in fondo. È una goccia che **cade**, non che pende.
+ *
+ * ⚠️ **Il bulbo è un cerchio vero, e quella di `ludoratti.it` non lo era.** La sua è appuntita a
+ * tutti e due i capi — la larghezza massima sta a 8,82 su 20, cioè sopra la metà — quindi a occhio
+ * è una mandorla, e stirata in verticale diventa una lama. Qui la metà bassa è un cerchio di
+ * raggio 4 centrato a `(4, 16)`, e la punta ci arriva tangente: pesa in fondo, come un liquido.
+ */
+const DRIP_PATH =
+  'M4 0C5.2 7 8 11.5 8 16C8 18.21 6.21 20 4 20C1.79 20 0 18.21 0 16C0 11.5 2.8 7 4 0Z';
 
-/** Il riflesso sul fianco, che è ciò che la fa sembrare bagnata invece che disegnata. */
-const DRIP_SHINE = 'M4.5 3C5.5 6 6 8.5 5 11';
+/** Il riflesso sul bulbo, che è ciò che la fa sembrare bagnata invece che disegnata. */
+const DRIP_SHINE = 'M2.4 13C1.9 14.3 1.9 15.7 2.5 16.8';
 
 export interface DripIconProps extends IconProps {
   /**

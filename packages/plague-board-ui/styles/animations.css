@@ -498,6 +498,100 @@
 }
 
 /* ─────────────────────────────────────────────────────────────────────────────
+ * La città in fondo al fondale: le finestre che sfarfallano, e i versi che ne escono.
+ * ───────────────────────────────────────────────────────────────────────────── */
+
+/* ⚠️ **È un calo di tensione, non un respiro.** Una finestra che pulsa con un `animate-pulse` —
+ * cioè un'opacità che va e viene con una curva morbida — dice «questo elemento sta caricando»;
+ * una città mezza abbandonata dice un'altra cosa, e la dice con scatti secchi e rari. Il ritmo lo
+ * fa la **curva a gradini** sulla classe: senza, i fotogrammi ravvicinati si interpolerebbero e
+ * tornerebbe un lampeggio morbido.
+ *
+ * ⚠️ E ogni finestra ha la **sua** durata e il suo ritardo, scritti dal componente: sette finestre
+ * che calano insieme sono un temporale, non una città. Chiesto dall'utente il 2026-09-20. */
+@keyframes pb-window-flicker {
+  0%,
+  40% {
+    opacity: 1;
+  }
+  41% {
+    opacity: 0.12;
+  }
+  42% {
+    opacity: 0.9;
+  }
+  43% {
+    opacity: 0.28;
+  }
+  45%,
+  77% {
+    opacity: 1;
+  }
+  78% {
+    opacity: 0.1;
+  }
+  79% {
+    opacity: 0.85;
+  }
+  80% {
+    opacity: 0.18;
+  }
+  82%,
+  100% {
+    opacity: 1;
+  }
+}
+
+.pb-city-window {
+  /* `steps(1, end)` tiene ogni valore fino al fotogramma dopo: è quello che rende lo scatto un
+     contatto che salta invece di una luce che respira. */
+  animation: pb-window-flicker var(--pb-window-duration, 5s) steps(1, end) var(--pb-window-delay, 0s)
+    infinite;
+}
+
+/* ⚠️ **Il verso che esce dalla città è `absolute`, al contrario del fumetto dell'emettitore.**
+ * Quello vola in un portale sul `body` perché deve uscire dal riquadro che l'ha generato; questo
+ * è **scenografia**, vive dentro il fondale e ci resta — se sbordasse passerebbe sopra il
+ * contenuto, che è esattamente il difetto che il fondale esiste per non avere.
+ *
+ * ⚠️ E i colori sono quelli di casa — fondo `gray-950`, bordo e testo lime — mentre
+ * `.pb-comic-bubble` è bianco su nero, che è la scheda autore di RattInventario. */
+.pb-city-chatter {
+  position: absolute;
+  /* Il valore predefinito centra il fumetto sul punto; chi lo genera lo riscrive quando il palazzo
+     è troppo vicino a un bordo — vedi `plagueChatter.tsx`. */
+  translate: -50% 0;
+  max-width: 180px;
+  padding: 2px 6px;
+  border: 1px solid rgb(163 230 53 / 0.35);
+  border-radius: 6px;
+  background: rgb(3 7 18 / 0.92);
+  color: #d9f99d;
+  font-size: 9px;
+  text-align: center;
+  /* ⚠️ **Qui si va a capo, e `.pb-comic-bubble` no.** Là il fumetto esce da una scheda larga 142 px
+     e una frase su due righe le coprirebbe il nome; qui è scenografia sopra una città, e due righe
+     stanno benissimo. Il guadagno è che le frasi lunghe — «Corvax, rendi tutti pazzi per giochi da
+     tavolo» ne misura duecento — non escono più dal riquadro. */
+  white-space: normal;
+  pointer-events: none;
+  animation: pb-comic-pop var(--pb-chatter-duration, 3200ms) ease-out forwards;
+}
+
+.pb-city-chatter::after {
+  content: '';
+  position: absolute;
+  bottom: -4px;
+  left: 50%;
+  width: 0;
+  height: 0;
+  transform: translateX(-50%);
+  border-top: 4px solid rgb(3 7 18 / 0.92);
+  border-right: 4px solid transparent;
+  border-left: 4px solid transparent;
+}
+
+/* ─────────────────────────────────────────────────────────────────────────────
  * `ToxicBubbles`. La bolla di gas che sale dal fondo del riquadro, ondeggiando.
  * ───────────────────────────────────────────────────────────────────────────── */
 
@@ -827,6 +921,10 @@
   .pb-potion-live .pb-potion-bubble,
   .pb-toxic-bubble,
   .pb-toxic-bubble-skin,
+  /* Ferma, la finestra resta **accesa**: è il primo fotogramma, ed è il ripiego giusto — una
+     città spenta sembrerebbe un guasto, non una preferenza rispettata. */
+  .pb-city-window,
+  .pb-city-chatter,
   [class*='animate-'],
   .pb-rat--running .pb-rat-part,
   .pb-rat--running .pb-rat-body,

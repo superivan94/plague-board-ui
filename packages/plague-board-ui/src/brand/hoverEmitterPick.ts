@@ -43,8 +43,12 @@ const altezza = (top: RandomRange, lanes: number | undefined, giro: number) => {
  * Quale testo, **senza ripetere quello di prima**. Si pesca fra gli altri — non si ripesca finché
  * non esce diverso, che con un testo solo è un ciclo che non finisce — ed è la stessa scelta di
  * `useRandomPhrase`, fatta con gli indici perché qui il mazzo si ripesca tre volte al secondo.
+ *
+ * ⚠️ Esce dal modulo perché al terzo posto che ne ha bisogno — l'emettitore, il gancio delle
+ * frasi, e i versi che escono dalla città — una quarta copia sarebbe la cosa che la regola sul
+ * copiare vieta.
  */
-const scegli = (contents: readonly string[], ultimo: number) => {
+export const scegli = (contents: readonly string[], ultimo: number) => {
   if (contents.length < 2 || ultimo < 0) return Math.floor(Math.random() * contents.length);
 
   const scelto = Math.floor(Math.random() * (contents.length - 1));

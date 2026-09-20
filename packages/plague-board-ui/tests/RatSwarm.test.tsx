@@ -4,17 +4,11 @@ import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest';
 
 import { RatSwarm, type RatSwarmHandle } from '../src';
 import { fineTraversata } from './animazioni';
-import { menoMovimento } from './preferenze';
+import { menoMovimento, paginaNascosta } from './preferenze';
 
 const ratti = (container: HTMLElement) => container.querySelectorAll('.pb-rat-run');
 
 const avanza = (ms: number) => act(() => void vi.advanceTimersByTime(ms));
-
-/** Mette la pagina in secondo piano, come una scheda dietro a un'altra. */
-const paginaNascosta = (nascosta: boolean) => {
-  Object.defineProperty(document, 'visibilityState', { value: nascosta ? 'hidden' : 'visible', configurable: true });
-  Object.defineProperty(document, 'hidden', { value: nascosta, configurable: true });
-};
 
 describe('RatSwarm', () => {
   const matchMediaVero = window.matchMedia;

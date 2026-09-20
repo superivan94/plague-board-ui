@@ -1,4 +1,5 @@
 import {
+  MusicToggle,
   PlagueBackground,
   PlaguePulse,
   PoisonIcon,
@@ -74,6 +75,7 @@ export default function AtmosferaPage() {
 
           <div className="flex flex-wrap items-center gap-3">
             <ToxicLevelSwitch label="Livello delle emissioni" />
+            <MusicToggle src="/audio/LudoRatti.mp3" volume={0.4} />
             <p className="text-sm text-muted">
               Il comando sta <strong>fuori</strong> dal fondale, e lo comanda lo stesso: fra i due
               c’è <code>ToxicLevelProvider</code>, quindi possono stare a due estremità della pagina.
@@ -92,7 +94,7 @@ export default function AtmosferaPage() {
               <th className="py-2 pr-4 font-medium">velo</th>
               <th className="py-2 pr-4 font-medium">icone</th>
               <th className="py-2 pr-4 font-medium">gocce</th>
-              <th className="py-2 pr-4 font-medium">finestre</th>
+              <th className="py-2 pr-4 font-medium">versi</th>
               <th className="py-2 pr-4 font-medium">bolle</th>
               <th className="py-2 font-medium">diametro</th>
             </tr>
@@ -110,7 +112,11 @@ export default function AtmosferaPage() {
                   <td className="py-2 pr-4 text-muted">{t.hazeClass.replace('opacity-', '')}%</td>
                   <td className="py-2 pr-4 text-muted">{t.floaters}</td>
                   <td className="py-2 pr-4 text-muted">{t.drips}</td>
-                  <td className="py-2 pr-4 text-muted">{t.windows}</td>
+                  <td className="py-2 pr-4 text-muted">
+                    {t.maxChatter === 0
+                      ? '—'
+                      : `max ${t.maxChatter}, uno ogni ${t.chatterEveryMs[0] / 1000}–${t.chatterEveryMs[1] / 1000}s`}
+                  </td>
                   <td className="py-2 pr-4 text-muted">
                     {spento ? '—' : `max ${t.maxBubbles}, una ogni ${t.bubbleEveryMs[0] / 1000}–${t.bubbleEveryMs[1] / 1000}s`}
                   </td>
@@ -126,15 +132,24 @@ export default function AtmosferaPage() {
 
       <p className="text-sm text-muted">
         <strong>«Spento» spegne davvero</strong>: niente velo, niente icone, niente gocce, niente
-        bolle, nessuna finestra accesa. È il livello che una persona sceglie quando il movimento la
-        disturba, e un fondale che a quel punto lascia ancora qualcosa in scena non sta obbedendo.
+        bolle, nessun verso. È il livello che una persona sceglie quando il movimento la disturba,
+        e un fondale che a quel punto lascia ancora qualcosa in scena non sta obbedendo.
       </p>
 
       <p className="text-sm text-muted">
-        ⚠️ <strong>I palazzi però restano, al buio.</strong> Il livello governa quello che si
-        muove, e una città non si muove: sono le sue finestre a pulsare, ed è quelle che il livello
-        conta. Farla sparire direbbe che la città è fatta di gas — e una schermata che perde il suo
-        skyline abbassando le emissioni sembra rotta, non obbediente.
+        ⚠️ <strong>La città però non c’entra col livello, e resta accesa.</strong> Il livello dice
+        quanto gas c’è in giro; la corrente di una città è un’altra cosa. Le sette finestre
+        sfarfallano sempre, ognuna col suo ciclo e il suo ritardo — è un <strong>calo di
+        tensione</strong>, non un respiro, e a renderlo uno scatto è la curva a gradini. Quello che
+        il livello governa sono i <strong>versi</strong> che escono dai tetti: i ratti che ci
+        abitano.
+      </p>
+
+      <p className="text-sm text-muted">
+        I versi sono lo stesso fumetto dell’easter egg della firma, ma nessuno li sfiora: escono da
+        soli, sopra un palazzo a caso, e le posizioni si ricavano dai tetti — sposta un palazzo e ci
+        si sposta anche quello che gli esce dal camino. Le parole sono una prop, e{' '}
+        <code>RAT_PHRASES</code> è solo il valore predefinito.
       </p>
 
       <p className="text-sm text-muted">
@@ -151,6 +166,26 @@ export default function AtmosferaPage() {
         guardare, e tenere acceso un timer per non dipingere nulla sarebbe solo costo. Il velo, che
         non si muove, resta.
       </p>
+
+      <TechRule>la musica di fondo</TechRule>
+
+      <div className="flex flex-col gap-3">
+        <p className="text-sm text-muted">
+          <code>MusicToggle</code> è il teschio con le cuffie qui sopra, accanto al selettore: fa
+          partire una traccia in ciclo e la ferma. ⚠️ <strong>La traccia non viaggia col
+          pacchetto</strong> — <code>LudoRatti.mp3</code> pesa <strong>2,1 MB</strong>, cento volte
+          il resto della libreria — quindi il comando riceve un indirizzo e il file lo serve chi
+          installa, dalla sua cartella pubblica.
+        </p>
+        <p className="text-sm text-muted">
+          ⚠️ <strong>Non parte da sé, e nemmeno al primo clic sulla pagina.</strong> È la cosa che
+          fa RattInventario: tenta l’autoplay, il browser lo blocca, e allora si mette in ascolto
+          del primo gesto qualunque — chi preme un campo per scrivere il proprio nome si ritrova la
+          musica addosso senza sapere che cosa l’ha accesa. Qui parte quando si preme questo
+          comando, e basta. Il file si scarica lì (<code>preload=&quot;none&quot;</code>): chi non
+          preme non paga i due megabyte.
+        </p>
+      </div>
 
       <TechRule>la lastra che respira</TechRule>
 

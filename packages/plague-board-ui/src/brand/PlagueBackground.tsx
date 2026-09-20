@@ -8,6 +8,8 @@ import { PoisonIcon } from '../icons/PoisonIcon';
 import { SkullIcon } from '../icons/SkullIcon';
 import { VirusIcon } from '../icons/VirusIcon';
 import type { IconProps } from '../icons/types';
+import { RAT_PHRASES } from '../data/phrases';
+import { PlagueChatter } from './plagueChatter';
 import { PlagueCityscape } from './plagueCityscape';
 import { ToxicBubbles } from './ToxicBubbles';
 import { TOXIC_LEVEL_SETTINGS } from './toxicLevel';
@@ -46,15 +48,19 @@ const GALLEGGIANTI: readonly Galleggiante[] = [
 /**
  * Le tre gocce che colano dal bordo di sopra, in ordine di comparsa.
  *
- * ⚠️ **Sono di tre misure diverse**, come su `ludoratti.it` — 8×32, 12×48 e 8×24 — e con durate
- * diverse: tre gocce uguali che cadono a ritmi diversi si leggono come un'animazione che si
- * ripete, tre gocce diverse come pioggia. Le misure e i tempi sono i suoi; le x sono più larghe,
- * perché di là le tre cadono tutte da sotto l'intestazione e qui devono coprire un fondale.
+ * ⚠️ **Le x coprono tutta la larghezza.** Su `ludoratti.it` le tre cadono al 40, 55 e 60 per cento
+ * perché escono da sotto l'intestazione, che è larga la metà della pagina; qui devono bagnare un
+ * fondale intero, e stipate in mezzo sembravano una perdita sola.
+ *
+ * ⚠️ **E sono meno stirate.** Le tre di là — 8×32, 12×48, 8×24 — stanno fra il triplo e il
+ * quadruplo della loro larghezza, mentre il disegno ne è alto due volte e mezzo: `DripIcon` si
+ * lascia stirare, e stirata di un altro 60% smette di essere una goccia e diventa una lama.
+ * Qui la più grande scende da 12×48 a 10×26.
  */
 const GOCCE = [
-  { left: '28%', w: 8, h: 32, durata: '8s', ritardo: '0.2s' },
-  { left: '55%', w: 12, h: 48, durata: '7s', ritardo: '1.5s' },
-  { left: '74%', w: 8, h: 24, durata: '9s', ritardo: '3s' },
+  { left: '12%', w: 8, h: 22, durata: '8s', ritardo: '0.2s' },
+  { left: '47%', w: 10, h: 26, durata: '7s', ritardo: '1.5s' },
+  { left: '83%', w: 7, h: 18, durata: '9s', ritardo: '3s' },
 ];
 
 /**
@@ -76,6 +82,11 @@ const CHIAZZE: CSSProperties = {
 export interface PlagueBackgroundProps {
   /** Quello che sta **sopra** il fondale: la pagina, un pannello, una scheda. */
   children?: ReactNode;
+  /**
+   * Che cosa dice la città. Il valore predefinito sono le frasi del ratto — è la voce di casa —
+   * e un elenco vuoto la zittisce senza togliere niente altro.
+   */
+  phrases?: readonly string[];
   /** Classi aggiuntive sul contenitore — la forma, il rientro, l'altezza minima. */
   className?: string;
   /** Classi aggiuntive sul riquadro che tiene il contenuto, se serve disporlo. */
@@ -90,8 +101,9 @@ export interface PlagueBackgroundProps {
  *
  * La scena è quella di `ludoratti.it` — è la pagina della corporazione, quindi è lei a dire come
  * si veste un fondale dei Ludoratti; da RattInventario vengono le bolle e il velo. ⚠️ **La città
- * resta a ogni livello, anche a `off`**: il livello governa quello che si muove, e una città non
- * si muove — sono le sue finestre a pulsare, e quelle il livello le conta.
+ * resta a ogni livello, anche a `off`, e le sue finestre sfarfallano sempre**: il livello dice
+ * quanto gas c'è in giro, e la corrente di una città non c'entra. Quello che il livello governa
+ * sono i **versi** che ne escono, cioè i ratti che ci abitano.
  *
  * **Avvolge il contenuto invece di stargli sotto**, ed è una scelta: così non c'è niente da
  * ricordarsi. In RattInventario il fondale è un fratello del pannello e le bolle stanno in un
@@ -117,7 +129,12 @@ export interface PlagueBackgroundProps {
  * </ToxicLevelProvider>
  * ```
  */
-export function PlagueBackground({ children, className = '', contentClassName = '' }: PlagueBackgroundProps) {
+export function PlagueBackground({
+  children,
+  phrases = RAT_PHRASES,
+  className = '',
+  contentClassName = '',
+}: PlagueBackgroundProps) {
   const { level } = useToxicLevel();
   const taratura = TOXIC_LEVEL_SETTINGS[level];
 
@@ -166,9 +183,12 @@ export function PlagueBackground({ children, className = '', contentClassName = 
 
         <ToxicBubbles />
 
-        {/* ⚠️ La città è l'**ultima**, quindi sta davanti a tutto il resto: le bolle salgono da
-            dietro i palazzi, che è il modo in cui un gas esce da una città e non da un riquadro. */}
-        <PlagueCityscape windows={taratura.windows} />
+        {/* ⚠️ La città è **davanti** a tutto il resto: le bolle salgono da dietro i palazzi, che è
+            il modo in cui un gas esce da una città e non da un riquadro. */}
+        <PlagueCityscape />
+
+        {/* I versi vengono **dopo** la città, perché escono dai tetti e devono passarci sopra. */}
+        <PlagueChatter phrases={phrases} />
       </div>
 
       <div className={`relative ${contentClassName}`}>{children}</div>
