@@ -707,6 +707,15 @@ un'altra scheda: `rattinventario.ludoratti.it/progettoE`, che è la pagina da cu
 | Le tre gocce | tre misure diverse, e una sagoma di goccia | **8×32, 12×48, 8×24**, `viewBox="0 0 8 20"` e `preserveAspectRatio="none"`, colore `oklab(…/0.7)` cioè `brand` al 70% |
 | Una bolla, guardata da vicino a 40 / 90 / 150 px | un gas che brilla, non una bolla di sapone | riflesso **verde** (`bef264`, niente bianco), nucleo in `toxic` al 24%, alone da `0,34 × diametro`, e `border-radius` che oscilla — `52% 48% 46% 54% / 50% 46% 54% 50%` al primo fotogramma |
 | Le animazioni di una pelle di bolla | tre, e le due lente in fase | `pb-toxic-sway, pb-toxic-wobble, pb-toxic-swell` a `3s, 3s, 6s` |
+| **Terzo giro** — le finestre della città | uno scatto secco, e ognuna per conto suo | `pb-window-flicker 4.2s steps(1) 0.5s` sulla prima; sette durate e sette ritardi, tutti diversi |
+| Le finestre ai quattro livelli | sempre sette, perché la città non è fatta di gas | 7 a `spento` come ad `alto`; 4 palazzi a ogni livello |
+| Le tre gocce | tre misure, e tutta la larghezza | **8×22, 10×26, 7×18** al 12, 47 e 83 per cento — prima 8×32 / 12×48 / 8×24 al 28, 55 e 74 |
+| La sagoma della goccia, a 120 px | una punta in cima e un bulbo tondo in fondo | il bulbo è un cerchio di raggio 4 centrato a `(4, 16)`; quella di `ludoratti.it` è appuntita a **tutti e due** i capi, cioè una mandorla |
+| I versi che escono dalla città, a `alto` | uno alla volta, sopra un palazzo | «Squit-squadra, all'attacco!» a `left: 23.5%`, `top: 75.7%` — cioè sul tetto del secondo palazzo |
+| Un verso lungo contro il bordo | non esce dal riquadro | `translate` vale `0 0` sotto il 25%, `-100% 0` sopra il 75%, `-50% 0` in mezzo; e il fumetto va a capo, al contrario di quello della firma |
+| Si preme il comando della musica | suona, e il comando lo dice | `paused: false`, `currentTime` 3,93 su **92,84 s**, `volume: 0.4`, `aria-pressed="true"`, nome accessibile «Togli la musica» |
+| Si preme di nuovo | si ferma | `paused: true`, `aria-pressed="false"`, nome «Metti la musica» |
+| Al caricamento, senza toccare niente | silenzio | `play` non chiamato, `preload="none"`: i 2,1 MB non partono finché nessuno preme |
 
 ⚠️ **Il contrasto si misura risolvendo il colore su una tela, non leggendo la stringa.** Oggi
 `getComputedStyle` restituisce `lab(96.5432 -0.0000596046 0)` e `oklab(0.657609 …)`: una regex che
@@ -728,6 +737,12 @@ danno valori iniziali, e cercando la classe fra le `cssRules` non si trova.
 ⚠️ **Quello che questo collaudo non prova è `prefers-reduced-motion`**: il riquadro del browser non
 emula la preferenza. Lì vale il test, che monta le bolle con `matchMedia` truccato e verifica che a
 livello `alto` dopo un minuto non ne sia nata nessuna.
+
+⚠️ **La musica si prova col clic, e il resto col test.** `HTMLMediaElement.play` in jsdom **non è
+implementato**: lanciare è tutto quello che fa, quindi il comando lì si prova con una spia al posto
+di `play`/`pause` — che è anche l'unico modo di provare il **rifiuto**, cioè il caso in cui il
+browser dice di no e il comando non deve restare «premuto» sopra un silenzio. Quello che solo un
+browser vero dice è se il file arriva e se suona davvero.
 
 ⚠️ **Tre cose del primo giro sono state rifatte al secondo, tutte segnalate dall'utente guardando
 la pagina.** Le bolle «sembravano di sapone»: il riflesso quasi bianco e la sfera perfetta sono il

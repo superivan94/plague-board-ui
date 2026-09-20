@@ -683,6 +683,31 @@ exist in target module» che **non sono veri**. Si guarda la pagina, o si crede 
   nucleo si accende (in `toxic`, con l'opacità) e il riflesso diventa verde; e una sacca di gas in
   un liquido si deforma, quindi il `border-radius` oscilla. Il cerchio resta come ripiego di «meno
   movimento», che è il caso in cui la deformazione non c'è.
+- ⚠️ **Un lampeggio e un respiro sono la stessa animazione con due curve di tempo.** Una luce che
+  va e viene con una curva morbida dice «sto caricando»; un **calo di tensione** dice che la
+  corrente è marcia, e la differenza la fa `steps(1, end)`, che tiene ogni valore fino al
+  fotogramma dopo invece di interpolarlo. Vale per le finestre della città, dove `animate-pulse`
+  faceva sembrare i palazzi sette segnaposto in attesa di dati. ⚠️ E ogni luce ha la **sua**
+  durata e il suo ritardo: sette finestre con lo stesso ciclo calano insieme, e insieme non sono
+  sette luci — sono un temporale. È la stessa regola dei due autori del piede, che sfalsano il
+  cenno di due secondi.
+- ⚠️ **Un fumetto centrato sul punto in cui nasce esce dal riquadro quando quel punto è vicino a un
+  bordo.** Largo 180 px sopra un palazzo al 10% di un fondale da 736 comincia a −45 px, cioè
+  mozzato — ed è lo stesso difetto degli 81 px del fumetto della firma, dall'altro lato. La cura è
+  che l'**ancoraggio dipenda da dove nasce**: spigolo sinistro contro il bordo sinistro, destro
+  contro il destro, centrato in mezzo. Sta sulla proprietà `translate` scritta in linea, che vince
+  su quella della classe e non tocca la `transform` che l'animazione sta scrivendo.
+- ⚠️ **jsdom non sa suonare: `HTMLMediaElement.play` non è implementato, e lanciare è tutto quello
+  che fa.** Si sostituisce con una spia che restituisce una promessa — che è il contratto vero — e
+  quella spia è anche l'unico modo di provare il caso che conta: il **rifiuto**. Il browser blocca
+  l'audio finché non c'è un gesto, e un comando che non gestisse quel rifiuto resterebbe
+  «premuto» sopra un silenzio, più un errore non gestito in console.
+- ⚠️ **L'autoplay che ripiega sul «primo gesto qualunque» è una trappola, non un ripiego.** È
+  quello che fa `useAudioPlayer` di RattInventario: tenta `play()` dopo mezzo secondo, il browser
+  lo blocca, e allora ascolta il primo `click`, `touchstart` o `keydown` della pagina. Vuol dire
+  che chi preme un campo per scrivere il proprio nome si ritrova la musica addosso senza sapere
+  che cosa l'abbia accesa, e senza aver chiesto niente. `MusicToggle` parte solo quando si preme
+  **lui**, e tiene `preload="none"` perché quei 2,1 MB non li deve pagare chi non preme.
 - ⚠️ **Il tema si commuta ricaricando, non scrivendo la classe sulla radice da console.** Cambiando
   `documentElement.classList` a mano, su `/atmosfera` metà dei token di HeroUI seguivano e metà no —
   un'opzione non scelta misurava 1,16 in scuro, quando ricaricando ne fa 14,52. Si scrive
