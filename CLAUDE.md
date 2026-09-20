@@ -966,6 +966,17 @@ exist in target module» che **non sono veri**. Si guarda la pagina, o si crede 
   **5,07** su tutti e cinque i colori. ⚠️ E il bordo `border-current/40` che sembrava fare quel
   lavoro non lo fa: vale 2,90 e 1,97 in scuro, 1,88 in chiaro — è una rifinitura.
   Segnalato dall'utente guardando il playground, che è l'unico posto dove i due temi stanno vicini.
+- ⚠️ **Qui dentro non entrano i segni di un dominio applicativo, e il confine sta prima delle
+  icone.** Il 2026-09-20 sono state scritte sette icone per gli attributi di un gioco da tavolo —
+  giocatori, durata, difficoltà, valutazione, editore, età, seguito — e tolte lo stesso giorno,
+  perché **questa libreria è l'identità dei Ludoratti e i componenti comuni**: i progetti che ci
+  sono attingono a un formato di comunicazione comune, e i nuovi nascono con la footprint giusta
+  senza reinventarla. Il modello di dati di un catalogo di giochi è di **Rattoteca**, e lì resta.
+  ⚠️ **Vale anche per il pannello Info Gioco**: il master plan lo dava per nascente qui come
+  componente presentazionale, e l'utente ha corretto il 2026-09-20 — si riprogetta dentro Rattoteca
+  quando questa libreria è completa. ⚠️ `DiceIcon` non è un'eccezione: non è un attributo di un
+  gioco, è il terzo termine del marchio dopo la peste e i ratti. Il criterio è quello — **parla il
+  marchio o parla l'applicazione?** I sette disegni vivono nel commit `0d55bee`.
 - ⚠️ **Il dente di un pezzo di puzzle non si fa con una Bézier, si fa con un arco maggiore.** Un
   dente vero ha il collo più stretto del bulbo, e la curva cubica quel sottosquadro non lo forma:
   all'inizio domina il termine `(1−t)³` del punto di partenza, quindi spingere i punti di controllo
@@ -980,8 +991,9 @@ exist in target module» che **non sono veri**. Si guarda la pagina, o si crede 
   pari/dispari conta gli incroci di un raggio, e chi sta dentro la prima incrocia anche i **due**
   bordi della seconda: il conto torna solo se i bordi che combaciano stanno esattamente sulla stessa
   x, e uno scarto di un decimo spegne una delle due o ci apre una fessura. Per questo il palazzo di
-  `PublisherIcon` è un **contorno a gradino** in un pezzo solo, e non una torre più un corpo basso.
-  Il problema non esiste con `nonzero`, dove due sagome dello stesso verso si saldano e basta.
+  un palazzo a due altezze va disegnato come **un contorno a gradino** in un pezzo solo, e non come
+  una torre più un corpo basso. Il problema non esiste con `nonzero`, dove due sagome dello stesso
+  verso si saldano e basta.
 - ⚠️ **Un'icona si giudica ingrandita e si usa piccola, e servono tutte e due le passate.** A 56px
   dentro la tabella del playground il pezzo di puzzle sembrava a posto; è a **168** che si è visto
   che il dente era un bozzo e che le fiamme della torta erano due punte di matita. E quel difetto a
@@ -989,22 +1001,15 @@ exist in target module» che **non sono veri**. Si guarda la pagina, o si crede 
   letto la cosa sbagliata. È la stessa forma del batterio che era un sole. La sonda: clonare gli
   `<svg>` della riga più grande in un riquadro fisso e renderli a 168.
 - ⚠️ **Una fiamma si legge se è larga circa il doppio della sua candela, e una torta senza piatto è
-  una scatola.** Misurato il 2026-09-20 sul primo giro di `AgeIcon`: fiamma 2,4 contro candela 1,8,
-  cioè quattro decimi di sporgenza per lato, e a 168px erano due matite. Con 3,45 contro 1,6 la
-  fiamma torna una fiamma. Il piatto è l'altra metà: una massa orizzontale con due bastoncini sopra
-  è una scatola con delle antenne, e la barra larga alla base è anche l'unico pezzo che resta
-  visibile a 12px.
-- ⚠️ **I sette segni degli attributi di gioco sono nominati per il mestiere, non per il disegno.**
-  `DurationIcon` rende un cronometro e `RatingIcon` una stella: è l'unico gruppo della libreria così,
-  perché è l'unico in cui il segno esiste per **marcare un campo**, e chi lo monta cerca «l'icona
-  della durata». Sono anche tutti a **campitura**: alla misura a cui si usano — 16px in una scheda —
-  un tratto da 2 su 24 è un pixel e un terzo, e i disegni a tratto di questa libreria sono infatti
-  quelli col limite più basso (bacillo 20, cocco 24).
-- ⚠️ **Lo stesso animale non può avere due mestieri nello stesso pacchetto.** In RattInventario «i
-  seguiti» sono l'emoji 🐭, ed era la battuta giusta; ma qui il ratto è già `RatIcon`, cioè
-  l'**emblema**, e riusarlo per un attributo è la strada per cui di là sono finiti tre teschi
-  disegnati tre volte. `FollowedIcon` è un'**impronta** — quattro dita, che è la zampa anteriore di
-  un ratto — e tiene la battuta senza pestare i piedi al marchio: seguire è stare sulle tracce.
+  una scatola.** Misurato il 2026-09-20: fiamma 2,4 contro candela 1,8, cioè quattro decimi di
+  sporgenza per lato, e a 168px erano due matite. Con 3,45 contro 1,6 la fiamma torna una fiamma. Il
+  piatto è l'altra metà: una massa orizzontale con due bastoncini sopra è una scatola con delle
+  antenne, e la barra larga alla base è anche l'unico pezzo che resta visibile a 12px.
+- ⚠️ **Un'icona a campitura regge il piccolo meglio di una a tratto, e i numeri sono nostri.** A
+  16px — la misura dentro una riga di dati — un tratto da 2 su una griglia da 24 è **un pixel e un
+  terzo**, e infatti i disegni a tratto di questa libreria sono quelli col limite più basso: il
+  bacillo si ferma a 20, il cocco a 24. Dove un segno deve stare accanto a un testo piccolo si
+  sceglie la campitura, e a tratto ci vanno quelli che si usano grandi.
 
 ## Memoria di sessione
 

@@ -18,8 +18,6 @@ import {
   VirusIcon,
 } from 'plague-board-ui';
 
-import { GameIconsSection } from './GameIconsSection';
-
 // ⚠️ Nessun colore scritto a mano in questa pagina: tutto passa dai token, perché è la pagina che
 // deve reggere il commutatore del tema in cima. Un `text-gray-400` qui dentro sarebbe invisibile
 // in chiaro, ed è esattamente il difetto che la pagina esiste per non far succedere.
@@ -257,10 +255,6 @@ export default function Home() {
           i bordi, alla stessa <code>size</code>, sembra più grande di quelli che gli stanno
           accanto.
         </p>
-      </section>
-
-      <section className="flex flex-col gap-6 text-plague-ink">
-        <GameIconsSection />
       </section>
 
       <TechRule>la firma</TechRule>

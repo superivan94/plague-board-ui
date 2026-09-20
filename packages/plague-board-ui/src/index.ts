@@ -148,28 +148,14 @@ export { SkullPhonesIcon } from './icons/SkullPhonesIcon';
 export { SkullPhonesOffIcon } from './icons/SkullPhonesOffIcon';
 export { SparklesIcon } from './icons/SparklesIcon';
 export { VirusIcon } from './icons/VirusIcon';
-
-// **I sette attributi di un gioco**, in un blocco loro e non in ordine alfabetico lì sopra: si
-// usano **insieme**, in una riga sola sotto il titolo di un gioco, e chi ne cerca uno li cerca
-// tutti. Di là sono emoji col font Noto Color Emoji preso da un CDN, che su iOS il sistema
-// sostituisce coi suoi — stesso codice, disegni diversi, e una riga che cambia aspetto a seconda
-// del telefono.
-// ⚠️ **Il nome dice il mestiere, non il disegno**: `DurationIcon` rende un cronometro e
-// `RatingIcon` una stella. È l'unico gruppo della libreria nominato così, perché è l'unico in cui
-// il segno esiste per marcare un campo — e chi lo monta cerca «l'icona della durata», non «il
-// cronometro». Che cosa disegna ognuna sta scritto nel suo file.
-// ⚠️ E resta `IconProps`, cioè **restano sostituibili**: il componente che un giorno mostrerà
-// questi campi userà queste come predefinite, e chi installa potrà passare le sue — Rattoteca ha
-// già le sue Lucide e non deve cambiarle per usare il resto della libreria.
-export { AgeIcon } from './icons/AgeIcon';
-export { DifficultyIcon } from './icons/DifficultyIcon';
-export { DurationIcon } from './icons/DurationIcon';
-export { FollowedIcon } from './icons/FollowedIcon';
-export { PlayersIcon } from './icons/PlayersIcon';
-export { PublisherIcon } from './icons/PublisherIcon';
-export { RatingIcon } from './icons/RatingIcon';
-
 export type { IconProps } from './icons/types';
+
+// ⚠️ **Qui dentro non entrano i segni di un dominio applicativo**, e il confine è stato messo alla
+// prova il 2026-09-20: sette icone per gli attributi di un gioco da tavolo — giocatori, durata,
+// difficoltà, valutazione, editore, età, seguito — erano state scritte e poi tolte, perché questo
+// elenco è la promessa della libreria e sette nomi di dominio dicono che sa che cos'è un gioco da
+// tavolo. `DiceIcon` resta perché non è un attributo: è il terzo termine del marchio, dopo la peste
+// e i ratti. I sette disegni vivono nel commit `0d55bee` e il loro posto è Rattoteca.
 
 // Il meccanismo, e i dati che gli si danno da mangiare: due moduli, perché chi vuole la voce dei
 // Ludoratti e chi vuole solo il sorteggio sono due persone diverse.
