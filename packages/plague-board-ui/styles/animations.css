@@ -592,6 +592,86 @@
 }
 
 /* ─────────────────────────────────────────────────────────────────────────────
+ * `GlitchText`. Il disturbo sul nome, terzo pezzo del registro dell'aggregatore.
+ * ───────────────────────────────────────────────────────────────────────────── */
+
+.pb-glitch {
+  position: relative;
+  display: inline-block;
+}
+
+/* La copia sfalsata. ⚠️ **Nasce collassata**, e sono i fotogrammi ad aprirla per una fetta alla
+ * volta: con «meno movimento» la regola in fondo al file spegne l'animazione, e senza questo
+ * `clip-path` di partenza resterebbero due copie **integre** spostate di due pixel — cioè
+ * l'aspetto di un difetto, non di una preferenza rispettata.
+ *
+ * ⚠️ **`white-space: pre` non è cosmesi.** La copia è larga quanto il contenitore, e il testo
+ * dentro è lo stesso: un arrotondamento sotto il pixel basta a mandarlo a capo, e una lamella su
+ * due righe si legge come un secondo testo comparso sotto al primo.
+ *
+ * ⚠️ **`user-select: none` è l'`aria-hidden` degli appunti.** Misurato il 2026-09-20 sulla demo:
+ * selezionando il titolo e copiandolo usciva «LUDORATTI E.E.E.EVIL CORP». Un attributo ARIA parla
+ * ai lettori di schermo e non dice niente alla selezione, che è una gamma nel DOM: le copie vanno
+ * tolte da tutt'e due i mondi. E `pointer-events: none` perché una lastra decorativa sopra il
+ * testo non deve intercettare né il puntatore né l'inizio di una selezione. */
+.pb-glitch-slice {
+  position: absolute;
+  top: 0;
+  width: 100%;
+  height: 100%;
+  overflow: hidden;
+  background: var(--pb-glitch-bg, transparent);
+  white-space: pre;
+  clip-path: inset(50% 0 50% 0);
+  user-select: none;
+  pointer-events: none;
+}
+
+/* I due colori sono quelli di `ludoratti.it` e restano **statici**: lo sdoppiamento cromatico è
+ * una convenzione — un segnale rotto si separa nei suoi canali — e non un colore del marchio da
+ * accordare al tema. Il verde della peste qui direbbe «peste», non «guasto». */
+.pb-glitch-slice--cyan {
+  left: 2px;
+  text-shadow: -2px 0 #0891b2;
+}
+
+/* ⚠️ **La durata diversa è ciò che rende il disturbo irregolare.** Con lo stesso ciclo le due
+ * lamelle si aprirebbero e chiuderebbero insieme per sempre, e due fette simultanee si leggono
+ * come un unico sfarfallio — la stessa regola dei due autori del piede, che sfalsano il cenno.
+ * Il valore sovrascrive quello dell'utility `animate-glitch` perché questa riga sta **fuori da
+ * ogni layer**, e le nostre vincono su `@layer utilities` senza dipendere dall'ordine. */
+.pb-glitch-slice--pink {
+  left: -2px;
+  text-shadow: -2px 0 #be185d;
+  animation-duration: 2s;
+}
+
+/* Il lampo. ⚠️ Nasce a **opacità zero**: spenta l'animazione non compare mai, che è il ripiego
+ * giusto per un easter egg — chi ha chiesto meno movimento non si ritrova una parola in più
+ * ferma sopra il nome.
+ *
+ * ⚠️ E l'alone prende `currentColor` invece del rosso scritto a mano di `ludoratti.it`: chi
+ * cambia il colore della parola si porta dietro il suo alone, senza doverne cambiare due. */
+.pb-glitch-reveal {
+  position: absolute;
+  top: 0;
+  left: 50%;
+  /* `translate` e non `transform`: la seconda la scriverebbero i fotogrammi, e si sostituirebbero
+     a questa invece di sommarsi. È la stessa riga che centra i fumetti della firma. */
+  translate: -50% 0;
+  width: max-content;
+  opacity: 0;
+  text-shadow:
+    0 0 5px currentColor,
+    0 0 10px currentColor;
+  /* Come le lamelle: fuori dagli appunti e fuori dalla strada del puntatore. ⚠️ Qui pesa il
+     doppio, perché la parola nascosta è **larga quanto sé stessa** e sborda dal nome: senza
+     `pointer-events: none` allargherebbe la zona sensibile di un titolo che è un collegamento. */
+  user-select: none;
+  pointer-events: none;
+}
+
+/* ─────────────────────────────────────────────────────────────────────────────
  * `ToxicBubbles`. La bolla di gas che sale dal fondo del riquadro, ondeggiando.
  * ───────────────────────────────────────────────────────────────────────────── */
 

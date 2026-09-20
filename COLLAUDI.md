@@ -931,3 +931,42 @@ corre porta l'inchiostro delle reference.
 **Che cosa protegge:** quattro delle icone della libreria arrivano da fuori — tre glifi di Material
 Design Icons da RattInventario, una nuvola da `ludoratti.it` — e il modo in cui sbagliano non è
 un errore di codice: è un disegno adottato per il suo **nome** e mai guardato alla misura vera.
+
+### Il nome che si disturba, e le tre copie negli appunti — 2026-09-20
+
+**Esegue:** agente
+**Ultima esecuzione:** agente, 2026-09-20
+
+**Preparazione:** `npm run build`, poi **riavviare** il dev server — `animate-glitch` e
+`animate-reveal` nascono da `@theme`, e Tailwind le cerca nel testo di `dist/`, che non
+riscandaglia da sé. Pagina `http://localhost:3100/atmosfera`, sezione «il nome che si disturba».
+I contrasti si misurano dipingendo il colore su una tela 1×1 e **dividendo per l'alfa** prima di
+comporre; il tema si commuta scrivendo `pb-playground-theme` in `localStorage` e ricaricando.
+
+| Azione | Atteso | Ottenuto |
+|---|---|---|
+| Durata delle due lamelle | diverse, o le fette si aprono sempre insieme | **2,5 s** e **2 s**: la riga fuori da ogni layer vince sull'utility |
+| Le loro fasce, a ciclo libero | due fette diverse nello stesso istante | `inset(33,49% … 43,11%)` e `inset(26,16% … 53,37%)` |
+| Il fondo delle lamelle | quello dichiarato dove c'è, trasparente dove non c'è | `rgb(3, 7, 18)` e `rgba(0, 0, 0, 0)` |
+| La fascia dichiarata nella classe | collassata, per quando l'animazione è spenta | `inset(50% 0px)` |
+| «Meno movimento» | la regola in fondo ad `animations.css` le raggiunge | lamelle e lampo corrispondono a `[class*='animate-']` |
+| Nome accessibile del titolo | il testo una volta sola | «LUDORATTI E. CORP» |
+| **Selezionare il titolo e copiarlo** | «LUDORATTI E. CORP» | ⚠️ **«LUDORATTI E.E.E.EVIL CORP»** |
+| Lo stesso, con `user-select: none` sulle copie | «LUDORATTI E. CORP» | confermato |
+| Contrasti, tema **scuro** | ≥ 4,5 | titolo sulla striscia 18,30 · la `E.` 13,35 · titolo su pagina 19,74 · la `E.` 13,43 |
+| Contrasti, tema **chiaro** | ≥ 4,5 | striscia 18,30 e 13,35 (non cambia: porta `dark`) · lampo rosso **5,29** · pagina 16,25 · la `E.` 4,58 |
+| A 375px | niente scorrimento di lato | `scrollWidth` 375 = `innerWidth` |
+| Gate | verde | build, typecheck, lint 0/0, **365 test**, undici pagine statiche |
+
+⚠️ **`aria-hidden` non dice niente agli appunti.** Le due copie e il lampo sono nascosti ai lettori
+di schermo — c'è un test che tiene il nome del titolo a una copia sola — ma la **selezione** è una
+gamma nel DOM e quegli attributi non la guardano: chi selezionava il titolo per copiarlo si portava
+via «LUDORATTI E.E.E.EVIL CORP», compresa la parola che l'easter egg dovrebbe nascondere. Si cura
+con `user-select: none`, che è l'`aria-hidden` dell'altro mondo, più `pointer-events: none` perché
+una lastra decorativa non deve intercettare il gesto che comincia la selezione.
+
+**Che cosa protegge:** un elemento decorativo che **duplica testo vero** sbaglia in tre mondi
+diversi e ognuno si ripara da solo — l'albero di accessibilità con `aria-hidden`, gli appunti con
+`user-select`, il puntatore con `pointer-events`. Nessuno dei tre si vede guardando la pagina, e a
+`ludoratti.it` le copie sono pseudo-elementi, dove il primo problema è **peggiore** e gli altri due
+identici.

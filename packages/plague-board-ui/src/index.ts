@@ -12,6 +12,10 @@
 export { BarRow, type BarRowProps } from './brand/BarRow';
 export { CreditCard, type CreditAuthor, type CreditCardProps } from './brand/CreditCard';
 export { CreditLine, type CreditLineProps } from './brand/CreditLine';
+// Il disturbo sul nome: il terzo pezzo del registro «futuro distopico» dell'aggregatore, dopo la
+// città e le gocce che stanno dentro `PlagueBackground`. ⚠️ Sta **fuori** dal fondale perché non
+// è scenografia: va addosso a un titolo, e quel titolo lo scrive l'applicazione.
+export { GlitchText, type GlitchTextProps } from './brand/GlitchText';
 export { HoverEmitter, type HoverEmitterProps } from './brand/HoverEmitter';
 // ⚠️ Le tarature stanno in un modulo **senza** `'use client'`, e non per simmetria con
 // `plagueBarSizes.ts`: una pagina server deve poter chiamare `binaryRain()` e passare il risultato

@@ -89,7 +89,7 @@ export const PLAYGROUND_PAGES: readonly PlaygroundPage[] = [
   {
     href: '/atmosfera',
     title: 'L’atmosfera',
-    components: ['PlagueBackground', 'ToxicBubbles', 'ToxicLevelSwitch', 'PlaguePulse'],
+    components: ['PlagueBackground', 'ToxicBubbles', 'ToxicLevelSwitch', 'GlitchText', 'PlaguePulse'],
     blurb: 'Il fondale della peste, i quattro livelli, e il comando che dice quanta ce ne deve essere.',
     family: 'fondamenta',
   },

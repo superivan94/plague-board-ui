@@ -836,6 +836,29 @@ exist in target module» che **non sono veri**. Si guarda la pagina, o si crede 
   `colore × alfa`, e ricomporlo sul fondo moltiplicando di nuovo lo scurisce due volte. Misurato
   il 2026-09-20 sul bordo di `PlaguePanel`: **2,75** invece di **1,99**. Si divide per l'alfa
   prima di comporre.
+- ⚠️ **Un elemento decorativo che duplica testo vero sbaglia in tre mondi, e nessuno dei tre si
+  vede guardando la pagina.** Il disturbo sul nome dell'aggregatore è il testo ricopiato due volte
+  e sfalsato: l'albero di accessibilità si cura con `aria-hidden` — di là le copie sono
+  pseudo-elementi con `content: attr(data-text)`, e il contenuto generato dal CSS alcuni lettori di
+  schermo lo **annunciano**, quindi il titolo si chiama «LUDORATTI E.E.E. CORP» — ma
+  `aria-hidden` non dice niente alla **selezione**, che è una gamma nel DOM: misurato il 2026-09-20,
+  copiare il titolo dava «LUDORATTI E.E.E.EVIL CORP», con dentro la parola che l'easter egg
+  dovrebbe nascondere. Le due cure sono `user-select: none` e `pointer-events: none`, e il primo
+  problema si prova in un test mentre gli altri due stanno in [`COLLAUDI.md`](COLLAUDI.md).
+- ⚠️ **Una classe che si anima e deve sparire con «meno movimento» nasce nello stato spento.** La
+  regola in fondo ad `animations.css` toglie l'animazione, non l'elemento: quello che resta è lo
+  **stato dichiarato nella classe**. Le lamelle del disturbo nascono con `clip-path: inset(50% 0
+  50% 0)` e il lampo con `opacity: 0`, così fermi non c'è niente; con lo stato «aperto» nella
+  classe resterebbero due copie integre spostate di due pixel, cioè l'aspetto di un difetto. È la
+  stessa scelta della finestra della città, che ferma resta **accesa** perché una città spenta
+  sembrerebbe un guasto: il ripiego si sceglie, non si eredita.
+- ⚠️ **Una riga scritta fuori da ogni layer sovrascrive anche una singola proprietà di un'utility
+  di Tailwind.** Le due lamelle del disturbo portano la stessa `animate-glitch` e devono avere
+  durate diverse — con lo stesso ciclo si aprirebbero insieme per sempre, e due fette simultanee
+  sono un unico sfarfallio, la stessa regola dei due autori del piede. Basta un
+  `animation-duration: 2s` in `animations.css`: misurato il 2026-09-20 sulla pagina viva,
+  `animationDuration` vale **2,5s** e **2s**. Vale perché le utility stanno in `@layer utilities` e
+  le dichiarazioni non in un layer vincono su qualunque layer, a prescindere dall'ordine.
 
 ## Memoria di sessione
 
