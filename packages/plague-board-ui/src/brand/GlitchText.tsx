@@ -8,9 +8,10 @@ export interface GlitchTextProps {
    */
   children: string;
   /**
-   * La parola che lampeggia sopra il testo, per due decimi di secondo ogni cinque. Assente, il
-   * lampo non esiste affatto: non c'è nessun valore predefinito perché una parola predefinita
-   * sarebbe il testo di un'applicazione dentro un componente.
+   * La parola che lampeggia sopra il testo: ogni tre secondi tenta di uscire due volte a fette e
+   * alla terza compare **intera**, per due decimi e mezzo. Assente, il lampo non esiste affatto:
+   * non c'è nessun valore predefinito perché una parola predefinita sarebbe il testo di
+   * un'applicazione dentro un componente.
    */
   reveal?: string;
   /**
@@ -38,8 +39,9 @@ export interface GlitchTextProps {
 /**
  * **Il disturbo sul nome**: il testo si sdoppia in due copie sfalsate di un paio di pixel, una
  * ciano e una rosa, e ognuna si vede solo per una fetta orizzontale che salta da un fotogramma
- * all'altro. Dove `reveal` c'è, ogni cinque secondi lampeggia per due decimi la parola che il
- * nome sta nascondendo.
+ * all'altro. Dove `reveal` c'è, ogni tre secondi la parola che il nome sta nascondendo prova a
+ * uscire: due sbirciate rotte da sei centesimi, e poi **tutta intera** per due decimi e mezzo —
+ * abbastanza da leggerla, che è l'unica misura che conta per una parola.
  *
  * Viene dal titolo di `ludoratti.it` — «LUDORATTI **E.** CORP», dove la `E.` ogni tanto diventa
  * `EVIL` — ed è il terzo pezzo del registro «futuro distopico» dell'aggregatore, dopo la città e

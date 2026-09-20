@@ -859,6 +859,16 @@ exist in target module» che **non sono veri**. Si guarda la pagina, o si crede 
   `animation-duration: 2s` in `animations.css`: misurato il 2026-09-20 sulla pagina viva,
   `animationDuration` vale **2,5s** e **2s**. Vale perché le utility stanno in `@layer utilities` e
   le dichiarazioni non in un layer vincono su qualunque layer, a prescindere dall'ordine.
+- ⚠️ **Una parola che compare solo a fette non si legge, si indovina — e un easter egg che non si
+  legge non esiste.** Il lampo di `ludoratti.it` sono due fasce da pochi centesimi, ognuna mezza
+  parola: l'utente l'ha detto il 2026-09-20 guardandolo — «si vede due volte incompleta, ma è
+  troppo difficile da leggere». Le fasce restano, perché sono il segnale che tenta di passare, ma
+  dopo serve un tempo in cui la parola è **intera**, e che duri più di tutte le fasce messe insieme:
+  60 + 60 ms di sbirciate contro **255 ms** di parola. Con una parola **sopra un'altra** servono
+  anche la lastra sotto — sennò il nome spunta fra le lettere — e `steps(1, end)`, o i tre tempi
+  diventano tre dissolvenze, cioè un respiro invece di un guasto. ⚠️ E l'attesa fra un lampo e
+  l'altro è una misura a sé: cinque secondi facevano credere che non ci fosse niente da aspettare,
+  tre no.
 
 ## Memoria di sessione
 

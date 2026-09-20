@@ -188,7 +188,8 @@ export default function AtmosferaPage() {
           <p className="text-sm text-muted">
             <code>GlitchText</code> sdoppia una parola in due copie sfalsate di due pixel, una ciano
             e una rosa, e ne mostra una fetta orizzontale alla volta. Con <code>reveal</code>, ogni
-            cinque secondi lampeggia per due decimi la parola che il nome sta nascondendo. È il terzo
+            tre secondi la parola che il nome sta nascondendo prova a uscire: due sbirciate rotte da
+            sei centesimi, e poi <strong>tutta intera</strong> per due decimi e mezzo. È il terzo
             pezzo del registro <strong>futuro distopico</strong> dell’aggregatore, dopo la città e le
             gocce che stanno già qui sopra dentro <code>PlagueBackground</code>.
           </p>

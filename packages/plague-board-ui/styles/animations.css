@@ -222,22 +222,46 @@
   }
 }
 
-/* Il lampo: per due decimi di secondo ogni cinque, compare quello che c'è sotto. */
+/* Il lampo: quello che c'è sotto il nome prova a uscire, e alla terza ci riesce.
+ *
+ * ⚠️ **Le due sbirciate rotte non bastano, perché una parola tagliata a metà non si legge.** Di là
+ * sono le sole due, sei centesimi l'una e mai intera: l'utente il 2026-09-20 ha detto che si
+ * intravede e non si riesce a leggere. Qui restano — sono il «segnale che tenta di passare» — ma
+ * dopo arriva un terzo tempo con `inset(0)`, cioè la parola **tutta**, e dura abbastanza da
+ * leggerla: **255 ms** su un ciclo di tre secondi, contro i sessanta di ogni sbirciata.
+ *
+ * ⚠️ **Le percentuali sono soglie, non transizioni**: la curva a gradini sulla classe tiene ogni
+ * valore fino al fotogramma dopo, quindi un fotogramma «spento» subito dopo uno acceso è quanto
+ * dura l'acceso. Senza, i valori si interpolerebbero e le sbirciate diventerebbero due
+ * dissolvenze — cioè un respiro invece di un guasto. È la stessa scelta delle finestre della
+ * città. */
 @keyframes pb-reveal {
-  0%,
-  90%,
-  94%,
-  98%,
-  100% {
+  0% {
     opacity: 0;
   }
+  /* Prima sbirciata: la fascia alta. */
+  82% {
+    opacity: 1;
+    clip-path: inset(10% 0 55% 0);
+  }
+  84% {
+    opacity: 0;
+  }
+  /* Seconda: la fascia bassa, che non si sovrappone alla prima. */
+  86% {
+    opacity: 1;
+    clip-path: inset(55% 0 10% 0);
+  }
+  88% {
+    opacity: 0;
+  }
+  /* E poi passa davvero. */
   91% {
     opacity: 1;
-    clip-path: inset(10% 0 40% 0);
+    clip-path: inset(0);
   }
-  95% {
-    opacity: 1;
-    clip-path: inset(40% 0 10% 0);
+  99.5% {
+    opacity: 0;
   }
 }
 
@@ -281,7 +305,9 @@
   --animate-bubble-pop: pb-bubble-pop 2.5s ease-out forwards;
   --animate-drip: pb-drip 8s ease-in infinite;
   --animate-glitch: pb-glitch 2.5s infinite reverse;
-  --animate-reveal: pb-reveal 5s infinite;
+  /* ⚠️ Tre secondi e non cinque, chiesto dall'utente il 2026-09-20: fra un lampo e l'altro
+   * l'attesa era abbastanza lunga da far credere che non ci fosse niente da aspettare. */
+  --animate-reveal: pb-reveal 3s infinite;
   --animate-heartbeat: pb-heartbeat 3.2s ease-in-out infinite;
 }
 
@@ -651,11 +677,21 @@
  * ferma sopra il nome.
  *
  * ⚠️ E l'alone prende `currentColor` invece del rosso scritto a mano di `ludoratti.it`: chi
- * cambia il colore della parola si porta dietro il suo alone, senza doverne cambiare due. */
+ * cambia il colore della parola si porta dietro il suo alone, senza doverne cambiare due.
+ *
+ * ⚠️ **Porta lo stesso fondo delle lamelle**, e per la stessa ragione: nel terzo tempo la parola
+ * si vede **intera**, e sotto c'è ancora il nome che sta nascondendo — «EVIL» sopra «E.» con la
+ * `E.` che spunta fra le lettere non si legge. Dove il fondo è dichiarato la parola posa su una
+ * lastra e copre il nome per due decimi e mezzo, che è quello che deve fare; dove non lo è, resta
+ * la sovrapposizione di `ludoratti.it`. */
 .pb-glitch-reveal {
   position: absolute;
   top: 0;
   left: 50%;
+  background: var(--pb-glitch-bg, transparent);
+  /* I fotogrammi sono soglie: ogni valore tiene fino al successivo, e un lampo è un interruttore,
+     non una dissolvenza. Vince sull'`ease` predefinito dell'utility perché sta fuori dai layer. */
+  animation-timing-function: steps(1, end);
   /* `translate` e non `transform`: la seconda la scriverebbero i fotogrammi, e si sostituirebbero
      a questa invece di sommarsi. È la stessa riga che centra i fumetti della firma. */
   translate: -50% 0;

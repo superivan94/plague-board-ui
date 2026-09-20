@@ -950,6 +950,9 @@ comporre; il tema si commuta scrivendo `pb-playground-theme` in `localStorage` e
 | Il fondo delle lamelle | quello dichiarato dove c'è, trasparente dove non c'è | `rgb(3, 7, 18)` e `rgba(0, 0, 0, 0)` |
 | La fascia dichiarata nella classe | collassata, per quando l'animazione è spenta | `inset(50% 0px)` |
 | «Meno movimento» | la regola in fondo ad `animations.css` le raggiunge | lamelle e lampo corrispondono a `[class*='animate-']` |
+| I tre tempi del lampo (secondo giro) | due sbirciate rotte, e poi la parola **intera** abbastanza da leggerla | **60 ms** fascia alta · **60 ms** fascia bassa · **255 ms** `inset(0)`, su un ciclo di **3 s** |
+| L'opacità del lampo, campionata ogni 7,5 ms | solo 0 o 1, o le sbirciate diventano due dissolvenze | due soli valori, `0` e `1` — `animationTimingFunction` vale `steps(1)` |
+| La lastra sotto la parola intera | il colore dichiarato, o la parola nascosta si legge sopra il nome | `rgb(3, 7, 18)`; la parola misura **71 px** contro i **35** del nome che copre |
 | Nome accessibile del titolo | il testo una volta sola | «LUDORATTI E. CORP» |
 | **Selezionare il titolo e copiarlo** | «LUDORATTI E. CORP» | ⚠️ **«LUDORATTI E.E.E.EVIL CORP»** |
 | Lo stesso, con `user-select: none` sulle copie | «LUDORATTI E. CORP» | confermato |
@@ -965,8 +968,18 @@ via «LUDORATTI E.E.E.EVIL CORP», compresa la parola che l'easter egg dovrebbe 
 con `user-select: none`, che è l'`aria-hidden` dell'altro mondo, più `pointer-events: none` perché
 una lastra decorativa non deve intercettare il gesto che comincia la selezione.
 
+⚠️ **Secondo giro, il 2026-09-20: la parola nascosta non si leggeva.** Segnalato dall'utente —
+«si vede due volte incompleta, che è corretto per effetto glitch, ma risulta troppo difficile da
+intravedere e leggerla». Di là il lampo sono **solo** le due fasce, quindi la parola non è mai
+intera: un occhio può indovinarla, non leggerla. La cura è un **terzo tempo** con `inset(0)` che
+dura più delle due sbirciate messe insieme, più la lastra sotto, più la curva a gradini perché i
+tre tempi siano interruttori e non dissolvenze. E il ciclo è sceso da 5 a **3 secondi**, sempre su
+richiesta: fra un lampo e l'altro l'attesa era lunga abbastanza da far credere che non ci fosse
+niente da aspettare.
+
 **Che cosa protegge:** un elemento decorativo che **duplica testo vero** sbaglia in tre mondi
 diversi e ognuno si ripara da solo — l'albero di accessibilità con `aria-hidden`, gli appunti con
 `user-select`, il puntatore con `pointer-events`. Nessuno dei tre si vede guardando la pagina, e a
 `ludoratti.it` le copie sono pseudo-elementi, dove il primo problema è **peggiore** e gli altri due
-identici.
+identici. E protegge la sola cosa che un easter egg di testo deve fare: **farsi leggere** quando
+compare.
