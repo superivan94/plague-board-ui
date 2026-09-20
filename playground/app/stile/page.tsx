@@ -1,5 +1,6 @@
 import { Button } from '@heroui/react';
 import {
+  DiceIcon,
   PoisonIcon,
   RAT_LIVERIES,
   Rat,
@@ -37,18 +38,6 @@ const floaters = [
   { Icon: SkullIcon, size: 26, top: '62%', left: '85%', delay: '1.4s' },
   { Icon: VirusIcon, size: 22, top: '80%', left: '9%', delay: '2.6s' },
 ];
-
-/** Il dado: il terzo termine del marchio, quello che né la peste né i ratti dicono. */
-function DiceIcon({ size = 24 }: { size?: number }) {
-  return (
-    <svg width={size} height={size} viewBox="0 0 24 24" fill="currentColor" aria-hidden="true">
-      <path
-        fillRule="evenodd"
-        d="M5 3h14a2 2 0 0 1 2 2v14a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2zm3 3.5a1.5 1.5 0 1 0 0 3 1.5 1.5 0 0 0 0-3zm8 0a1.5 1.5 0 1 0 0 3 1.5 1.5 0 0 0 0-3zm-8 8a1.5 1.5 0 1 0 0 3 1.5 1.5 0 0 0 0-3zm8 0a1.5 1.5 0 1 0 0 3 1.5 1.5 0 0 0 0-3zm-4-4a1.5 1.5 0 1 0 0 3 1.5 1.5 0 0 0 0-3z"
-      />
-    </svg>
-  );
-}
 
 const lexicon = [
   ['Accedi', 'Entra nella tana'],

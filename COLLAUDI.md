@@ -893,3 +893,41 @@ somiglia a un difetto, somiglia a una tabella stretta. Si cura scrivendo la misu
 cui si rompono non è un errore: è un disegno che alla misura vera dice un'altra cosa — un sole, una
 pillola, un razzo, una nuvoletta del meteo — oppure una tabella che mostra una misura e ne rende
 un'altra. Nessuna di queste cose fa un test rosso.
+
+### Il virione e l'ampolla, ridisegnati — 2026-09-20
+
+**Esegue:** agente — sono misure di geometria, e in jsdom `getBBox` non esiste.
+**Ultima esecuzione:** agente, 2026-09-20.
+
+**Preparazione:** `npm run build`, poi **riavviare** il dev server. Pagine:
+`http://localhost:3100/` (sezione «i segni»), `/profilo` (il veleno a 16 e il virus a 12 dentro una
+pastiglia), `/stile` (il virus a 14 nel separatore, il dado a 36). Il riquadro di un tracciato si
+prende montando un `<path>` in un `<svg>` fuori schermo e leggendo `getBBox()`.
+
+| Azione | Atteso | Ottenuto |
+|---|---|---|
+| Riquadro del virione | centrato e dentro, coi margini di famiglia | **2,85 → 21,15** su tutti e due gli assi |
+| Riquadro del solo capside | ben dentro alle punte | 6,8 → 17,2 |
+| Riquadro dell'ampolla | dentro, e centrata in larghezza | x **5,7 → 18,3** (centro esatto), y 1,8 → 21,1 |
+| Il virione a 24 e a 16 | a 24 dice «virione», a 16 è una macchia irta | confermato a occhio: a 16 i pomelli si saldano al capside |
+| Il virione a 12, dentro la pastiglia del grado | una macchia **piena**, diversa dai batteri a tratto | confermato su `/profilo` |
+| L'ampolla a 16, accanto al nome della scheda | la boccia col tappo si legge, il collo è un accenno | collo **2,5 px** a 16, sagoma leggibile |
+| Il dado di `/stile` | identico a prima, ma è quello della libreria | il segnaposto locale della pagina è sparito; la sezione rende uguale |
+| Gate | verde | build, typecheck, lint 0/0, **331 test**, dieci pagine statiche |
+
+⚠️ **Il vecchio virus era l'icona delle impostazioni.** Le sue protuberanze sono **denti
+trapezoidali** attorno a due cerchi concentrici: a grandezza vera è un ingranaggio con un mirino in
+mezzo, ed era il contagio più usato della libreria — dentro le pastiglie del grado, nel piede, nel
+separatore della schermata di accesso. Non si vedeva perché a 12 e 14 px qualunque disegno è un
+puntino: si è visto **ingrandendolo**, che è lo stesso metodo della pagina `/lente` per le cuciture
+del ratto.
+
+⚠️ **E il vecchio veleno erano due bolle con due puntini sopra.** L'utente: *«bella da vedere, ma
+non si capisce»*. Al suo posto l'**ampolla che la mascotte tiene in mano** — scelta fra due
+candidate, contro una boccetta col teschio ritagliato dentro: quella diceva «veleno» in modo più
+letterale, ma l'ampolla lega l'icona al personaggio, che è la stessa ragione per cui il ratto che
+corre porta l'inchiostro delle reference.
+
+**Che cosa protegge:** quattro delle icone della libreria arrivano da fuori — tre glifi di Material
+Design Icons da RattInventario, una nuvola da `ludoratti.it` — e il modo in cui sbagliano non è
+un errore di codice: è un disegno adottato per il suo **nome** e mai guardato alla misura vera.

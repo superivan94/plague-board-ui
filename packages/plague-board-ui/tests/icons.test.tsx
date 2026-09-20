@@ -246,6 +246,28 @@ describe.each([
   });
 });
 
+describe.each([
+  { nome: 'VirusIcon', Icon: VirusIcon, corpo: 4, secondo: 16 },
+  { nome: 'PoisonIcon', Icon: PoisonIcon, corpo: 4, secondo: 2 },
+])('$nome', ({ Icon, corpo, secondo }) => {
+  it('il corpo fora, il pezzo sopra somma — e sono due tracciati perché le regole sono due', () => {
+    const { container } = render(<Icon />);
+
+    const [dentro, sopra] = [...container.querySelectorAll('svg path')];
+
+    // Il corpo è la sagoma più i tre buchi dentro. Senza `evenodd` non si rompe niente: i buchi si
+    // riempiono, e restano un disco liscio e un'ampolla vuota.
+    expect(dentro).toHaveAttribute('fill-rule', 'evenodd');
+    expect(pezzi(dentro?.getAttribute('d'))).toBe(corpo);
+
+    // ⚠️ E il secondo **non** deve portarla. Con `evenodd` anche qui, ogni pezzo che si sovrappone
+    // al corpo si cancellerebbe invece di saldarcisi: le punte del virione si staccherebbero dal
+    // capside, e il collo dell'ampolla lascerebbe una tacca dove entra nella boccia.
+    expect(sopra).not.toHaveAttribute('fill-rule');
+    expect(pezzi(sopra?.getAttribute('d'))).toBe(secondo);
+  });
+});
+
 describe('CloudIcon', () => {
   it('è tre lobi più la base piatta, che è ciò che la rende una cappa', () => {
     const { container } = render(<CloudIcon />);

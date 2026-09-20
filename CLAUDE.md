@@ -789,6 +789,25 @@ exist in target module» che **non sono veri**. Si guarda la pagina, o si crede 
   della 2 e in questo repository non è installato affatto. Vuol dire che la regola «prima si cerca
   in HeroUI» sulle icone **si esaurisce subito**, e che ogni segno di questa libreria è per forza
   disegnato qui.
+- ⚠️ **Un pezzo che fora e un pezzo che salda non stanno nello stesso tracciato.** È la regola che
+  governa metà delle icone piene: `fill-rule="evenodd"` fa **cancellare** due sagome dove si
+  sovrappongono — che è quello che serve per bucare tre granuli dentro un capside — mentre la
+  soletta piena (`nonzero`, il predefinito) le **somma**, che è quello che serve perché una punta
+  nata dentro il corpo ci resti attaccata. Con una regola sola si sbaglia sempre qualcosa: le punte
+  del virione si staccherebbero dal capside, il collo dell'ampolla lascerebbe una tacca dove entra
+  nella boccia, i tre lobi della cappa si bucherebbero a vicenda. Due tracciati, due regole.
+  ⚠️ E dentro un tracciato `nonzero` **la mano conta**: due sagome girate al contrario si annullano
+  dove si toccano, quindi i quadrilateri dei gambi vanno emessi nello stesso verso dei dischi dei
+  pomelli, o ogni pomello si mangia la cima del suo gambo.
+- ⚠️ **Tre delle quattro icone della peste di RattInventario sono glifi di Material Design Icons,
+  e due dicevano un'altra cosa.** Si riconoscono dalla notazione compatta (`A9,9 0 0,0`, le `S`,
+  niente spazi). Il «virus» è un **ingranaggio con un bersaglio dentro** — protuberanze trapezoidali
+  attorno a due cerchi concentrici, cioè l'icona delle impostazioni — e il «veleno» sono due bocce
+  affiancate con due gocce sopra, che a grandezza vera non dice niente. Segnalato dall'utente il
+  2026-09-20 (*«il virus mi sembra sotto tono; poison, bella da vedere, ma non si capisce»*) e
+  ridisegnati: il virione a pomelli e l'**ampolla della mascotte**. Resta di Material il teschio,
+  che però dice quello che promette. ⚠️ **La regola operativa è che un glifo preso da una libreria
+  generica va guardato alla misura vera prima di adottarlo**: il nome del file non è il disegno.
 - ⚠️ **Un disegno che tocca i bordi del suo riquadro, alla stessa `size`, sembra più grande degli
   altri.** La nuvola di Material — quella che `ludoratti.it` usa — misura **0 → 24** in larghezza;
   le icone di casa stanno fra 1,5 e 22,5, il dado fra 3 e 21. È il motivo tecnico per cui un glifo

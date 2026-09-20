@@ -151,13 +151,31 @@ export default function Home() {
         </p>
 
         <p className="text-sm text-muted">
-          E i quattro non si sovrappongono: <code>VirusIcon</code> è il <strong>virione</strong>,{' '}
+          E i cinque non si sovrappongono: <code>VirusIcon</code> è il <strong>virione</strong>,{' '}
           <code>MoleculeIcon</code> la <strong>molecola</strong>, <code>BiohazardIcon</code> il{' '}
           <strong>cartello di pericolo</strong>. I batteri sono gli unici <strong>vivi</strong>, e
           sono due perché hanno due mestieri: il bacillo ha un verso e si mette accanto a una
           parola, il cocco non ce l&apos;ha e per questo galleggia in un fondale senza sembrare
           storto. ⚠️ Nessuno dei due si chiama <code>BacteriaIcon</code>: un nome generico dovrebbe
           scegliere una delle due forme, e chi lo importasse si ritroverebbe l&apos;altra.
+        </p>
+
+        <p className="text-sm text-muted">
+          ⚠️ <strong>Il virione è l&apos;unico contagio a campitura piena</strong>, ed è quello che
+          lo tiene distinguibile quando il dettaglio è sparito: a <strong>12</strong> e{' '}
+          <strong>14</strong> — le misure a cui viene usato davvero, dentro una pastiglia del grado
+          o in una riga di firma — nessuno dei cinque disegna più niente, ma una <strong>macchia
+          irta e piena</strong> resta un&apos;altra cosa da un contorno vuoto. Da 24 in su torna a
+          dire «virione».
+        </p>
+
+        <p className="text-sm text-muted">
+          I due recipienti dicono l&apos;opposto l&apos;uno dell&apos;altro, e la differenza è la
+          sagoma. <code>PoisonIcon</code> è l&apos;<strong>ampolla</strong>, la stessa che la
+          mascotte tiene in mano: è un accento su un&apos;<strong>azione</strong> — il comando che
+          manda un modulo, la riga che apre un profilo. <code>PotionMugIcon</code> ha un{' '}
+          <strong>manico</strong>, perché la tazza è la convenzione che nel software dice «offrimi
+          qualcosa», e sta solo dentro il comando delle donazioni.
         </p>
 
         <div className="overflow-x-auto">

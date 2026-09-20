@@ -1,22 +1,68 @@
 import { IconBase } from './IconBase';
 import type { IconProps } from './types';
 
-const VIRUS_PATH =
-  'M12,2A1,1 0 0,0 11,3V4.08C10.16,4.21 9.34,4.42 8.56,4.73L7.8,3.97L6.39,5.39L7.15,6.15C6.84,6.93 6.63,7.75 6.5,8.59H5.42A1,1 0 0,0 4.42,9.59V14.41A1,1 0 0,0 5.42,15.41H6.5C6.63,16.25 6.84,17.07 7.15,17.85L6.39,18.61L7.8,20.03L8.56,19.27C9.34,19.58 10.16,19.79 11,19.92V21A1,1 0 0,0 12,22A1,1 0 0,0 13,21V19.92C13.84,19.79 14.66,19.58 15.44,19.27L16.2,20.03L17.61,18.61L16.85,17.85C17.16,17.07 17.37,16.25 17.5,15.41H18.58A1,1 0 0,0 19.58,14.41V9.59A1,1 0 0,0 18.58,8.59H17.5C17.37,7.75 17.16,6.93 16.85,6.15L17.61,5.39L16.2,3.97L15.44,4.73C14.66,4.42 13.84,4.21 13,4.08V3A1,1 0 0,0 12,2M12,6A6,6 0 0,1 18,12A6,6 0 0,1 12,18A6,6 0 0,1 6,12A6,6 0 0,1 12,6M12,8A4,4 0 0,0 8,12A4,4 0 0,0 12,16A4,4 0 0,0 16,12A4,4 0 0,0 12,8M12,10A2,2 0 0,1 14,12A2,2 0 0,1 12,14A2,2 0 0,1 10,12A2,2 0 0,1 12,10Z';
+/**
+ * Il capside: un disco pieno con **tre granuli forati** dentro.
+ *
+ * I granuli sono buchi e non dischi dipinti, per la stessa ragione dei punti del dado — da lì si
+ * vede quello che c'è dietro, qualunque fondo sia. Stanno tutti entro 2,3 unità dal centro, cioè
+ * ben dentro al disco: se un buco toccasse la radice di una punta, la punta lo richiuderebbe.
+ */
+const VIRUS_BODY =
+  'M6.8 12a5.2 5.2 0 1 1 10.4 0a5.2 5.2 0 1 1 -10.4 0Z' +
+  'M9.3 11a1 1 0 1 1 2 0a1 1 0 1 1 -2 0Z' +
+  'M12.5 11.6a0.8 0.8 0 1 1 1.6 0a0.8 0.8 0 1 1 -1.6 0Z' +
+  'M10.75 13.9a0.85 0.85 0 1 1 1.7 0a0.85 0.85 0 1 1 -1.7 0Z';
 
 /**
- * **Virus.** Un anello irto di protuberanze con due cerchi concentrici dentro: un virione visto
- * al microscopio.
+ * Le otto punte, una ogni 45°: un gambo e un **pomello** in cima.
  *
- * È il segno **piccolo e ripetuto**, quello che marca una misura invece di una schermata: di là
- * compare a 16px ai due lati del livello tossico, nel piede e nella pagina di accesso. Cresciuto
- * oltre i 32px i suoi cerchi concentrici diventano un bersaglio, e va usato
- * {@link BiohazardIcon}.
+ * Ogni punta è un quadrilatero dal raggio 4,4 al 7,7 più un disco di 1,45 sulla punta; il gambo
+ * nasce **dentro** il capside, così non si vede la giunzione. ⚠️ **Stanno in un tracciato a parte
+ * apposta**: nel disco i granuli si forano con `evenodd`, e con la stessa regola qui un gambo
+ * sovrapposto al corpo si cancellerebbe invece di saldarcisi. Due tracciati, due regole — quello
+ * del corpo fora, questo somma.
+ *
+ * ⚠️ E i quadrilateri girano **nello stesso verso** dei dischi: a soletta piena due sagome di mano
+ * opposta si annullano dove si toccano, e ogni pomello si mangerebbe la cima del suo gambo.
+ */
+const VIRUS_SPIKES =
+  'M16.4 12.75L16.4 11.25L19.7 11.25L19.7 12.75ZM18.25 12a1.45 1.45 0 1 1 2.9 0a1.45 1.45 0 1 1 -2.9 0Z' +
+  'M14.58 15.64L15.64 14.58L17.98 16.91L16.91 17.98ZM15.99 17.44a1.45 1.45 0 1 1 2.9 0a1.45 1.45 0 1 1 -2.9 0Z' +
+  'M11.25 16.4L12.75 16.4L12.75 19.7L11.25 19.7ZM10.55 19.7a1.45 1.45 0 1 1 2.9 0a1.45 1.45 0 1 1 -2.9 0Z' +
+  'M8.36 14.58L9.42 15.64L7.09 17.98L6.02 16.91ZM5.11 17.44a1.45 1.45 0 1 1 2.9 0a1.45 1.45 0 1 1 -2.9 0Z' +
+  'M7.6 11.25L7.6 12.75L4.3 12.75L4.3 11.25ZM2.85 12a1.45 1.45 0 1 1 2.9 0a1.45 1.45 0 1 1 -2.9 0Z' +
+  'M9.42 8.36L8.36 9.42L6.02 7.09L7.09 6.02ZM5.11 6.56a1.45 1.45 0 1 1 2.9 0a1.45 1.45 0 1 1 -2.9 0Z' +
+  'M12.75 7.6L11.25 7.6L11.25 4.3L12.75 4.3ZM10.55 4.3a1.45 1.45 0 1 1 2.9 0a1.45 1.45 0 1 1 -2.9 0Z' +
+  'M15.64 9.42L14.58 8.36L16.91 6.02L17.98 7.09ZM15.99 6.56a1.45 1.45 0 1 1 2.9 0a1.45 1.45 0 1 1 -2.9 0Z';
+
+/**
+ * **Virus.** Il virione: un capside pieno coi granuli dentro e otto punte col pomello in cima.
+ *
+ * È il segno della **malattia**, quello che marca uno stato o una misura — di là sta ai due lati
+ * del livello tossico, nel piede e nella pagina di accesso — ed è il contagio più usato della
+ * libreria. Per il pericolo c'è {@link BiohazardIcon}, che è un cartello; per il laboratorio
+ * {@link MoleculeIcon}; per gli organismi vivi {@link BacillusIcon} e {@link CoccusIcon}.
+ *
+ * ⚠️ **È l'unico contagio a campitura piena**, e non è una scelta estetica: i due batteri sono a
+ * tratto, quindi in una riga di segni il virus è una **massa** e loro un contorno. È quello che li
+ * tiene distinguibili anche quando sono piccoli e il dettaglio è sparito.
+ *
+ * ⚠️ **Fino al 2026-09-20 era un ingranaggio con un bersaglio dentro.** Il disegno che arrivava da
+ * RattInventario è un glifo di Material Design Icons, e le sue protuberanze sono **denti
+ * trapezoidali**: a grandezza vera è l'icona delle impostazioni con un mirino in mezzo. Come per
+ * la nuvola, Material non entra nella libreria — ma qui il motivo non è la regola, è che il
+ * disegno diceva un'altra cosa.
+ *
+ * ⚠️ **Da 24 in su dice «virione»; a 12 e 14 è un puntino irto**, ed è la misura a cui viene usato
+ * davvero — dentro una pastiglia del grado, accanto alla firma della direzione. Lì non c'è disegno
+ * che regga: quello che conta è che la macchia sia irta e piena, cioè diversa dai due batteri.
  */
 export function VirusIcon(props: IconProps) {
   return (
     <IconBase {...props}>
-      <path d={VIRUS_PATH} />
+      <path d={VIRUS_BODY} fillRule="evenodd" />
+      <path d={VIRUS_SPIKES} />
     </IconBase>
   );
 }

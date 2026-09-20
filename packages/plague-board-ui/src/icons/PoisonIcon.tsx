@@ -1,20 +1,58 @@
 import { IconBase } from './IconBase';
 import type { IconProps } from './types';
 
-const POISON_PATH =
-  'M7.5 2C8.33 2 9 2.67 9 3.5C9 4.33 8.33 5 7.5 5C6.67 5 6 4.33 6 3.5C6 2.67 6.67 2 7.5 2M16.5 2C17.33 2 18 2.67 18 3.5C18 4.33 17.33 5 16.5 5C15.67 5 15 4.33 15 3.5C15 2.67 15.67 2 16.5 2M7.5 7C8.88 7 10.13 7.5 11.13 8.38C11.88 7.55 12.92 7 14.13 7C16.88 7 19.13 9.25 19.13 12S16.88 17 14.13 17C12.92 17 11.88 16.45 11.13 15.62C10.13 16.5 8.88 17 7.5 17C4.75 17 2.5 14.75 2.5 12S4.75 7 7.5 7M7.5 9C5.84 9 4.5 10.34 4.5 12S5.84 15 7.5 15C8.28 15 8.97 14.72 9.5 14.25C9.91 13.88 10.19 13.42 10.31 12.88C10.36 12.59 10.38 12.3 10.38 12C10.38 11.7 10.36 11.41 10.31 11.12C10.19 10.58 9.91 10.12 9.5 9.75C8.97 9.28 8.28 9 7.5 9M14.13 9C15.78 9 17.13 10.34 17.13 12S15.78 15 14.13 15C13.34 15 12.66 14.72 12.13 14.25C11.72 13.88 11.44 13.42 11.31 12.88C11.27 12.59 11.25 12.3 11.25 12C11.25 11.7 11.27 11.41 11.31 11.12C11.44 10.58 11.72 10.12 12.13 9.75C12.66 9.28 13.34 9 14.13 9Z';
+/**
+ * La boccia e le **tre bolle forate** dentro: la miscela che ribolle.
+ *
+ * Le bolle sono buchi e non dischi dipinti — come i punti del dado e i granuli del virione — così
+ * da lì si vede il fondo, qualunque sia. Sono tre e di tre misure diverse: due uguali e simmetriche
+ * dentro un corpo si leggono come due occhi, ed è successo davvero provando il batterio.
+ */
+const POISON_BODY =
+  'M5.7 14.8a6.3 6.3 0 1 1 12.6 0a6.3 6.3 0 1 1 -12.6 0Z' +
+  'M8.6 16.2a1.3 1.3 0 1 1 2.6 0a1.3 1.3 0 1 1 -2.6 0Z' +
+  'M12.7 17a1 1 0 1 1 2 0a1 1 0 1 1 -2 0Z' +
+  'M12.32 13.5a0.78 0.78 0 1 1 1.56 0a0.78 0.78 0 1 1 -1.56 0Z';
 
 /**
- * **Veleno.** Due bocce affiancate sormontate da due gocce: la miscela che ribolle.
+ * Il collo e il tappo, che scendono **dentro** la boccia invece di posarcisi sopra.
+ *
+ * ⚠️ **Stanno in un tracciato a parte apposta**: nel corpo le bolle si forano con `evenodd`, e con
+ * la stessa regola qui il collo si cancellerebbe nel punto in cui entra nella boccia, lasciando una
+ * tacca. Due tracciati, due regole — quello del corpo fora, questo somma.
+ */
+const POISON_GLASS = 'M9.2 1.8h5.6a1.1 1.1 0 0 1 0 2.2H9.2a1.1 1.1 0 0 1 0-2.2ZM10.1 4h3.8v6.4h-3.8Z';
+
+/**
+ * **Veleno.** L'ampolla: boccia tonda, collo stretto, tappo, e dentro qualcosa che fa le bolle.
+ *
+ * ⚠️ **È l'oggetto che la mascotte tiene in mano**, ed è il motivo per cui è questo il disegno del
+ * veleno e non un altro: il ratto con l'ampolla, il ratto che corre e questa icona diventano la
+ * stessa storia invece di tre disegni che si somigliano. Vale la stessa regola dell'inchiostro
+ * `#180828` — l'identità sta nel ripetere le stesse cose, non nel disegnarne di nuove.
  *
  * È l'accento su un'**azione**, non su uno stato — di là sta dentro il pulsante che manda il
  * modulo di accesso e accanto ai dati di un profilo. Per il rischio, che è uno stato, c'è
- * {@link BiohazardIcon}; per il livello di contaminazione c'è {@link VirusIcon}.
+ * {@link BiohazardIcon}; per la malattia {@link VirusIcon}.
+ *
+ * ⚠️ **Non è la tazza delle donazioni.** {@link PotionMugIcon} ha un manico e sta dentro un comando
+ * che chiede di sostenere il progetto, e ha quella sagoma perché la tazza è la convenzione che nel
+ * software dice «offrimi qualcosa». Questa è un recipiente da laboratorio, e dice l'opposto.
+ *
+ * ⚠️ **Fino al 2026-09-20 erano due bocce affiancate con due gocce sopra**, un glifo di Material
+ * Design Icons che arrivava da RattInventario. Segnalato dall'utente il 2026-09-20: «bella da
+ * vedere, ma non si capisce». Era vero — a grandezza vera sono due bolle e due puntini, e nessuno
+ * dei due dice veleno.
+ *
+ * ⚠️ **Il collo è largo 3,8 unità su 24**, cioè 2,5 pixel a 16 e meno di due a 12: sotto i 16 la
+ * boccia resta e il collo diventa un accenno. La sagoma regge lo stesso, perché a portare il segno
+ * è il corpo tondo col tappo sopra.
  */
 export function PoisonIcon(props: IconProps) {
   return (
     <IconBase {...props}>
-      <path d={POISON_PATH} />
+      <path d={POISON_BODY} fillRule="evenodd" />
+      <path d={POISON_GLASS} />
     </IconBase>
   );
 }
