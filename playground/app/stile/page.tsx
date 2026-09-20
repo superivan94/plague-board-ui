@@ -160,7 +160,10 @@ export default function StyleReference() {
 
         <div className="flex flex-wrap items-center gap-x-6 gap-y-3 rounded-lg border border-border p-4">
           <span className="dark flex shrink-0 items-center gap-2 rounded bg-gray-950/90 px-3 py-2">
-            <RatIcon size={20} className="animate-heartbeat shrink-0 text-brand" />
+            {/* ⚠️ Niente `animate-heartbeat` addosso: dal 2026-09-20 il battito lo governa il
+                componente, e le due animazioni si moltiplicherebbero — la scala della classe
+                sull'`<svg>` per quella del gruppo dentro. */}
+            <RatIcon size={20} className="shrink-0 text-brand" />
             <TechLabel className="text-muted">plague-board-ui</TechLabel>
           </span>
           <p className="max-w-lg text-sm text-muted">

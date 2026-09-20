@@ -140,7 +140,11 @@ export { GoogleIcon, type GoogleIconProps } from './icons/GoogleIcon';
 export { MoleculeIcon } from './icons/MoleculeIcon';
 export { PoisonIcon } from './icons/PoisonIcon';
 export { PotionMugIcon } from './icons/PotionMugIcon';
-export { RatIcon } from './icons/RatIcon';
+// ⚠️ Il marchio, e l'unica icona con un **contratto suo** oltre a `IconProps`: ha due stati — il
+// cuore vuoto e quello pieno, cioè anche i preferiti — e un battito che governa da sé. La deroga
+// alla regola «l'interruttore sta su chi monta» è dichiarata nel suo file: un marchio che batte è
+// identità, non decorazione.
+export { RatIcon, type RatIconProps, type RatIconState } from './icons/RatIcon';
 export { RobotIcon } from './icons/RobotIcon';
 export { SkullIcon } from './icons/SkullIcon';
 // I due stati della musica: lo stesso teschio con le cuffie, uno con la sbarra.

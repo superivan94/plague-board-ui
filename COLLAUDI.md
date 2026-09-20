@@ -1169,3 +1169,34 @@ un'applicazione non sta qui. Vivono nel commit `0d55bee`. Lo scenario resta, per
 per qualunque segno nuovo.
 
 **Che cosa protegge:** un segno che dice un'altra cosa non si rompe, mente — e mente in silenzio.
+
+### Il marchio: due stati, e un cuore che batte dentro il suo anello — 2026-09-20
+
+**Esegue:** agente
+
+**Ultima esecuzione:** agente, 2026-09-20
+
+**Preparazione:** `http://localhost:3100/`, sezione «il marchio». I due stati si guardano
+**ingranditi** — la sonda clona i due `<svg>` da 96 e li rende a 240px, togliendo la classe del
+battito perché un'animazione in uno screenshot è un fotogramma a caso — e poi alle misure vere,
+dalla riga da 18 in giù. Il tema si commuta scrivendo `pb-playground-theme` in `localStorage` e
+ricaricando.
+
+| Azione | Atteso | Ottenuto |
+|---|---|---|
+| I due stati a 240px | il pieno è il vuoto riempito, stessa sagoma | sì: le orecchie restano staccate in tutti e due, il contorno non cambia spessore |
+| Lo stato vuoto | identico al marchio di `ludoratti.it` | sì, i due tracciati e i due cerchi sono quelli di prima |
+| L'animazione, dal vivo | il cuore batte, l'anello sta fermo | `pb-heartbeat 3.2s`, `transform-box: view-box`, `transform-origin: 12px 13px` |
+| Quanti gruppi battono sulla pagina | solo quelli che `animateOn` permette | **9**: la barra, i due grandi, i due preferiti pieni, e quattro delle otto tarature |
+| `animateOn="none"` nella tabella delle misure di `/barra` | le tre misure si confrontano ferme | sì |
+| `/stile` | un battito solo, non due moltiplicati | tolta la `animate-heartbeat` dalla `className`: la scala della classe e quella del gruppo si moltiplicavano |
+| I due stati, **chiaro** e **scuro** | si distinguono | sì; il colore è `brand-ink`, già misurato 4,58 e 13,43 — sopra la soglia 3 della grafica |
+| Gate | verde | build, typecheck, lint 0/0, **483 test**, dodici pagine statiche |
+
+⚠️ **Un'animazione montata dentro un componente e una messa addosso da fuori si moltiplicano.**
+Finché il battito era una `className`, `/stile` lo passava a mano; col battito dentro il
+componente quella riga dava `scale(1.12)` sull'`<svg>` **per** `scale(1.12)` sul gruppo. Non si
+vede come un difetto: si vede come un marchio che pulsa un po' troppo.
+
+**Che cosa protegge:** il marchio è la cosa che si vede per prima su ogni pagina di ogni
+applicazione dei Ludoratti, e il suo battito è quello che lo fa sembrare vivo invece che stampato.

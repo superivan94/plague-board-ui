@@ -977,6 +977,26 @@ exist in target module» che **non sono veri**. Si guarda la pagina, o si crede 
   quando questa libreria è completa. ⚠️ `DiceIcon` non è un'eccezione: non è un attributo di un
   gioco, è il terzo termine del marchio dopo la peste e i ratti. Il criterio è quello — **parla il
   marchio o parla l'applicazione?** I sette disegni vivono nel commit `0d55bee`.
+- ⚠️ **Il marchio ha due stati, e il secondo non è un secondo disegno.** Il cuore pieno di
+  `RatIcon` è la **concatenazione letterale** delle due curve del contorno, chiusa con una `Z` —
+  e si concatenano senza toccarle perché la curva sinistra comincia con una `S`, la cubica il cui
+  primo controllo è il riflesso del precedente: dopo una `M` quel riflesso è il punto corrente, e in
+  coda alla destra il controllo precedente è già lo stesso punto. Un secondo tracciato scritto a
+  mano si scollerebbe dal primo al primo ritocco, e lo scarto a 18px è invisibile mentre a 96 è un
+  alone. ⚠️ **E il contorno resta anche da pieno**: il tratto dipinge mezza unità oltre il percorso,
+  quindi togliendolo il cuore pieno sarebbe più magro del vuoto e i due stati cambierebbero
+  **taglia** invece di riempirsi. Vuoto e pieno sono la convenzione di «non l'ho scelto / l'ho
+  scelto», ed è l'unico posto in cui il marchio fa anche da comando — ci sta perché continua a dire
+  la stessa cosa.
+- ⚠️ **L'interruttore dell'animazione sta su chi monta, tranne che per il marchio.** La regola della
+  tazza e del pallino vale per tutto il resto; `RatIcon` batte **da sé** (utente, 2026-09-20) perché
+  il battito di un marchio è identità e non decorazione, e chi lo monta non deve ricordarsi di
+  accenderlo. Chi non lo vuole ha `animateOn`, che è a quattro valori invece che a due booleani
+  perché il caso vero non è «anima sì/no» ma **in quale dei due stati**: in una lista di preferiti a
+  muoversi è quello scelto, o quello da scegliere. ⚠️ E a battere è il **cuore**, non tutto il
+  segno: l'anello sta fuori dal gruppo animato, o il marchio respira invece di battere.
+  ⚠️ **La classe nostra va aggiunta a mano alla regola di `prefers-reduced-motion`**: lì dentro
+  `[class*='animate-']` prende le utility di Tailwind e non `.pb-mark-beat`.
 - ⚠️ **Il dente di un pezzo di puzzle non si fa con una Bézier, si fa con un arco maggiore.** Un
   dente vero ha il collo più stretto del bulbo, e la curva cubica quel sottosquadro non lo forma:
   all'inizio domina il termine `(1−t)³` del punto di partenza, quindi spingere i punti di controllo

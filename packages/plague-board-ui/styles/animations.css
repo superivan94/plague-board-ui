@@ -307,6 +307,24 @@
   }
 }
 
+/* Il battito, montato dentro il marchio invece che addosso da fuori.
+ *
+ * ⚠️ **`transform-box: view-box` non è un di più.** Senza, l'origine di una `transform` su un
+ * elemento SVG si conta dal riquadro **della parte**, e il cuore si gonfierebbe attorno al proprio
+ * centro geometrico invece che attorno al punto in cui sta dentro il marchio. Con `view-box` le
+ * due unità qui sotto sono coordinate del `viewBox`: 12 · 13 è il cuore del cuore, un po' sotto il
+ * centro del riquadro perché sopra ci sono le orecchie. È la stessa regola misurata sul ratto che
+ * corre, dove i perni delle zampe sono scritti dal generatore.
+ *
+ * ⚠️ **L'animazione la prende dalla utility invece di riscriverla**: `--animate-heartbeat` è
+ * dichiarata in `@theme` qui sotto, quindi vive su `:root` ed è la stessa cosa che ottiene chi
+ * scrive `animate-heartbeat` a mano. Due copie della stessa durata divergono al primo ritocco. */
+.pb-mark-beat {
+  transform-box: view-box;
+  transform-origin: 12px 13px;
+  animation: var(--animate-heartbeat);
+}
+
 /* ─────────────────────────────────────────────────────────────────────────────
  * Le utility. `@theme` le GENERA — è la differenza con `:root`, che dichiara e basta.
  * ───────────────────────────────────────────────────────────────────────────── */
@@ -1059,6 +1077,10 @@
      città spenta sembrerebbe un guasto, non una preferenza rispettata. */
   .pb-city-window,
   .pb-city-chatter,
+  /* ⚠️ Serve la riga sua: `[class*='animate-']` qui sotto non la prende, perché il battito del
+     marchio è una classe nostra e non una utility. Ferma, resta al primo fotogramma, cioè alla
+     sua taglia vera. */
+  .pb-mark-beat,
   [class*='animate-'],
   .pb-rat--running .pb-rat-part,
   .pb-rat--running .pb-rat-body,

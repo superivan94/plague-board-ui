@@ -18,6 +18,8 @@ import {
   VirusIcon,
 } from 'plague-board-ui';
 
+import { MarkSection } from './MarkSection';
+
 // ⚠️ Nessun colore scritto a mano in questa pagina: tutto passa dai token, perché è la pagina che
 // deve reggere il commutatore del tema in cima. Un `text-gray-400` qui dentro sarebbe invisibile
 // in chiaro, ed è esattamente il difetto che la pagina esiste per non far succedere.
@@ -133,6 +135,8 @@ export default function Home() {
           vivere dentro una pagina scura e viceversa.
         </p>
       </section>
+
+      <MarkSection />
 
       <TechRule>i segni</TechRule>
 

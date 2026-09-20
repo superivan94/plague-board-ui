@@ -245,7 +245,9 @@ export default function BarPage() {
         <div className="flex items-end gap-8 rounded-lg border border-border p-4 text-brand-ink">
           {SAMPLES.map(({ size }) => (
             <span key={size} className="flex flex-col items-center gap-2">
-              <RatIcon size={PLAGUE_BAR_MARK_SIZE[size]} />
+              {/* Fermo: qui si confrontano tre misure, e un cuore che batte le fa ballare. È il
+                  caso per cui `animateOn` esiste. */}
+              <RatIcon size={PLAGUE_BAR_MARK_SIZE[size]} animateOn="none" />
               <TechLabel className="text-muted">
                 {size} · {PLAGUE_BAR_MARK_SIZE[size]}
               </TechLabel>
