@@ -227,40 +227,58 @@
  * ⚠️ **Le due sbirciate rotte non bastano, perché una parola tagliata a metà non si legge.** Di là
  * sono le sole due, sei centesimi l'una e mai intera: l'utente il 2026-09-20 ha detto che si
  * intravede e non si riesce a leggere. Qui restano — sono il «segnale che tenta di passare» — ma
- * dopo arriva un terzo tempo con `inset(0)`, cioè la parola **tutta**, e dura abbastanza da
- * leggerla: **255 ms** su un ciclo di tre secondi, contro i sessanta di ogni sbirciata.
+ * dopo la parola arriva **tutta**, con `inset(0)`.
+ *
+ * ⚠️ **E non arriva in un colpo solo: prima sfarfalla.** Un'unica comparsa lunga, sempre chiesta
+ * dall'utente, si leggeva bene e sembrava una scritta che si accende invece di un guasto. I tempi
+ * interi sono tre — **45, 45 e 165 ms**, separati da trenta millesimi di buio — che è il modo in
+ * cui un tubo al neon prende la corrente: due colpi che non tengono, e poi la tenuta. Il totale
+ * acceso resta lo stesso, ma non c'è più nessun singolo tempo lungo.
  *
  * ⚠️ **Le percentuali sono soglie, non transizioni**: la curva a gradini sulla classe tiene ogni
  * valore fino al fotogramma dopo, quindi un fotogramma «spento» subito dopo uno acceso è quanto
- * dura l'acceso. Senza, i valori si interpolerebbero e le sbirciate diventerebbero due
- * dissolvenze — cioè un respiro invece di un guasto. È la stessa scelta delle finestre della
- * città. */
+ * dura l'acceso. Senza, i valori si interpolerebbero e i colpi diventerebbero dissolvenze — cioè
+ * un respiro invece di un calo di tensione. È la stessa scelta delle finestre della città, e qui
+ * è ciò che rende possibile uno stacco da trenta millesimi: una dissolvenza così corta non si
+ * vedrebbe affatto. */
 @keyframes pb-reveal {
   0% {
     opacity: 0;
   }
   /* Prima sbirciata: la fascia alta. */
-  82% {
+  80% {
     opacity: 1;
     clip-path: inset(10% 0 55% 0);
   }
-  84% {
+  82% {
     opacity: 0;
   }
   /* Seconda: la fascia bassa, che non si sovrappone alla prima. */
-  86% {
+  84% {
     opacity: 1;
     clip-path: inset(55% 0 10% 0);
   }
-  88% {
+  86% {
     opacity: 0;
   }
-  /* E poi passa davvero. */
-  91% {
+  /* E poi passa — ma la tensione non tiene subito: due colpi corti e poi la tenuta. */
+  88% {
     opacity: 1;
     clip-path: inset(0);
   }
-  99.5% {
+  89.5% {
+    opacity: 0;
+  }
+  90.5% {
+    opacity: 1;
+  }
+  92% {
+    opacity: 0;
+  }
+  93% {
+    opacity: 1;
+  }
+  98.5% {
     opacity: 0;
   }
 }

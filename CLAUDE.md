@@ -865,10 +865,25 @@ exist in target module» che **non sono veri**. Si guarda la pagina, o si crede 
   troppo difficile da leggere». Le fasce restano, perché sono il segnale che tenta di passare, ma
   dopo serve un tempo in cui la parola è **intera**, e che duri più di tutte le fasce messe insieme:
   60 + 60 ms di sbirciate contro **255 ms** di parola. Con una parola **sopra un'altra** servono
-  anche la lastra sotto — sennò il nome spunta fra le lettere — e `steps(1, end)`, o i tre tempi
-  diventano tre dissolvenze, cioè un respiro invece di un guasto. ⚠️ E l'attesa fra un lampo e
+  anche la lastra sotto — sennò il nome spunta fra le lettere — e `steps(1, end)`, o i tempi
+  diventano dissolvenze, cioè un respiro invece di un guasto. ⚠️ E l'attesa fra un lampo e
   l'altro è una misura a sé: cinque secondi facevano credere che non ci fosse niente da aspettare,
   tre no.
+- ⚠️ **Ma un tempo intero e lungo è un'insegna che si accende, non un guasto: quei 255 ms vanno
+  spezzati.** Seconda correzione dell'utente, lo stesso 2026-09-20 — «ridurrei la sua durata, ma lo
+  farei riapparire immediatamente dopo, un po' come stesse flickerando o sbalzi di tensione». La
+  forma che regge è **45, 45 e 165 ms** con trenta millesimi di buio in mezzo, cioè un tubo al neon
+  che prende la corrente: due colpi che non tengono e poi la tenuta. Il totale acceso non cambia e
+  la parola si legge lo stesso, perché la si vede tre volte invece di una. ⚠️ Uno stacco da 30 ms
+  esiste **solo** con `steps(1, end)`: interpolato è una dissolvenza che non si vede. È la stessa
+  differenza fra `animate-pulse` e il calo di tensione delle finestre della città.
+- ⚠️ **Un effetto che vale per un testo vale per ogni testo della stessa scena, e se ne vale per uno
+  solo si vede.** Il disturbo stava sul nome e non sulla parola che il nome nasconde — «noto che
+  evil non lo ha proprio», ha detto l'utente guardando. La cura non è ripetere il markup ma un pezzo
+  che lo rende, `GlitchSlices`, montato due volte: per il nome come fratello, per la parola nascosta
+  **dentro** di lei. ⚠️ E il dentro non è un dettaglio: opacità e `clip-path` valgono per tutto il
+  sottoalbero, quindi le copie compaiono e spariscono col lampo; messe accanto girerebbero sopra il
+  nome anche nei tre secondi in cui il lampo non c'è.
 
 ## Memoria di sessione
 

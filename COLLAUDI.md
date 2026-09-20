@@ -950,9 +950,12 @@ comporre; il tema si commuta scrivendo `pb-playground-theme` in `localStorage` e
 | Il fondo delle lamelle | quello dichiarato dove c'è, trasparente dove non c'è | `rgb(3, 7, 18)` e `rgba(0, 0, 0, 0)` |
 | La fascia dichiarata nella classe | collassata, per quando l'animazione è spenta | `inset(50% 0px)` |
 | «Meno movimento» | la regola in fondo ad `animations.css` le raggiunge | lamelle e lampo corrispondono a `[class*='animate-']` |
-| I tre tempi del lampo (secondo giro) | due sbirciate rotte, e poi la parola **intera** abbastanza da leggerla | **60 ms** fascia alta · **60 ms** fascia bassa · **255 ms** `inset(0)`, su un ciclo di **3 s** |
-| L'opacità del lampo, campionata ogni 7,5 ms | solo 0 o 1, o le sbirciate diventano due dissolvenze | due soli valori, `0` e `1` — `animationTimingFunction` vale `steps(1)` |
+| I tempi del lampo, campionati ogni 1,5 ms (terzo giro) | due sbirciate rotte, e poi la parola intera che sfarfalla prima di tenere | **60** fascia alta · **60** fascia bassa · **45 · 45 · 165 ms** con `inset(0)`, su un ciclo di **3 s** |
+| Il buio fra un colpo intero e l'altro | breve abbastanza da leggersi come un calo di tensione | **30 ms** fra il primo e il secondo, **30** fra il secondo e la tenuta |
+| L'opacità del lampo lungo tutto il ciclo | solo 0 o 1, o i colpi diventano dissolvenze | due soli valori, `0` e `1` — `animationTimingFunction` vale `steps(1)` |
 | La lastra sotto la parola intera | il colore dichiarato, o la parola nascosta si legge sopra il nome | `rgb(3, 7, 18)`; la parola misura **71 px** contro i **35** del nome che copre |
+| Le lamelle **della parola nascosta** | due, col suo testo, dentro il lampo e non accanto | 2 copie «EVIL», fondo `rgb(3, 7, 18)`, ombre `rgb(8, 145, 178)` e `rgb(190, 24, 93)` |
+| Selezionare il titolo col lampo che porta le sue copie | sempre «LUDORATTI E. CORP» | confermato: `user-select` si eredita, e le copie annidate sono già coperte |
 | Nome accessibile del titolo | il testo una volta sola | «LUDORATTI E. CORP» |
 | **Selezionare il titolo e copiarlo** | «LUDORATTI E. CORP» | ⚠️ **«LUDORATTI E.E.E.EVIL CORP»** |
 | Lo stesso, con `user-select: none` sulle copie | «LUDORATTI E. CORP» | confermato |
@@ -976,6 +979,16 @@ dura più delle due sbirciate messe insieme, più la lastra sotto, più la curva
 tre tempi siano interruttori e non dissolvenze. E il ciclo è sceso da 5 a **3 secondi**, sempre su
 richiesta: fra un lampo e l'altro l'attesa era lunga abbastanza da far credere che non ci fosse
 niente da aspettare.
+
+⚠️ **Terzo giro, lo stesso giorno: la parola si leggeva e sembrava un'insegna che si accende.**
+L'utente: «ridurrei la sua durata, ma lo farei riapparire immediatamente dopo, un po' come stesse
+flickerando o sbalzi di tensione». Il tempo intero da 255 ms è diventato **tre** — 45, 45 e 165, con
+trenta millesimi di buio in mezzo — che è come un tubo al neon prende la corrente: due colpi che non
+tengono e poi la tenuta. Il totale acceso non cambia, ma nessun singolo tempo è più lungo di due
+decimi. ⚠️ Uno stacco da 30 ms esiste **solo** grazie a `steps(1, end)`: interpolato non si
+vedrebbe affatto. E l'altra metà della segnalazione — «terrei lo stesso effetto glitch della E.,
+noto che evil non lo ha proprio» — è diventata `GlitchSlices`, il pezzo che ora rende le due copie
+per tutti e due: il nome le ha come fratelli, la parola nascosta **dentro** di sé.
 
 **Che cosa protegge:** un elemento decorativo che **duplica testo vero** sbaglia in tre mondi
 diversi e ognuno si ripara da solo — l'albero di accessibilità con `aria-hidden`, gli appunti con

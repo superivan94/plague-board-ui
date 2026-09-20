@@ -9,7 +9,8 @@ export interface GlitchTextProps {
   children: string;
   /**
    * La parola che lampeggia sopra il testo: ogni tre secondi tenta di uscire due volte a fette e
-   * alla terza compare **intera**, per due decimi e mezzo. Assente, il lampo non esiste affatto:
+   * poi compare **intera**, sfarfallando come un tubo che prende la corrente — due colpi corti e
+   * la tenuta. Porta lo stesso disturbo del nome. Assente, il lampo non esiste affatto:
    * non c'è nessun valore predefinito perché una parola predefinita sarebbe il testo di
    * un'applicazione dentro un componente.
    */
@@ -40,8 +41,10 @@ export interface GlitchTextProps {
  * **Il disturbo sul nome**: il testo si sdoppia in due copie sfalsate di un paio di pixel, una
  * ciano e una rosa, e ognuna si vede solo per una fetta orizzontale che salta da un fotogramma
  * all'altro. Dove `reveal` c'è, ogni tre secondi la parola che il nome sta nascondendo prova a
- * uscire: due sbirciate rotte da sei centesimi, e poi **tutta intera** per due decimi e mezzo —
- * abbastanza da leggerla, che è l'unica misura che conta per una parola.
+ * uscire: due sbirciate rotte da sei centesimi, due colpi interi da quarantacinque millesimi e
+ * infine la tenuta, 165 ms — il modo in cui un tubo al neon prende la corrente. ⚠️ **E la parola
+ * nascosta porta lo stesso disturbo del nome**, con le sue due lamelle **dentro** di lei: così
+ * compaiono e spariscono con lei, invece di girare sopra il nome anche quando non c'è.
  *
  * Viene dal titolo di `ludoratti.it` — «LUDORATTI **E.** CORP», dove la `E.` ogni tanto diventa
  * `EVIL` — ed è il terzo pezzo del registro «futuro distopico» dell'aggregatore, dopo la città e
@@ -69,6 +72,30 @@ export interface GlitchTextProps {
  * </h1>
  * ```
  */
+/**
+ * Le due copie sfalsate di una parola, ciano e rosa.
+ *
+ * ⚠️ È un componente e non due righe scritte due volte perché le porta **anche la parola
+ * nascosta**: il nome si disturba e lei no era la prima differenza che si vedeva a schermo, e due
+ * disturbi scritti separatamente sarebbero due disturbi destinati a divergere.
+ *
+ * ⚠️ `aria-hidden` sta qui anche dove sarebbe superfluo — dentro il lampo, che è già nascosto —
+ * perché a rendere invisibile una copia dev'essere la copia stessa, non il posto dove capita di
+ * montarla.
+ */
+function GlitchSlices({ text }: { text: string }) {
+  return (
+    <>
+      <span aria-hidden="true" className="pb-glitch-slice pb-glitch-slice--cyan animate-glitch">
+        {text}
+      </span>
+      <span aria-hidden="true" className="pb-glitch-slice pb-glitch-slice--pink animate-glitch">
+        {text}
+      </span>
+    </>
+  );
+}
+
 export function GlitchText({
   children,
   reveal,
@@ -79,20 +106,19 @@ export function GlitchText({
   return (
     <span
       className={`pb-glitch ${className}`}
-      // La variabile sta qui e non sulle due lamelle: loro la ereditano, e detta una volta sola
-      // non può diventare due valori diversi.
+      // La variabile sta qui e non sulle lamelle: loro la ereditano — comprese quelle dentro il
+      // lampo — e detta una volta sola non può diventare due valori diversi.
       style={{ '--pb-glitch-bg': background } as CSSProperties}
     >
       {children}
-      <span aria-hidden="true" className="pb-glitch-slice pb-glitch-slice--cyan animate-glitch">
-        {children}
-      </span>
-      <span aria-hidden="true" className="pb-glitch-slice pb-glitch-slice--pink animate-glitch">
-        {children}
-      </span>
+      <GlitchSlices text={children} />
       {reveal ? (
         <span aria-hidden="true" className={`pb-glitch-reveal animate-reveal ${revealClassName}`}>
           {reveal}
+          {/* ⚠️ **Dentro** il lampo, non accanto: il ritaglio e l'opacità di `pb-reveal` valgono
+              per tutto il sottoalbero, quindi le copie compaiono e spariscono con lui. Fuori
+              girerebbero sopra il nome per tutti e tre i secondi in cui il lampo non c'è. */}
+          <GlitchSlices text={reveal} />
         </span>
       ) : null}
     </span>

@@ -48,6 +48,18 @@ describe('GlitchText', () => {
     expect(lampo(container)).toHaveAttribute('aria-hidden', 'true');
   });
 
+  it('la parola nascosta porta le stesse due lamelle del nome', () => {
+    const { container } = render(<GlitchText reveal="EVIL">E.</GlitchText>);
+
+    // ⚠️ Sono **dentro** il lampo, non accanto: così ne ereditano l'opacità e il ritaglio, e si
+    // vedono solo quando si vede lui. Fuori girerebbero sopra il nome tutto il tempo.
+    const sue = lampo(container)!.querySelectorAll('.pb-glitch-slice');
+
+    expect(sue).toHaveLength(2);
+    sue.forEach((copia) => expect(copia).toHaveTextContent('EVIL'));
+    expect(lamelle(container)).toHaveLength(4);
+  });
+
   it('la parola nascosta resta fuori dal nome accessibile', () => {
     render(
       <h1>
