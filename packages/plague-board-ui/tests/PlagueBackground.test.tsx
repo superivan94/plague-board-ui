@@ -9,6 +9,9 @@ import {
   ToxicLevelProvider,
   type ToxicLevel,
 } from '../src';
+// ⚠️ Dal modulo e non da `../src`: lo skyline è **scenografia del fondale**, non un pezzo che si
+// monta da fuori, quindi da `src/index.ts` non esce. Qui servono i suoi numeri per non riscriverli.
+import { CITTA, FINESTRE_TOTALI } from '../src/brand/plagueCityscape';
 import { fineAnimazione } from './animazioni';
 import { menoMovimento } from './preferenze';
 
@@ -23,6 +26,8 @@ const paginaNascosta = (nascosta: boolean) => {
 const gocce = (container: HTMLElement) => container.querySelectorAll('.animate-drip');
 const galleggianti = (container: HTMLElement) => container.querySelectorAll('.animate-float');
 const bolle = (container: HTMLElement) => container.querySelectorAll('.pb-toxic-bubble');
+const palazzi = (container: HTMLElement) => container.querySelectorAll('.pb-city-block');
+const finestre = (container: HTMLElement) => container.querySelectorAll('.pb-city-block .animate-pulse');
 
 const conFondale = (level: ToxicLevel) =>
   render(
@@ -53,9 +58,54 @@ describe('PlagueBackground', () => {
 
       expect(gocce(container)).toHaveLength(TOXIC_LEVEL_SETTINGS[livello].drips);
       expect(galleggianti(container)).toHaveLength(TOXIC_LEVEL_SETTINGS[livello].floaters);
+      expect(finestre(container)).toHaveLength(TOXIC_LEVEL_SETTINGS[livello].windows);
 
       unmount();
     }
+  });
+
+  it('la città c’è a ogni livello, anche spento: a cambiare sono le finestre accese', () => {
+    // ⚠️ È la riga che tiene ferma la distinzione: il livello governa quello che **si muove**, e
+    // una città non si muove. Facendo sparire i palazzi, «spento» direbbe che la città è fatta di
+    // gas — e una schermata che perde il suo skyline abbassando le emissioni sembra rotta.
+    for (const livello of ['off', 'low', 'medium', 'high'] as const) {
+      const { container, unmount } = conFondale(livello);
+
+      expect(palazzi(container)).toHaveLength(CITTA.length);
+      unmount();
+    }
+  });
+
+  it('accende le finestre in ordine, senza sfondare il tetto della città', () => {
+    const { container } = conFondale('high');
+
+    expect(finestre(container)).toHaveLength(FINESTRE_TOTALI);
+    expect(TOXIC_LEVEL_SETTINGS.high.windows).toBeLessThanOrEqual(FINESTRE_TOTALI);
+  });
+
+  it('le tre gocce sono di tre misure diverse', () => {
+    // ⚠️ Segnalato dall'utente il 2026-09-20 guardando la pagina: tre gocce identiche che cadono
+    // a ritmi diversi si leggono come un'animazione che si ripete, non come pioggia. Le misure
+    // sono quelle di `ludoratti.it`.
+    const { container } = conFondale('high');
+
+    const misure = [...gocce(container)].map((colonna) => {
+      const disegno = colonna.querySelector('svg');
+      return `${disegno?.getAttribute('width')}×${disegno?.getAttribute('height')}`;
+    });
+
+    expect(misure).toHaveLength(3);
+    expect(new Set(misure).size).toBe(3);
+  });
+
+  it('la goccia è una goccia, non un rettangolo tagliato in cima', () => {
+    // La sagoma di `DripIcon` è appuntita in alto e tonda in basso: era il secondo difetto
+    // segnalato — un bordo dritto in cima si legge come un pezzo tagliato via, non come liquido.
+    const { container } = conFondale('low');
+
+    const disegno = gocce(container)[0].querySelector('svg');
+    expect(disegno).toHaveAttribute('viewBox', '0 0 8 20');
+    expect(disegno?.querySelector('path')?.getAttribute('d')).toContain('C');
   });
 
   it('è decorativo: gli strati non si annunciano, il contenuto sì', () => {

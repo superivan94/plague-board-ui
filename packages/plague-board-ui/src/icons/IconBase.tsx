@@ -6,6 +6,20 @@ interface IconBaseProps extends IconProps {
   /** Il riquadro del disegno. Le icone dei Ludoratti stanno tutte su una griglia 24×24. */
   viewBox?: string;
   /**
+   * L'altezza, quando **non** è uguale alla larghezza.
+   *
+   * ⚠️ Non sta in `IconProps` apposta: il contratto pubblico di un'icona è quadrato — `size` è il
+   * lato — e questo è lo sfogo per l'unico disegno che quadrato non è, la goccia, che è alta due
+   * volte e mezzo tanto e per di più si **allunga** cadendo. Chi sostituisce un'icona di un
+   * componente continua a doversela vedere solo con `IconProps`.
+   */
+  height?: number;
+  /**
+   * Come il disegno riempie il riquadro quando le due misure non sono in proporzione col
+   * `viewBox`. `none` lo stira, ed è quello che vuole una goccia che si allunga.
+   */
+  preserveAspectRatio?: string;
+  /**
    * Come è fatto il disegno: a **campitura** (`fill`, il caso normale) o a **tratto** (`stroke`).
    *
    * ⚠️ Non è una preferenza estetica, è dove va a finire `color`: un'icona a tratto dipinta col
@@ -35,6 +49,8 @@ export function IconBase({
   color = 'currentColor',
   title,
   viewBox = '0 0 24 24',
+  height,
+  preserveAspectRatio,
   paint = 'fill',
   children,
 }: IconBaseProps) {
@@ -44,8 +60,9 @@ export function IconBase({
     <svg
       xmlns="http://www.w3.org/2000/svg"
       width={size}
-      height={size}
+      height={height ?? size}
       viewBox={viewBox}
+      preserveAspectRatio={preserveAspectRatio}
       // ⚠️ Il colore arriva ai tracciati **attraverso `currentColor`**, non scritto dentro `fill`.
       // Costa una riga di `style` in più e serve ai disegni a paint misto — il marchio del ratto è
       // a tratto ma ha le orecchie piene: se il colore stesse nell'attributo `fill` dell'`<svg>`,

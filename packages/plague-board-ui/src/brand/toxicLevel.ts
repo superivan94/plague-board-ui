@@ -42,6 +42,14 @@ export interface ToxicLevelSettings {
   readonly floaters: number;
   /** Quante gocce colano dal bordo di sopra. */
   readonly drips: number;
+  /**
+   * Quante finestre sono accese nella città in fondo.
+   *
+   * ⚠️ **I palazzi ci sono a ogni livello, anche a `off`**: il livello governa quello che si
+   * muove, e una città non si muove — sono le sue finestre a pulsare. Una città che sparisce
+   * abbassando le emissioni direbbe che la città è fatta di gas.
+   */
+  readonly windows: number;
   /** Ogni quanto nasce una bolla, in millisecondi. L'attesa si ripesca a ogni giro. */
   readonly bubbleEveryMs: RandomRange;
   /** Quante bolle al massimo insieme. Zero vuol dire che le bolle non partono affatto. */
@@ -61,15 +69,17 @@ export interface ToxicLevelSettings {
  * mentre le sei icone che galleggiano restavano identiche a qualunque livello. Qui il livello
  * comanda tutto quello che si muove, che è ciò che il suo nome promette.
  *
- * ⚠️ **`off` spegne davvero.** Niente velo, niente icone, niente gocce, niente bolle: resta il
- * fondo e basta. Di là `off` lasciava il velo al 20% e cambiava il testo in «INTRUDER DETECTED»,
- * cioè faceva una battuta invece di obbedire — e quel testo era della pagina, non del comando.
+ * ⚠️ **`off` spegne davvero.** Niente velo, niente icone, niente gocce, niente bolle, nessuna
+ * finestra accesa: resta il fondo e la città al buio. Di là `off` lasciava il velo al 20% e
+ * cambiava il testo in «INTRUDER DETECTED», cioè faceva una battuta invece di obbedire — e quel
+ * testo era della pagina, non del comando.
  */
 export const TOXIC_LEVEL_SETTINGS: Record<ToxicLevel, ToxicLevelSettings> = {
   off: {
     hazeClass: 'opacity-0',
     floaters: 0,
     drips: 0,
+    windows: 0,
     bubbleEveryMs: [0, 0],
     maxBubbles: 0,
     bubbleSize: [0, 0],
@@ -79,6 +89,7 @@ export const TOXIC_LEVEL_SETTINGS: Record<ToxicLevel, ToxicLevelSettings> = {
     hazeClass: 'opacity-30',
     floaters: 2,
     drips: 1,
+    windows: 2,
     bubbleEveryMs: [6000, 10000],
     maxBubbles: 4,
     bubbleSize: [20, 40],
@@ -88,6 +99,7 @@ export const TOXIC_LEVEL_SETTINGS: Record<ToxicLevel, ToxicLevelSettings> = {
     hazeClass: 'opacity-60',
     floaters: 4,
     drips: 2,
+    windows: 4,
     bubbleEveryMs: [3000, 5000],
     maxBubbles: 8,
     bubbleSize: [25, 50],
@@ -97,6 +109,7 @@ export const TOXIC_LEVEL_SETTINGS: Record<ToxicLevel, ToxicLevelSettings> = {
     hazeClass: 'opacity-100',
     floaters: 6,
     drips: 3,
+    windows: 7,
     bubbleEveryMs: [800, 1600],
     maxBubbles: 16,
     bubbleSize: [45, 90],

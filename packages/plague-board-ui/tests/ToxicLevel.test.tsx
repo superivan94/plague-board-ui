@@ -36,7 +36,7 @@ describe('la scala dell’atmosfera', () => {
 
   it('cresce a ogni gradino, e `off` non mette in scena niente', () => {
     const spento = TOXIC_LEVEL_SETTINGS.off;
-    expect([spento.floaters, spento.drips, spento.maxBubbles]).toStrictEqual([0, 0, 0]);
+    expect([spento.floaters, spento.drips, spento.windows, spento.maxBubbles]).toStrictEqual([0, 0, 0, 0]);
 
     // La monotonia è il contratto che il selettore promette a chi lo guarda: spostarsi verso
     // «alto» deve sempre aggiungere roba, mai toglierne.
@@ -46,6 +46,7 @@ describe('la scala dell’atmosfera', () => {
 
       expect(dopo.floaters).toBeGreaterThan(prima.floaters);
       expect(dopo.drips).toBeGreaterThan(prima.drips);
+      expect(dopo.windows).toBeGreaterThan(prima.windows);
       expect(dopo.maxBubbles).toBeGreaterThan(prima.maxBubbles);
     }
   });

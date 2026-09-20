@@ -85,6 +85,9 @@ export { VersionTag, type VersionTagProps } from './brand/VersionTag';
 // l'icona predefinita di un componente con la propria.
 export { BiohazardIcon } from './icons/BiohazardIcon';
 export { CodeIcon } from './icons/CodeIcon';
+// ⚠️ L'unica icona che non è quadrata, e l'unica che porta un'altezza sua: una goccia è alta due
+// volte e mezzo tanto, e cadendo si allunga ancora.
+export { DripIcon, type DripIconProps } from './icons/DripIcon';
 export { MoleculeIcon } from './icons/MoleculeIcon';
 export { PoisonIcon } from './icons/PoisonIcon';
 export { PotionMugIcon } from './icons/PotionMugIcon';

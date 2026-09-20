@@ -24,9 +24,15 @@ export default function AtmosferaPage() {
       <div className="flex flex-col gap-2">
         <h1 className="text-2xl font-semibold">L’atmosfera</h1>
         <p className="text-sm text-muted">
-          Il fondale della peste: un velo verde, le icone che galleggiano, le gocce che colano e le
-          bolle di gas che salgono. Serve dove una schermata deve dire «rete della peste» prima di
-          dire qualunque altra cosa — l’accesso, una pagina d’ingresso, un pannello che si presenta.
+          Il fondale della peste: la <strong>città distopica</strong> in fondo, un velo verde, le
+          icone che galleggiano, le gocce che colano e le bolle di gas che salgono da dietro i
+          palazzi. Serve dove una schermata deve dire «rete della peste» prima di dire qualunque
+          altra cosa — l’accesso, una pagina d’ingresso, un pannello che si presenta.
+        </p>
+        <p className="text-sm text-muted">
+          La scena viene da <code>ludoratti.it</code>, che è la pagina della corporazione e quindi
+          l’ultima parola su come si veste un fondale dei Ludoratti; da RattInventario vengono le
+          bolle e il velo.
         </p>
         <p className="text-sm text-muted">
           <strong>Avvolge il contenuto</strong> invece di stargli sotto: gli strati e la pagina sono
@@ -86,6 +92,7 @@ export default function AtmosferaPage() {
               <th className="py-2 pr-4 font-medium">velo</th>
               <th className="py-2 pr-4 font-medium">icone</th>
               <th className="py-2 pr-4 font-medium">gocce</th>
+              <th className="py-2 pr-4 font-medium">finestre</th>
               <th className="py-2 pr-4 font-medium">bolle</th>
               <th className="py-2 font-medium">diametro</th>
             </tr>
@@ -103,6 +110,7 @@ export default function AtmosferaPage() {
                   <td className="py-2 pr-4 text-muted">{t.hazeClass.replace('opacity-', '')}%</td>
                   <td className="py-2 pr-4 text-muted">{t.floaters}</td>
                   <td className="py-2 pr-4 text-muted">{t.drips}</td>
+                  <td className="py-2 pr-4 text-muted">{t.windows}</td>
                   <td className="py-2 pr-4 text-muted">
                     {spento ? '—' : `max ${t.maxBubbles}, una ogni ${t.bubbleEveryMs[0] / 1000}–${t.bubbleEveryMs[1] / 1000}s`}
                   </td>
@@ -118,8 +126,15 @@ export default function AtmosferaPage() {
 
       <p className="text-sm text-muted">
         <strong>«Spento» spegne davvero</strong>: niente velo, niente icone, niente gocce, niente
-        bolle. È il livello che una persona sceglie quando il movimento la disturba, e un fondale
-        che a quel punto lascia ancora qualcosa in scena non sta obbedendo.
+        bolle, nessuna finestra accesa. È il livello che una persona sceglie quando il movimento la
+        disturba, e un fondale che a quel punto lascia ancora qualcosa in scena non sta obbedendo.
+      </p>
+
+      <p className="text-sm text-muted">
+        ⚠️ <strong>I palazzi però restano, al buio.</strong> Il livello governa quello che si
+        muove, e una città non si muove: sono le sue finestre a pulsare, ed è quelle che il livello
+        conta. Farla sparire direbbe che la città è fatta di gas — e una schermata che perde il suo
+        skyline abbassando le emissioni sembra rotta, non obbediente.
       </p>
 
       <p className="text-sm text-muted">

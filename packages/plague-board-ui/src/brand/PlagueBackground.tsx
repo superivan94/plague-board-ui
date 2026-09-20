@@ -3,10 +3,12 @@
 import type { CSSProperties, ReactNode } from 'react';
 
 import { BiohazardIcon } from '../icons/BiohazardIcon';
+import { DripIcon } from '../icons/DripIcon';
 import { PoisonIcon } from '../icons/PoisonIcon';
 import { SkullIcon } from '../icons/SkullIcon';
 import { VirusIcon } from '../icons/VirusIcon';
 import type { IconProps } from '../icons/types';
+import { PlagueCityscape } from './plagueCityscape';
 import { ToxicBubbles } from './ToxicBubbles';
 import { TOXIC_LEVEL_SETTINGS } from './toxicLevel';
 import { useToxicLevel } from './ToxicLevelProvider';
@@ -41,11 +43,18 @@ const GALLEGGIANTI: readonly Galleggiante[] = [
   { Icon: SkullIcon, size: 26, top: '34%', left: '70%', delay: '2s' },
 ];
 
-/** Le tre gocce che colano dal bordo di sopra, in ordine di comparsa. */
+/**
+ * Le tre gocce che colano dal bordo di sopra, in ordine di comparsa.
+ *
+ * ⚠️ **Sono di tre misure diverse**, come su `ludoratti.it` — 8×32, 12×48 e 8×24 — e con durate
+ * diverse: tre gocce uguali che cadono a ritmi diversi si leggono come un'animazione che si
+ * ripete, tre gocce diverse come pioggia. Le misure e i tempi sono i suoi; le x sono più larghe,
+ * perché di là le tre cadono tutte da sotto l'intestazione e qui devono coprire un fondale.
+ */
 const GOCCE = [
-  { left: '28%', durata: '7s', ritardo: '0s' },
-  { left: '55%', durata: '8s', ritardo: '1.6s' },
-  { left: '74%', durata: '9s', ritardo: '3.2s' },
+  { left: '28%', w: 8, h: 32, durata: '8s', ritardo: '0.2s' },
+  { left: '55%', w: 12, h: 48, durata: '7s', ritardo: '1.5s' },
+  { left: '74%', w: 8, h: 24, durata: '9s', ritardo: '3s' },
 ];
 
 /**
@@ -74,9 +83,15 @@ export interface PlagueBackgroundProps {
 }
 
 /**
- * **L'atmosfera della peste**: velo verde, icone che galleggiano, gocce che colano e bolle di gas
- * che salgono. Quanto ce n'è lo dice il livello di {@link ToxicLevelProvider}, che
- * {@link ToxicLevelSwitch} può cambiare da qualunque punto della pagina.
+ * **L'atmosfera della peste**: la città distopica in fondo, il velo verde, le icone che
+ * galleggiano, le gocce che colano e le bolle di gas che salgono da dietro i palazzi. Quanto ce
+ * n'è lo dice il livello di {@link ToxicLevelProvider}, che {@link ToxicLevelSwitch} può cambiare
+ * da qualunque punto della pagina.
+ *
+ * La scena è quella di `ludoratti.it` — è la pagina della corporazione, quindi è lei a dire come
+ * si veste un fondale dei Ludoratti; da RattInventario vengono le bolle e il velo. ⚠️ **La città
+ * resta a ogni livello, anche a `off`**: il livello governa quello che si muove, e una città non
+ * si muove — sono le sue finestre a pulsare, e quelle il livello le conta.
  *
  * **Avvolge il contenuto invece di stargli sotto**, ed è una scelta: così non c'è niente da
  * ricordarsi. In RattInventario il fondale è un fratello del pannello e le bolle stanno in un
@@ -115,26 +130,27 @@ export function PlagueBackground({ children, className = '', contentClassName = 
             sembrerebbe un lampo di pagina sbagliata. */}
         <div className={`absolute inset-0 transition-opacity duration-700 ${taratura.hazeClass}`} style={CHIAZZE} />
 
-        {GOCCE.slice(0, taratura.drips).map(({ left, durata, ritardo }) => (
+        {GOCCE.slice(0, taratura.drips).map(({ left, w, h, durata, ritardo }) => (
           <span
             key={left}
-            // ⚠️ La goccia è una **colonna alta quanto il fondale**, con il capo disegnato in cima:
-            // `pb-drip` cade di `--pb-drip-distance`, e una percentuale in `translateY` conta
-            // l'altezza dell'elemento. Data alla colonna, `100%` è esattamente l'altezza del
+            // ⚠️ La goccia è una **colonna alta quanto il fondale**, con la goccia disegnata in
+            // cima: `pb-drip` cade di `--pb-drip-distance`, e una percentuale in `translateY`
+            // conta l'altezza dell'elemento. Data alla colonna, `100%` è esattamente l'altezza del
             // riquadro — dentro una scheda come su una pagina intera — e il `100vh` predefinito
             // della variabile non serve più. Il perno in alto fa allungare la goccia mentre cade,
             // invece di spostarla.
-            className="absolute top-0 h-full w-1.5 origin-top animate-drip"
+            className="absolute top-0 h-full origin-top animate-drip"
             style={
               {
                 left,
+                width: w,
                 animationDuration: durata,
                 animationDelay: ritardo,
                 '--pb-drip-distance': '100%',
               } as CSSProperties
             }
           >
-            <span className="block h-5 w-full rounded-b-full bg-brand/70" />
+            <DripIcon size={w} height={h} className="block text-brand/70" />
           </span>
         ))}
 
@@ -149,6 +165,10 @@ export function PlagueBackground({ children, className = '', contentClassName = 
         ))}
 
         <ToxicBubbles />
+
+        {/* ⚠️ La città è l'**ultima**, quindi sta davanti a tutto il resto: le bolle salgono da
+            dietro i palazzi, che è il modo in cui un gas esce da una città e non da un riquadro. */}
+        <PlagueCityscape windows={taratura.windows} />
       </div>
 
       <div className={`relative ${contentClassName}`}>{children}</div>

@@ -5,6 +5,7 @@ import { describe, expect, it } from 'vitest';
 import {
   BiohazardIcon,
   CodeIcon,
+  DripIcon,
   MoleculeIcon,
   type IconProps,
   PoisonIcon,
@@ -130,4 +131,43 @@ it('ogni icona è un disegno diverso dalle altre', () => {
   // File quasi identici sono il posto dove un copia e incolla lascia due volte lo stesso
   // tracciato: il teschio che si rende come il virus è un difetto che nessun altro caso vede.
   expect(new Set(drawings).size).toBe(icons.length);
+});
+
+describe('DripIcon', () => {
+  // ⚠️ Non sta nella tabella qui sopra, e il primo caso dice perché: è l'unica icona che quadrata
+  // non è. `IconProps` promette un lato solo perché tutte le altre lo sono, e chi sostituisce
+  // l'icona di un componente continua a vedere solo quel contratto.
+  it('è alta due volte e mezzo la sua larghezza, che è la proporzione del disegno', () => {
+    const { container } = render(<DripIcon />);
+
+    const svg = container.querySelector('svg');
+    expect(svg).toHaveAttribute('width', '8');
+    expect(svg).toHaveAttribute('height', '20');
+    expect(svg).toHaveAttribute('viewBox', '0 0 8 20');
+  });
+
+  it('si lascia stirare, perché una goccia che cade si allunga', () => {
+    const { container } = render(<DripIcon size={12} height={48} />);
+
+    const svg = container.querySelector('svg');
+    expect(svg).toHaveAttribute('width', '12');
+    expect(svg).toHaveAttribute('height', '48');
+    // Senza questo, un disegno 8×20 dentro un riquadro 12×48 resterebbe in proporzione e la
+    // goccia si vedrebbe centrata e piccola invece di riempire lo spazio che le è stato dato.
+    expect(svg).toHaveAttribute('preserveAspectRatio', 'none');
+  });
+
+  it('porta il suo riflesso, che resta bianco anche quando la goccia è verde', () => {
+    const { container } = render(<DripIcon color="#a3e635" />);
+
+    const riflesso = container.querySelector('svg path[stroke]');
+    expect(riflesso).toHaveAttribute('stroke', 'white');
+    expect(riflesso).toHaveAttribute('fill', 'none');
+  });
+
+  it('è decorativa se non ha un titolo, come tutte le altre', () => {
+    const { container } = render(<DripIcon />);
+
+    expect(container.querySelector('svg')).toHaveAttribute('aria-hidden', 'true');
+  });
 });
