@@ -137,6 +137,9 @@ export { useRandomPhrase, type RandomPhrase } from './hooks/useRandomPhrase';
 // e poter dire a chi guarda perché una decorazione non c'è.
 export { useReducedMotion } from './hooks/useReducedMotion';
 export { DEV_PHRASES, RAT_PHRASES } from './data/phrases';
+// Il lessico: le parole di casa, ognuna accanto a quella generica che sostituisce. È un dato come
+// le frasi — chi vuole la voce dei Ludoratti lo applica, chi non la vuole lo ignora.
+export { LUDORATTI_COPY, type LudorattiTerm, type LudorattiTermKey } from './data/copy';
 
 // Gli estremi fra cui si pesca: uno solo per tutta la libreria, perché lo sciame e l'emettitore
 // fanno la stessa cosa con numeri diversi.

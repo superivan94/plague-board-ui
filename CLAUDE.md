@@ -789,6 +789,16 @@ exist in target module» che **non sono veri**. Si guarda la pagina, o si crede 
   della 2 e in questo repository non è installato affatto. Vuol dire che la regola «prima si cerca
   in HeroUI» sulle icone **si esaurisce subito**, e che ogni segno di questa libreria è per forza
   disegnato qui.
+- ⚠️ **Una voce del lessico senza il termine generico accanto è una battuta che nessuno sa dove
+  mettere.** `LUDORATTI_COPY` è un dato come `RAT_PHRASES` — i componenti ricevono le parole come
+  prop, la libreria esporta il dizionario — e ogni voce porta `plain` **e** `house`: «Torna nelle
+  fogne», da solo, non dice che è il comando di uscita, e il generico è anche la chiave con cui una
+  persona cerca (si cerca la parola che si stava per scrivere). ⚠️ **E una sola voce si usa col
+  generico accanto invece che al suo posto**: `delete`, perché un comando che cancella per sempre
+  deve dire che cosa fa anche a chi non conosce il nostro vocabolario. ⚠️ Il dizionario è **di
+  casa, non di un'applicazione**: «i tuoi manuali» non ci sta, e l'app se lo affianca. ⚠️ E la
+  libreria lo **usa** in un punto solo — l'etichetta predefinita di `SupportButton` — che è quindi
+  l'unico posto da cui può divergere, ed è tenuto da un test.
 - ⚠️ **Un pezzo che fora e un pezzo che salda non stanno nello stesso tracciato.** È la regola che
   governa metà delle icone piene: `fill-rule="evenodd"` fa **cancellare** due sagome dove si
   sovrappongono — che è quello che serve per bucare tre granuli dentro un capside — mentre la

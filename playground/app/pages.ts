@@ -135,4 +135,11 @@ export const PLAYGROUND_PAGES: readonly PlaygroundPage[] = [
     blurb: 'Il bersaglio: come deve venire una schermata vestita da Ludoratti.',
     family: 'filosofia',
   },
+  {
+    href: '/lessico',
+    title: 'Il lessico',
+    components: ['LUDORATTI_COPY'],
+    blurb: 'Le parole di casa, ognuna accanto a quella generica che sostituisce.',
+    family: 'filosofia',
+  },
 ];

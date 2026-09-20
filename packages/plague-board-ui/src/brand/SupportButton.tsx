@@ -2,6 +2,7 @@
 
 import { useRef, type MouseEvent, type ReactNode } from 'react';
 
+import { LUDORATTI_COPY } from '../data/copy';
 import { PotionMugIcon } from '../icons/PotionMugIcon';
 import { openInNewTab } from './openInNewTab';
 import { ParticleBurst, type ParticleBurstHandle } from './ParticleBurst';
@@ -17,7 +18,14 @@ const MAX_WAIT_MS = 900;
 export interface SupportButtonProps {
   /** Dove si va a finire: la pagina delle donazioni. */
   href: string;
-  /** Che cosa c'è scritto. È anche il nome accessibile, che resta anche quando il testo sparisce. */
+  /**
+   * Che cosa c'è scritto. È anche il nome accessibile, che resta anche quando il testo sparisce.
+   *
+   * ⚠️ Senza, la parola di casa: `LUDORATTI_COPY.support.house`, cioè «Offrimi una pozione». Viene
+   * dal dizionario e non è scritta qui, perché è **l'unico punto in cui la libreria usa il proprio
+   * lessico** invece di limitarsi a esportarlo — e due copie della stessa frase divergono al primo
+   * ritocco, come i tre teschi.
+   */
   label?: string;
   /** Il segno. Senza, la tazza di pozione. */
   icon?: ReactNode;
@@ -68,7 +76,7 @@ export interface SupportButtonProps {
  */
 export function SupportButton({
   href,
-  label = 'Offrimi una pozione',
+  label = LUDORATTI_COPY.support.house,
   icon = <PotionMugIcon size={22} />,
   className = '',
 }: SupportButtonProps) {

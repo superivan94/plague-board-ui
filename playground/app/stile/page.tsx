@@ -1,6 +1,8 @@
 import { Button } from '@heroui/react';
 import {
   DiceIcon,
+  LUDORATTI_COPY,
+  type LudorattiTerm,
   PoisonIcon,
   RAT_LIVERIES,
   Rat,
@@ -39,13 +41,21 @@ const floaters = [
   { Icon: VirusIcon, size: 22, top: '80%', left: '9%', delay: '2.6s' },
 ];
 
-const lexicon = [
-  ['Accedi', 'Entra nella tana'],
-  ['I tuoi manuali', 'I manuali della diffusione'],
-  ['Catalogo pubblico', 'I vettori ludici classificati'],
-  ['In lavorazione', 'Ceppo sperimentale · in incubazione'],
-  ['Impostazioni', 'Parametri del Grande Piano'],
-  ['Esci', 'Torna nelle fogne'],
+/**
+ * Il lessico come lo monta un'applicazione vera: le parole **di casa** arrivano dal dizionario
+ * della libreria, quelle **sue** se le tiene qui.
+ *
+ * ⚠️ «I tuoi manuali» non sta in `LUDORATTI_COPY` e non ci deve stare: i manuali sono di
+ * Rattoteca, e un dizionario di casa che nomina il dominio di una sola app smette di valere per
+ * le altre tre. È la stessa riga che tiene `RAT_PHRASES` senza frasi sull'inventario.
+ */
+const lexicon: readonly LudorattiTerm[] = [
+  LUDORATTI_COPY.signIn,
+  { plain: 'I tuoi manuali', house: 'I manuali della diffusione' },
+  LUDORATTI_COPY.catalog,
+  LUDORATTI_COPY.beta,
+  LUDORATTI_COPY.settings,
+  LUDORATTI_COPY.signOut,
 ];
 
 export default function StyleReference() {
@@ -231,13 +241,13 @@ export default function StyleReference() {
           esporta e che ogni app applica se vuole la voce.
         </p>
         <div className="grid gap-2 sm:grid-cols-2">
-          {lexicon.map(([before, after]) => (
+          {lexicon.map(({ plain, house }) => (
             <div
-              key={before}
+              key={plain}
               className="flex flex-col gap-1 rounded-lg border border-border bg-surface p-3"
             >
-              <span className="text-xs text-muted line-through">{before}</span>
-              <span className="font-mono text-sm text-brand-ink">{after}</span>
+              <span className="text-xs text-muted line-through">{plain}</span>
+              <span className="font-mono text-sm text-brand-ink">{house}</span>
             </div>
           ))}
         </div>
