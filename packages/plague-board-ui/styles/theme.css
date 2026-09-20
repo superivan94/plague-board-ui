@@ -118,6 +118,14 @@
    * dentro una proprietà personalizzata si risolve sull'elemento che la dichiara, quindi su
    * un'isola `.dark` dentro una pagina chiara resterebbe congelata sul valore del chiaro. */
   --accent-soft-foreground: #3f6212; /* lime-800 — 6,11 sul lime al 15% del fondo chiaro; il lime-700 di `--pb-brand-ink` lì si ferma a 4,31 */
+
+  /* ⚠️ **L'anello di fuoco, ridichiarato per lo stesso motivo dell'accento tenue.** HeroUI ricava
+   * `--focus` dal nostro `--accent`, cioè dal lime pieno, e un anello sottile di lime su una
+   * pagina chiara fa **1,38**: un comando che con la tastiera non si trova. È il numero che
+   * `CLAUDE.md` aveva già registrato per la mascotte — la soglia della grafica che porta
+   * significato è **3**, non 4,5, e nemmeno quella era raggiunta. Col lime-700 fa **4,58**.
+   * Una riga qui vale per ogni comando dell'applicazione, nostro o di HeroUI. */
+  --focus: #4d7c0f; /* lime-700 — 4,58 sul fondo chiaro di HeroUI */
 }
 
 .dark,
@@ -126,6 +134,7 @@
   --pb-plague-ink: #4ade80; /* plague-400 — 11,55 sul nero, ed è il verde del testo di là */
   --muted: #a1a1aa; /* zinc-400 — 6,50 sul fondo scuro di HeroUI */
   --accent-soft-foreground: #a3e635; /* il lime pieno — 12,74 sul lime al 15% del fondo scuro */
+  --focus: #a3e635; /* il lime pieno: in scuro l'anello si vede, ed è il colore del marchio */
 }
 
 /* ─────────────────────────────────────────────────────────────────────────────

@@ -1051,3 +1051,53 @@ separatori e la parola in mezzo, e il prezzo — un annuncio in più — è dich
 useranno uguale, e il modo in cui si rompe non si vede guardandola: un'attesa che sembra un guasto,
 una riga divisoria che non c'è, un marchio di terzi «sistemato» da chi non sapeva perché era
 diverso, un titolo che a schermo è giusto e nell'albero dei livelli è un `h3` sotto a niente.
+
+### I chip che si contano, e l'anello di fuoco che non c'era — 2026-09-20
+
+**Esegue:** agente
+
+**Ultima esecuzione:** agente, 2026-09-20
+
+**Preparazione:** `npm run build`, poi **riavviare** il dev server — `focus-visible:focus-ring` è
+una classe nuova nei sorgenti della libreria. Pagina `http://localhost:3100/profilo`, sezione «i
+chip che si contano». ⚠️ **L'anello di fuoco si guarda col Tab, non col mouse**: `:focus-visible`
+non corrisponde a un `focus()` da console né a un clic, quindi un anello rotto resta invisibile a
+chi prova a mano nel modo sbagliato. I contrasti si misurano dipingendo il colore su una tela 1×1
+e componendolo sul fondo con la sua alfa; il tema si commuta scrivendo `pb-playground-theme` in
+`localStorage` e ricaricando.
+
+| Azione | Atteso | Ottenuto |
+|---|---|---|
+| Le quattro strisce di `CountedChips` | tre comandi e uno senza, su sei voci | `+3`, `+5`, `+6`, e la striscia sotto il limite non ne ha |
+| Il nome dei comandi | contiene il testo che si vede | «Mostra tutti (+3)», «(+5)», «(+6)» |
+| Lo stato da chiuso | dichiarato | `aria-expanded="false"` su tutt'e tre |
+| Premere il primo | si aprono tutte, nella stessa riga | la riga passa a `cooperativo · medioevo · dadi · deck-building · due giocatori · peste · −`, `aria-expanded="true"` |
+| Il nome dopo l'apertura | **non** cambia | «Mostra tutti (+3)» |
+| Tab | i `+N` sono nell'ordine di tabulazione | dal primo si arriva al secondo, `tabIndex` 0 |
+| L'anello di fuoco, **prima** | 2px attorno al comando | ⚠️ `:focus-visible` corrispondeva, `outline-width` **2px**, `outline-style` **none** — nessun anello |
+| Perché | — | `outline-none` scrive `--tw-outline-style: none`, e `outline-2` vale `outline-style: var(--tw-outline-style, solid)` |
+| Quanti componenti ne erano colpiti | — | ⚠️ **tre già in produzione**: `CreditCard`, `SupportButton`, `TalkingMascot` — tutti con `--tw-outline-style: none` |
+| L'anello, **dopo** (`focus-visible:focus-ring`) | si disegna | `box-shadow` con anello a 2px e stacco a 2px, cioè `ring-*`, che `outline-none` non tocca |
+| Il suo colore, tema chiaro, **prima** | ≥ 3 | ⚠️ **1,38** — `--focus` viene dal nostro `--accent`, cioè il lime pieno |
+| Il suo colore, tema chiaro, **dopo** | ≥ 3 | **4,58** con `--focus` a lime-700 |
+| Lo stesso, tema scuro | ≥ 3 | **13,43** col lime pieno |
+| Lo stesso, nel **piede** con la pagina in chiaro | il valore scuro, perché il piede è un'isola `dark` | **11,00** — i valori scritti per esteso non si congelano, come per `--accent-soft-foreground` |
+| Il testo del `+N` | ≥ 4,5 | **16,25** in chiaro |
+| L'altezza del comando | uguale a quella delle pastiglie | 26 px contro 26 |
+| Gate | verde | build, typecheck, lint 0/0, **475 test**, dodici pagine statiche |
+
+⚠️ **Un anello di fuoco si prova col Tab, e per questo può restare rotto per settimane.** Le tre
+classi che lo scrivevano c'erano tutte, il colore era quello giusto, la larghezza pure: mancava
+solo lo `outline-style`, che `outline-none` aveva spento attraverso una variabile. Non lo vede una
+passata sui contrasti — il colore dichiarato si misura lo stesso, ed è così che `CLAUDE.md` aveva
+registrato l'1,38 della mascotte senza accorgersi che quell'anello non si disegnava affatto. Si
+vede solo arrivando sul comando da tastiera e leggendo `outline-style` in pagina.
+
+⚠️ **E il difetto era doppio.** Anche disegnandolo, l'anello veniva dal `--focus` di HeroUI, che
+lui ricava dal nostro `--accent`: il lime pieno, che su una pagina chiara fa 1,38. Le due cure
+sono indipendenti e servono tutt'e due — una fa comparire l'anello, l'altra lo fa vedere.
+
+**Che cosa protegge:** il fuoco da tastiera è l'unica cosa che dice, a chi non usa il mouse, dove
+si trova. È anche la cosa che nessuno guarda: si prova col mouse, si vede che «funziona», e nessun
+test sulle prop la sfiora. Il guard `tests/focusRing.test.ts` tiene la combinazione fuori dai
+sorgenti; questo scenario tiene i numeri.

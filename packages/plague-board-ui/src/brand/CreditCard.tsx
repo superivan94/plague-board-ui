@@ -70,7 +70,7 @@ export function CreditCard({ name, icon, href, effect, hintDelayMs, className = 
       href={href}
       target="_blank"
       rel="noopener noreferrer"
-      className="rounded-lg outline-none hover:text-brand-ink focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-brand-ink"
+      className="rounded-lg hover:text-brand-ink focus-visible:focus-ring"
     >
       {corpo}
     </a>

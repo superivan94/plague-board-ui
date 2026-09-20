@@ -118,7 +118,7 @@ export function SupportButton({
         // `pb-potion-live` accende le bolle della tazza: sta qui e non nel disegno, così l'icona
         // usata altrove resta ferma. Con un'icona sostituita dall'esterno non fa semplicemente
         // niente, che è il modo giusto in cui una classe di troppo dovrebbe fallire.
-        className={`pb-potion-live flex items-center gap-1.5 rounded-lg border border-brand/40 px-2 py-0.5 text-xs font-medium text-brand-ink outline-none transition-colors hover:border-brand hover:bg-brand/10 focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-brand-ink ${className}`}
+        className={`pb-potion-live flex items-center gap-1.5 rounded-lg border border-brand/40 px-2 py-0.5 text-xs font-medium text-brand-ink transition-colors hover:border-brand hover:bg-brand/10 focus-visible:focus-ring ${className}`}
       >
         {icon}
         <span className="hidden @lg:inline">{label}</span>

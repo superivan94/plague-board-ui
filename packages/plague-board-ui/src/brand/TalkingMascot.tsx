@@ -89,7 +89,7 @@ export function TalkingMascot({
         // di contrasto sul fondo che lo circonda: il lime della corporazione su una pagina chiara
         // fa **1,38** e sparisce. Il token che cambia col tema fa **4,58** in chiaro e 13,35 in
         // scuro. Misurato il 2026-09-17 scrivendolo prima con `brand`.
-        className={`inline-flex cursor-pointer rounded-lg outline-none transition-transform focus-visible:outline-2 focus-visible:outline-offset-4 focus-visible:outline-brand-ink motion-reduce:transition-none ${
+        className={`inline-flex cursor-pointer rounded-lg transition-transform focus-visible:focus-ring motion-reduce:transition-none ${
           isPressed ? 'scale-95' : ''
         }`}
       >

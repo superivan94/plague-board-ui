@@ -922,6 +922,38 @@ exist in target module» che **non sono veri**. Si guarda la pagina, o si crede 
   è un salto di livello che a schermo non si vede. ⚠️ **La taglia invece non si scontra**: la sua
   classe è `card__title`, che tiene il `text-sm` dentro `@layer components`, e una utility vince su
   un layer — misurato `card__title text-xl` → `font-size: 20px`.
+- ⚠️ **`outline-none` con `focus-visible:outline-*` non disegna nessun anello, e c'erano tre
+  componenti così in produzione.** In Tailwind v4 `outline-none` non spegne solo il contorno:
+  scrive `--tw-outline-style: none`, e un `outline-2` vale
+  `outline-style: var(--tw-outline-style, solid)`. Messe insieme — ed è l'accoppiata che viene in
+  mente per prima — la larghezza cambia, il colore pure, e lo **stile resta `none`**. Misurato il
+  2026-09-20 su `/profilo` col Tab: `:focus-visible` corrispondeva, `outline-width` valeva `2px`,
+  `outline-style` valeva `none`. È la stessa famiglia di `animate-scale-bounce` e
+  `text-default-500` — una classe che non produce nessuna regola — e in più non si vede guardando,
+  perché per accorgersene bisogna arrivarci da tastiera. La cura è `focus-visible:focus-ring`,
+  l'utility di HeroUI: l'anello lo fa con `ring-*`, cioè con un'ombra, che `outline-none` non
+  tocca, e dà lo stesso fuoco a ogni comando della pagina. Lo tiene `tests/focusRing.test.ts`.
+- ⚠️ **E l'anello di HeroUI nasce dal nostro `--accent`, quindi in chiaro era invisibile lo
+  stesso.** `--focus` lui lo ricava dall'accento, che per noi è il lime pieno: un anello sottile di
+  lime su pagina chiara fa **1,38** — il numero che questa guida aveva già registrato per la
+  mascotte — e la soglia di una grafica che porta significato è **3**. Ridichiarato in `theme.css`
+  nei **due** blocchi del tema: lime-700 in chiaro (**4,58**), lime pieno in scuro (**13,43**).
+  ⚠️ I valori si scrivono per esteso e non con una `var()`, come `--accent-soft-foreground`:
+  verificato che un'isola `.dark` dentro una pagina chiara — il piede — legge il valore scuro e fa
+  **11,00**.
+- ⚠️ **Il `Chip` di HeroUI rende un `dom.span` scritto nel codice, non `dom[E]`.** Il parametro
+  generico tipa le prop e basta: a cambiare davvero l'elemento è solo `render`, perché `DOMElement`
+  quando ce l'ha ignora il tipo e chiama lei. Serve saperlo per `CountedChips`, dove il `+N` deve
+  essere un `<button>` vero — uno `<span>` con un `onClick` è un comando che la tastiera non trova
+  — ed è il terzo posto, dopo `Surface` e `Popover.Trigger`, in cui la via è `render`.
+- ⚠️ **Un comando che apre e chiude tiene lo stesso nome, e il conto va _dentro_ il nome.** Il `+N`
+  di `CountedChips` si annuncia «Mostra tutti (+2)» sia chiuso sia aperto, e a dire lo stato è
+  `aria-expanded`: un comando che cambia nome a metà è un comando che chi legge deve ritrovare.
+  ⚠️ E il conto sta nel nome perché chi comanda il browser **a voce** legge `+2` e lo pronuncia: se
+  il nome accessibile non contenesse il testo visibile, quel comando non si potrebbe dire.
+  ⚠️ **E quello che non si vede non è nella pagina**: le pastiglie chiuse non esistono nel DOM
+  invece di essere nascoste con una classe, come l'interruttore di `GlitchText` e per la stessa
+  ragione — la ricerca del browser, la selezione e chi copia le troverebbero lo stesso.
 
 ## Memoria di sessione
 
