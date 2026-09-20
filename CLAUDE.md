@@ -751,6 +751,34 @@ exist in target module» che **non sono veri**. Si guarda la pagina, o si crede 
   scelta finale non l'ha fatta il rapporto peso/qualità ma la **compatibilità**: MP3 è l'unico
   formato senza una sola riserva — Safari suona Opus in Ogg solo dal **18.4** (marzo 2025) e prima
   solo in CAF, e Firefox decodifica AAC solo se glielo presta il sistema.
+- ⚠️ **Le nostre utility vincono su HeroUI senza dipendere dall'ordine degli import, perché i suoi
+  componenti stanno in `@layer components`.** Verificato leggendo il suo CSS: `.avatar`, `.chip`,
+  `.card` sono tutti lì dentro, e Tailwind v4 dichiara `theme, base, components, utilities` in
+  quest'ordine. Vuol dire che vestire un componente di HeroUI è **aggiungere una classe**, senza
+  `!important` e senza `:where()`. Serve saperlo perché la prima cosa che viene in mente è
+  ridichiarare le sue variabili, che è la via giusta solo per i **colori** — la forma si cambia
+  con una utility. ⚠️ Il suo `Avatar`, per dire, è un **quadrato stondato**
+  (`border-radius: calc(var(--radius) * 3)`), non un cerchio, e le sue taglie sono tre: 32, 40 e
+  48 px, con `.avatar--md` che **non esiste** perché la media è la base.
+- ⚠️ **`Avatar` di HeroUI è `@radix-ui/react-avatar`, e in jsdom l'immagine non compare mai.**
+  Radix rende l'`<img>` **solo dopo che si è caricata davvero**: fabbrica un `new Image()` e
+  aspetta `onload`, che in jsdom non arriva — quindi un test che cerca `<img>`, `src` o `alt` è
+  rosso per un motivo che non è un difetto, e quella parte è **confine dichiarato**. Nel browser
+  succede l'opposto: a caricamento finito il **ripiego viene tolto dal DOM** (misurato il
+  2026-09-20: 2 ripieghi su 7 ritratti, i due senza immagine). ⚠️ E la radice dell'avatar è
+  l'unico pezzo di HeroUI **senza `data-slot`**: nei test si cerca per classe.
+- ⚠️ **In tema chiaro `--background` di HeroUI è il colore della pagina, quindi una sfumatura che
+  ci scende dentro dissolve la superficie.** Misurati il 2026-09-20: `--surface` è `#ffffff` e
+  `--background` è `#f5f5f5`, che è il fondo del `body` — un pannello con
+  `bg-linear-to-br from-surface to-background` finiva **1,09** di contrasto sulla pagina, cioè
+  invisibile in basso. Un velo del **colore del marchio** tinge invece nei due temi. ⚠️ E vale
+  la pena saperlo: `surface` contro pagina fa 1,09 in chiaro e 1,14 in scuro, perché a staccare
+  una scheda in HeroUI è **l'ombra**, non il fondo.
+- ⚠️ **Il colore letto dalla tela 1×1 esce premoltiplicato per l'alfa.** È la seconda metà del
+  metodo dei contrasti: su un colore opaco il pixel è il colore, su uno **traslucido** è già
+  `colore × alfa`, e ricomporlo sul fondo moltiplicando di nuovo lo scurisce due volte. Misurato
+  il 2026-09-20 sul bordo di `PlaguePanel`: **2,75** invece di **1,99**. Si divide per l'alfa
+  prima di comporre.
 
 ## Memoria di sessione
 

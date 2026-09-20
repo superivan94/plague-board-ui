@@ -805,3 +805,45 @@ lancia niente. Il difetto sarebbe silenzioso e comparirebbe solo nell'applicazio
 mai qui. La riga del `206` è l'altra metà: dice che il file si comporta da file — si scarica a
 pezzi e comincia a suonare prima di essere finito, che è esattamente ciò che un modulo base64 non
 avrebbe potuto fare.
+
+### I tre pezzi della scheda, nei due temi — 2026-09-20
+
+**Esegue:** agente — sono misure di colore e di geometria, e in jsdom ogni rettangolo vale zero.
+**Ultima esecuzione:** agente, 2026-09-20.
+
+**Preparazione:** `npm run build --workspace packages/plague-board-ui`, poi **riavviare** il dev
+server (`npm run playground`) — i tre pezzi portano classi nuove, e Tailwind non riscandaglia
+`dist/` quando `tsc` lo riscrive. Pagina: `http://localhost:3100/profilo`. Il tema si commuta
+scrivendo `pb-playground-theme` in `localStorage` e **ricaricando**.
+
+| Azione | Atteso | Ottenuto |
+|---|---|---|
+| Geometria del ritratto `lg` | 48 px tondo, non il quadrato stondato di HeroUI | **48×48**, `border-radius` a fondo scala, anello `rgb(163,230,53)` a **2px** |
+| L'immagine arriva davvero | il ritratto si vede, non il ripiego | `<img>` `complete`, `naturalWidth` **288**, reso a 48 |
+| Il ripiego dopo il caricamento | non resta sotto l'immagine | tolto dal DOM: restano **2** ripieghi su 7 ritratti, i due senza `src` |
+| Il segno nell'angolo | pastiglia lime, segno scuro dentro | **16×16**, fondo `rgb(163,230,53)`, segno a **13,35** di contrasto |
+| Anello sul pannello — scuro / chiaro | ≥ 3, che è la soglia della grafica che porta significato | **11,75** / **4,99** |
+| Titolo e descrizione della scheda — scuro / chiaro | ≥ 4,5 | **17,27** e 6,91 / **17,72** e 7,73 |
+| Le cinque pastiglie del grado — scuro / chiaro | ≥ 4,5, nessuna esclusa | peggiore **4,90** (`success`) / **4,80** (`warning`); `default` 14,52 / 14,87 |
+| Teschio sul disco del ripiego, in tema chiaro | il disco resta scuro nei due temi, ed è un'isola | teschio **9,73**, disco sulla pagina **13,46** |
+| Bordo del pannello al 50% — scuro / chiaro | visibile | **3,85** / **1,99** |
+| A 375 px | niente scorrimento laterale | `scrollWidth` **375** = `innerWidth`; i 25 elementi che sbordano sono tutti dentro la tabella, che scorre nel suo riquadro |
+
+⚠️ **Il velo del pannello non può scendere verso `background`.** Era la prima scrittura — `from-surface
+to-background` — e in tema chiaro il fondo della scheda finiva **esattamente del colore della
+pagina**: misurati `--surface` `#ffffff` e `--background` `#f5f5f5`, che è il fondo del `body`, con
+**1,09** di contrasto. La scheda si dissolveva verso il basso. Adesso il fondo è `surface` pieno e
+sopra c'è un velo del colore del marchio al 10%, che tinge senza sparire nei due temi. ⚠️ E
+`surface` contro pagina fa comunque 1,09 in chiaro e 1,14 in scuro: a staccare una scheda, in
+HeroUI, è **l'ombra**, non il fondo. Il nostro bordo verde ci si aggiunge.
+
+⚠️ **Un colore tradotto dal canvas esce premoltiplicato per l'alfa.** Il metodo di `CLAUDE.md` —
+dipingere il colore su una tela 1×1 e leggere il pixel — su un colore **traslucido** restituisce
+già `colore × alfa`: ricomporlo sul fondo moltiplicando di nuovo per l'alfa lo scurisce due volte.
+Il bordo del pannello misurava **2,75** invece di **1,99**. Si divide per l'alfa prima di comporre.
+
+**Che cosa protegge:** i tre pezzi sono i primi della libreria che **vestono** un componente di
+HeroUI invece di essere scritti da zero, e il modo in cui si rompono è che il vestito non arrivi:
+una classe che non vince sulla sua, un token che nel tema chiaro vale il colore della pagina, un
+verde che in scuro c'è e in chiaro no. Nessuna di queste cose fa un errore: fanno una scheda che
+sembra di qualcun altro.

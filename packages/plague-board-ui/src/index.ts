@@ -47,6 +47,17 @@ export { MusicProvider, useMusic, type MusicProviderProps, type MusicValue } fro
 export { LUDORATTI_TRACK_URL } from './assets/ludorattiTrack';
 export { MusicToggle, type MusicToggleProps } from './brand/MusicToggle';
 export { MusicVolume, type MusicVolumeProps } from './brand/MusicVolume';
+// I pezzi della scheda del profilo, tutti e tre **sopra** un componente di HeroUI: l'avatar sopra
+// `Avatar` + `Badge`, la pastiglia sopra `Chip`, il pannello sopra `Card`. ⚠️ I nomi dei gradi e i
+// loro colori restano all'applicazione: qui c'è il vestito, non il modello di abbonamento.
+export {
+  PLAGUE_AVATAR_SIZE,
+  PlagueAvatar,
+  type PlagueAvatarProps,
+  type PlagueAvatarSize,
+} from './brand/PlagueAvatar';
+export { PlaguePanel, type PlaguePanelProps } from './brand/PlaguePanel';
+export { ThematicBadge, type ThematicBadgeColor, type ThematicBadgeProps } from './brand/ThematicBadge';
 // Il pulsare che mette l'occhio su un comando. ⚠️ Niente a che vedere con `PulseDot`, che è un
 // pallino di stato: questo avvolge, quello marca.
 export { PlaguePulse, type PlaguePulseProps } from './brand/PlaguePulse';
