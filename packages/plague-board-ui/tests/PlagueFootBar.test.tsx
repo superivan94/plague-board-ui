@@ -82,8 +82,12 @@ describe('i pezzi del piede', () => {
     expect(clic).toBe(false);
     expect(apri).not.toHaveBeenCalled();
 
-    // La durata non è un numero scritto nel comando: gliela dice la fontana.
-    act(() => void vi.advanceTimersByTime(5000));
+    // ⚠️ L'attesa ha un tetto: una scheda aperta da un timer vale come una finestra nuova, e il
+    // credito che il clic concede è di **1 s** nel browser più stretto. A 800 ms non è ancora ora.
+    act(() => void vi.advanceTimersByTime(800));
+    expect(apri).not.toHaveBeenCalled();
+
+    act(() => void vi.advanceTimersByTime(200));
     // ⚠️ **Niente `noopener` fra le opzioni.** Quella parola fa tornare `null` a `window.open`
     // **anche quando la scheda si è aperta davvero**: il ripiego qui sotto scatterebbe lo stesso e
     // porterebbe via pure questa pagina — due pagine di donazioni per un clic solo. Il legame si
@@ -95,14 +99,36 @@ describe('i pezzi del piede', () => {
     vi.useRealTimers();
   });
 
-  it('e se le finestre nuove sono bloccate, si va in quella di adesso', () => {
-    // ⚠️ Il ripiego si prova **sulla funzione**, non sul componente: in jsdom `location` è
-    // dichiarata non riconfigurabile, quindi una spia su `assign` muore prima di partire. Con la
-    // finestra passata da fuori, il caso si scrive in tre righe.
-    const finestra = { open: () => null, location: { href: 'about:blank' } };
-    openInNewTab('https://esempio.test/dona', finestra);
+  it('quando la scheda non si apre lo dice, e non fa nient’altro', () => {
+    // ⚠️ Si prova **sulla funzione**, passandole una finestra finta: nel componente il caso non si
+    // saprebbe distinguere, e soprattutto non c'è nessun altro effetto da osservare — è il punto.
+    expect(openInNewTab('https://esempio.test/dona', { open: () => null })).toBe(false);
 
-    expect(finestra.location.href).toBe('https://esempio.test/dona');
+    const scheda = { opener: {} };
+    expect(openInNewTab('https://esempio.test/dona', { open: () => scheda })).toBe(true);
+    expect(scheda.opener).toBeNull();
+  });
+
+  it('dopo un’apertura bloccata il clic torna al browser, e la pagina non si muove', () => {
+    vi.useFakeTimers();
+    const apri = vi.spyOn(window, 'open').mockReturnValue(null);
+    render(<SupportButton href="https://esempio.test/dona" />);
+
+    // Il primo clic è trattenuto per far vedere la fontana, e l'apertura viene bloccata.
+    expect(fireEvent.click(screen.getByRole('link'))).toBe(false);
+    act(() => void vi.advanceTimersByTime(5000));
+    expect(apri).toHaveBeenCalledTimes(1);
+
+    // ⚠️ Il secondo **non** si tocca: lo gestisce il browser col `target="_blank"` del
+    // collegamento, cioè col gesto vero, che nessuno blocca. Trattenerlo di nuovo vorrebbe dire un
+    // comando che non funziona mai; portarci questa pagina vorrebbe dire buttare via lo stato
+    // dell'applicazione di chi ha premuto.
+    expect(fireEvent.click(screen.getByRole('link'))).toBe(true);
+    act(() => void vi.advanceTimersByTime(5000));
+    expect(apri).toHaveBeenCalledTimes(1);
+
+    apri.mockRestore();
+    vi.useRealTimers();
   });
 
   it('con meno movimento il comando è un collegamento e basta', () => {
@@ -119,6 +145,21 @@ describe('i pezzi del piede', () => {
 
     apri.mockRestore();
     vi.useRealTimers();
+  });
+
+  it('la tazza ribolle dentro il comando, e le tre bolle non partono insieme', () => {
+    render(<SupportButton href="https://esempio.test/dona" />);
+    const comando = screen.getByRole('link');
+
+    // ⚠️ Il legame fra l'icona e le sue animazioni è fatto di due classi che devono combaciare:
+    // l'interruttore sul comando e i bersagli nel disegno. In jsdom il movimento non si vede, ma
+    // se una delle due sparisce il legame è rotto, e a schermo non se ne accorgerebbe nessuno.
+    expect(comando.className).toContain('pb-potion-live');
+
+    const bolle = comando.querySelectorAll('.pb-potion-bubble');
+    expect(bolle).toHaveLength(3);
+    // Due delle tre portano una classe in più: è lì che sta il loro ritardo.
+    expect(comando.querySelectorAll('.pb-potion-bubble-b, .pb-potion-bubble-c')).toHaveLength(2);
   });
 
   it('il piede monta i tre pezzi in una riga sola che scorre', () => {

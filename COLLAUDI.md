@@ -392,8 +392,11 @@ il legame viene reciso, e se questa pagina si muove, senza andare da nessuna par
 | Si preme due volte di fila | il secondo getto non parte finché il primo non è finito | 16 particelle e basta: due getti sovrapposti non si leggono come due |
 | Dove stanno le particelle, e i fumetti della firma | fuori dal piede, non tagliati dalla riga che scorre | tutti nel portale sul `body`, `position: fixed`, `z-index` **50**: il fumetto «EVVAI! FUNZIONA!» sta 3 px sopra il bordo del piede e si legge intero |
 | I cenni delle due schede autore | non partono insieme | `animation-delay` **0s** e **2s**: due schede che saltellano allo stesso istante sembrano una cosa sola che pulsa |
-| Si preme la tazza e si guarda **quando** cambia pagina | dopo la fontana, non prima | la pagina resta `/barra` e l'apertura parte a **1728 ms** dal clic, cioè la durata che la fontana ha dichiarato |
+| Si preme la tazza e si guarda **quando** cambia pagina | dopo un pezzo di fontana, e comunque entro il secondo | apertura a **904 ms** dal clic: la fontana dichiara 1728, il comando taglia a `MAX_WAIT_MS` = 900 perché oltre il secondo la scheda non si aprirebbe su Firefox |
 | Si preme la tazza e si guarda **come** si apre | una scheda sola, e questa pagina ferma dov'è | **una** chiamata, `('https://ko-fi.com/superivan94', '_blank')` — niente `noopener` fra le opzioni — `opener` a `null` subito dopo, e `location` invariata. Misurato a 1660 px e a 375 |
+| Quanto dura il credito che il clic concede | abbastanza da coprire l'attesa, ma non è la stessa cosa ovunque | `navigator.userActivation.isActive` **vero** a 4211 ms, **falso** a 5201: cinque secondi su Chromium. Firefox ne dichiara uno, Safari zero — da lì il tetto a 900 ms |
+| Con `window.open` che torna sempre `null`, come in un browser che blocca | la pagina dell'applicazione **non si muove**, e il clic dopo passa al browser | una chiamata sola a 904 ms, `location` ferma su `/barra`; al secondo clic `defaultPrevented` è **false** e nessuna seconda chiamata: se ne occupa il `target="_blank"` del collegamento |
+| Le bolle della tazza, a riposo e sotto il puntatore | salgono sfalsate, e sotto il puntatore più in fretta | tre animazioni `pb-potion-bubble` da **3,4 s** con ritardi **0 / 1,15 / 2,3 s**; col puntatore sopra, **1,5 s**. Fermate a mano: salita da `+2` a `−3,5` del viewBox, scala 0,4 → 1,1, opacità 0 → 1 → 0 |
 | Il segno da solo, alle tre misure della pagina d'ingresso | si riconosce come tazza anche a 16 px | a 56 px tazza, manico, liquido e bolle; a 24 e a 16 la sagoma regge e restano il manico e il pelo del liquido |
 | Si scorre a metà pagina | barra **e** piede restano in vista | a `scrollY` 400 tutti e due dentro la finestra: `position: sticky`, `bottom: 0` — e il piede resta nel flusso, quindi non copre niente |
 | Le regole dell'incavo, nel CSS **generato** | sei, tre per lato, che sommano il rientro della taglia | `.pt-[calc(var(--spacing)*2_+_env(safe-area-inset-top))]` e le altre cinque, tutte risolte in `calc(... + env(...))`; il `meta` della pagina porta `viewport-fit=cover`, che è quello che le accende |
@@ -408,6 +411,13 @@ si nota solo sapendo che cosa cercare. ⚠️ E il portale ha un prezzo che ques
 le posizioni sono **pixel della finestra**, quindi le corsie e il centraggio non si provano più
 leggendo l'elemento. Si provano sulla funzione che li calcola, dandole un riquadro finto; dove
 nascono **davvero** lo dicono le righe qui sopra.
+
+⚠️ **E per il giro dopo non l'ha aperto affatto**, portando invece _questa_ pagina su ko-fi:
+trovato dall'utente, che ci ha perso lo stato dell'applicazione. È lo stesso `null` di prima con
+una causa diversa — un browser che blocca davvero le finestre nuove — e la lezione è che il ripiego
+non deve esistere: se la scheda non si apre, il comando smette di trattenere il clic e il
+successivo lo fa il browser. Un piede non ha nessun diritto di portarsi via la pagina in cui si sta
+lavorando.
 
 ⚠️ **Per un giro il comando ha aperto ko-fi due volte**, e le righe di questo scenario non se ne
 accorgevano perché guardavano **quando** si apriva, non **come**. La scheda nuova partiva e insieme

@@ -386,6 +386,60 @@
 }
 
 /* ─────────────────────────────────────────────────────────────────────────────
+ * `PotionMugIcon`. Le bolle che scappano dalla tazza.
+ * ───────────────────────────────────────────────────────────────────────────── */
+
+/* ⚠️ I `px` qui sono **unità del viewBox**, non pixel dello schermo: una `transform` su un
+ * elemento SVG lavora nel sistema di coordinate utente, quindi 3,5 su una griglia da 24 restano
+ * proporzionati a qualunque misura l'icona venga resa. */
+@keyframes pb-potion-bubble {
+  0% {
+    opacity: 0;
+    transform: translateY(2px) scale(0.4);
+  }
+  25% {
+    opacity: 1;
+  }
+  75% {
+    opacity: 0.85;
+  }
+  100% {
+    opacity: 0;
+    transform: translateY(-3.5px) scale(1.1);
+  }
+}
+
+/* ⚠️ **Le bolle salgono solo dentro chi lo chiede.** Un'icona che si anima da sola ovunque la si
+ * metta è invadente, e `PotionMugIcon` è pubblica: la classe sta sul **comando**, non sul disegno.
+ * Chi monta il piede se la trova accesa; chi usa la tazza dentro una tabella no.
+ *
+ * ⚠️ E serve `transform-box: fill-box`, o `scale` conterebbe dall'origine del viewBox e la bolla
+ * si allontanerebbe invece di gonfiarsi — è la stessa trappola del perno delle zampe del ratto,
+ * dall'altro lato. */
+.pb-potion-live .pb-potion-bubble {
+  transform-box: fill-box;
+  transform-origin: center;
+  animation: pb-potion-bubble 3.4s ease-out infinite;
+}
+
+/* Le tre non partono insieme: tre bolle simultanee sono un lampeggio, tre sfalsate sono una
+ * pozione che ribolle. È la stessa regola dei due autori che si sfalsano di due secondi. */
+.pb-potion-live .pb-potion-bubble-b {
+  animation-delay: 1.15s;
+}
+
+.pb-potion-live .pb-potion-bubble-c {
+  animation-delay: 2.3s;
+}
+
+/* Sotto il dito o il puntatore la pozione bolle più forte. Il fuoco conta quanto il passaggio:
+ * chi arriva da tastiera vede la stessa cosa. */
+.pb-potion-live:hover .pb-potion-bubble,
+.pb-potion-live:focus-visible .pb-potion-bubble {
+  animation-duration: 1.5s;
+}
+
+/* ─────────────────────────────────────────────────────────────────────────────
  * `ParticleBurst`. Un segno che parte dal centro, vola via e svanisce.
  * ───────────────────────────────────────────────────────────────────────────── */
 
@@ -635,6 +689,7 @@
   .pb-comic-bubble,
   .pb-hover-hint,
   .pb-particle,
+  .pb-potion-live .pb-potion-bubble,
   [class*='animate-'],
   .pb-rat--running .pb-rat-part,
   .pb-rat--running .pb-rat-body,

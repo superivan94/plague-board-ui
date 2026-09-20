@@ -16,9 +16,20 @@ const MUG_PATH =
 const BREW_PATH =
   'M4.7 12.1C6.4 11 8.3 13 10 12.1C11.7 11.2 13.6 13.2 15.3 12.1V14A5.3 5.3 0 0 1 4.7 14V12.1M7.6 14.3A0.95 0.95 0 0 0 7.6 16.2A0.95 0.95 0 0 0 7.6 14.3M11.4 16A0.75 0.75 0 0 0 11.4 17.5A0.75 0.75 0 0 0 11.4 16Z';
 
-/** Le tre bolle che scappano dalla tazza: il segno che dentro qualcosa ribolle. */
-const FUMES_PATH =
-  'M6.95 5.2A1.25 1.25 0 1 0 9.45 5.2A1.25 1.25 0 1 0 6.95 5.2M10.95 3.2A0.95 0.95 0 1 0 12.85 3.2A0.95 0.95 0 1 0 10.95 3.2M13.15 6A0.75 0.75 0 1 0 14.65 6A0.75 0.75 0 1 0 13.15 6Z';
+/**
+ * Le tre bolle che scappano dalla tazza: il segno che dentro qualcosa ribolle.
+ *
+ * ⚠️ Sono **tre tracciati e non uno**, perché ognuna deve poter salire per conto suo: unite in un
+ * `d` solo si muoverebbero in blocco, e tre bolle che partono insieme sono un lampeggio. Le classi
+ * servono ad `animations.css`, che le anima **solo** dentro un `.pb-potion-live`.
+ */
+const BUBBLE_PATHS = [
+  'M6.95 5.2A1.25 1.25 0 1 0 9.45 5.2A1.25 1.25 0 1 0 6.95 5.2Z',
+  'M10.95 3.2A0.95 0.95 0 1 0 12.85 3.2A0.95 0.95 0 1 0 10.95 3.2Z',
+  'M13.15 6A0.75 0.75 0 1 0 14.65 6A0.75 0.75 0 1 0 13.15 6Z',
+] as const;
+
+const BUBBLE_CLASSES = ['pb-potion-bubble', 'pb-potion-bubble pb-potion-bubble-b', 'pb-potion-bubble pb-potion-bubble-c'] as const;
 
 /**
  * **La tazza di pozione.** Il segno delle donazioni dei Ludoratti: una tazza col manico, piena a
@@ -35,13 +46,20 @@ const FUMES_PATH =
  *
  * ⚠️ **Non è {@link PoisonIcon}, e non la sostituisce.** L'ampolla resta il veleno: un accento
  * su un'azione dentro l'applicazione. Questa è un **invito**, e vive nel piede.
+ *
+ * ⚠️ **Da sola sta ferma.** Le bolle salgono soltanto dentro un antenato con la classe
+ * `pb-potion-live` — che {@link SupportButton} mette da sé — perché un segno che si anima ovunque
+ * lo si metta è invadente, e questa icona è pubblica. Le regole stanno in `animations.css`, che
+ * chi installa importa insieme al tema.
  */
 export function PotionMugIcon(props: IconProps) {
   return (
     <IconBase {...props}>
       <path d={MUG_PATH} fillRule="evenodd" />
       <path d={BREW_PATH} fillRule="evenodd" />
-      <path d={FUMES_PATH} fillRule="evenodd" />
+      {BUBBLE_PATHS.map((d, posto) => (
+        <path key={d} d={d} className={BUBBLE_CLASSES[posto]} />
+      ))}
     </IconBase>
   );
 }

@@ -502,22 +502,43 @@ exist in target module» che **non sono veri**. Si guarda la pagina, o si crede 
   chi ha premuto sulla scheda nuova, e quello che succede su questa non lo vede nessuno —
   segnalato dall'utente sul comando delle donazioni. La cura è fermare la navigazione
   (`preventDefault`), far partire l'effetto e aprire **dopo**: ⚠️ `window.open` dentro un
-  `setTimeout` funziona ancora, perché l'attivazione che un clic concede dura qualche secondo e non
-  finisce con la funzione — ma se qualcuno blocca le finestre nuove torna `null`, e lì si va nella
-  stessa scheda invece di non fare niente. ⚠️ **E allora fra le opzioni di `window.open` non ci può
+  `setTimeout` funziona ancora, perché l'attivazione che un clic concede non finisce con la
+  funzione — ma **dura poco, e non uguale dappertutto**. Misurata il 2026-09-20 con
+  `navigator.userActivation.isActive` sul browser dello strumento: viva a 4,2 s, spenta a 5,2 —
+  i canonici cinque secondi. Firefox però dichiara **un secondo** (`dom.disable_open_click_delay`)
+  e Safari pretende che l'apertura stia dentro il gesto. Quindi l'attesa si tiene **sotto il
+  secondo** (`MAX_WAIT_MS` a 900 ms) e si rinuncia all'ultimo pezzo dell'effetto, che intanto
+  continua sotto la scheda nuova. ⚠️ **E quando la scheda non si apre, la pagina di chi ha premuto
+  non si tocca**: portarla all'indirizzo — la prima idea — vuol dire far perdere lo stato
+  dell'applicazione a chi voleva fare una donazione, e l'utente l'ha segnalato due volte. Si
+  smette invece di trattenere il clic: il successivo lo fa il browser col gesto vero, che nessuno
+  blocca. ⚠️ **E allora fra le opzioni di `window.open` non ci può
   stare `noopener`**: con quella parola la specifica prescrive che il valore di ritorno sia `null`
   **anche quando la scheda si è aperta**, quindi il ripiego non distingue più il successo dal
   blocco, scatta sempre, e chi ha premuto si ritrova la stessa pagina **due volte** — segnalato
   dall'utente il 2026-09-20, che vedeva aprirsi due ko-fi. Il legame si recide subito dopo con
   `scheda.opener = null`; il prezzo è il `Referer`, che con `noreferrer` non sarebbe partito.
-  ⚠️ **Nel riquadro del browser dello strumento questo difetto non si vede**: lì le finestre nuove
-  sono bloccate sempre, `open` torna `null` per l'altro motivo, e si apre una pagina sola. Si
-  misura mettendo una **spia al posto di `window.open`** che registra gli argomenti e torna una
-  finestra finta. ⚠️ **E i clic speciali restano del browser**: ctrl, cmd,
+  ⚠️ **Nel riquadro del browser dello strumento questi difetti non si vedono**: lì le finestre
+  nuove sono bloccate sempre, `open` torna `null` per l'altro motivo, e nel primo caso si apriva
+  una pagina sola. Si misura mettendo una **spia al posto di `window.open`** che registra gli
+  argomenti e torna quello che si vuole provare — una finestra finta per il caso buono, `null` per
+  il caso bloccato. ⚠️ **E i clic speciali restano del browser**: ctrl, cmd,
   shift, alt e il tasto centrale si lasciano passare, o si toglie a chi legge un gesto che si
   aspetta. ⚠️ Quanto aspettare **non si scrive nel comando**: lo chiede all'effetto, che è l'unico
   a sapere quante particelle sono e quanto vola la più lenta — `burst()` restituisce i millisecondi,
-  e `0` quando non è partito niente. Misurato: 1728 ms fra il clic e l'apertura.
+  e `0` quando non è partito niente. Poi il comando lo **taglia** al suo tetto: misurati 1728 ms di
+  fontana, 904 fra il clic e l'apertura.
+- ⚠️ **Un'icona che si anima da sola è invadente: l'interruttore sta su chi la monta, non sul
+  disegno.** `PotionMugIcon` porta le classi sui suoi pezzi (`pb-potion-bubble`, più due per i
+  ritardi) e `animations.css` le anima **solo** dentro un antenato `.pb-potion-live`, che è
+  `SupportButton` a mettere. Così la stessa tazza dentro una tabella resta ferma, e una classe di
+  troppo non fa niente invece di far muovere qualcosa. ⚠️ **E le bolle vanno in tre tracciati
+  separati**: in un `d` solo si muoverebbero in blocco, e tre bolle simultanee sono un lampeggio —
+  la stessa regola dei due autori che sfalsano il cenno di due secondi. ⚠️ I `px` di una
+  `transform` su un elemento SVG sono **unità del viewBox**, non pixel dello schermo, e `scale`
+  vuole `transform-box: fill-box` o conta dall'origine del viewBox e la bolla scappa di lato.
+  Misurato: da `+2` a `−3,5` di salita, scala da 0,4 a 1,1, opacità 0 → 1 → 0; 3,4 s a riposo,
+  1,5 s sotto il puntatore o col fuoco.
 - ⚠️ **Un segno che sostituisce il testo appartiene a una convenzione prima che al tema.** Sotto le
   32rem il comando delle donazioni si riduce a **36 px**: resta il solo segno, e l'ampolla della
   peste — bella, nostra e a tema — non diceva a che cosa serviva quel comando. Le convenzioni che
