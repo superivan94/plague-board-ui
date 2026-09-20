@@ -838,10 +838,13 @@ sopra c'è un velo del colore del marchio al 10%, che tinge senza sparire nei du
 `surface` contro pagina fa comunque 1,09 in chiaro e 1,14 in scuro: a staccare una scheda, in
 HeroUI, è **l'ombra**, non il fondo. Il nostro bordo verde ci si aggiunge.
 
-⚠️ **Un colore tradotto dal canvas esce premoltiplicato per l'alfa.** Il metodo di `CLAUDE.md` —
-dipingere il colore su una tela 1×1 e leggere il pixel — su un colore **traslucido** restituisce
-già `colore × alfa`: ricomporlo sul fondo moltiplicando di nuovo per l'alfa lo scurisce due volte.
-Il bordo del pannello misurava **2,75** invece di **1,99**. Si divide per l'alfa prima di comporre.
+⚠️ **Un colore traslucido non si misura come se fosse pieno.** Il metodo di `CLAUDE.md` —
+dipingere il colore su una tela 1×1 e leggere il pixel — su un colore **traslucido** va completato
+componendolo sul fondo con la sua alfa, `c·α + fondo·(1−α)`; letto come tinta piena, il bordo del
+pannello misurava **2,75** invece di **1,99**. ⚠️ **E si compone soltanto: non si divide.** Questa
+riga prescriveva anche una divisione per l'alfa, e il 2026-09-20 la sonda ha mostrato che è di
+troppo — `getImageData` smonta da sé la premoltiplicazione della tela, quindi dividere raddoppia il
+colore. Vedi la riga corretta in `CLAUDE.md` § Cose misurate.
 
 **Che cosa protegge:** i tre pezzi sono i primi della libreria che **vestono** un componente di
 HeroUI invece di essere scritti da zero, e il modo in cui si rompono è che il vestito non arrivi:
@@ -940,8 +943,8 @@ un errore di codice: è un disegno adottato per il suo **nome** e mai guardato a
 **Preparazione:** `npm run build`, poi **riavviare** il dev server — `animate-glitch` e
 `animate-reveal` nascono da `@theme`, e Tailwind le cerca nel testo di `dist/`, che non
 riscandaglia da sé. Pagina `http://localhost:3100/atmosfera`, sezione «il nome che si disturba».
-I contrasti si misurano dipingendo il colore su una tela 1×1 e **dividendo per l'alfa** prima di
-comporre; il tema si commuta scrivendo `pb-playground-theme` in `localStorage` e ricaricando.
+I contrasti si misurano dipingendo il colore su una tela 1×1 e **componendolo sul fondo con la sua
+alfa**; il tema si commuta scrivendo `pb-playground-theme` in `localStorage` e ricaricando.
 
 | Azione | Atteso | Ottenuto |
 |---|---|---|
@@ -997,3 +1000,54 @@ diversi e ognuno si ripara da solo — l'albero di accessibilità con `aria-hidd
 `ludoratti.it` le copie sono pseudo-elementi, dove il primo problema è **peggiore** e gli altri due
 identici. E protegge la sola cosa che un easter egg di testo deve fare: **farsi leggere** quando
 compare.
+
+### La schermata di accesso, e l'attesa che sembrava un comando spento — 2026-09-20
+
+**Esegue:** agente
+
+**Ultima esecuzione:** agente, 2026-09-20
+
+**Preparazione:** `npm run build`, poi **riavviare** il dev server — `bg-brand-ink/50` è una classe
+nuova nei sorgenti della libreria, e Tailwind non riscandaglia `dist/` da sé. Pagina
+`http://localhost:3100/accesso`. I contrasti si misurano dipingendo il colore su una tela 1×1 e
+**componendolo sul fondo con la sua alfa**, un livello alla volta; il tema si commuta scrivendo
+`pb-playground-theme` in `localStorage` e ricaricando.
+
+| Azione | Atteso | Ottenuto |
+|---|---|---|
+| I tracciati di `GoogleIcon` | i quattro colori del marchio, nessuno `currentColor` | `#4285F4 · #34A853 · #FBBC05 · #EA4335`, in quest'ordine |
+| Passargli `color` | errore in **compilazione** | `tsc` rosso; e togliendo `Omit<…,'color'>` diventa `TS2578: Unused '@ts-expect-error' directive` — il caso ha i denti |
+| Il comando in attesa: attributi | non premibile, ma raggiungibile | `aria-disabled="true"` · `disabled` **false** · `tabIndex` 0 · `data-pending="true"` |
+| Il comando in attesa: aspetto | qualcosa che dica «sta lavorando» | ⚠️ `opacity: 0.5`, `cursor: not-allowed`, `pointer-events: none` — cioè l'aspetto di un comando **disabilitato** |
+| Da dove viene quell'aspetto | da `[data-pending]`, si direbbe | ⚠️ no: `status-pending` è solo `pointer-events: none`; a dipingere è la regola del **disabilitato**, che guarda `[aria-disabled="true"]` |
+| Il cerchio che gira | c'è in attesa, non c'è a riposo, ed è muto | `[data-slot="spinner"]` presente solo in attesa, con `aria-hidden="true"` |
+| L'etichetta sotto il velo, tema scuro | ≥ 4,5 anche a metà opacità | **19,74** a riposo, **5,20** in attesa |
+| Il bordo della variante `outline` | ≥ 3 per identificare il comando | ⚠️ **1,38** in scuro e **1,23** in chiaro: è il `--border` di HeroUI, dichiarato e non corretto qui |
+| I fili di `PlagueDivider` | due separatori veri, larghi uguali | due `<hr>` `data-slot="separator"`, `flex-grow: 1`, `flex-basis: 0%`, stessa larghezza |
+| Il loro colore, prima | visibile su pagina e su pannello | ⚠️ `--separator`: **1,26** sulla pagina e **1,10** dentro il pannello, in scuro |
+| Il loro colore, dopo (`bg-brand-ink/50`) | come il bordo di `PlaguePanel` | **3,85** sulla pagina e **3,83** sul pannello in scuro, **1,98** sulla pagina in chiaro |
+| Le classi di HeroUI per una riga con la parola in mezzo | usarle, se ci sono | ⚠️ `separator__container`, `__line` e `__content` esistono **solo nel CSS**: zero occorrenze in tutto il `dist` dei componenti |
+| Il segno del separatore | due di serie, nessuno con `icon={null}` | 2 `<svg>` e 0 |
+| Il titolo di `LoginScreen` | l'`h1` della pagina, non un `h3` | `H1`, classi `card__title text-xl`, `font-size` **20px** — l'utility vince sul `text-sm` del layer `components` |
+| Senza sottotitolo | niente paragrafo vuoto | `[data-slot="card-description"]` assente |
+| Il fondale e i ratti | la città c'è sempre, i ratti passano da soli | `.pb-city-block` presente; con `hasRats={false}`, zero `.pb-rat-run` dopo 20 s |
+| A 375px | niente scorrimento di lato, e la parola non va a capo | `scrollWidth` **375** = `innerWidth`; pannello 311, comando 277, fili 47–113, parola su una riga |
+| Gate | verde | build, typecheck, lint 0/0, **390 test**, **dodici** pagine statiche |
+
+⚠️ **In HeroUI 3 un comando in attesa si veste da comando spento, e nessuno dei due nomi lo dice.**
+`isPending` di `react-aria` fa la cosa giusta dove conta — non parte niente, il fuoco resta dov'è,
+il cambio viene annunciato — ma scrive `aria-disabled="true"`, e la regola del disabilitato di
+HeroUI guarda proprio quell'attributo: velo al 50% e cursore sbarrato. Lo stato `pending` suo, di
+grafica, non porta niente. Quindi il segno che distingue «sto lavorando» da «non si può» lo deve
+mettere il componente, ed è lo scambio del marchio col cerchio.
+
+⚠️ **Il `Separator` di HeroUI non accetta contenuto, e il suo CSS finge di sì.** Il foglio di stile
+porta `separator__container`, `separator__line` e `separator__content` — cioè esattamente la riga
+con la parola in mezzo — ma nessun componente le emette: sono classi morte, come lo erano
+`animate-glitch` e `animate-reveal` qui prima di `GlitchText`. La riga si fa quindi con **due**
+separatori e la parola in mezzo, e il prezzo — un annuncio in più — è dichiarato.
+
+**Che cosa protegge:** è la prima superficie della libreria che tutte e quattro le applicazioni
+useranno uguale, e il modo in cui si rompe non si vede guardandola: un'attesa che sembra un guasto,
+una riga divisoria che non c'è, un marchio di terzi «sistemato» da chi non sapeva perché era
+diverso, un titolo che a schermo è giusto e nell'albero dei livelli è un `h3` sotto a niente.

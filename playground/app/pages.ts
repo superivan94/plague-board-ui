@@ -94,6 +94,13 @@ export const PLAYGROUND_PAGES: readonly PlaygroundPage[] = [
     family: 'fondamenta',
   },
   {
+    href: '/accesso',
+    title: 'L’accesso',
+    components: ['GoogleIcon', 'GoogleSignInButton', 'PlagueDivider', 'LoginScreen'],
+    blurb: 'La schermata con cui si entra, scomposta: il marchio, il comando, la riga, la scena.',
+    family: 'fondamenta',
+  },
+  {
     href: '/profilo',
     title: 'La scheda',
     components: ['PlagueAvatar', 'ThematicBadge', 'PlaguePanel'],

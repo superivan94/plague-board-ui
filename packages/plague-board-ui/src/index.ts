@@ -43,6 +43,16 @@ export {
   PLAGUE_FOOT_MARK_SIZE,
   type PlagueBarSize,
 } from './brand/plagueBarSizes';
+// La schermata di accesso, scomposta. ⚠️ È una superficie **condivisa**: tutte e quattro le
+// applicazioni dei Ludoratti entrano con un account Google, e oggi ognuna se l'è disegnata da sé.
+// Quello che resta fuori sono i testi e l'autenticazione — la libreria non sa che cosa sia
+// Firebase, e chi la usa passa la funzione che accede davvero.
+export { GoogleSignInButton, type GoogleSignInButtonProps } from './brand/GoogleSignInButton';
+export { PlagueDivider, type PlagueDividerProps } from './brand/PlagueDivider';
+// ⚠️ L'unico componente della libreria che ne compone altri, e il solo posto in cui ha senso: la
+// schermata intera. Chi ne vuole una diversa prende i pezzi qui sopra, che non sanno di lei.
+export { LoginScreen, type LoginScreenProps } from './brand/LoginScreen';
+
 // L'audio di fondo, nella stessa forma del livello tossico: un provider che tiene la traccia, e i
 // comandi che la governano da dove vuole chi monta la pagina.
 // ⚠️ La traccia viaggia col pacchetto, in `assets/`, e l'indirizzo lo risolve il bundler di chi
@@ -120,6 +130,10 @@ export { DiceIcon } from './icons/DiceIcon';
 // ⚠️ L'unica icona che non è quadrata, e l'unica che porta un'altezza sua: una goccia è alta due
 // volte e mezzo tanto, e cadendo si allunga ancora.
 export { DripIcon, type DripIconProps } from './icons/DripIcon';
+// ⚠️ L'unica icona che non è nostra e l'unica che **non si tinge**: `GoogleIconProps` è `IconProps`
+// meno `color`, perché le linee guida di Google pretendono il marchio così com'è. Il tipo esce di
+// qui apposta — è lui a fermare in compilazione chi prova a uniformarla alle altre.
+export { GoogleIcon, type GoogleIconProps } from './icons/GoogleIcon';
 export { MoleculeIcon } from './icons/MoleculeIcon';
 export { PoisonIcon } from './icons/PoisonIcon';
 export { PotionMugIcon } from './icons/PotionMugIcon';

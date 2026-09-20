@@ -28,6 +28,10 @@ import {
 //
 // `paint` non è un dettaglio del disegno: un'icona a tratto porta il colore su `stroke` e ha
 // `fill="none"`, e chi le scambia ottiene una macchia nera o un'icona invisibile.
+//
+// ⚠️ Due icone non stanno in tabella, e non è una dimenticanza: `DripIcon` non è quadrata e ha il
+// suo blocco in fondo a questo file, `GoogleIcon` non si tinge e sta in `Login.test.tsx` con gli
+// altri pezzi della schermata di accesso.
 interface IconEntry {
   readonly name: string;
   readonly Icon: ComponentType<IconProps>;

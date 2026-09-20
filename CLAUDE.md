@@ -831,11 +831,16 @@ exist in target module» che **non sono veri**. Si guarda la pagina, o si crede 
   icone da ventuno, con l'attributo ancora addosso. Non somiglia a un difetto, somiglia a una
   tabella stretta. La misura va scritta nelle **colonne** — `repeat(n, 3.5rem)` — e l'involucro
   lasciato traboccare con `overflow-x-auto`.
-- ⚠️ **Il colore letto dalla tela 1×1 esce premoltiplicato per l'alfa.** È la seconda metà del
-  metodo dei contrasti: su un colore opaco il pixel è il colore, su uno **traslucido** è già
-  `colore × alfa`, e ricomporlo sul fondo moltiplicando di nuovo lo scurisce due volte. Misurato
-  il 2026-09-20 sul bordo di `PlaguePanel`: **2,75** invece di **1,99**. Si divide per l'alfa
-  prima di comporre.
+- ⚠️ **Il colore letto dalla tela 1×1 torna con l'alfa a parte, e va _composto_ — non diviso.** È
+  la seconda metà del metodo dei contrasti, e questa riga prima diceva il contrario. Misurato il
+  2026-09-20: `rgba(163,230,53,.5)` dipinto su una tela vuota si rilegge `[163, 229, 54, 128]` —
+  il colore è intero e l'alfa sta nel quarto canale, perché `getImageData` **smonta** la
+  premoltiplicazione che la tela usa al suo interno. Dividere un'altra volta per l'alfa raddoppia
+  il colore: lo stesso verde al 50% sul pannello usciva **13,06** invece di **3,83**, ed è 3,83 il
+  numero che il repository ha già scritto per quel bordo. La regola è una: si prende il colore
+  com'è e lo si compone sul fondo con la sua alfa — `c·α + fondo·(1−α)` — un livello alla volta,
+  dal più basso in su. Quello che resta vietato è **ignorarla**, che era il difetto di partenza:
+  un velo al 15% letto come tinta piena dà il contrasto di una tinta piena.
 - ⚠️ **Un elemento decorativo che duplica testo vero sbaglia in tre mondi, e nessuno dei tre si
   vede guardando la pagina.** Il disturbo sul nome dell'aggregatore è il testo ricopiato due volte
   e sfalsato: l'albero di accessibilità si cura con `aria-hidden` — di là le copie sono
@@ -884,6 +889,39 @@ exist in target module» che **non sono veri**. Si guarda la pagina, o si crede 
   **dentro** di lei. ⚠️ E il dentro non è un dettaglio: opacità e `clip-path` valgono per tutto il
   sottoalbero, quindi le copie compaiono e spariscono col lampo; messe accanto girerebbero sopra il
   nome anche nei tre secondi in cui il lampo non c'è.
+- ⚠️ **In HeroUI 3 l'attesa di un comando è `isPending`, non `isDisabled` — e si veste da
+  comando spento.** La prop arriva da `react-aria` e il `Button` di HeroUI la inoltra intatta: fa
+  la cosa giusta dove conta — non parte niente, il fuoco **resta** sul comando invece di cadere sul
+  `body` mentre la pagina risponde, e il cambio viene annunciato a chi ci sta sopra. Ma scrive
+  `aria-disabled="true"`, e la regola del **disabilitato** di HeroUI guarda proprio quell'attributo:
+  misurati `opacity: 0.5` e `cursor: not-allowed`, mentre il suo `status-pending` è
+  `pointer-events: none` e nient'altro. Quindi «sto lavorando» e «non si può» hanno lo stesso
+  aspetto, e a distinguerli dev'essere il componente — in `GoogleSignInButton` è il marchio che
+  lascia il posto al cerchio. ⚠️ E il cerchio si mette `aria-hidden`: lo `Spinner` di HeroUI nasce
+  `role="status"` con dentro «Loading», una parola inglese non traducibile, e sarebbe un secondo
+  annuncio per lo stesso fatto.
+- ⚠️ **Il `Separator` di HeroUI non accetta contenuto, e il suo CSS finge di sì.** Rende un `<hr>`
+  coi soli `separatorProps` — letto nel sorgente di `react-aria-components` — quindi la riga con
+  una parola in mezzo si fa con **due** separatori, non con uno. Il foglio di stile porta però
+  `separator__container`, `separator__line` e `separator__content`, cioè esattamente quella riga:
+  classi che **nessun componente emette** (zero occorrenze in tutto il `dist`), come lo erano qui
+  `animate-glitch` e `animate-reveal`. Appoggiarcisi vorrebbe dire dipendere da qualcosa che la
+  prossima versione può togliere senza che niente diventi rosso.
+- ⚠️ **Un marchio di terzi non «ignora» il colore: glielo si toglie dal tipo.** `GoogleIcon` porta
+  i quattro colori scritti sui tracciati — l'unico caso in cui `IconBase` non li lascia ereditare da
+  `currentColor` — e il suo tipo è `Omit<IconProps, 'color'>`. Una prop accettata e ignorata è la
+  forma peggiore: a schermo non si vede niente e chi l'ha passata crede solo che non funzioni,
+  mentre così il primo che prova a uniformarla alle altre trova un errore di compilazione e va a
+  leggere il perché scritto accanto. ⚠️ Resta assegnabile dove si aspetta un'icona qualunque,
+  perché una funzione che accetta *meno* prop sta al posto di una che ne accetta di più. E il test
+  che lo difende è un `@ts-expect-error`: senza l'`Omit`, `tsc` dà `TS2578`.
+- ⚠️ **`Card.Title` di HeroUI è un `h3`, e cambiarglielo costa un `'use client'`.** L'elemento si
+  sostituisce solo con `render`, che è una funzione: da una pagina server non attraversa il
+  confine, quindi il modulo che la scrive dev'essere lui il confine. È il prezzo che paga
+  `LoginScreen` per avere l'`h1` che una schermata di accesso deve avere — un `h3` sotto a niente
+  è un salto di livello che a schermo non si vede. ⚠️ **La taglia invece non si scontra**: la sua
+  classe è `card__title`, che tiene il `text-sm` dentro `@layer components`, e una utility vince su
+  un layer — misurato `card__title text-xl` → `font-size: 20px`.
 
 ## Memoria di sessione
 
