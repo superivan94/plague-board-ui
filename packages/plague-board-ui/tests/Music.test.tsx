@@ -1,7 +1,10 @@
+import { existsSync, statSync } from 'node:fs';
+import { join } from 'node:path';
+
 import { fireEvent, render, screen } from '@testing-library/react';
 import { afterEach, describe, expect, it, vi } from 'vitest';
 
-import { MusicProvider, MusicToggle, MusicVolume, useMusic } from '../src';
+import { LUDORATTI_TRACK_URL, MusicProvider, MusicToggle, MusicVolume, useMusic } from '../src';
 
 /**
  * jsdom non sa suonare: `HTMLMediaElement.play` **non è implementato** e lanciare è tutto quello
@@ -59,6 +62,45 @@ describe('MusicProvider', () => {
     expect(audio).toHaveAttribute('preload', 'none');
     expect(audio).toHaveAttribute('src', '/audio/LudoRatti.mp3');
     expect(audio).toHaveProperty('loop', true);
+  });
+
+  it('senza `src` monta la traccia che viaggia col pacchetto', () => {
+    spiaAudio('suona');
+    const { container } = render(
+      <MusicProvider>
+        <MusicToggle />
+      </MusicProvider>,
+    );
+
+    // ⚠️ Si guarda l'**attributo**, non la proprietà: `audio.src` la risolve contro la base del
+    // documento, e qui l'indirizzo è un `file://` perché fuori da un bundler `import.meta.url` è
+    // il modulo stesso. Quello che il contratto promette è che il provider monti *quel* file.
+    expect(container.querySelector('audio')?.getAttribute('src')).toBe(LUDORATTI_TRACK_URL);
+    expect(LUDORATTI_TRACK_URL.endsWith('/assets/ludoratti.mp3')).toBe(true);
+  });
+
+  it('il file che l’indirizzo promette esiste davvero, col peso misurato', () => {
+    // ⚠️ È il guard dell'unico pezzo che nessun compilatore controlla: `LUDORATTI_TRACK_URL` è un
+    // `new URL(…, import.meta.url)`, e se il file venisse rinominato o perso l'espressione
+    // resterebbe **valida** — `tsc` non sa che quella stringa è un percorso, e il difetto uscirebbe
+    // solo come un 404 silenzioso nell'applicazione di chi installa.
+    const traccia = join(process.cwd(), 'assets', 'ludoratti.mp3');
+
+    expect(existsSync(traccia)).toBe(true);
+    // E resta leggera: 1,26 MB misurati, con un margine per un giorno che la si riconverta. Sopra
+    // il tetto, la decisione da rivedere è se la traccia debba ancora viaggiare col pacchetto.
+    expect(statSync(traccia).size).toBeLessThan(1_500_000);
+  });
+
+  it('un `src` dichiarato vince sulla traccia del pacchetto', () => {
+    spiaAudio('suona');
+    const { container } = render(
+      <MusicProvider src="/audio/altro.mp3">
+        <MusicToggle />
+      </MusicProvider>,
+    );
+
+    expect(container.querySelector('audio')).toHaveAttribute('src', '/audio/altro.mp3');
   });
 
   it('fuori dal provider dice che cosa manca, invece di comandare una traccia che non c’è', () => {

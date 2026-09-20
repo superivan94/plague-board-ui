@@ -720,11 +720,37 @@ exist in target module» che **non sono veri**. Si guarda la pagina, o si crede 
   lo blocca, e allora ascolta il primo `click`, `touchstart` o `keydown` della pagina. Vuol dire
   che chi preme un campo per scrivere il proprio nome si ritrova la musica addosso senza sapere
   che cosa l'abbia accesa, e senza aver chiesto niente. `MusicToggle` parte solo quando si preme
-  **lui**, e tiene `preload="none"` perché quei 2,1 MB non li deve pagare chi non preme.
+  **lui**, e tiene `preload="none"` perché quel megabyte e un quarto non lo deve pagare chi non preme.
 - ⚠️ **Il tema si commuta ricaricando, non scrivendo la classe sulla radice da console.** Cambiando
   `documentElement.classList` a mano, su `/atmosfera` metà dei token di HeroUI seguivano e metà no —
   un'opzione non scelta misurava 1,16 in scuro, quando ricaricando ne fa 14,52. Si scrive
   `pb-playground-theme` in `localStorage` e si ricarica, che è la via che usa la pagina.
+- ⚠️ **Un binario in una libreria `tsc` ha una terza via, e sopra i cento chilobyte batte il
+  base64: `new URL('…', import.meta.url)`.** webpack 5 e Turbopack la riconoscono come «questo
+  modulo dipende da quel file»: copiano l'asset nell'output dell'applicazione e sostituiscono
+  l'espressione con l'indirizzo vero — misurato il 2026-09-20 sulla traccia,
+  `/_next/static/media/ludoratti.<hash>.mp3`, identica byte per byte all'originale e servita in
+  **206 Partial Content**, cioè a pezzi. È ciò che la base64 di `RAT_MASCOT_IMAGE` non potrebbe
+  fare: 1,26 MB di audio dentro un modulo sarebbero 1,7 MB di JavaScript scaricati **prima** di
+  sapere se qualcuno preme il comando, e `preload="none"` non vorrebbe più dire niente. ⚠️ **Il
+  prezzo è che un bundler che non conosce quella forma sbaglia in silenzio**: fuori da un bundler
+  `import.meta.url` è il modulo stesso, quindi l'indirizzo esce **plausibile** e punta accanto al
+  file JavaScript — e un `<audio>` che prende 404 non lancia niente. Per questo la prop `src`
+  resta e vince, e per questo un test verifica che il file esista davvero sul disco: è l'unico
+  pezzo che nessun compilatore guarda. ⚠️ E il percorso **webpack** non è verificabile qui:
+  `next build --webpack` su questo playground muore su `client-only` dentro
+  `react-aria-components`, che è un'incompatibilità di HeroUI 3 col vecchio compilatore.
+- ⚠️ **Alzare il bitrate non alleggerisce, e la qualità di una conversione si misura per banda.**
+  Il bitrate *è* quanti dati al secondo: 320 kbps avrebbero portato la traccia da 2,04 a 3,54 MB.
+  La leva vera è il codec, e quale scegliere si decide misurando — `highpass`+`lowpass`+`astats`
+  su bande di 2 kHz, confrontate con l'originale. Su `LudoRatti.mp3` (VBR 182 kbps, 92,88 s):
+  LAME `-q:a 6` sta entro **1,2 dB** fino a 20 kHz a **1256 KB**, mentre 128 CBR costa 200 KB in
+  più ed è peggio su ogni banda; AAC 64 toglie fino a 8,4 dB in cima. ⚠️ **Opus esce identico
+  all'originale e quella misura lo favorisce**: il suo CELT l'energia alta la **sintetizza**
+  invece di trascriverla, quindi l'RMS per banda torna anche dove il dettaglio non c'è più. E la
+  scelta finale non l'ha fatta il rapporto peso/qualità ma la **compatibilità**: MP3 è l'unico
+  formato senza una sola riserva — Safari suona Opus in Ogg solo dal **18.4** (marzo 2025) e prima
+  solo in CAF, e Firefox decodifica AAC solo se glielo presta il sistema.
 
 ## Memoria di sessione
 

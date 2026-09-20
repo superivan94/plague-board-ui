@@ -760,3 +760,48 @@ Di là succede, e non se ne accorge nessuno perché il testo torna leggibile app
 La riga del riferimento in cima alla tabella è lì per ricordare che il difetto è quello, e le due
 righe sui contrasti perché un comando che dice **quale** livello si è scelto, se quel testo non si
 legge, non dice niente.
+
+### La traccia viaggia col pacchetto, e l'indirizzo lo risolve il bundler — 2026-09-20
+
+**Esegue:** agente — serve un `next build` e un browser vero: l'espressione che produce l'indirizzo
+la sostituisce il bundler, quindi in jsdom non è mai stata risolta da nessuno.
+**Ultima esecuzione:** agente, 2026-09-20.
+
+**Preparazione:** `npm run build --workspace packages/plague-board-ui`, poi
+`npm run build --workspace playground`; per le righe sul browser, `npm run playground` e
+`http://localhost:3100/atmosfera`.
+
+| Azione | Atteso | Ottenuto |
+|---|---|---|
+| `find playground/.next -name "*.mp3"` dopo il build | l'asset è stato emesso dall'applicazione, non copiato a mano | `.next/static/media/ludoratti.2g7la1ve2p52_.mp3` |
+| `md5sum` dell'emesso contro `packages/plague-board-ui/assets/ludoratti.mp3` | identici: il bundler copia, non riconverte | `a2b1b94…` per entrambi, **1 286 311 byte** |
+| La stringa nel chunk che monta il provider | non più `new URL(…)` ma un indirizzo assoluto | `"/_next/static/media/ludoratti.2g7la1ve2p52_.mp3"` |
+| `next build` | dieci pagine statiche, come prima | ✅ tutte `○ (Static)` |
+| Sulla pagina, l'attributo `src` dell'`<audio>` | lo stesso indirizzo anche in dev | `/_next/static/media/ludoratti.2g7la1ve2p52_.mp3` |
+| Caricata la pagina, **prima** di premere: `performance.getEntriesByType('resource')` filtrato su `ludoratti` | nessuna richiesta: `preload="none"` | `[]`, con l'`<audio>` già nel DOM |
+| Clic su «Metti la musica», tre secondi | suona dal file del pacchetto | `paused false`, `currentTime` **2,92**, `duration` **92,84**, `volume` 0,4, `aria-pressed` `true` |
+| La richiesta di rete della traccia | servita a pezzi, come un file vero | `GET …/ludoratti.2g7la1ve2p52_.mp3 → 206 Partial Content` |
+
+⚠️ **Il percorso webpack non è stato provato, e non per colpa nostra**: `next build --webpack` su
+questo playground muore prima di arrivare agli asset, con «`client-only` cannot be imported from a
+Server Component» dentro `react-aria-components`. È un'incompatibilità fra HeroUI 3 e il vecchio
+compilatore in Next 16, non un difetto di questa riga: quindi la forma è **misurata su Turbopack**,
+che di Next 16 è il predefinito, e su webpack resta dichiarata e non verificata.
+
+⚠️ **La conversione della traccia si è decisa sui numeri, non a orecchio.** L'originale è un MP3
+**VBR a 182 kbps** medi, stereo 48 kHz, 92,88 s, con dentro **19,7 KB di copertina JPEG** che in un
+`<audio>` non serve a niente. Misurando l'energia per banda (`highpass`+`lowpass`+`astats`) contro
+l'originale, lo scarto in alto è: MP3 128 CBR −0,3/−0,5/−1,0/−1,8 dB (1452 KB), **LAME `-q:a 6`
++0,4/+0,2/−0,4/−1,2 dB (1256 KB)**, `-q:a 7` +0,2/−0,3/−1,2/−2,3 (1104 KB), AAC 64 −2,0/−4,1/−6,5/−8,4
+(747 KB), Opus 48 praticamente identico all'originale (516 KB) — ⚠️ ma quella misura **lo favorisce**,
+perché il CELT di Opus l'energia in alto la **sintetizza** invece di trascriverla. Ha vinto `-q:a 6`
+perché era il vincolo dichiarato: *la più compatibile che non degradi in modo sensibile*, e MP3 è
+l'unico formato senza una sola riserva di compatibilità — Opus lo suona Safari solo dal **18.4**, e
+AAC lo decodifica Firefox solo se glielo presta il sistema.
+
+**Che cosa protegge:** un indirizzo che il bundler non riconoscesse non darebbe un errore: darebbe
+una stringa **plausibile** che punta accanto al file JavaScript, e un `<audio>` che prende 404 non
+lancia niente. Il difetto sarebbe silenzioso e comparirebbe solo nell'applicazione di chi installa,
+mai qui. La riga del `206` è l'altra metà: dice che il file si comporta da file — si scarica a
+pezzi e comincia a suonare prima di essere finito, che è esattamente ciò che un modulo base64 non
+avrebbe potuto fare.

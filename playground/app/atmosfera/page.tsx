@@ -23,7 +23,7 @@ import {
  */
 export default function AtmosferaPage() {
   return (
-    <MusicProvider src="/audio/LudoRatti.mp3" defaultVolume={0.4}>
+    <MusicProvider defaultVolume={0.4}>
       <main className="mx-auto flex min-h-dvh max-w-3xl flex-col gap-10 px-4 py-12">
         <div className="flex flex-col gap-2">
           <h1 className="text-2xl font-semibold">L’atmosfera</h1>
@@ -188,10 +188,16 @@ export default function AtmosferaPage() {
             La musica è fatta come il livello tossico: <code>MusicProvider</code> tiene la traccia,
             lo stato e il volume, e i due comandi la governano da dove vuole chi monta la pagina —{' '}
             <code>MusicToggle</code> è il teschio con le cuffie lassù accanto al selettore,{' '}
-            <code>MusicVolume</code> è il cursore qui sopra. ⚠️ <strong>La traccia non viaggia col
-            pacchetto</strong> — <code>LudoRatti.mp3</code> pesa <strong>2,1 MB</strong>, cento volte
-            il resto della libreria — quindi il provider riceve un indirizzo e il file lo serve chi
-            installa, dalla sua cartella pubblica.
+            <code>MusicVolume</code> è il cursore qui sopra. Senza <code>src</code> il provider suona
+            la traccia dei Ludoratti, che <strong>viaggia dentro il pacchetto</strong>: niente da
+            copiare in <code>public/</code>, perché l’indirizzo lo risolve il bundler
+            dell’applicazione. Chi ne vuole un’altra passa <code>src</code>, che vince.
+          </p>
+          <p className="text-sm text-muted">
+            ⚠️ <strong>1,26 MB per 1m33s</strong>, MP3 a ~111 kbps medi: più del doppio di tutto il
+            resto della libreria, che srotolata pesa 565 KB. Il file non lo scarica chi non preme —
+            l’elemento ha <code>preload=&quot;none&quot;</code> — ma sta comunque nell’output di chi
+            installa, ed è il prezzo di averlo già dentro invece che a carico dell’applicazione.
           </p>
           <p className="text-sm text-muted">
             ⚠️ Il cursore <strong>non si nasconde quando la musica è ferma</strong>, al contrario di

@@ -2,6 +2,8 @@
 
 import { createContext, useContext, useMemo, useRef, useState, type ReactNode } from 'react';
 
+import { LUDORATTI_TRACK_URL } from '../assets/ludorattiTrack';
+
 /** Che cosa sta suonando, a che volume, e le due leve per cambiarlo. */
 export interface MusicValue {
   /** Se la traccia sta suonando **davvero**: lo dicono gli eventi dell'elemento, non i comandi. */
@@ -20,13 +22,16 @@ const ContestoMusica = createContext<MusicValue | null>(null);
 
 export interface MusicProviderProps {
   /**
-   * La traccia da suonare, in ciclo.
+   * La traccia da suonare, in ciclo. Senza, suona quella dei Ludoratti che viaggia col pacchetto —
+   * {@link LUDORATTI_TRACK_URL}.
    *
-   * ⚠️ **Il file non viaggia col pacchetto**: `LudoRatti.mp3` pesa **2,1 MB**, cento volte il resto
-   * della libreria messo insieme, e sarebbe scaricato da chiunque installi il pacchetto — anche da
-   * chi la musica non la vuole. Lo serve l'applicazione dalla sua cartella pubblica.
+   * ⚠️ **Passarne un'altra non toglie la nostra dalla build**: l'indirizzo predefinito lo risolve
+   * il bundler qui dentro, quindi il file finisce comunque nell'output dell'applicazione — 1,26 MB
+   * che nessuno scaricherà, perché un `<audio>` con `preload="none"` non chiede niente finché non
+   * glielo si dice. È il prezzo di avere la traccia già dentro il pacchetto invece che a carico di
+   * chi installa.
    */
-  src: string;
+  src?: string;
   /** Il volume di partenza, da 0 a 1. Una musica di fondo non parte al massimo. */
   defaultVolume?: number;
   children?: ReactNode;
@@ -51,13 +56,13 @@ const tronca = (volume: number) => Math.min(1, Math.max(0, volume));
  *
  * @example
  * ```tsx
- * <MusicProvider src="/audio/LudoRatti.mp3" defaultVolume={0.4}>
+ * <MusicProvider defaultVolume={0.4}>
  *   <PlagueBar><MusicToggle /></PlagueBar>
  *   <SettingsPanel><MusicVolume /></SettingsPanel>
  * </MusicProvider>
  * ```
  */
-export function MusicProvider({ src, defaultVolume = 0.5, children }: MusicProviderProps) {
+export function MusicProvider({ src = LUDORATTI_TRACK_URL, defaultVolume = 0.5, children }: MusicProviderProps) {
   const traccia = useRef<HTMLAudioElement>(null);
   const [isPlaying, setIsPlaying] = useState(false);
   const [volume, setVolumeState] = useState(() => tronca(defaultVolume));

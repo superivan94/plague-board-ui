@@ -41,9 +41,10 @@ export {
 } from './brand/plagueBarSizes';
 // L'audio di fondo, nella stessa forma del livello tossico: un provider che tiene la traccia, e i
 // comandi che la governano da dove vuole chi monta la pagina.
-// ⚠️ La traccia **non** viaggia col pacchetto — `LudoRatti.mp3` pesa 2,1 MB — quindi il provider
-// riceve un indirizzo e il file lo serve chi installa.
+// ⚠️ La traccia viaggia col pacchetto, in `assets/`, e l'indirizzo lo risolve il bundler di chi
+// installa: vedi `LUDORATTI_TRACK_URL`. Chi ne vuole un'altra passa `src`.
 export { MusicProvider, useMusic, type MusicProviderProps, type MusicValue } from './brand/MusicProvider';
+export { LUDORATTI_TRACK_URL } from './assets/ludorattiTrack';
 export { MusicToggle, type MusicToggleProps } from './brand/MusicToggle';
 export { MusicVolume, type MusicVolumeProps } from './brand/MusicVolume';
 // Il pulsare che mette l'occhio su un comando. ⚠️ Niente a che vedere con `PulseDot`, che è un
