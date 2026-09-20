@@ -137,6 +137,24 @@ it('ogni icona è un disegno diverso dalle altre', () => {
   expect(new Set(drawings).size).toBe(icons.length);
 });
 
+it('il teschio con le cuffie porta il nostro cranio, non un secondo teschio', () => {
+  // ⚠️ Chiesto dall'utente il 2026-09-20 guardando il comando della musica, e il caso è qui perché
+  // il difetto non si vede in un file solo: due teschi disegnati a mano nello stesso pacchetto
+  // divergono al primo ritocco, e chi li guarda affiancati nota subito che non sono lo stesso.
+  // Di là ce ne sono **tre**, uno per posto in cui serviva.
+  const solo = render(<SkullIcon />);
+  const cranio = solo.container.querySelector('svg path')?.getAttribute('d');
+  expect(cranio).toBeTruthy();
+
+  for (const ConCuffie of [SkullPhonesIcon, SkullPhonesOffIcon]) {
+    const { container, unmount } = render(<ConCuffie />);
+    const tracciati = [...container.querySelectorAll('svg path')].map((p) => p.getAttribute('d'));
+
+    expect(tracciati).toContain(cranio);
+    unmount();
+  }
+});
+
 describe('DripIcon', () => {
   // ⚠️ Non sta nella tabella qui sopra, e il primo caso dice perché: è l'unica icona che quadrata
   // non è. `IconProps` promette un lato solo perché tutte le altre lo sono, e chi sostituisce
