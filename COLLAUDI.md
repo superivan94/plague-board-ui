@@ -1170,33 +1170,38 @@ per qualunque segno nuovo.
 
 **Che cosa protegge:** un segno che dice un'altra cosa non si rompe, mente — e mente in silenzio.
 
-### Il marchio: due stati, e un cuore che batte dentro il suo anello — 2026-09-20
+### Il marchio: due stati, due perimetri di battito — 2026-09-20
 
 **Esegue:** agente
 
 **Ultima esecuzione:** agente, 2026-09-20
 
-**Preparazione:** `http://localhost:3100/`, sezione «il marchio». I due stati si guardano
-**ingranditi** — la sonda clona i due `<svg>` da 96 e li rende a 240px, togliendo la classe del
-battito perché un'animazione in uno screenshot è un fotogramma a caso — e poi alle misure vere,
-dalla riga da 18 in giù. Il tema si commuta scrivendo `pb-playground-theme` in `localStorage` e
-ricaricando.
+**Preparazione:** `http://localhost:3100/`, sezione «il marchio». I due **stati** si guardano
+ingranditi — la sonda clona i due `<svg>` da 96 e li rende a 240px. I due **perimetri** non si
+guardano: si **fermano**. `document.getAnimations()` filtrate per `pb-heartbeat`, messe in pausa e
+portate a `currentTime = 256`, che è il picco del primo colpo; poi si legge la `transform`
+calcolata su `<svg>` e `<g>`. Uno screenshot di un'animazione che gira è un fotogramma a caso.
 
 | Azione | Atteso | Ottenuto |
 |---|---|---|
 | I due stati a 240px | il pieno è il vuoto riempito, stessa sagoma | sì: le orecchie restano staccate in tutti e due, il contorno non cambia spessore |
 | Lo stato vuoto | identico al marchio di `ludoratti.it` | sì, i due tracciati e i due cerchi sono quelli di prima |
-| L'animazione, dal vivo | il cuore batte, l'anello sta fermo | `pb-heartbeat 3.2s`, `transform-box: view-box`, `transform-origin: 12px 13px` |
-| Quanti gruppi battono sulla pagina | solo quelli che `animateOn` permette | **9**: la barra, i due grandi, i due preferiti pieni, e quattro delle otto tarature |
-| `animateOn="none"` nella tabella delle misure di `/barra` | le tre misure si confrontano ferme | sì |
-| `/stile` | un battito solo, non due moltiplicati | tolta la `animate-heartbeat` dalla `className`: la scala della classe e quella del gruppo si moltiplicavano |
-| I due stati, **chiaro** e **scuro** | si distinguono | sì; il colore è `brand-ink`, già misurato 4,58 e 13,43 — sopra la soglia 3 della grafica |
-| Gate | verde | build, typecheck, lint 0/0, **483 test**, dodici pagine statiche |
+| `beat="whole"` al picco | la scala sull'`<svg>`, il gruppo fermo | `matrix(1.12, 0, 0, 1.12, 0, 0)` sull'`<svg>`, `none` sul gruppo |
+| `beat="inner"` al picco | l'opposto | `none` sull'`<svg>`, `matrix(1.12, …)` sul gruppo |
+| Quanti segni hanno **tutt'e due** le animazioni | zero | **0** — prima di questa passata l'intestazione le aveva entrambe, per un picco a 1,25 |
+| Il perno, variante interna | unità del `viewBox` | `transform-box: view-box`, `transform-origin: 12px 13px` |
+| Il perno, variante intera | il centro del rendering | `transform-origin` risolto a metà del riquadro |
+| ⚠️ `transform-origin` su un `<svg>` **radice** da 96px | in unità del viewBox? | **no**: `center` → `48px 48px`, e `12px 13px` resta a dodici pixel dallo spigolo. È il motivo per cui le classi sono due |
+| Quanti battono sulla pagina | solo quelli che `animateOn` permette | **9**, di cui 8 interi e 1 interno |
+| I due stati, **chiaro** e **scuro** | si distinguono | sì; il colore è `brand-ink`, 4,58 e 13,43 — sopra la soglia 3 della grafica |
+| Gate | verde | build, typecheck, lint 0/0, **486 test**, dodici pagine statiche |
 
-⚠️ **Un'animazione montata dentro un componente e una messa addosso da fuori si moltiplicano.**
-Finché il battito era una `className`, `/stile` lo passava a mano; col battito dentro il
-componente quella riga dava `scale(1.12)` sull'`<svg>` **per** `scale(1.12)` sul gruppo. Non si
-vede come un difetto: si vede come un marchio che pulsa un po' troppo.
+⚠️ **Due animazioni sullo stesso segno si moltiplicano, e non sembra un difetto.** Finché il
+battito era una `className`, l'intestazione e `/stile` lo passavano a mano; col battito dentro il
+componente quelle righe davano `scale(1.12)` sull'`<svg>` **per** `scale(1.12)` sul gruppo. A
+schermo si legge come un marchio che pulsa un po' troppo, non come un errore — si trova cercando
+chi monta il pezzo, non guardandolo. Il conteggio dei doppioni nella tabella qui sopra è la riga
+che lo prende.
 
 **Che cosa protegge:** il marchio è la cosa che si vede per prima su ogni pagina di ogni
 applicazione dei Ludoratti, e il suo battito è quello che lo fa sembrare vivo invece che stampato.

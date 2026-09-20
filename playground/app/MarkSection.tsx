@@ -1,4 +1,4 @@
-import { RatIcon, type RatIconProps, TechLabel, TechRule } from 'plague-board-ui';
+import { RatIcon, type RatIconBeat, type RatIconProps, TechLabel, TechRule } from 'plague-board-ui';
 
 /** Le quattro tarature di `animateOn`, con quello che ognuna serve a dire. */
 const BATTITI: readonly { animateOn: RatIconProps['animateOn']; a_che_serve: string }[] = [
@@ -6,6 +6,12 @@ const BATTITI: readonly { animateOn: RatIconProps['animateOn']; a_che_serve: str
   { animateOn: 'filled', a_che_serve: 'un preferito scelto, che si vede' },
   { animateOn: 'empty', a_che_serve: 'un preferito da scegliere, che chiama' },
   { animateOn: 'none', a_che_serve: 'dentro qualcosa che si legge: fermo' },
+];
+
+/** Le due varianti di perimetro, con quello che ognuna serve a dire. */
+const VARIANTI: readonly { beat: RatIconBeat; a_che_serve: string }[] = [
+  { beat: 'whole', a_che_serve: 'il predefinito: anello e cuore insieme, come in barra' },
+  { beat: 'inner', a_che_serve: 'l’anello fa da recinto fermo e il cuore batte dentro' },
 ];
 
 /** Una finta riga di preferiti, per far vedere i due stati al loro mestiere. */
@@ -38,11 +44,11 @@ export function MarkSection() {
 
         <div className="flex flex-wrap items-end gap-10 text-brand-ink">
           <span className="flex flex-col items-center gap-2">
-            <RatIcon size={96} />
+            <RatIcon size={96} animateOn="none" />
             <TechLabel className="text-muted">vuoto · il marchio</TechLabel>
           </span>
           <span className="flex flex-col items-center gap-2">
-            <RatIcon size={96} isFilled />
+            <RatIcon size={96} isFilled animateOn="none" />
             <TechLabel className="text-muted">pieno · isFilled</TechLabel>
           </span>
         </div>
@@ -73,8 +79,34 @@ export function MarkSection() {
           ⚠️ <strong>Batte da sé</strong>, ed è una deroga dichiarata: la regola della tazza e del
           pallino vuole l’interruttore dell’animazione su chi monta il pezzo, non dentro il disegno.
           Qui è il contrario, perché il battito del marchio è <strong>identità</strong> e chi lo
-          monta non deve ricordarsi di accenderlo. A battere è il <strong>cuore</strong>, non tutto
-          il segno: l’anello è il recinto e resta fermo.
+          monta non deve ricordarsi di accenderlo.
+        </p>
+
+        <div className="flex flex-wrap items-end gap-12 text-brand-ink">
+          {VARIANTI.map(({ beat, a_che_serve }) => (
+            <span key={beat} className="flex w-56 flex-col items-center gap-2 text-center">
+              <RatIcon size={72} beat={beat} />
+              <TechLabel className="text-muted">beat={`"${beat}"`}</TechLabel>
+              <span className="text-xs text-muted">{a_che_serve}</span>
+            </span>
+          ))}
+        </div>
+
+        <p className="text-sm text-muted">
+          Le due varianti sono lo <strong>stesso battito con due perimetri</strong>, non due
+          animazioni: <code>whole</code> lo mette sull’<code>{'<svg>'}</code> e{' '}
+          <code>inner</code> sul gruppo che contiene cuore e orecchie, lasciando fermo l’anello.
+          Alle misure grandi la seconda si legge meglio — un riferimento immobile accanto a una cosa
+          che si muove — mentre a 18 o 24px la differenza quasi non c’è.
+        </p>
+
+        <p className="text-sm text-muted">
+          ⚠️ <strong>Le classi in gioco sono due e non una</strong>, e il motivo è il perno: la
+          variante interna ha bisogno di <code>transform-box: view-box</code> perché il suo{' '}
+          <code>transform-origin</code> è scritto in <strong>unità del viewBox</strong> — 12 · 13,
+          che è il cuore del cuore. Sull’<code>{'<svg>'}</code> esterno quegli stessi numeri
+          tornerebbero pixel dello schermo, e a 96px il marchio pulserebbe attorno a un punto vicino
+          allo spigolo invece che al centro.
         </p>
 
         <div className="flex flex-wrap items-end gap-8 text-brand-ink">

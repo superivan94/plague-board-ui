@@ -27,6 +27,7 @@ const marchio = (props: Parameters<typeof RatIcon>[0] = {}) => {
      * cioè un oggetto, quindi è **sempre** vero e un `toBeFalsy()` su di lui non prova niente.
      */
     classe: svg.querySelector('g')?.getAttribute('class'),
+    classeSvg: svg.getAttribute('class'),
     gruppo: svg.querySelector('g'),
     riempimento: svg.querySelector('path[fill="currentColor"]'),
     /** Le due curve del contorno: sono le sole a portare i capi tondi. */
@@ -74,28 +75,62 @@ describe('RatIcon — il battito', () => {
   it('batte da sé, senza che chi lo monta se lo ricordi', () => {
     // ⚠️ Deroga dichiarata alla regola della tazza e del pallino, dove l'interruttore sta su chi
     // monta il pezzo: questo è il **marchio**, e il suo battito è identità, non decorazione.
-    expect(marchio().gruppo).toHaveClass('pb-mark-beat');
+    expect(marchio().classeSvg).toContain('pb-mark-beat');
   });
 
-  it('si può fermare', () => {
+  it('batte tutto insieme, che è quello che il marchio ha sempre fatto', () => {
+    const { classeSvg, classe } = marchio();
+
+    // ⚠️ La classe va sull'`<svg>` e **non** sul gruppo: da sempre l'intestazione passava
+    // `animate-heartbeat` addosso all'icona intera, e cambiare il predefinito vorrebbe dire
+    // cambiare l'aspetto di ogni marchio già montato senza che nessuno l'abbia chiesto.
+    expect(classeSvg).toContain('pb-mark-beat');
+    expect(classe).toBeFalsy();
+  });
+
+  it('o solo dentro, con l’anello fermo', () => {
+    const { classeSvg, classe } = marchio({ beat: 'inner' });
+
+    // Il modificatore porta il perno in unità del `viewBox`. ⚠️ Senza di lui, sull'`<svg>` esterno
+    // quei numeri tornerebbero pixel dello schermo e a 96px il marchio pulserebbe attorno a un
+    // punto vicino allo spigolo: è per questo che le classi sono due e non una.
+    expect(classe).toBe('pb-mark-beat pb-mark-beat--inner');
+    expect(classeSvg).not.toContain('pb-mark-beat');
+  });
+
+  it('si può fermare, e allora non batte né fuori né dentro', () => {
     expect(marchio({ animateOn: 'none' }).classe).toBeFalsy();
+    expect(marchio({ animateOn: 'none' }).classeSvg).not.toContain('pb-mark-beat');
+    expect(marchio({ animateOn: 'none', beat: 'inner' }).classe).toBeFalsy();
   });
 
   it('e si può far battere in uno stato solo', () => {
     // Il caso vero: una lista di preferiti, dove a muoversi è quello scelto e gli altri stanno
     // fermi — o l'opposto, se a chiamare l'occhio dev'essere quello ancora da scegliere.
-    expect(marchio({ animateOn: 'filled', isFilled: true }).classe).toBe('pb-mark-beat');
-    expect(marchio({ animateOn: 'filled' }).classe).toBeFalsy();
-    expect(marchio({ animateOn: 'empty' }).classe).toBe('pb-mark-beat');
-    expect(marchio({ animateOn: 'empty', isFilled: true }).classe).toBeFalsy();
+    expect(marchio({ animateOn: 'filled', isFilled: true }).classeSvg).toContain('pb-mark-beat');
+    expect(marchio({ animateOn: 'filled' }).classeSvg).not.toContain('pb-mark-beat');
+    expect(marchio({ animateOn: 'empty', beat: 'inner' }).classe).toContain('pb-mark-beat');
+    expect(marchio({ animateOn: 'empty', beat: 'inner', isFilled: true }).classe).toBeFalsy();
   });
 
-  it('l’anello non batte: sta fuori dal gruppo', () => {
-    const { svg, gruppo } = marchio();
+  it('la classe di chi lo monta non si perde quando il marchio batte', () => {
+    // ⚠️ La variante predefinita scrive sull'`<svg>`, cioè sullo stesso attributo che riceve
+    // `className`. Sostituendolo invece di comporlo, un marchio che batte perderebbe il colore e
+    // lo `shrink-0` che chi lo mette in una barra gli ha dato — e si vedrebbe come un marchio
+    // schiacciato, non come una classe persa.
+    const { classeSvg } = marchio({ className: 'text-brand shrink-0' });
+
+    expect(classeSvg).toContain('text-brand');
+    expect(classeSvg).toContain('shrink-0');
+    expect(classeSvg).toContain('pb-mark-beat');
+  });
+
+  it('l’anello non batte da solo: sta fuori dal gruppo', () => {
+    const { svg, gruppo } = marchio({ beat: 'inner' });
     const anello = svg.querySelector('path[stroke-opacity]');
 
-    // ⚠️ L'anello è il recinto, non il soggetto. Dentro il gruppo pulserebbe anche lui, e un
-    // marchio che si gonfia tutto insieme non è un cuore che batte: è un segno che respira.
+    // ⚠️ Nella variante interna l'anello è il recinto, non il soggetto. Dentro il gruppo
+    // pulserebbe anche lui, e le due varianti diventerebbero la stessa cosa.
     expect(anello).toBeInTheDocument();
     expect(gruppo?.contains(anello!)).toBe(false);
   });

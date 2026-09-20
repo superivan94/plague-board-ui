@@ -993,10 +993,32 @@ exist in target module» che **non sono veri**. Si guarda la pagina, o si crede 
   il battito di un marchio è identità e non decorazione, e chi lo monta non deve ricordarsi di
   accenderlo. Chi non lo vuole ha `animateOn`, che è a quattro valori invece che a due booleani
   perché il caso vero non è «anima sì/no» ma **in quale dei due stati**: in una lista di preferiti a
-  muoversi è quello scelto, o quello da scegliere. ⚠️ E a battere è il **cuore**, non tutto il
-  segno: l'anello sta fuori dal gruppo animato, o il marchio respira invece di battere.
+  muoversi è quello scelto, o quello da scegliere.
   ⚠️ **La classe nostra va aggiunta a mano alla regola di `prefers-reduced-motion`**: lì dentro
   `[class*='animate-']` prende le utility di Tailwind e non `.pb-mark-beat`.
+  ⚠️ **E non si usa una utility di Tailwind dentro un componente della libreria**: una utility
+  esiste solo se qualcuno la **genera**, e a generarla è chi installa scandagliando `dist/` — se il
+  suo `@source` non ci arriva, la classe non produce nessuna regola e non anima niente, in
+  silenzio. È la forma di `animate-scale-bounce`. Le nostre classi stanno in `animations.css`, che
+  viaggia com'è.
+- ⚠️ **Il battito del marchio ha due perimetri, ed è lo stesso keyframe su due elementi.** `'whole'`
+  lo mette sull'`<svg>` — anello e cuore insieme, che è quello che il marchio ha sempre fatto in
+  un'intestazione, ed è il predefinito perché cambiarlo modificherebbe l'aspetto di ogni marchio già
+  montato — e `'inner'` sul `<g>` di cuore e orecchie, lasciando l'anello fermo a fare da recinto.
+  Misurato il 2026-09-20 fermando le animazioni a 256 ms, il picco del primo colpo: `matrix(1.12…)`
+  sull'`<svg>` e `none` sul gruppo, e l'esatto contrario nell'altra.
+  ⚠️ **Le classi sono due perché il perno non si può condividere, e il motivo è misurato.** Su un
+  `<svg>` **radice** il riquadro di riferimento di `transform-origin` è quello di **rendering**,
+  anche con `transform-box: view-box`, che è il valore iniziale: a 96px `center` risolve a
+  `48px 48px`, e un `12px 13px` resterebbe dodici e tredici pixel dallo spigolo. Su un elemento
+  **interno**, invece, le stesse due cifre sono coordinate del `viewBox` — 12 · 13 è il cuore del
+  cuore, un po' sotto il centro perché sopra ci sono le orecchie. Quindi `.pb-mark-beat` porta
+  `transform-origin: center` e `.pb-mark-beat--inner` lo sovrascrive col perno vero.
+- ⚠️ **Due animazioni sullo stesso segno si moltiplicano, e non sembra un difetto.** Quando il
+  battito è passato dentro `RatIcon`, l'intestazione del playground continuava a passargli
+  `animate-heartbeat` nella `className`: `scale(1.12)` sull'`<svg>` **per** `scale(1.12)` sul
+  gruppo, cioè un picco a **1,25**. A schermo non si legge come un errore — si legge come un
+  marchio che pulsa un po' troppo. Si trova cercando chi monta il pezzo, non guardandolo.
 - ⚠️ **Il dente di un pezzo di puzzle non si fa con una Bézier, si fa con un arco maggiore.** Un
   dente vero ha il collo più stretto del bulbo, e la curva cubica quel sottosquadro non lo forma:
   all'inizio domina il termine `(1−t)³` del punto di partenza, quindi spingere i punti di controllo

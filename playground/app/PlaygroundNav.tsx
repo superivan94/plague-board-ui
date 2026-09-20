@@ -160,9 +160,14 @@ export function PlaygroundNav() {
               classe il marchio resterebbe a 24 dentro una barra alta come una da 20 — che è il
               modo giusto di sbagliare, ma è comunque sbagliato. */}
           <span className="flex items-center gap-2">
+            {/* ⚠️ Niente `animate-heartbeat` addosso: dal 2026-09-20 il battito lo governa il
+                componente, e le due scale si **moltiplicano** — 1,12 sull'`<svg>` per 1,12 sul
+                gruppo fa un picco a 1,25. Non sembra un difetto: sembra un marchio che pulsa un
+                po' troppo. Qui la variante è quella predefinita, cioè esattamente quello che la
+                barra faceva prima. */}
             <RatIcon
               size={PLAGUE_BAR_MARK_SIZE.medium}
-              className={`animate-heartbeat shrink-0 text-brand ${PLAGUE_BAR_MARK_CLASS.medium}`}
+              className={`shrink-0 text-brand ${PLAGUE_BAR_MARK_CLASS.medium}`}
             />
             <TechLabel className="text-muted">plague-board-ui</TechLabel>
           </span>

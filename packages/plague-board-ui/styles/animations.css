@@ -307,22 +307,34 @@
   }
 }
 
-/* Il battito, montato dentro il marchio invece che addosso da fuori.
- *
- * ⚠️ **`transform-box: view-box` non è un di più.** Senza, l'origine di una `transform` su un
- * elemento SVG si conta dal riquadro **della parte**, e il cuore si gonfierebbe attorno al proprio
- * centro geometrico invece che attorno al punto in cui sta dentro il marchio. Con `view-box` le
- * due unità qui sotto sono coordinate del `viewBox`: 12 · 13 è il cuore del cuore, un po' sotto il
- * centro del riquadro perché sopra ci sono le orecchie. È la stessa regola misurata sul ratto che
- * corre, dove i perni delle zampe sono scritti dal generatore.
+/* Il battito, montato dentro il marchio invece che addosso da fuori. Due varianti, due classi.
  *
  * ⚠️ **L'animazione la prende dalla utility invece di riscriverla**: `--animate-heartbeat` è
  * dichiarata in `@theme` qui sotto, quindi vive su `:root` ed è la stessa cosa che ottiene chi
- * scrive `animate-heartbeat` a mano. Due copie della stessa durata divergono al primo ritocco. */
+ * scrive `animate-heartbeat` a mano. Due copie della stessa durata divergono al primo ritocco.
+ *
+ * ⚠️ **E non si usa la utility direttamente dentro il componente.** Una utility di Tailwind esiste
+ * solo se qualcuno la **genera**, e a generarla è chi installa, scandagliando `dist/`: se il suo
+ * `@source` non ci arriva, la classe non produce nessuna regola e il marchio non anima — in
+ * silenzio, che è la forma esatta del difetto `animate-scale-bounce`. Le nostre classi stanno in
+ * questo file, che viaggia com'è. */
 .pb-mark-beat {
+  transform-origin: center;
+  animation: var(--animate-heartbeat);
+}
+
+/* La variante col recinto fermo: batte il cuore e l'anello no. Sta sul `<g>` interno.
+ *
+ * ⚠️ **`transform-box: view-box` non è un di più, e per questo la classe è separata.** Le due
+ * unità qui sotto sono coordinate del `viewBox` — 12 · 13 è il cuore del cuore, un po' sotto il
+ * centro del riquadro perché sopra ci sono le orecchie — e valgono solo se il riquadro di
+ * riferimento è quello del `viewBox`. Sull'`<svg>` esterno, che nel flusso è un elemento
+ * sostituito, gli stessi numeri tornerebbero **pixel dello schermo**: a 96px il marchio pulserebbe
+ * attorno a un punto vicino allo spigolo in alto a sinistra. È la stessa regola misurata sul ratto
+ * che corre, dove i perni delle zampe sono scritti dal generatore. */
+.pb-mark-beat--inner {
   transform-box: view-box;
   transform-origin: 12px 13px;
-  animation: var(--animate-heartbeat);
 }
 
 /* ─────────────────────────────────────────────────────────────────────────────

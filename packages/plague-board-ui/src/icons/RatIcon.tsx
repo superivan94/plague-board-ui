@@ -27,6 +27,15 @@ const HEART_FILL = `${HEART_RIGHT}${HEART_LEFT.replace('M12 10.5', '')}Z`;
 /** Lo stato del marchio: il cuore col solo contorno, o pieno. */
 export type RatIconState = 'empty' | 'filled';
 
+/**
+ * Che cosa batte.
+ *
+ * `'whole'` è il marchio intero, anello compreso, ed è quello che ha sempre fatto in
+ * un'intestazione; `'inner'` tiene fermo l'anello — che è il recinto, non il soggetto — e fa
+ * battere il cuore dentro di lui.
+ */
+export type RatIconBeat = 'whole' | 'inner';
+
 export interface RatIconProps extends IconProps {
   /**
    * Il cuore **pieno** invece che col solo contorno.
@@ -45,6 +54,16 @@ export interface RatIconProps extends IconProps {
    * si legge: una tabella di misure con un cuore che pulsa dentro fa muovere i numeri.
    */
   animateOn?: RatIconState | 'both' | 'none';
+  /**
+   * Che cosa batte: tutto il marchio, o il solo cuore dentro un anello fermo.
+   *
+   * ⚠️ Il predefinito è `'whole'` perché è quello che il marchio faceva già prima che il battito
+   * entrasse nel componente — l'intestazione gli passava `animate-heartbeat` addosso all'`<svg>`
+   * intero. Cambiarlo vorrebbe dire modificare l'aspetto di ogni marchio già montato senza che
+   * nessuno l'abbia chiesto. `'inner'` è la variante di regia: alle misure grandi l'anello fermo
+   * dà un riferimento immobile e il battito si legge meglio.
+   */
+  beat?: RatIconBeat;
 }
 
 /**
@@ -75,8 +94,10 @@ export interface RatIconProps extends IconProps {
  * deve ricordarsi di accenderlo. Chi non lo vuole ha `animateOn`. ⚠️ E chi ha chiesto meno
  * movimento lo ottiene comunque, dalla regola in fondo ad `animations.css`.
  *
- * ⚠️ **A battere è il cuore, non tutto il segno**: l'anello è il recinto e sta fuori dal gruppo
- * animato. Un marchio che si gonfia tutto insieme non è un cuore che batte, è un segno che respira.
+ * ⚠️ **A battere è tutto il marchio, o il solo cuore**: lo dice `beat`. Il predefinito è il primo,
+ * che è quello che il segno ha sempre fatto; col secondo l'anello resta fermo e fa da recinto, e
+ * alle misure grandi è lui a far leggere meglio il battito — un riferimento immobile accanto a una
+ * cosa che si muove.
  *
  * ⚠️ **Non è il ratto che attraversa la pagina.** Quello è un personaggio disegnato, con la livrea
  * e la coda, e vive altrove: qui c'è un emblema, fatto per essere riconosciuto a 18px.
@@ -85,17 +106,29 @@ export interface RatIconProps extends IconProps {
  *
  * @example
  * ```tsx
- * <RatIcon size={28} />                                   // il marchio, che batte
+ * <RatIcon size={28} />                                   // il marchio, che batte tutto insieme
+ * <RatIcon size={96} beat="inner" />                      // grande: l'anello fermo, il cuore batte
  * <RatIcon isFilled animateOn="filled" />                 // un preferito scelto, che si vede
  * <RatIcon size={16} animateOn="none" />                  // dentro una tabella, fermo
  * ```
  */
-export function RatIcon({ isFilled = false, animateOn = 'both', ...props }: RatIconProps) {
+export function RatIcon({
+  isFilled = false,
+  animateOn = 'both',
+  beat = 'whole',
+  className = '',
+  ...props
+}: RatIconProps) {
   const state: RatIconState = isFilled ? 'filled' : 'empty';
   const beats = animateOn === 'both' || animateOn === state;
 
+  // ⚠️ La variante intera scrive sullo stesso attributo che riceve `className`: si **compone**, o
+  // un marchio che batte perde il colore e lo `shrink-0` che gli ha dato chi lo mette in una barra.
+  const svgClass = beats && beat === 'whole' ? `pb-mark-beat ${className}`.trim() : className;
+  const innerClass = beats && beat === 'inner' ? 'pb-mark-beat pb-mark-beat--inner' : undefined;
+
   return (
-    <IconBase {...props} paint="stroke">
+    <IconBase {...props} className={svgClass} paint="stroke">
       {/* L'anello che contiene tutto. Tenue: è il recinto, non il soggetto — e per questo resta
           fuori dal gruppo che batte. */}
       <path
@@ -103,7 +136,7 @@ export function RatIcon({ isFilled = false, animateOn = 'both', ...props }: RatI
         strokeOpacity="0.3"
         strokeWidth="1.5"
       />
-      <g className={beats ? 'pb-mark-beat' : undefined}>
+      <g className={innerClass}>
         {/* La campitura sta **sotto** il contorno, o il tratto tondo dei capi si vedrebbe tagliato
             dal bordo netto del riempimento. */}
         {isFilled ? <path d={HEART_FILL} fill="currentColor" stroke="none" /> : null}
