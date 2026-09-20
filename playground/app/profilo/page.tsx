@@ -1,7 +1,6 @@
 import { Card } from '@heroui/react';
 import {
   BiohazardIcon,
-  CountedChips,
   PLAGUE_AVATAR_SIZE,
   PlagueAvatar,
   PlaguePanel,
@@ -15,6 +14,8 @@ import {
   VirusIcon,
   type ThematicBadgeColor,
 } from 'plague-board-ui';
+
+import { ChipsSection } from './ChipsSection';
 
 /**
  * I cinque colori del tema, coi nomi che ci si mette sopra in una demo.
@@ -33,13 +34,10 @@ const GRADI: readonly { color: ThematicBadgeColor; nome: string }[] = [
 
 const TAGLIE = ['sm', 'md', 'lg'] as const;
 
-/** Sei tag di un gioco da tavolo, per far vedere a che serve contarli. */
-const TAG = ['cooperativo', 'medioevo', 'dadi', 'deck-building', 'due giocatori', 'peste'];
-
 /**
  * La pagina è un componente **server**: nessuno dei quattro pezzi prende una funzione —
- * `CountedChips` è client, ma le pastiglie gli arrivano come figli già resi — quindi il confine
- * regge e la pagina resta statica.
+ * `CountedChips`, dentro `ChipsSection`, è client, ma le pastiglie gli arrivano come figli già
+ * resi — quindi il confine regge e la pagina resta statica.
  */
 export default function ProfiloPage() {
   return (
@@ -209,67 +207,22 @@ export default function ProfiloPage() {
 
       <p className="text-sm text-muted">
         Il contorno è <code>border-current</code>, cioè il colore del testo della pastiglia: HeroUI,
-        per i suoi colori, cambia solo <code>--chip-fg</code> e lascia il fondo com’è, quindi senza
-        quella riga un <code>accent</code> e un <code>danger</code> a mezzo metro di distanza sono la
-        stessa pastiglia grigia.
+        per i suoi colori, cambia solo <code>--chip-fg</code> e lascia il fondo com’è.
       </p>
 
-      <TechRule>i chip che si contano</TechRule>
+      <p className="text-sm text-muted">
+        ⚠️ <strong>Ma a distinguere i cinque colori è il testo, non il contorno — e in tema chiaro
+        si distinguono poco.</strong> Il contorno è il colore al 40% sul fondo della pastiglia, e
+        misurato vale 2,90 per <code>accent</code> e 1,97 per <code>danger</code> in scuro, 1,88 in
+        chiaro: è una rifinitura, non il segnale. Il segnale è il testo, e lì i due temi non si
+        somigliano — in scuro <code>accent</code> è il lime pieno accanto a un bianco, in chiaro è
+        un verde oliva accanto a un quasi-nero, che a colpo d’occhio è la stessa cosa. Il numero:
+        fra <code>accent</code> e <code>default</code> ci sono 1,47 di luminanza in scuro (ma due
+        tinte lontanissime) e 2,50 in chiaro (due tinte scure e vicine). Tutti e cinque restano
+        sopra 5,7 di contrasto sul fondo: si leggono, è il <em>colore</em> che dice meno.
+      </p>
 
-      <div className="flex flex-col gap-3">
-        <p className="text-sm text-muted">
-          <code>CountedChips</code> ne mostra poche e mette il resto dietro un <code>+N</code> che
-          le apre. Serve dove le pastiglie sono tante e lo spazio è quello di una scheda: i tag di
-          un manuale, gli autori, chi l’ha inserito.
-        </p>
-
-        <div className="flex flex-col gap-4 rounded-xl border border-border p-6">
-          {[3, 1, 0].map((visible) => (
-            <div key={visible} className="flex flex-col gap-2">
-              <CountedChips visible={visible}>
-                {TAG.map((tag) => (
-                  <ThematicBadge key={tag} color="accent">
-                    {tag}
-                  </ThematicBadge>
-                ))}
-              </CountedChips>
-              <TechLabel className="text-muted">
-                visible={`{${visible}}`} · {TAG.length} voci
-              </TechLabel>
-            </div>
-          ))}
-
-          <div className="flex flex-col gap-2">
-            <CountedChips>
-              {TAG.slice(0, 2).map((tag) => (
-                <ThematicBadge key={tag}>{tag}</ThematicBadge>
-              ))}
-            </CountedChips>
-            <TechLabel className="text-muted">sotto il limite · nessun comando</TechLabel>
-          </div>
-        </div>
-
-        <p className="text-sm text-muted">
-          <strong>Non disegna le pastiglie: gliele si passa.</strong> Il colore di un tag è
-          dell’applicazione — di là è una tabella <code>tagColors</code> — e farglielo arrivare
-          vorrebbe dire o una funzione che disegna, che da una pagina server non attraversa il
-          confine, o inventare uno schema di dati per una cosa che JSX dice già. Qui si conta e si
-          nasconde, e basta.
-        </p>
-
-        <p className="text-sm text-muted">
-          ⚠️ <strong>Quello che non si vede non è nella pagina.</strong> Le pastiglie chiuse non
-          esistono nel DOM, invece di essere nascoste con una classe: altrimenti le troverebbero lo
-          stesso la ricerca del browser, la selezione e chi copia.
-        </p>
-
-        <p className="text-sm text-muted">
-          ⚠️ <strong>Il nome del comando non cambia aprendo</strong> — resta «Mostra tutti (+2)», e
-          a dire lo stato è <code>aria-expanded</code>. Il conto entra nel nome perché chi comanda
-          il browser a voce legge <code>+2</code> e lo pronuncia: se il nome non contenesse quel
-          testo, quel comando non si potrebbe dire. La parola è una prop.
-        </p>
-      </div>
+      <ChipsSection />
 
       <TechRule>quando non usarli</TechRule>
 
