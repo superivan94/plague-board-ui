@@ -498,6 +498,115 @@
 }
 
 /* ─────────────────────────────────────────────────────────────────────────────
+ * `ToxicBubbles`. La bolla di gas che sale dal fondo del riquadro, ondeggiando.
+ * ───────────────────────────────────────────────────────────────────────────── */
+
+/* ⚠️ **La bolla è due elementi, e non è un vezzo**: la salita e l'ondeggiamento sono due
+ * `transform` sullo stesso asse, e una proprietà si scrive una volta sola. Fuori la **colonna**,
+ * che sale; dentro la **pelle**, che ondeggia e si gonfia.
+ *
+ * ⚠️ **La colonna è alta quanto il riquadro, ed è così che si misura la salita.** Un `translateY`
+ * in percentuale conta l'altezza **dell'elemento**, non del contenitore: una bolla da 40 px che
+ * sale del 100% si sposta di 40 px. Con la colonna a `h-full`, invece, `-100%` è esattamente
+ * l'altezza del fondale, qualunque essa sia — dentro una scheda come su una pagina intera. È la
+ * stessa ragione per cui non serve una container query: la percentuale ce l'ha già, basta darla
+ * all'elemento giusto.
+ *
+ * ⚠️ **Niente SVG e nessun `id`.** Di là ogni bolla portava una sfumatura radiale e un filtro di
+ * sfocatura con due identificatori suoi, sedici volte; qui è un cerchio con un bordo, due
+ * sfumature nel fondo e un alone — cioè quello che fa leggere «bolla» invece di «pallina verde»:
+ * il **bordo**, che di là non c'era affatto. */
+@keyframes pb-toxic-rise {
+  0% {
+    opacity: 0;
+    transform: translateY(18%);
+  }
+  14% {
+    opacity: 1;
+  }
+  82% {
+    opacity: 0.85;
+  }
+  100% {
+    opacity: 0;
+    transform: translateY(-100%);
+  }
+}
+
+/* L'ondeggiamento laterale: quanto si sposta lo scrive chi genera la bolla, perché una bolla
+ * grande che ondeggia come una piccola sembra trascinata. */
+@keyframes pb-toxic-sway {
+  0%,
+  100% {
+    transform: translateX(0);
+  }
+  25% {
+    transform: translateX(var(--pb-toxic-sway, 12px));
+  }
+  75% {
+    transform: translateX(calc(var(--pb-toxic-sway, 12px) * -1));
+  }
+}
+
+/* ⚠️ Il gonfiarsi sta sulla proprietà `scale` e non dentro la `transform`, così convive con
+ * l'ondeggiamento sullo stesso elemento: il browser applica prima `translate`, poi `rotate` e
+ * `scale`, e solo alla fine la `transform`. È lo stesso meccanismo con cui il fumetto si centra
+ * mentre la sua animazione gli scrive la `transform`. */
+@keyframes pb-toxic-swell {
+  from {
+    scale: 0.55;
+  }
+  to {
+    scale: 1.1;
+  }
+}
+
+.pb-toxic-bubble {
+  position: absolute;
+  top: 0;
+  bottom: 0;
+  display: flex;
+  align-items: flex-end;
+  /* La corsia è un punto, non un bordo: la colonna si centra sulla x che le viene data, così una
+     bolla grande non esce a destra solo perché è grande. Sta su `translate` e non nella
+     `transform` per lo stesso motivo del fumetto — la `transform` la scrive l'animazione. */
+  translate: -50% 0;
+  pointer-events: none;
+  animation: pb-toxic-rise var(--pb-toxic-rise-duration, 6000ms) linear forwards;
+  will-change: transform, opacity;
+}
+
+/* ⚠️ Le misure che dipendono dal diametro si ricavano da `--pb-toxic-size`, scritto una volta
+ * sola da chi genera la bolla: un alone da 12 px fisso è un velo su una bolla da 90 e una nuvola
+ * su una da 20. */
+.pb-toxic-bubble-skin {
+  display: block;
+  width: var(--pb-toxic-size, 40px);
+  height: var(--pb-toxic-size, 40px);
+  border-radius: 9999px;
+  /* Il bordo è `plague-400`: la malattia, non il marchio. */
+  border: 1px solid rgb(74 222 128 / 0.7);
+  /* ⚠️ **Una bolla è vuota, e si vede dal bordo.** I tre gradienti, dall'alto in basso: il lampo
+     speculare — il punto in cui si specchia la luce, piccolo e quasi bianco, che è la cosa che
+     dice «vetro» —, il riflesso morbido attorno, e la densità **al bordo** invece che al centro,
+     perché guardando di sbieco la pellicola si attraversa più film. Riempirla al centro, come di
+     là, dà una pallina verde. */
+  background:
+    radial-gradient(circle at 30% 26%, rgb(240 253 244 / 0.75), rgb(240 253 244 / 0) 10%),
+    radial-gradient(circle at 34% 30%, rgb(187 247 208 / 0.26), transparent 46%),
+    radial-gradient(circle at 50% 50%, rgb(34 197 94 / 0.05) 42%, rgb(74 222 128 / 0.22) 100%);
+  /* Il verde `toxic` compare solo qui e solo nell'alone, con l'opacità: è il modo in cui il tema
+     dice che quel verde puro si usa, non a campitura. */
+  box-shadow:
+    0 0 calc(var(--pb-toxic-size, 40px) * 0.22) rgb(0 255 0 / 0.18),
+    inset 0 0 calc(var(--pb-toxic-size, 40px) * 0.28) rgb(74 222 128 / 0.16);
+  animation:
+    pb-toxic-sway var(--pb-toxic-sway-duration, 3000ms) ease-in-out infinite,
+    pb-toxic-swell var(--pb-toxic-rise-duration, 6000ms) linear forwards;
+  will-change: transform, scale;
+}
+
+/* ─────────────────────────────────────────────────────────────────────────────
  * La corsa del ratto. Il disegno è un pupazzo articolato — tronco, coda, quattro zampe, e i pezzi
  * che pendono dai kit — e ogni pezzo porta il proprio perno come `transform-origin`, scritto dal
  * componente nelle unità della cornice. Qui c'è solo il **tempo**: che cosa ruota, di quanto, e con
@@ -690,6 +799,8 @@
   .pb-hover-hint,
   .pb-particle,
   .pb-potion-live .pb-potion-bubble,
+  .pb-toxic-bubble,
+  .pb-toxic-bubble-skin,
   [class*='animate-'],
   .pb-rat--running .pb-rat-part,
   .pb-rat--running .pb-rat-body,

@@ -20,6 +20,10 @@ export { binaryRain, comicBubbles, type HoverEffect } from './brand/hoverEffects
 // Lo scoppio di segni: sta accanto all'emettitore perché è l'altro modo di far volare qualcosa —
 // quello si accende finché lo sfiori, questo parte una volta sola quando glielo chiedi.
 export { ParticleBurst, type ParticleBurstHandle, type ParticleBurstProps } from './brand/ParticleBurst';
+// L'atmosfera: il fondale che avvolge una pagina, le bolle che ci salgono dentro, e il comando che
+// dice quanta ce ne deve essere. Si parlano attraverso il provider, che è l'unico contesto della
+// libreria — vedi `ToxicLevelProvider` per il perché.
+export { PlagueBackground, type PlagueBackgroundProps } from './brand/PlagueBackground';
 export { PlagueBar, type PlagueBarPlacement, type PlagueBarProps } from './brand/PlagueBar';
 // Il piede già montato. I suoi pezzi restano pubblici: chi ne vuole uno diverso se lo compone.
 export { PlagueFootBar, type PlagueFootBarProps } from './brand/PlagueFootBar';
@@ -35,6 +39,9 @@ export {
   PLAGUE_FOOT_MARK_SIZE,
   type PlagueBarSize,
 } from './brand/plagueBarSizes';
+// Il pulsare che mette l'occhio su un comando. ⚠️ Niente a che vedere con `PulseDot`, che è un
+// pallino di stato: questo avvolge, quello marca.
+export { PlaguePulse, type PlaguePulseProps } from './brand/PlaguePulse';
 export { PulseDot, type PulseDotProps } from './brand/PulseDot';
 // Il personaggio, non il marchio: `RatIcon` è l'emblema, questo è il ratto che cammina.
 export { RAT_LIVERIES, Rat, type RatLivery, type RatProps } from './brand/Rat';
@@ -54,6 +61,24 @@ export { SupportButton, type SupportButtonProps } from './brand/SupportButton';
 export { TalkingMascot, type TalkingMascotProps } from './brand/TalkingMascot';
 export { TechLabel, type TechLabelProps } from './brand/TechLabel';
 export { TechRule, type TechRuleProps } from './brand/TechRule';
+export { ToxicBubbles } from './brand/ToxicBubbles';
+// ⚠️ La scala sta in un modulo **senza** `'use client'`, come le misure della barra: le tabelle le
+// indicizza anche una pagina server, e un dato esportato da un modulo client le arriverebbe come
+// riferimento — cioè `undefined`, in silenzio.
+export {
+  TOXIC_LEVELS,
+  TOXIC_LEVEL_LABELS,
+  TOXIC_LEVEL_SETTINGS,
+  type ToxicLevel,
+  type ToxicLevelSettings,
+} from './brand/toxicLevel';
+export {
+  ToxicLevelProvider,
+  useToxicLevel,
+  type ToxicLevelProviderProps,
+  type ToxicLevelValue,
+} from './brand/ToxicLevelProvider';
+export { ToxicLevelSwitch, type ToxicLevelSwitchProps } from './brand/ToxicLevelSwitch';
 export { VersionTag, type VersionTagProps } from './brand/VersionTag';
 
 // Le icone. `IconProps` è pubblico perché è il contratto che deve rispettare chi sostituisce
