@@ -58,7 +58,7 @@ export interface CreditCardProps extends CreditAuthor {
 export function CreditCard({ name, icon, href, effect, hintDelayMs, className = '' }: CreditCardProps) {
   const corpo = (
     <span
-      className={`flex items-center gap-1.5 rounded-lg border border-border px-2 py-1 text-sm font-medium transition-colors ${className}`}
+      className={`flex items-center gap-1.5 rounded-lg border border-border px-2 py-0.5 text-xs font-medium transition-colors ${className}`}
     >
       {icon}
       {name}

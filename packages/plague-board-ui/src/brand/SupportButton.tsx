@@ -40,6 +40,11 @@ export interface SupportButtonProps {
  * pubblicità, e insieme staccarsi abbastanza da farsi trovare. Il colore del marchio sul segno è
  * quello che fa il lavoro.
  *
+ * ⚠️ **Il segno è più grande del testo che gli sta accanto, ed è voluto** — 22 px contro 12.
+ * Quando la riga si stringe il testo sparisce e resta lui: il pezzo che deve reggere da solo è
+ * quello che va dimensionato per primo, e un piede si legge meglio con le parole piccole e un
+ * segno grande che con tutto della stessa misura.
+ *
  * ⚠️ **Sotto le 32rem di contenitore resta la sola tazza**, e il nome accessibile no: il testo si
  * nasconde con una container query mentre `aria-label` porta la stessa parola sempre. Un comando
  * che si riduce a un segno senza nome è un comando muto — e anche per chi vede, quel segno da solo
@@ -64,7 +69,7 @@ export interface SupportButtonProps {
 export function SupportButton({
   href,
   label = 'Offrimi una pozione',
-  icon = <PotionMugIcon size={18} />,
+  icon = <PotionMugIcon size={22} />,
   className = '',
 }: SupportButtonProps) {
   const scoppio = useRef<ParticleBurstHandle>(null);
@@ -105,7 +110,7 @@ export function SupportButton({
         // `pb-potion-live` accende le bolle della tazza: sta qui e non nel disegno, così l'icona
         // usata altrove resta ferma. Con un'icona sostituita dall'esterno non fa semplicemente
         // niente, che è il modo giusto in cui una classe di troppo dovrebbe fallire.
-        className={`pb-potion-live flex items-center gap-1.5 rounded-lg border border-brand/40 px-2 py-1 text-sm font-medium text-brand-ink outline-none transition-colors hover:border-brand hover:bg-brand/10 focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-brand-ink ${className}`}
+        className={`pb-potion-live flex items-center gap-1.5 rounded-lg border border-brand/40 px-2 py-0.5 text-xs font-medium text-brand-ink outline-none transition-colors hover:border-brand hover:bg-brand/10 focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-brand-ink ${className}`}
       >
         {icon}
         <span className="hidden @lg:inline">{label}</span>

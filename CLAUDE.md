@@ -528,6 +528,17 @@ exist in target module» che **non sono veri**. Si guarda la pagina, o si crede 
   a sapere quante particelle sono e quanto vola la più lenta — `burst()` restituisce i millisecondi,
   e `0` quando non è partito niente. Poi il comando lo **taglia** al suo tetto: misurati 1728 ms di
   fontana, 904 fra il clic e l'apertura.
+- ⚠️ **La stessa taglia non vale uguale alle due estremità della pagina, e un piede va misurato
+  intero.** `PLAGUE_BAR_PADDING` è indicizzato **prima per posizione e poi per taglia**: 8/12/16 px
+  per lato in cima, 4/8/12 in fondo — un'intestazione regge lo spazio che ha, un piede appiccicato
+  lo toglie alla pagina a ogni schermata. Col contenuto di `PlagueFootBar` le tre taglie misurano
+  **35, 45 e 57 px**. ⚠️ E il rientro dell'incavo segue la stessa scala, o su un telefono i due
+  numeri si sconterebbero: `pb-[calc(var(--spacing)*1_+_env(...))]` per la piccola.
+  ⚠️ **Quattro di quei pixel non venivano da nessun rientro**: un contenitore che dispone i figli
+  in riga di **testo** fa una line box, e la line box lascia posto ai discendenti anche quando
+  dentro c'è un solo riquadro. Il comando delle donazioni misurava 28 px e il suo involucro 32.
+  Si cura dichiarando `flex` sull'involucro, e si scopre solo misurando l'elemento **e** suo padre:
+  guardando il comando, i numeri tornavano.
 - ⚠️ **Un'icona che si anima da sola è invadente: l'interruttore sta su chi la monta, non sul
   disegno.** `PotionMugIcon` porta le classi sui suoi pezzi (`pb-potion-bubble`, più due per i
   ritardi) e `animations.css` le anima **solo** dentro un antenato `.pb-potion-live`, che è

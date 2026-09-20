@@ -3,10 +3,14 @@
 import { Surface } from '@heroui/react';
 import type { ReactNode } from 'react';
 
-import { PLAGUE_BAR_PADDING, PLAGUE_BAR_SAFE_PADDING, type PlagueBarSize } from './plagueBarSizes';
+import {
+  PLAGUE_BAR_PADDING,
+  PLAGUE_BAR_SAFE_PADDING,
+  type PlagueBarPlacement,
+  type PlagueBarSize,
+} from './plagueBarSizes';
 
-/** A quale estremità della pagina sta la lastra. */
-export type PlagueBarPlacement = 'top' | 'bottom';
+export type { PlagueBarPlacement };
 
 export interface PlagueBarProps {
   /** Quello che la barra contiene: marchio, collegamenti, comandi. Li decide chi la usa. */
@@ -60,9 +64,14 @@ export interface PlagueBarProps {
  *
  * ⚠️ **Le tre taglie sono altezze, e la taglia non arriva a chi sta dentro.** La barra non ha modo
  * di ridimensionare un `<svg>` che non conosce, quindi chi mette il marchio legge da sé quanto
- * farlo grande in `PLAGUE_BAR_MARK_SIZE`, che sta in `plagueBarSizes.ts` — fuori da questo file, e
- * il motivo è scritto là. È lo stesso confine di sempre: la lastra è della libreria, quello che ci
- * vive dentro è dell'applicazione.
+ * farlo grande in `PLAGUE_BAR_MARK_SIZE` — o in `PLAGUE_FOOT_MARK_SIZE`, se la lastra sta in
+ * fondo — che stanno in `plagueBarSizes.ts`, fuori da questo file, e il motivo è scritto là. È lo
+ * stesso confine di sempre: la lastra è della libreria, quello che ci vive dentro è
+ * dell'applicazione.
+ *
+ * ⚠️ **E la stessa taglia vale meno in fondo che in cima**, di un gradino: `small` rientra di 8 px
+ * per lato sopra e di 4 sotto. Un piede è una firma, e su una lastra appiccicata lo spazio che
+ * prende lo toglie alla pagina a ogni schermata.
  */
 export function PlagueBar({
   children,
@@ -83,7 +92,7 @@ export function PlagueBar({
       render={(props) => (inCima ? <header {...props} /> : <footer {...props} />)}
       className={`dark ${isSticky ? `sticky z-20 ${inCima ? 'top-0' : 'bottom-0'}` : ''} w-full ${
         inCima ? 'border-b' : 'border-t'
-      } border-brand/20 bg-gray-950/90 backdrop-blur-sm ${PLAGUE_BAR_PADDING[size]} ${
+      } border-brand/20 bg-gray-950/90 backdrop-blur-sm ${PLAGUE_BAR_PADDING[placement][size]} ${
         PLAGUE_BAR_SAFE_PADDING[placement][size]
       } ${className}`}
     >

@@ -13,6 +13,14 @@
 export type PlagueBarSize = 'small' | 'medium' | 'large';
 
 /**
+ * A quale estremità della pagina sta la lastra.
+ *
+ * ⚠️ Sta qui e non in `PlagueBar.tsx` per la stessa ragione delle tabelle: da lì dentro non
+ * potrebbe indicizzarle senza tirarsi dietro un modulo `'use client'`.
+ */
+export type PlagueBarPlacement = 'top' | 'bottom';
+
+/**
  * **Quanto è grande il segno del marchio dentro una barra di quella taglia.** Non è una misura che
  * la barra impone — non sa nemmeno di avere un marchio dentro — è quella che chi lo mette dovrebbe
  * usare perché la riga torni: `<RatIcon size={PLAGUE_BAR_MARK_SIZE[size]} />`.
@@ -33,12 +41,46 @@ export const PLAGUE_BAR_MARK_SIZE: Record<PlagueBarSize, number> = {
  * dipende dalla pagina e non dalla barra. Se anche il contenuto porta il suo `py`, le due
  * spaziature si sommano e la taglia smette di voler dire qualcosa.
  *
+ * ⚠️ **A parità di taglia la lastra in fondo rientra di meno di quella in cima**, di un gradino
+ * esatto: 4, 8 e 12 px per lato invece di 8, 12 e 16. Non è un'eccezione. Un'intestazione è il
+ * posto da cui si parte e regge lo spazio che ha; un piede è una firma, e su una lastra
+ * appiccicata ogni pixel che prende è un pixel tolto alla pagina **a ogni schermata**. Col
+ * contenuto che {@link PlagueFootBar} monta, le tre taglie misurano **35, 45 e 57 px** — prima di
+ * questo scarto la più piccola ne faceva 45. Chiesto dall'utente il 2026-09-20, che voleva le tre
+ * taglie del piede «come quelle dell'header».
+ *
  * Non esce da `src/index.ts`: sono classi di Tailwind, cioè un dettaglio di come la barra è fatta.
  */
-export const PLAGUE_BAR_PADDING: Record<PlagueBarSize, string> = {
-  small: 'py-2',
-  medium: 'py-3',
-  large: 'py-4',
+export const PLAGUE_BAR_PADDING: Record<PlagueBarPlacement, Record<PlagueBarSize, string>> = {
+  top: {
+    small: 'py-2',
+    medium: 'py-3',
+    large: 'py-4',
+  },
+  bottom: {
+    small: 'py-1',
+    medium: 'py-2',
+    large: 'py-3',
+  },
+};
+
+/**
+ * **Quanto è grande il segno dentro un piede di quella taglia**: il gemello di
+ * {@link PLAGUE_BAR_MARK_SIZE}, e vale per la stessa ragione — la lastra non può ridimensionare un
+ * `<svg>` che non conosce, quindi la misura giusta si legge da qui.
+ *
+ * `mark` è il segno del comando donazioni, che {@link PlagueFootBar} applica da sé; `authorMark` è
+ * quello di una scheda autore, che arriva dall'applicazione insieme al nome e quindi lo passa chi
+ * scrive la firma — `<CodeIcon size={PLAGUE_FOOT_MARK_SIZE.medium.authorMark} />`.
+ *
+ * ⚠️ **Il segno del comando è più grande del testo che gli sta accanto, in tutte e tre le taglie.**
+ * Quando la riga si stringe il testo sparisce e resta lui solo: è il pezzo che deve reggere da
+ * solo, e va dimensionato per primo.
+ */
+export const PLAGUE_FOOT_MARK_SIZE: Record<PlagueBarSize, { mark: number; authorMark: number }> = {
+  small: { mark: 20, authorMark: 14 },
+  medium: { mark: 22, authorMark: 16 },
+  large: { mark: 26, authorMark: 18 },
 };
 
 /**
@@ -61,8 +103,8 @@ export const PLAGUE_BAR_SAFE_PADDING: Record<'top' | 'bottom', Record<PlagueBarS
     large: 'pt-[calc(var(--spacing)*4_+_env(safe-area-inset-top))]',
   },
   bottom: {
-    small: 'pb-[calc(var(--spacing)*2_+_env(safe-area-inset-bottom))]',
-    medium: 'pb-[calc(var(--spacing)*3_+_env(safe-area-inset-bottom))]',
-    large: 'pb-[calc(var(--spacing)*4_+_env(safe-area-inset-bottom))]',
+    small: 'pb-[calc(var(--spacing)*1_+_env(safe-area-inset-bottom))]',
+    medium: 'pb-[calc(var(--spacing)*2_+_env(safe-area-inset-bottom))]',
+    large: 'pb-[calc(var(--spacing)*3_+_env(safe-area-inset-bottom))]',
   },
 };

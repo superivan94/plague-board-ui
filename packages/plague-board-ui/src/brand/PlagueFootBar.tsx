@@ -1,8 +1,11 @@
+import type { ReactNode } from 'react';
+
+import { PotionMugIcon } from '../icons/PotionMugIcon';
 import { BarRow } from './BarRow';
 import type { CreditAuthor } from './CreditCard';
 import { CreditLine } from './CreditLine';
 import { PlagueBar } from './PlagueBar';
-import type { PlagueBarSize } from './plagueBarSizes';
+import { PLAGUE_FOOT_MARK_SIZE, type PlagueBarSize } from './plagueBarSizes';
 import { SupportButton } from './SupportButton';
 import { VersionTag } from './VersionTag';
 
@@ -15,12 +18,21 @@ export interface PlagueFootBarProps {
   supportHref?: string;
   /** Che cosa c'è scritto sul comando delle donazioni. */
   supportLabel?: string;
+  /**
+   * Il segno del comando donazioni. Senza, la tazza di pozione **alla misura della taglia**: è
+   * l'unico segno che il piede può dimensionare da sé, perché è l'unico che conosce.
+   */
+  supportIcon?: ReactNode;
   /** Le parole davanti ai nomi, con spazio e senza. */
   creditLabel?: string;
   creditShortLabel?: string;
   /** Resta attaccato in fondo mentre la pagina scorre. Vero di default. */
   isSticky?: boolean;
-  /** Quanto è alto. `small` di default: un piede non è un'intestazione. */
+  /**
+   * Quanto è alto: **35, 45 o 57 px** misurati col contenuto che monta. `small` di default, perché un piede non è
+   * un'intestazione — e infatti la stessa taglia in fondo rientra un gradino meno che in cima.
+   * Oltre al rientro della lastra, la taglia decide quanto è grande il segno delle donazioni.
+   */
   size?: PlagueBarSize;
   /** Classi aggiuntive sulla riga interna: è qui che si mette la larghezza della colonna. */
   rowClassName?: string;
@@ -58,6 +70,7 @@ export function PlagueFootBar({
   version,
   supportHref,
   supportLabel,
+  supportIcon,
   creditLabel,
   creditShortLabel,
   isSticky = true,
@@ -78,8 +91,20 @@ export function PlagueFootBar({
         {version && <VersionTag version={version} className="mx-auto" />}
 
         {supportHref && (
-          <span className="ml-auto">
-            <SupportButton href={supportHref} label={supportLabel} />
+          // ⚠️ `flex` e non solo `ml-auto`: un contenitore che dispone i figli **in riga di testo**
+          // fa una line box, e una line box lascia posto ai discendenti della `g` anche quando
+          // dentro c'è un solo riquadro. Misurati **quattro pixel** di aria sotto il comando, che
+          // su una lastra appiccicata sono quattro pixel tolti alla pagina a ogni schermata.
+          <span className="ml-auto flex">
+            <SupportButton
+              href={supportHref}
+              label={supportLabel}
+              // ⚠️ Il segno lo dimensiona **il piede** e non il comando, perché la taglia è del
+              // piede: è lo stesso giro con cui chi monta un marchio in cima legge la sua misura
+              // da `PLAGUE_BAR_MARK_SIZE`. Qui il passaggio è comodo perché l'icona predefinita la
+              // conosciamo; quella di un autore no, e infatti quella la passa l'applicazione.
+              icon={supportIcon ?? <PotionMugIcon size={PLAGUE_FOOT_MARK_SIZE[size].mark} />}
+            />
           </span>
         )}
       </BarRow>

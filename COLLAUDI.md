@@ -382,8 +382,9 @@ il legame viene reciso, e se questa pagina si muove, senza andare da nessuna par
 
 | Azione | Atteso | Ottenuto |
 |---|---|---|
-| A 900 px | firma a sinistra, versione al centro, donazioni a destra, su **una riga** | piede alto **48 px**, riga **39**; «Creato da · Superivan94 · AI-Dev · v0.1.0 · Offrimi una pozione» |
-| A 380 px | «By:», **un autore solo**, la versione, e la sola tazza | riga alta **38 px**, contenuto 380 su 380: ci sta senza scorrere. Visibili: «By:», Superivan94, v0.1.0, e il comando senza testo — largo **36 px**, col segno a 18 e il testo a `display: none` |
+| A 900 px | firma a sinistra, versione al centro, donazioni a destra, su **una riga** | piede alto **35 px**, riga **26**; «Creato da · Superivan94 · AI-Dev · v0.1.0 · Offrimi una pozione» |
+| A 375 px | «By:», **un autore solo**, la versione, e la sola tazza | piede alto **35 px**, contenuto 375 su 375: ci sta senza scorrere. Il comando senza testo è **38 × 26**, cioè sopra il bersaglio minimo di 24, col segno a 20 e il testo a `display: none` |
+| Le tre taglie del piede | una scala vera, come quella della barra in cima | **35 / 45 / 57 px**, coi rientri 4 / 8 / 12 per lato — un gradino sotto gli 8 / 12 / 16 della lastra in cima — e i segni delle donazioni a 20 / 22 / 26 |
 | La barra in cima a 380 px | una riga sola che scorre, non tre righe | barra alta **61 px** (prima ~150), riga 348 visibili su **891** di contenuto, `scorre: true` |
 | Si porta il fuoco sull'ultima voce della barra stretta | la riga si porta in vista da sé | `scrollLeft` **543** senza che nessuno l'abbia scritto: è il motivo per cui non c'è nessun `tabIndex` sul contenitore |
 | Si preme la tazza | sedici segni della peste zampillano dal comando, uno dopo l'altro | 16 particelle, ognuna con `--pb-dx`, `--pb-apex`, `--pb-dy`, `--pb-spin`, una durata e un **ritardo** suoi — es. `−61,1 / −82,6 / +50,5 px, 192°, 0,97 s` |
@@ -399,7 +400,7 @@ il legame viene reciso, e se questa pagina si muove, senza andare da nessuna par
 | Le bolle della tazza, a riposo e sotto il puntatore | salgono sfalsate, e sotto il puntatore più in fretta | tre animazioni `pb-potion-bubble` da **3,4 s** con ritardi **0 / 1,15 / 2,3 s**; col puntatore sopra, **1,5 s**. Fermate a mano: salita da `+2` a `−3,5` del viewBox, scala 0,4 → 1,1, opacità 0 → 1 → 0 |
 | Il segno da solo, alle tre misure della pagina d'ingresso | si riconosce come tazza anche a 16 px | a 56 px tazza, manico, liquido e bolle; a 24 e a 16 la sagoma regge e restano il manico e il pelo del liquido |
 | Si scorre a metà pagina | barra **e** piede restano in vista | a `scrollY` 400 tutti e due dentro la finestra: `position: sticky`, `bottom: 0` — e il piede resta nel flusso, quindi non copre niente |
-| Le regole dell'incavo, nel CSS **generato** | sei, tre per lato, che sommano il rientro della taglia | `.pt-[calc(var(--spacing)*2_+_env(safe-area-inset-top))]` e le altre cinque, tutte risolte in `calc(... + env(...))`; il `meta` della pagina porta `viewport-fit=cover`, che è quello che le accende |
+| Le regole dell'incavo, nel CSS **generato** | sei, tre per lato, che sommano il rientro della taglia — e quelle di sotto seguono la scala del piede | `.pt-[calc(var(--spacing)*2_+_env(safe-area-inset-top))]` per la cima e `.pb-[calc(var(--spacing)*1_+_env(safe-area-inset-bottom))]` per il fondo, tutte risolte in `calc(... + env(...))`; il `meta` della pagina porta `viewport-fit=cover`, che è quello che le accende |
 | La versione scritta nel piede | quella vera della libreria, non una copiata a mano | `v0.1.0`, letta dal `package.json` |
 | `next build` | nove pagine ancora **statiche**, col piede in ogni layout | `○` su tutte e nove |
 

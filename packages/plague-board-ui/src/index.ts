@@ -26,7 +26,11 @@ export { PlagueFootBar, type PlagueFootBarProps } from './brand/PlagueFootBar';
 // ⚠️ Le misure **non** escono da `PlagueBar.tsx`, che dichiara `'use client'`: un dato esportato
 // da un modulo client arriva a una pagina server come riferimento, e chi lo indicizza ottiene
 // `undefined` senza che niente diventi rosso. Il perché per esteso sta in `plagueBarSizes.ts`.
-export { PLAGUE_BAR_MARK_SIZE, type PlagueBarSize } from './brand/plagueBarSizes';
+export {
+  PLAGUE_BAR_MARK_SIZE,
+  PLAGUE_FOOT_MARK_SIZE,
+  type PlagueBarSize,
+} from './brand/plagueBarSizes';
 export { PulseDot, type PulseDotProps } from './brand/PulseDot';
 // Il personaggio, non il marchio: `RatIcon` è l'emblema, questo è il ratto che cammina.
 export { RAT_LIVERIES, Rat, type RatLivery, type RatProps } from './brand/Rat';

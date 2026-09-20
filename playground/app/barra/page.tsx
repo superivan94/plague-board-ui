@@ -1,11 +1,16 @@
 import {
+  CodeIcon,
   PLAGUE_BAR_MARK_SIZE,
+  PLAGUE_FOOT_MARK_SIZE,
   PlagueBar,
   type PlagueBarSize,
+  PlagueFootBar,
   PulseDot,
   RatIcon,
+  RobotIcon,
   TechLabel,
   TechRule,
+  type CreditAuthor,
 } from 'plague-board-ui';
 
 // ⚠️ Ogni barra in mostra sta dentro una `<section>`, e l'intestazione di questa pagina è una
@@ -39,6 +44,39 @@ const SAMPLES: readonly BarSample[] = [
     use: "La pagina d'ingresso e l'aggregatore, dove la barra si presenta invece di navigare: poche voci e molta aria.",
   },
 ];
+
+const FOOT_SAMPLES: readonly BarSample[] = [
+  {
+    size: 'small',
+    padding: '4px',
+    use: 'Il valore predefinito. Una firma sottile sotto una pagina di contenuti: si vede, e non chiede spazio.',
+  },
+  {
+    size: 'medium',
+    padding: '8px',
+    use: "Quando il piede porta qualcosa in più di una firma — un secondo comando, un avviso — o quando la pagina è ariosa e una striscia sottile sparirebbe.",
+  },
+  {
+    size: 'large',
+    padding: '12px',
+    use: "La pagina d'ingresso, dove il piede è l'ultima cosa che si legge e può permettersi di pesare quanto l'intestazione.",
+  },
+];
+
+/**
+ * ⚠️ **I segni degli autori li passa l'applicazione**, quindi la taglia non li raggiunge da sé:
+ * la misura giusta si legge da `PLAGUE_FOOT_MARK_SIZE`, esattamente come il marchio in cima legge
+ * la sua da `PLAGUE_BAR_MARK_SIZE`. Qui si fa per mostrarlo; un'app che non lo fa non si rompe,
+ * ha solo i segni di una misura sola.
+ */
+function autoriDiEsempio(size: PlagueBarSize): readonly CreditAuthor[] {
+  const misura = PLAGUE_FOOT_MARK_SIZE[size].authorMark;
+
+  return [
+    { name: 'Superivan94', icon: <CodeIcon size={misura} className="text-brand" /> },
+    { name: 'AI-Dev', icon: <RobotIcon size={misura} className="text-plague-400" /> },
+  ];
+}
 
 /**
  * Il contenuto di esempio: lo stesso nelle tre barre, così a cambiare è solo la taglia.
@@ -162,9 +200,40 @@ export default function BarPage() {
           nell&apos;ordine giusto; i suoi pezzi — <code>CreditLine</code>, <code>VersionTag</code>,{' '}
           <code>SupportButton</code> — restano pubblici per chi lo vuole montare da sé. Stringi la
           finestra e guarda: «Creato da» diventa «By:», resta un autore solo e il comando delle
-          donazioni si riduce all&apos;ampolla. Non è una media query — è il <em>contenitore</em> a
+          donazioni si riduce alla tazza. Non è una media query — è il <em>contenitore</em> a
           decidere, quindi lo stesso piede dentro una colonna stretta si comporta uguale.
         </p>
+        <p className="max-w-2xl text-sm text-muted">
+          <strong className="text-foreground">Le taglie sono le stesse, il rientro no.</strong> A
+          parità di nome la lastra in fondo rientra di un gradino meno di quella in cima — 4px
+          contro 8 in <strong>small</strong>, 8 contro 12, 12 contro 16 — e il piede qui sotto ne
+          esce alto <strong>35, 45 o 57</strong> pixel. Un&apos;intestazione regge lo spazio che ha;
+          un piede appiccicato lo toglie alla pagina a ogni schermata.
+        </p>
+
+        {FOOT_SAMPLES.map(({ size, padding, use }) => (
+          <div key={size} className="flex flex-col gap-2">
+            <div className="flex flex-wrap items-baseline gap-3">
+              <h3 className="font-medium">{size}</h3>
+              <TechLabel className="text-brand-ink">
+                rientro {padding} · segno {PLAGUE_FOOT_MARK_SIZE[size].mark}px · autore{' '}
+                {PLAGUE_FOOT_MARK_SIZE[size].authorMark}px
+              </TechLabel>
+            </div>
+
+            <PlagueFootBar
+              size={size}
+              isSticky={false}
+              authors={autoriDiEsempio(size)}
+              version="0.1.0"
+              supportHref="https://ko-fi.com/superivan94"
+              rowClassName="px-4"
+              className="rounded-lg border border-border"
+            />
+
+            <p className="text-sm text-muted">{use}</p>
+          </div>
+        ))}
         <p className="max-w-2xl text-sm text-muted">
           <strong className="text-foreground">Una riga sola, in cima come in fondo.</strong>{' '}
           <code>BarRow</code> non manda a capo: se le voci non ci stanno, si scorre di lato. Una

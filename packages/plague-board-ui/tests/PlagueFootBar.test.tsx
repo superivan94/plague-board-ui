@@ -21,6 +21,23 @@ describe('la lastra alle due estremità', () => {
     expect(lastra.className).toContain('top-0');
   });
 
+  it('la stessa taglia rientra di un gradino meno in fondo che in cima', () => {
+    const { container: cima } = render(<PlagueBar size="small">ciao</PlagueBar>);
+    const { container: fondo } = render(
+      <PlagueBar placement="bottom" size="small">
+        ciao
+      </PlagueBar>,
+    );
+
+    // ⚠️ Un'intestazione regge lo spazio che ha; un piede appiccicato lo toglie alla pagina a ogni
+    // schermata. Per questo la scala è la stessa ma sfalsata di un gradino.
+    expect(cima.firstElementChild!.className).toContain('py-2');
+    expect(fondo.firstElementChild!.className).toContain('py-1');
+
+    // E il rientro dell'incavo segue la taglia, o su un telefono i due numeri si sconterebbero.
+    expect(fondo.firstElementChild!.className).toContain('*1_+_env(safe-area-inset-bottom)');
+  });
+
   it('in fondo è un `footer` col filo sopra', () => {
     // ⚠️ Non è pignoleria sull'elemento: `header` e `footer` sono `banner` e `contentinfo`, due
     // punti di riferimento diversi. Un piede reso come intestazione sarebbe un secondo `banner`.
@@ -180,6 +197,16 @@ describe('i pezzi del piede', () => {
     expect(screen.getByText('Superivan94')).toBeInTheDocument();
     expect(screen.getByText('v4.0.0')).toBeInTheDocument();
     expect(screen.getByRole('link', { name: 'Offrimi una pozione' })).toBeInTheDocument();
+  });
+
+  it('la taglia del piede decide quanto è grande il segno delle donazioni', () => {
+    const { unmount } = render(<PlagueFootBar authors={AUTORI} supportHref="https://esempio.test" />);
+    // `small` è il valore predefinito: un piede non è un'intestazione.
+    expect(screen.getByRole('link').querySelector('svg')).toHaveAttribute('width', '20');
+    unmount();
+
+    render(<PlagueFootBar authors={AUTORI} supportHref="https://esempio.test" size="large" />);
+    expect(screen.getByRole('link').querySelector('svg')).toHaveAttribute('width', '26');
   });
 
   it('senza versione e senza indirizzo, il piede resta la sola firma', () => {

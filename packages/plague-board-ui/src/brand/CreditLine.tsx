@@ -36,7 +36,7 @@ export function CreditLine({
   className = '',
 }: CreditLineProps) {
   return (
-    <span className={`flex items-center gap-2 text-sm text-muted ${className}`}>
+    <span className={`flex items-center gap-2 text-xs text-muted ${className}`}>
       {/* Due nodi e non uno con due classi: il testo cambia, non solo la sua misura. */}
       <span className="hidden @lg:inline">{label}</span>
       <span className="@lg:hidden">{shortLabel}</span>
