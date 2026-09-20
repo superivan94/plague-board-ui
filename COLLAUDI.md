@@ -371,26 +371,30 @@ ignorare. La ricerca fa il lavoro: si scrive una parola e chi la ripete finisce 
 classi, quante particelle, il nome accessibile del comando). Quello che solo un browser vero dice è
 se la riga **sta davvero** su una riga alle due larghezze, e se le particelle si vedono o le taglia
 qualcosa.
-**Ultima esecuzione:** agente, 2026-09-20 — tutto come atteso.
+**Ultima esecuzione:** agente, 2026-09-20 — tutto come atteso, e le due righe sull'apertura sono
+quelle aggiunte per il difetto delle **due pagine di ko-fi**.
 
 **Preparazione:** `npm run build`, `npm run playground`, una pagina qualunque — il piede sta nel
 layout, quindi c'è su tutte. La larghezza si emula col riquadro (900 e 380). ⚠️ Il comando delle
-donazioni porta a un indirizzo vero: per provarlo si annulla la navigazione con un
-`addEventListener('click', e => e.preventDefault(), { once: true })` prima del clic.
+donazioni porta a un indirizzo vero: per provarlo si mette una **spia al posto di `window.open`**
+che registra gli argomenti e torna una finestra finta — così si vede con quali opzioni si apre, se
+il legame viene reciso, e se questa pagina si muove, senza andare da nessuna parte.
 
 | Azione | Atteso | Ottenuto |
 |---|---|---|
 | A 900 px | firma a sinistra, versione al centro, donazioni a destra, su **una riga** | piede alto **48 px**, riga **39**; «Creato da · Superivan94 · AI-Dev · v0.1.0 · Offrimi una pozione» |
-| A 380 px | «By:», **un autore solo**, la versione, e la sola ampolla | riga alta **38 px**, contenuto 380 su 380: ci sta senza scorrere. Visibili: «By:», Superivan94, v0.1.0, e il comando senza testo |
+| A 380 px | «By:», **un autore solo**, la versione, e la sola tazza | riga alta **38 px**, contenuto 380 su 380: ci sta senza scorrere. Visibili: «By:», Superivan94, v0.1.0, e il comando senza testo — largo **36 px**, col segno a 18 e il testo a `display: none` |
 | La barra in cima a 380 px | una riga sola che scorre, non tre righe | barra alta **61 px** (prima ~150), riga 348 visibili su **891** di contenuto, `scorre: true` |
 | Si porta il fuoco sull'ultima voce della barra stretta | la riga si porta in vista da sé | `scrollLeft` **543** senza che nessuno l'abbia scritto: è il motivo per cui non c'è nessun `tabIndex` sul contenitore |
-| Si preme l'ampolla | sedici segni della peste zampillano dal comando, uno dopo l'altro | 16 particelle, ognuna con `--pb-dx`, `--pb-apex`, `--pb-dy`, `--pb-spin`, una durata e un **ritardo** suoi — es. `−61,1 / −82,6 / +50,5 px, 192°, 0,97 s` |
+| Si preme la tazza | sedici segni della peste zampillano dal comando, uno dopo l'altro | 16 particelle, ognuna con `--pb-dx`, `--pb-apex`, `--pb-dy`, `--pb-spin`, una durata e un **ritardo** suoi — es. `−61,1 / −82,6 / +50,5 px, 192°, 0,97 s` |
 | Si mette in pausa una particella e la si porta a mano sui suoi istanti | **una parabola**: sale, si ferma in alto, ricade sotto il punto di partenza | y a 0 → **−55** → −80 → **−83** (apice, al 55%) → −63 → **+12**; la x scorre da −22 a −53 senza fermarsi; opacità 0 → 1 → 0,29 |
 | Il colore dei segni | verde di casa, non quello del testo della pagina | `rgb(163, 230, 53)`, cioè il lime del marchio. ⚠️ Va detto sulla particella: nel portale `currentColor` è quello del `body`, non quello del comando |
 | Si preme due volte di fila | il secondo getto non parte finché il primo non è finito | 16 particelle e basta: due getti sovrapposti non si leggono come due |
 | Dove stanno le particelle, e i fumetti della firma | fuori dal piede, non tagliati dalla riga che scorre | tutti nel portale sul `body`, `position: fixed`, `z-index` **50**: il fumetto «EVVAI! FUNZIONA!» sta 3 px sopra il bordo del piede e si legge intero |
 | I cenni delle due schede autore | non partono insieme | `animation-delay` **0s** e **2s**: due schede che saltellano allo stesso istante sembrano una cosa sola che pulsa |
-| Si preme l'ampolla e si guarda **quando** cambia pagina | dopo la fontana, non prima | la pagina resta `/barra` e l'apertura parte a **1728 ms** dal clic, cioè la durata che la fontana ha dichiarato |
+| Si preme la tazza e si guarda **quando** cambia pagina | dopo la fontana, non prima | la pagina resta `/barra` e l'apertura parte a **1728 ms** dal clic, cioè la durata che la fontana ha dichiarato |
+| Si preme la tazza e si guarda **come** si apre | una scheda sola, e questa pagina ferma dov'è | **una** chiamata, `('https://ko-fi.com/superivan94', '_blank')` — niente `noopener` fra le opzioni — `opener` a `null` subito dopo, e `location` invariata. Misurato a 1660 px e a 375 |
+| Il segno da solo, alle tre misure della pagina d'ingresso | si riconosce come tazza anche a 16 px | a 56 px tazza, manico, liquido e bolle; a 24 e a 16 la sagoma regge e restano il manico e il pelo del liquido |
 | Si scorre a metà pagina | barra **e** piede restano in vista | a `scrollY` 400 tutti e due dentro la finestra: `position: sticky`, `bottom: 0` — e il piede resta nel flusso, quindi non copre niente |
 | Le regole dell'incavo, nel CSS **generato** | sei, tre per lato, che sommano il rientro della taglia | `.pt-[calc(var(--spacing)*2_+_env(safe-area-inset-top))]` e le altre cinque, tutte risolte in `calc(... + env(...))`; il `meta` della pagina porta `viewport-fit=cover`, che è quello che le accende |
 | La versione scritta nel piede | quella vera della libreria, non una copiata a mano | `v0.1.0`, letta dal `package.json` |
@@ -404,6 +408,14 @@ si nota solo sapendo che cosa cercare. ⚠️ E il portale ha un prezzo che ques
 le posizioni sono **pixel della finestra**, quindi le corsie e il centraggio non si provano più
 leggendo l'elemento. Si provano sulla funzione che li calcola, dandole un riquadro finto; dove
 nascono **davvero** lo dicono le righe qui sopra.
+
+⚠️ **Per un giro il comando ha aperto ko-fi due volte**, e le righe di questo scenario non se ne
+accorgevano perché guardavano **quando** si apriva, non **come**. La scheda nuova partiva e insieme
+partiva anche questa pagina, perché `window.open` con `noopener` fra le opzioni torna `null` per
+specifica — anche quando la scheda si è aperta — e il ripiego pensato per le finestre bloccate
+scattava sempre. Trovato dall'utente provandolo su un browser vero: qui dentro le finestre nuove
+sono bloccate comunque, quindi si vedeva **una** pagina sola e il difetto non compariva. Da lì le
+due righe sugli argomenti dell'apertura, che sono ciò che distingue i due casi.
 
 ⚠️ **Lo scoppio era uniforme, ed è diventato una fontana** su richiesta dell'utente: le direzioni
 pescate su tutto il giro davano una girandola. Una fontana si riconosce perché ha **un apice** —

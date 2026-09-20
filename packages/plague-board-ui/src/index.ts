@@ -54,6 +54,7 @@ export { BiohazardIcon } from './icons/BiohazardIcon';
 export { CodeIcon } from './icons/CodeIcon';
 export { MoleculeIcon } from './icons/MoleculeIcon';
 export { PoisonIcon } from './icons/PoisonIcon';
+export { PotionMugIcon } from './icons/PotionMugIcon';
 export { RatIcon } from './icons/RatIcon';
 export { RobotIcon } from './icons/RobotIcon';
 export { SkullIcon } from './icons/SkullIcon';

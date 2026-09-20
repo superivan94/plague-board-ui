@@ -8,6 +8,7 @@ import {
   MoleculeIcon,
   type IconProps,
   PoisonIcon,
+  PotionMugIcon,
   RatIcon,
   RobotIcon,
   SkullIcon,
@@ -28,6 +29,7 @@ interface IconEntry {
 
 const icons: readonly IconEntry[] = [
   { name: 'PoisonIcon', Icon: PoisonIcon, paint: 'fill' },
+  { name: 'PotionMugIcon', Icon: PotionMugIcon, paint: 'fill' },
   { name: 'SkullIcon', Icon: SkullIcon, paint: 'fill' },
   { name: 'BiohazardIcon', Icon: BiohazardIcon, paint: 'fill' },
   { name: 'MoleculeIcon', Icon: MoleculeIcon, paint: 'fill' },

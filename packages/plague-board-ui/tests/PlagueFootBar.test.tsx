@@ -2,6 +2,7 @@ import { act, fireEvent, render, screen } from '@testing-library/react';
 import { describe, expect, it, vi } from 'vitest';
 
 import { CreditLine, PlagueBar, PlagueFootBar, SupportButton, VersionTag } from '../src';
+import { openInNewTab } from '../src/brand/openInNewTab';
 import { particelle } from './particelle';
 import { menoMovimento } from './preferenze';
 
@@ -66,7 +67,8 @@ describe('i pezzi del piede', () => {
 
   it('al clic sul comando i segni della peste sprigionano, e la pagina si apre dopo', () => {
     vi.useFakeTimers();
-    const apri = vi.spyOn(window, 'open').mockReturnValue(window);
+    const scheda = { opener: window } as unknown as Window;
+    const apri = vi.spyOn(window, 'open').mockReturnValue(scheda);
     render(<SupportButton href="https://esempio.test/dona" />);
 
     expect(particelle()).toHaveLength(0);
@@ -82,10 +84,25 @@ describe('i pezzi del piede', () => {
 
     // La durata non è un numero scritto nel comando: gliela dice la fontana.
     act(() => void vi.advanceTimersByTime(5000));
-    expect(apri).toHaveBeenCalledWith('https://esempio.test/dona', '_blank', 'noopener,noreferrer');
+    // ⚠️ **Niente `noopener` fra le opzioni.** Quella parola fa tornare `null` a `window.open`
+    // **anche quando la scheda si è aperta davvero**: il ripiego qui sotto scatterebbe lo stesso e
+    // porterebbe via pure questa pagina — due pagine di donazioni per un clic solo. Il legame si
+    // recide dopo, azzerando `opener`.
+    expect(apri).toHaveBeenCalledWith('https://esempio.test/dona', '_blank');
+    expect(scheda.opener).toBeNull();
 
     apri.mockRestore();
     vi.useRealTimers();
+  });
+
+  it('e se le finestre nuove sono bloccate, si va in quella di adesso', () => {
+    // ⚠️ Il ripiego si prova **sulla funzione**, non sul componente: in jsdom `location` è
+    // dichiarata non riconfigurabile, quindi una spia su `assign` muore prima di partire. Con la
+    // finestra passata da fuori, il caso si scrive in tre righe.
+    const finestra = { open: () => null, location: { href: 'about:blank' } };
+    openInNewTab('https://esempio.test/dona', finestra);
+
+    expect(finestra.location.href).toBe('https://esempio.test/dona');
   });
 
   it('con meno movimento il comando è un collegamento e basta', () => {

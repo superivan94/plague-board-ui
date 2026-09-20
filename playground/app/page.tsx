@@ -5,6 +5,7 @@ import {
   CodeIcon,
   MoleculeIcon,
   PoisonIcon,
+  PotionMugIcon,
   RobotIcon,
   SkullIcon,
   SparklesIcon,
@@ -18,6 +19,7 @@ import {
 // in chiaro, ed è esattamente il difetto che la pagina esiste per non far succedere.
 const icons = [
   { name: 'PoisonIcon', Icon: PoisonIcon },
+  { name: 'PotionMugIcon', Icon: PotionMugIcon },
   { name: 'SkullIcon', Icon: SkullIcon },
   { name: 'MoleculeIcon', Icon: MoleculeIcon },
   { name: 'BiohazardIcon', Icon: BiohazardIcon },

@@ -504,11 +504,28 @@ exist in target module» che **non sono veri**. Si guarda la pagina, o si crede 
   (`preventDefault`), far partire l'effetto e aprire **dopo**: ⚠️ `window.open` dentro un
   `setTimeout` funziona ancora, perché l'attivazione che un clic concede dura qualche secondo e non
   finisce con la funzione — ma se qualcuno blocca le finestre nuove torna `null`, e lì si va nella
-  stessa scheda invece di non fare niente. ⚠️ **E i clic speciali restano del browser**: ctrl, cmd,
+  stessa scheda invece di non fare niente. ⚠️ **E allora fra le opzioni di `window.open` non ci può
+  stare `noopener`**: con quella parola la specifica prescrive che il valore di ritorno sia `null`
+  **anche quando la scheda si è aperta**, quindi il ripiego non distingue più il successo dal
+  blocco, scatta sempre, e chi ha premuto si ritrova la stessa pagina **due volte** — segnalato
+  dall'utente il 2026-09-20, che vedeva aprirsi due ko-fi. Il legame si recide subito dopo con
+  `scheda.opener = null`; il prezzo è il `Referer`, che con `noreferrer` non sarebbe partito.
+  ⚠️ **Nel riquadro del browser dello strumento questo difetto non si vede**: lì le finestre nuove
+  sono bloccate sempre, `open` torna `null` per l'altro motivo, e si apre una pagina sola. Si
+  misura mettendo una **spia al posto di `window.open`** che registra gli argomenti e torna una
+  finestra finta. ⚠️ **E i clic speciali restano del browser**: ctrl, cmd,
   shift, alt e il tasto centrale si lasciano passare, o si toglie a chi legge un gesto che si
   aspetta. ⚠️ Quanto aspettare **non si scrive nel comando**: lo chiede all'effetto, che è l'unico
   a sapere quante particelle sono e quanto vola la più lenta — `burst()` restituisce i millisecondi,
   e `0` quando non è partito niente. Misurato: 1728 ms fra il clic e l'apertura.
+- ⚠️ **Un segno che sostituisce il testo appartiene a una convenzione prima che al tema.** Sotto le
+  32rem il comando delle donazioni si riduce a **36 px**: resta il solo segno, e l'ampolla della
+  peste — bella, nostra e a tema — non diceva a che cosa serviva quel comando. Le convenzioni che
+  nel software dicono «sostieni» sono tre: la **tazza** (ko-fi, BuyMeACoffee), il **cuore** (GitHub
+  Sponsors), la **moneta**. `PotionMugIcon` tiene la sagoma della prima e ci mette dentro la nostra
+  roba, liquido e bolle — lo stesso mestiere che fa il testo «offrimi una pozione», che è il calco
+  di «offrimi un caffè». Segnalato dall'utente il 2026-09-20. ⚠️ E non ha sostituito l'ampolla:
+  `PoisonIcon` resta il veleno dentro l'applicazione. Due segni, due mestieri.
 - ⚠️ **Una lastra che tocca il bordo dello schermo deve tenere conto degli incavi, e `env()` da
   solo non basta.** `env(safe-area-inset-*)` vale **zero** finché la pagina non dichiara
   `viewport-fit=cover` — senza, è il browser a tenere il contenuto lontano dagli incavi, e la
