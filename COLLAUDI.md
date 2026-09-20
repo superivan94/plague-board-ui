@@ -828,6 +828,7 @@ scrivendo `pb-playground-theme` in `localStorage` e **ricaricando**.
 | Teschio sul disco del ripiego, in tema chiaro | il disco resta scuro nei due temi, ed è un'isola | teschio **9,73**, disco sulla pagina **13,46** |
 | Bordo del pannello al 50% — scuro / chiaro | visibile | **3,85** / **1,99** |
 | A 375 px | niente scorrimento laterale | `scrollWidth` **375** = `innerWidth`; i 25 elementi che sbordano sono tutti dentro la tabella, che scorre nel suo riquadro |
+| A 375 px, col nome del grado più lungo | la pastiglia va a capo, non si taglia | «Consigliere Bubbonico» misura **171 px** e scende sulla riga sotto; nessuna delle 12 pastiglie ha il testo tagliato |
 
 ⚠️ **Il velo del pannello non può scendere verso `background`.** Era la prima scrittura — `from-surface
 to-background` — e in tema chiaro il fondo della scheda finiva **esattamente del colore della

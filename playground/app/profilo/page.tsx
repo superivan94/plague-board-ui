@@ -15,13 +15,19 @@ import {
   type ThematicBadgeColor,
 } from 'plague-board-ui';
 
-/** I cinque colori del tema, coi nomi che ci si mette sopra in una demo. */
+/**
+ * I cinque colori del tema, coi nomi che ci si mette sopra in una demo.
+ *
+ * ⚠️ Sono **inventati per questa pagina**, e stanno nel registro di casa: in RattInventario la
+ * scala vera è di tre — «Ratto di Fogna», «Diffusore di Peste», «Signore Bubbonico» — e vive nel
+ * suo `userPlansConfig`, non qui.
+ */
 const GRADI: readonly { color: ThematicBadgeColor; nome: string }[] = [
-  { color: 'default', nome: 'Portatore sano' },
-  { color: 'accent', nome: 'Paziente Zero' },
-  { color: 'success', nome: 'Immune' },
-  { color: 'warning', nome: 'Sintomatico' },
-  { color: 'danger', nome: 'Untore' },
+  { color: 'default', nome: 'Topo di Fogna' },
+  { color: 'accent', nome: 'Consigliere Bubbonico' },
+  { color: 'success', nome: 'Portatore Sano' },
+  { color: 'warning', nome: 'Diffusore di Peste' },
+  { color: 'danger', nome: 'Signore Bubbonico' },
 ];
 
 const TAGLIE = ['sm', 'md', 'lg'] as const;
@@ -54,7 +60,7 @@ export default function ProfiloPage() {
             <Card.Description className="truncate">ratto.zero@ludoratti.it</Card.Description>
             <div className="flex flex-wrap gap-2 pt-1">
               <ThematicBadge color="accent" icon={<VirusIcon size={12} />}>
-                Paziente Zero
+                Consigliere Bubbonico
               </ThematicBadge>
               <ThematicBadge color="warning">Contagio alto</ThematicBadge>
             </div>
@@ -174,8 +180,8 @@ export default function ProfiloPage() {
                       : color === 'success'
                         ? 'uno stato raggiunto, non un livello di pericolo'
                         : color === 'warning'
-                          ? 'un limite vicino'
-                          : 'un limite superato'}
+                          ? 'un grado che avvisa: un limite vicino, una scadenza'
+                          : 'il grado in cima, o un limite superato'}
                 </td>
                 <td className="py-2">
                   <ThematicBadge color={color}>{nome}</ThematicBadge>
