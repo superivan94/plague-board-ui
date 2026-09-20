@@ -178,13 +178,25 @@ finestra si porta alle misure della tabella con l'emulazione del riquadro; i num
 di produzione si contano in `playground/.next/static/chunks/*.css` dopo `npm run build --workspace
 playground`.
 
+⚠️ **Le taglie che il playground non monta si provano con una sonda**, perché qui la barra è
+`medium` e il piede `small`, e le lastre in mostra hanno la compattazione spenta: si appende al
+`body` un `<div>` con le classi della tabella — e un `<svg>` col suo `width` scritto — si legge lo
+stile calcolato e si toglie. Che da quelle classi ci arrivi davvero il **componente** lo tengono i
+test di `brand.test.tsx` e `PlagueFootBar.test.tsx`: le due metà insieme fanno la catena.
+
 | Azione | Atteso | Ottenuto |
 |---|---|---|
-| A 1280×900, la barra (`medium`) e il piede (`small`) | rientro 12 e 4 px, segno 24 | 12 e 4, segno 24 |
+| A 1280×900, la barra (`medium`) e il piede (`small`) del playground | rientro 12 e 4 px, segno 24 | 12 e 4, segno 24 |
 | A 375×812 | la barra torna a `small`: 8 px e segno 20 | 8 px, segno 20 |
 | L'attributo `width` del marchio, a 375 | resta 24: a cambiare è la regola, non il numero | `width="24"`, disegno **20 px** |
 | A 844×390 — il telefono **coricato** | compatta lo stesso, per l'altezza | rientro 8 e 4, segno 20 |
 | A 900×700 | torna alla taglia dichiarata | rientro 12, segno 24 |
+| Sonda, a 1280×900: i tre rientri in cima e i due in fondo | 8/12/16 e 4/8/12 | 8/12/16 e 4/8/12 |
+| Sonda, a 375×812: gli stessi cinque | tutti alla taglia piccola: 8 e 4 | 8, 8, 8 e 4, 4 |
+| Sonda, i sei segni (marchio, tazza, autore × medium e large) a 1280×900 | 24/32, 22/26, 16/18 | 24/32, 22/26, 16/18 |
+| Gli stessi sei a 375×812 | tutti al pavimento: 20, 20, 14 | 20/20, 20/20, 14/14 |
+| Il confine in larghezza, con `large` in cima: 639×800 poi 640×800 | 8 px, poi 16 | 8 px, poi 16 |
+| Il confine in altezza: 800×479 poi 800×480 | 8 px, poi 16 | 8 px, poi 16 |
 | Le sei lastre in mostra di `/barra` a 375, con `isCompactOnMobile={false}` | non compattano | 8/12/16 in cima, 4/8/12 in fondo |
 | Le regole `pb-roomy:` nel CSS di produzione | tutte in **un solo** `@media (min-width:40rem) and (min-height:30rem)`, **dopo** le regole di base | 13 regole a 439928, le `py-*` di base a 431523 |
 | Scorrimento laterale a 375 | nessuno | nessuno |
@@ -196,6 +208,11 @@ semplicemente «grande», senza niente di rosso da nessuna parte. La seconda è 
 `size-*` **sostituisce davvero** l'attributo `width` di un `<svg>`: è il meccanismo su cui poggia
 tutta la compattazione dei segni, ed è una proprietà del browser, non nostra. La terza è la
 soglia sull'**altezza**, che è l'unica cosa che distingue un telefono coricato da un desktop.
+
+⚠️ **Una cosa resta dedotta e non misurata**, e va detto: che senza `theme.css` le lastre restino
+compatte **ovunque** invece di restare grandi sul telefono. Non si prova qui senza smontare il
+playground, ma segue dalla riga misurata a 375 — lì si vede esattamente la classe di base, che è
+l'unica che sopravviverebbe se la variante non fosse dichiarata.
 
 ---
 
