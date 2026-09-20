@@ -716,6 +716,9 @@ un'altra scheda: `rattinventario.ludoratti.it/progettoE`, che è la pagina da cu
 | Si preme il comando della musica | suona, e il comando lo dice | `paused: false`, `currentTime` 3,93 su **92,84 s**, `volume: 0.4`, `aria-pressed="true"`, nome accessibile «Togli la musica» |
 | Si preme di nuovo | si ferma | `paused: true`, `aria-pressed="false"`, nome «Metti la musica» |
 | Al caricamento, senza toccare niente | silenzio | `play` non chiamato, `preload="none"`: i 2,1 MB non partono finché nessuno preme |
+| **Quarto giro** — il cursore del volume, montato lontano dall'interruttore | lo comanda lo stesso | gruppo `role="group"` largo **192 px** con nome «Volume della musica», `value 40`, `step 10`; `audio.volume` 0,4 |
+| Si abbassa il volume da tastiera mentre suona | il volume scende e **la musica non si interrompe** | da 40 a 30, `audio.volume` 0,3, `paused: false`, la traccia resta al suo punto |
+| `Slider` di HeroUI senza i suoi sotto-pezzi | non rende niente da afferrare | un `<div role="group">` **vuoto**: nessuna traccia, nessun `<input type="range">` |
 
 ⚠️ **Il contrasto si misura risolvendo il colore su una tela, non leggendo la stringa.** Oggi
 `getComputedStyle` restituisce `lab(96.5432 -0.0000596046 0)` e `oklab(0.657609 …)`: una regex che

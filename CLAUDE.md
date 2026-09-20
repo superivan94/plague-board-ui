@@ -702,6 +702,19 @@ exist in target module» che **non sono veri**. Si guarda la pagina, o si crede 
   quella spia è anche l'unico modo di provare il caso che conta: il **rifiuto**. Il browser blocca
   l'audio finché non c'è un gesto, e un comando che non gestisse quel rifiuto resterebbe
   «premuto» sopra un silenzio, più un errore non gestito in console.
+- ⚠️ **Un componente che si tiene dentro l'elemento è un componente che non si può affiancare.**
+  `MusicToggle` nasceva con l'`<audio>` e lo stato addosso, e finché era così il **volume non
+  aveva dove stare**: un secondo comando altrove non avrebbe avuto niente da comandare. La forma
+  giusta ce l'aveva già il livello tossico — provider che tiene la cosa, comandi che la leggono —
+  ed è la domanda da farsi ogni volta che un pezzo possiede una risorsa: qualcuno vorrà
+  governarla da un altro punto della pagina? Con l'audio la risposta è sì, e si vede subito.
+  Segnalato dall'utente il 2026-09-20.
+- ⚠️ **`Slider` di HeroUI senza i suoi sotto-pezzi rende un `<div role="group">` vuoto**: niente
+  traccia, niente `<input type="range">`, quindi niente da afferrare col mouse e niente da
+  annunciare. Vanno scritti `Slider.Track`, `Slider.Fill` e `Slider.Thumb`. È la stessa forma del
+  `Radio` composto, e lo stesso modo di fallire: a occhio sembra solo un cursore che non si vede.
+  ⚠️ E il `aria-label` sta sul **gruppo**, mentre l'`<input>` lo eredita con `aria-labelledby`:
+  un test lo cerca con `getByRole('slider', { name })` e lo trova lo stesso.
 - ⚠️ **L'autoplay che ripiega sul «primo gesto qualunque» è una trappola, non un ripiego.** È
   quello che fa `useAudioPlayer` di RattInventario: tenta `play()` dopo mezzo secondo, il browser
   lo blocca, e allora ascolta il primo `click`, `touchstart` o `keydown` della pagina. Vuol dire

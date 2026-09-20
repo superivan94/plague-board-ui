@@ -39,9 +39,13 @@ export {
   PLAGUE_FOOT_MARK_SIZE,
   type PlagueBarSize,
 } from './brand/plagueBarSizes';
-// L'audio di fondo. ⚠️ La traccia **non** viaggia col pacchetto — `LudoRatti.mp3` pesa 2,1 MB —
-// quindi il comando riceve un indirizzo e la serve chi installa.
+// L'audio di fondo, nella stessa forma del livello tossico: un provider che tiene la traccia, e i
+// comandi che la governano da dove vuole chi monta la pagina.
+// ⚠️ La traccia **non** viaggia col pacchetto — `LudoRatti.mp3` pesa 2,1 MB — quindi il provider
+// riceve un indirizzo e il file lo serve chi installa.
+export { MusicProvider, useMusic, type MusicProviderProps, type MusicValue } from './brand/MusicProvider';
 export { MusicToggle, type MusicToggleProps } from './brand/MusicToggle';
+export { MusicVolume, type MusicVolumeProps } from './brand/MusicVolume';
 // Il pulsare che mette l'occhio su un comando. ⚠️ Niente a che vedere con `PulseDot`, che è un
 // pallino di stato: questo avvolge, quello marca.
 export { PlaguePulse, type PlaguePulseProps } from './brand/PlaguePulse';
