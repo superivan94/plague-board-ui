@@ -13,6 +13,8 @@ import {
   RatIcon,
   RobotIcon,
   SkullIcon,
+  SkullPhonesIcon,
+  SkullPhonesOffIcon,
   SparklesIcon,
   VirusIcon,
 } from '../src';
@@ -39,6 +41,8 @@ const icons: readonly IconEntry[] = [
   { name: 'CodeIcon', Icon: CodeIcon, paint: 'stroke' },
   { name: 'SparklesIcon', Icon: SparklesIcon, paint: 'stroke' },
   { name: 'RatIcon', Icon: RatIcon, paint: 'stroke' },
+  { name: 'SkullPhonesIcon', Icon: SkullPhonesIcon, paint: 'fill' },
+  { name: 'SkullPhonesOffIcon', Icon: SkullPhonesOffIcon, paint: 'fill' },
 ];
 
 it('il marchio del ratto si tinge tutto, tratto e orecchie insieme', () => {

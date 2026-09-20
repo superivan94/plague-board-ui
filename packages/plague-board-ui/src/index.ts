@@ -39,6 +39,9 @@ export {
   PLAGUE_FOOT_MARK_SIZE,
   type PlagueBarSize,
 } from './brand/plagueBarSizes';
+// L'audio di fondo. ⚠️ La traccia **non** viaggia col pacchetto — `LudoRatti.mp3` pesa 2,1 MB —
+// quindi il comando riceve un indirizzo e la serve chi installa.
+export { MusicToggle, type MusicToggleProps } from './brand/MusicToggle';
 // Il pulsare che mette l'occhio su un comando. ⚠️ Niente a che vedere con `PulseDot`, che è un
 // pallino di stato: questo avvolge, quello marca.
 export { PlaguePulse, type PlaguePulseProps } from './brand/PlaguePulse';
@@ -94,6 +97,9 @@ export { PotionMugIcon } from './icons/PotionMugIcon';
 export { RatIcon } from './icons/RatIcon';
 export { RobotIcon } from './icons/RobotIcon';
 export { SkullIcon } from './icons/SkullIcon';
+// I due stati della musica: lo stesso teschio con le cuffie, uno con la sbarra.
+export { SkullPhonesIcon } from './icons/SkullPhonesIcon';
+export { SkullPhonesOffIcon } from './icons/SkullPhonesOffIcon';
 export { SparklesIcon } from './icons/SparklesIcon';
 export { VirusIcon } from './icons/VirusIcon';
 export type { IconProps } from './icons/types';
