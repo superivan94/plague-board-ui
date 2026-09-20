@@ -561,6 +561,24 @@
   }
 }
 
+/* ⚠️ **Il tremolio è ciò che distingue un gas da una bolla di sapone.** Una bolla di sapone è una
+ * sfera perfetta e resta tale; una sacca di gas in un liquido si deforma di continuo. Con il solo
+ * `border-radius: 9999px` il disegno leggeva «sapone» — segnalato dall'utente il 2026-09-20 — e
+ * nessun colore lo correggeva, perché il problema era la **forma**. Spegnendo l'animazione (meno
+ * movimento) resta il cerchio della classe, che è il ripiego giusto. */
+@keyframes pb-toxic-wobble {
+  0%,
+  100% {
+    border-radius: 52% 48% 46% 54% / 50% 46% 54% 50%;
+  }
+  33% {
+    border-radius: 46% 54% 53% 47% / 55% 52% 48% 45%;
+  }
+  66% {
+    border-radius: 54% 46% 50% 50% / 45% 53% 47% 55%;
+  }
+}
+
 .pb-toxic-bubble {
   position: absolute;
   top: 0;
@@ -583,25 +601,33 @@
   display: block;
   width: var(--pb-toxic-size, 40px);
   height: var(--pb-toxic-size, 40px);
+  /* Il cerchio è il ripiego per chi ha chiesto meno movimento: la forma vera la scrive
+     `pb-toxic-wobble`, perché una sacca di gas non è mai una sfera. */
   border-radius: 9999px;
   /* Il bordo è `plague-400`: la malattia, non il marchio. */
-  border: 1px solid rgb(74 222 128 / 0.7);
-  /* ⚠️ **Una bolla è vuota, e si vede dal bordo.** I tre gradienti, dall'alto in basso: il lampo
-     speculare — il punto in cui si specchia la luce, piccolo e quasi bianco, che è la cosa che
-     dice «vetro» —, il riflesso morbido attorno, e la densità **al bordo** invece che al centro,
-     perché guardando di sbieco la pellicola si attraversa più film. Riempirla al centro, come di
-     là, dà una pallina verde. */
+  border: 1px solid rgb(74 222 128 / 0.65);
+  /* ⚠️ **Un gas tossico fa luce da dentro; una bolla di sapone la riflette.** È tutta qui la
+     differenza fra i due disegni, e il primo giro l'aveva sbagliata — riflesso quasi bianco,
+     centro vuoto, densità al bordo: il vocabolario del vetro. I tre gradienti sono adesso il
+     **riflesso verde** (nessun bianco: il bianco è l'occhiello del sapone), il **nucleo che
+     brilla** in `toxic` — l'unico posto, con l'alone, dove quel verde puro compare, e sempre con
+     l'opacità, come vuole il tema — e la pellicola al bordo che lo chiude. */
   background:
-    radial-gradient(circle at 30% 26%, rgb(240 253 244 / 0.75), rgb(240 253 244 / 0) 10%),
-    radial-gradient(circle at 34% 30%, rgb(187 247 208 / 0.26), transparent 46%),
-    radial-gradient(circle at 50% 50%, rgb(34 197 94 / 0.05) 42%, rgb(74 222 128 / 0.22) 100%);
-  /* Il verde `toxic` compare solo qui e solo nell'alone, con l'opacità: è il modo in cui il tema
-     dice che quel verde puro si usa, non a campitura. */
+    radial-gradient(circle at 32% 27%, rgb(190 242 100 / 0.4), rgb(190 242 100 / 0) 26%),
+    radial-gradient(
+      circle at 50% 58%,
+      rgb(0 255 0 / 0.24),
+      rgb(34 197 94 / 0.12) 52%,
+      rgb(34 197 94 / 0) 78%
+    ),
+    radial-gradient(circle at 50% 50%, transparent 64%, rgb(74 222 128 / 0.26) 100%);
+  /* L'alone è il gas che filtra fuori: più largo e più acceso di quello di una bolla di vetro. */
   box-shadow:
-    0 0 calc(var(--pb-toxic-size, 40px) * 0.22) rgb(0 255 0 / 0.18),
-    inset 0 0 calc(var(--pb-toxic-size, 40px) * 0.28) rgb(74 222 128 / 0.16);
+    0 0 calc(var(--pb-toxic-size, 40px) * 0.34) rgb(0 255 0 / 0.26),
+    inset 0 0 calc(var(--pb-toxic-size, 40px) * 0.3) rgb(0 255 0 / 0.12);
   animation:
     pb-toxic-sway var(--pb-toxic-sway-duration, 3000ms) ease-in-out infinite,
+    pb-toxic-wobble var(--pb-toxic-sway-duration, 3000ms) ease-in-out infinite,
     pb-toxic-swell var(--pb-toxic-rise-duration, 6000ms) linear forwards;
   will-change: transform, scale;
 }
