@@ -26,8 +26,12 @@ export { PlagueFootBar, type PlagueFootBarProps } from './brand/PlagueFootBar';
 // ⚠️ Le misure **non** escono da `PlagueBar.tsx`, che dichiara `'use client'`: un dato esportato
 // da un modulo client arriva a una pagina server come riferimento, e chi lo indicizza ottiene
 // `undefined` senza che niente diventi rosso. Il perché per esteso sta in `plagueBarSizes.ts`.
+// ⚠️ E accanto a ogni numero esce la sua **classe**: un numero non risponde a una media query,
+// quindi un marchio dentro una barra che si compatta sul telefono ha bisogno di tutt'e due.
 export {
+  PLAGUE_BAR_MARK_CLASS,
   PLAGUE_BAR_MARK_SIZE,
+  PLAGUE_FOOT_MARK_CLASS,
   PLAGUE_FOOT_MARK_SIZE,
   type PlagueBarSize,
 } from './brand/plagueBarSizes';

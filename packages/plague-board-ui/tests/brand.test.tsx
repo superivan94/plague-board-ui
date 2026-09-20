@@ -2,6 +2,7 @@ import { render, screen } from '@testing-library/react';
 import { describe, expect, it } from 'vitest';
 
 import {
+  PLAGUE_BAR_MARK_CLASS,
   PLAGUE_BAR_MARK_SIZE,
   PlagueBar,
   type PlagueBarSize,
@@ -133,13 +134,57 @@ describe('PlagueBar', () => {
     ['medium', 'py-3'],
     ['large', 'py-4'],
   ] as const)('la taglia %s porta la sua altezza', (size, padding) => {
-    render(<PlagueBar size={size}>x</PlagueBar>);
+    render(
+      <PlagueBar size={size} isCompactOnMobile={false}>
+        x
+      </PlagueBar>,
+    );
 
     expect(screen.getByRole('banner')).toHaveClass(padding);
   });
 
+  // ⚠️ **La taglia dichiarata vale dove c'è posto, e su un telefono vale `small`.** Le due classi
+  // sono una sola frase: il `py-2` di base è quello che si vede sotto la soglia, `pb-roomy:` lo
+  // ripristina sopra. Se un giorno sparisse la prima, la barra resterebbe grande sul telefono
+  // senza che niente diventi rosso — ed è per questo che il test guarda tutt'e due.
+  it.each([
+    ['small', 'py-2', undefined],
+    ['medium', 'py-2', 'pb-roomy:py-3'],
+    ['large', 'py-2', 'pb-roomy:py-4'],
+  ] as const)('di default la taglia %s si accontenta di small sul telefono', (size, base, roomy) => {
+    render(<PlagueBar size={size}>x</PlagueBar>);
+
+    const bar = screen.getByRole('banner');
+    expect(bar).toHaveClass(base);
+    if (roomy) {
+      expect(bar).toHaveClass(roomy);
+      // La taglia piena non c'è **senza** variante: quella è la riga che si vedrebbe sul telefono.
+      expect(bar.className.split(' ')).not.toContain(roomy.replace('pb-roomy:', ''));
+    }
+  });
+
+  it('e il rientro dell’incavo scala insieme a lei, nei due modi', () => {
+    const { rerender } = render(<PlagueBar size="large">x</PlagueBar>);
+
+    // Sul telefono l'incavo si somma al rientro di `small`, non a quello di `large`: sommare la
+    // taglia grande all'orecchia della fotocamera è esattamente il pixel di troppo che si voleva
+    // togliere.
+    expect(screen.getByRole('banner').className).toContain('pt-[calc(var(--spacing)*2_+_env(safe-area-inset-top))]');
+    expect(screen.getByRole('banner').className).toContain(
+      'pb-roomy:pt-[calc(var(--spacing)*4_+_env(safe-area-inset-top))]',
+    );
+
+    rerender(
+      <PlagueBar size="large" isCompactOnMobile={false}>
+        x
+      </PlagueBar>,
+    );
+    expect(screen.getByRole('banner').className).toContain('pt-[calc(var(--spacing)*4_+_env(safe-area-inset-top))]');
+    expect(screen.getByRole('banner').className).not.toContain('pb-roomy:');
+  });
+
   it('senza taglia è media', () => {
-    render(<PlagueBar>x</PlagueBar>);
+    render(<PlagueBar isCompactOnMobile={false}>x</PlagueBar>);
 
     expect(screen.getByRole('banner')).toHaveClass('py-3');
   });
@@ -155,4 +200,35 @@ describe('PlagueBar', () => {
     expect(marks).toStrictEqual([...marks].sort((a, b) => a - b));
     expect(new Set(marks).size).toBe(sizes.length);
   });
+
+  // ⚠️ **La stessa misura scritta due volte è una misura che prima o poi diverge.** Il numero serve
+  // a chi non compatta, la classe a chi compatta — ma devono dire la stessa cosa, o il marchio
+  // cambierebbe di misura passando da un modo all'altro. Qui si legge la classe e si controlla che
+  // il pixel che ne esce sia quello della tabella dei numeri.
+  it('la classe del segno dice lo stesso numero della tabella, e sul telefono dice 20', () => {
+    const sizes: readonly PlagueBarSize[] = ['small', 'medium', 'large'];
+
+    for (const size of sizes) {
+      const [base, roomy] = PLAGUE_BAR_MARK_CLASS[size].split(' ');
+
+      expect(pixelDiSize(base)).toBe(PLAGUE_BAR_MARK_SIZE.small);
+      expect(roomy ? pixelDiSize(roomy.replace('pb-roomy:', '')) : PLAGUE_BAR_MARK_SIZE.small).toBe(
+        PLAGUE_BAR_MARK_SIZE[size],
+      );
+    }
+  });
 });
+
+/**
+ * I pixel che una utility `size-*` di Tailwind produce: `size-5` è cinque gradini da `0.25rem`,
+ * `size-[26px]` è ventisei pixel scritti a mano. Serve solo a questi test, che sono l'unico posto
+ * in cui una classe va **letta** invece che scritta.
+ */
+function pixelDiSize(classe: string): number {
+  const arbitraria = classe.match(/^size-\[(\d+)px\]$/);
+  if (arbitraria) return Number(arbitraria[1]);
+
+  const scala = classe.match(/^size-([\d.]+)$/);
+  if (!scala) throw new Error(`classe non riconosciuta: ${classe}`);
+  return Number(scala[1]) * 4;
+}

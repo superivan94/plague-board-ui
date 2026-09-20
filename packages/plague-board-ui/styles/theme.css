@@ -142,3 +142,27 @@
   --success-hover: #16a34a;
   --success-foreground: #ffffff;
 }
+
+/* ─────────────────────────────────────────────────────────────────────────────
+ * `pb-roomy` — «c'è posto».
+ *
+ * La soglia oltre la quale una lastra dei Ludoratti porta la taglia che le è stata chiesta. Sotto,
+ * barra e piede tornano a `small`: è quello che fa `isCompactOnMobile`, acceso di default.
+ *
+ * ⚠️ **Due condizioni, non una.** La larghezza da sola — `sm:`, cioè queste stesse 40rem — lascia
+ * fuori il caso in cui lo spazio verticale è più scarso di tutti: un telefono **coricato** è largo
+ * 844 px e alto 390, quindi passerebbe per un desktop mentre una barra `large` e un piede `large`
+ * gli prendono un terzo dello schermo. La seconda condizione è lì per lui, e prende di rimbalzo
+ * anche una finestra bassa sul desktop. Soglie scelte con l'utente il 2026-09-20.
+ *
+ * ⚠️ **È una variante e non una utility perché deve poter vestire qualunque proprietà**: il
+ * rientro della lastra, il rientro dell'incavo, la misura di un segno. E sta in `theme.css`, cioè
+ * nel foglio che chi installa la libreria importa comunque: senza, le classi `pb-roomy:*` non
+ * generano nessuna regola e le lastre restano **compatte ovunque** — meno bello, mai rotto.
+ * ───────────────────────────────────────────────────────────────────────────── */
+
+@custom-variant pb-roomy {
+  @media (min-width: 40rem) and (min-height: 30rem) {
+    @slot;
+  }
+}

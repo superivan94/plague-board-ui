@@ -539,6 +539,32 @@ exist in target module» che **non sono veri**. Si guarda la pagina, o si crede 
   dentro c'è un solo riquadro. Il comando delle donazioni misurava 28 px e il suo involucro 32.
   Si cura dichiarando `flex` sull'involucro, e si scopre solo misurando l'elemento **e** suo padre:
   guardando il comando, i numeri tornavano.
+- ⚠️ **Una taglia che deve cambiare col dispositivo si scrive in CSS, non in JavaScript.** È
+  `isCompactOnMobile` su `PlagueBar` e `PlagueFootBar`, acceso di default: sul telefono la taglia
+  dichiarata torna `small`. Un gancio che legge la larghezza risponderebbe **dopo** l'idratazione —
+  il server non sa quanto è largo lo schermo — quindi ogni caricamento su un telefono muoverebbe
+  la lastra di venti pixel a pagina già disegnata. ⚠️ **E si scrive mobile-first**: la taglia
+  piccola di base, quella dichiarata dentro la variante. Al contrario — taglia piena di base e
+  compattazione in una `max-*` — chi vince dipenderebbe dall'**ordine** delle due regole nel CSS
+  generato, perché una media query non aggiunge specificità; e il giorno che la variante non
+  venisse emessa, la lastra resterebbe grande sul telefono invece che compatta ovunque. Verificato
+  nel CSS di produzione: 13 regole `pb-roomy:` in un solo `@media`, a 439928, contro le `py-*` di
+  base a 431523. ⚠️ **La soglia guarda larghezza e altezza** — `@custom-variant pb-roomy` in
+  `theme.css`, 40rem e 30rem — perché un telefono **coricato** è largo 844 px e alto 390: sulla
+  sola larghezza passerebbe per un desktop proprio dove una barra e un piede `large` si prendono
+  122 dei suoi 390 pixel. ⚠️ **E guarda la finestra, non il contenitore**, al contrario dei pezzi
+  dentro la riga: il rientro sta sulla lastra, e una container query può interrogare solo un
+  **antenato**.
+- ⚠️ **Una classe `size-*` sostituisce l'attributo `width` di un `<svg>`, ed è l'unico modo di far
+  rispondere a una media query un numero già stampato.** Misurato il 2026-09-20 sul marchio della
+  barra: `width="24"` nell'attributo, **20 px** di disegno. Per questo accanto a ogni tabella di
+  misure ce n'è una di classi — `PLAGUE_BAR_MARK_CLASS`, `PLAGUE_FOOT_MARK_CLASS` — e si passano
+  **insieme**: il numero serve a chi non compatta, la classe a chi compatta, e un test tiene i due
+  allineati leggendo il pixel dentro la classe. Chi passa solo il numero si ritrova un marchio
+  grande in una barra bassa: sbagliato, ma non rotto. ⚠️ **Le classi vanno scritte per esteso**:
+  `'pb-roomy:' + tabella[size]` darebbe la stringa giusta e **nessuna regola**, perché Tailwind le
+  classi le cerca nel testo dei file — ed è il motivo per cui `plagueBarSizes.ts` ha due tabelle
+  invece di una funzione.
 - ⚠️ **Un'icona che si anima da sola è invadente: l'interruttore sta su chi la monta, non sul
   disegno.** `PotionMugIcon` porta le classi sui suoi pezzi (`pb-potion-bubble`, più due per i
   ritardi) e `animations.css` le anima **solo** dentro un antenato `.pb-potion-live`, che è

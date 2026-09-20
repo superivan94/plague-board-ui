@@ -3,7 +3,15 @@
 import { Popover } from '@heroui/react';
 import Link from 'next/link';
 import { usePathname } from 'next/navigation';
-import { BarRow, PLAGUE_BAR_MARK_SIZE, PlagueBar, RatIcon, TechLabel, TechRule } from 'plague-board-ui';
+import {
+  BarRow,
+  PLAGUE_BAR_MARK_CLASS,
+  PLAGUE_BAR_MARK_SIZE,
+  PlagueBar,
+  RatIcon,
+  TechLabel,
+  TechRule,
+} from 'plague-board-ui';
 import { useState } from 'react';
 
 import { PLAYGROUND_FAMILIES, PLAYGROUND_PAGES, type PlaygroundFamilyInfo, type PlaygroundPage } from './pages';
@@ -146,11 +154,15 @@ export function PlaygroundNav() {
               la prima delle sue tre letture, invece di aggiungerne una quarta — che era il difetto
               del pallino che stava qui prima.
               ⚠️ La misura non è scritta a mano: la barra è `medium`, e chi mette il segno chiede
-              alla libreria quanto farlo grande per quella taglia. */}
+              alla libreria quanto farlo grande per quella taglia.
+              ⚠️ E la chiede **due volte**, numero e classe: la barra sul telefono torna `small`,
+              e un numero già stampato dentro `width` non risponde a una media query. Senza la
+              classe il marchio resterebbe a 24 dentro una barra alta come una da 20 — che è il
+              modo giusto di sbagliare, ma è comunque sbagliato. */}
           <span className="flex items-center gap-2">
             <RatIcon
               size={PLAGUE_BAR_MARK_SIZE.medium}
-              className="animate-heartbeat shrink-0 text-brand"
+              className={`animate-heartbeat shrink-0 text-brand ${PLAGUE_BAR_MARK_CLASS.medium}`}
             />
             <TechLabel className="text-muted">plague-board-ui</TechLabel>
           </span>

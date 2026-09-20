@@ -4,6 +4,8 @@ import { Surface } from '@heroui/react';
 import type { ReactNode } from 'react';
 
 import {
+  PLAGUE_BAR_COMPACT_PADDING,
+  PLAGUE_BAR_COMPACT_SAFE_PADDING,
   PLAGUE_BAR_PADDING,
   PLAGUE_BAR_SAFE_PADDING,
   type PlagueBarPlacement,
@@ -27,6 +29,15 @@ export interface PlagueBarProps {
   placement?: PlagueBarPlacement;
   /** Quanto è alta. `medium` di default: è la barra di un'applicazione. */
   size?: PlagueBarSize;
+  /**
+   * Sul telefono la taglia torna `small`, qualunque sia quella dichiarata. **Vero di default.**
+   *
+   * ⚠️ La soglia è larghezza **e** altezza — `pb-roomy` in `theme.css` — perché il posto dove lo
+   * spazio verticale è più scarso è un telefono coricato, che di larghezza ne ha da vendere.
+   * Si spegne quando la barra non vive in una pagina intera: dentro un riquadro di demo, o in
+   * un'applicazione che ha già una sua idea di come si comporta sul telefono.
+   */
+  isCompactOnMobile?: boolean;
 }
 
 /**
@@ -72,6 +83,15 @@ export interface PlagueBarProps {
  * ⚠️ **E la stessa taglia vale meno in fondo che in cima**, di un gradino: `small` rientra di 8 px
  * per lato sopra e di 4 sotto. Un piede è una firma, e su una lastra appiccicata lo spazio che
  * prende lo toglie alla pagina a ogni schermata.
+ *
+ * ⚠️ **Sul telefono la taglia dichiarata non vale: vale `small`.** È `isCompactOnMobile`, acceso
+ * di default, e succede **in CSS** — due classi, quella piccola sempre e quella dichiarata sotto
+ * `pb-roomy`. Con un gancio che legge la larghezza sarebbe successo dopo l'idratazione, cioè con
+ * la pagina già disegnata: il server non sa quanto è largo lo schermo, quindi ogni caricamento su
+ * un telefono avrebbe mosso la pagina di venti pixel. ⚠️ **La soglia guarda la finestra e non il
+ * contenitore**, al contrario di quello che fanno i pezzi dentro la riga: il rientro sta sulla
+ * lastra, e una container query può interrogare solo un antenato — che qui è la pagina di chi
+ * installa la libreria.
  */
 export function PlagueBar({
   children,
@@ -79,8 +99,13 @@ export function PlagueBar({
   isSticky = true,
   placement = 'top',
   size = 'medium',
+  isCompactOnMobile = true,
 }: PlagueBarProps) {
   const inCima = placement === 'top';
+  // ⚠️ Due tabelle e non un prefisso calcolato: Tailwind cerca le classi nel **testo** dei file, e
+  // una stringa composta a runtime non genera nessuna regola. Il perché per esteso sta là dentro.
+  const rientro = isCompactOnMobile ? PLAGUE_BAR_COMPACT_PADDING : PLAGUE_BAR_PADDING;
+  const incavo = isCompactOnMobile ? PLAGUE_BAR_COMPACT_SAFE_PADDING : PLAGUE_BAR_SAFE_PADDING;
 
   return (
     <Surface
@@ -92,8 +117,8 @@ export function PlagueBar({
       render={(props) => (inCima ? <header {...props} /> : <footer {...props} />)}
       className={`dark ${isSticky ? `sticky z-20 ${inCima ? 'top-0' : 'bottom-0'}` : ''} w-full ${
         inCima ? 'border-b' : 'border-t'
-      } border-brand/20 bg-gray-950/90 backdrop-blur-sm ${PLAGUE_BAR_PADDING[placement][size]} ${
-        PLAGUE_BAR_SAFE_PADDING[placement][size]
+      } border-brand/20 bg-gray-950/90 backdrop-blur-sm ${rientro[placement][size]} ${
+        incavo[placement][size]
       } ${className}`}
     >
       {children}

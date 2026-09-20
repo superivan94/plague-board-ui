@@ -1,17 +1,14 @@
 import {
-  CodeIcon,
   PLAGUE_BAR_MARK_SIZE,
-  PLAGUE_FOOT_MARK_SIZE,
   PlagueBar,
   type PlagueBarSize,
-  PlagueFootBar,
   PulseDot,
   RatIcon,
-  RobotIcon,
   TechLabel,
   TechRule,
-  type CreditAuthor,
 } from 'plague-board-ui';
+
+import { FootSamples } from './FootSamples';
 
 // ⚠️ Ogni barra in mostra sta dentro una `<section>`, e l'intestazione di questa pagina è una
 // `<div>` invece che un `<header>`: `PlagueBar` si rende come `<header>`, e un `<header>` vale
@@ -44,39 +41,6 @@ const SAMPLES: readonly BarSample[] = [
     use: "La pagina d'ingresso e l'aggregatore, dove la barra si presenta invece di navigare: poche voci e molta aria.",
   },
 ];
-
-const FOOT_SAMPLES: readonly BarSample[] = [
-  {
-    size: 'small',
-    padding: '4px',
-    use: 'Il valore predefinito. Una firma sottile sotto una pagina di contenuti: si vede, e non chiede spazio.',
-  },
-  {
-    size: 'medium',
-    padding: '8px',
-    use: "Quando il piede porta qualcosa in più di una firma — un secondo comando, un avviso — o quando la pagina è ariosa e una striscia sottile sparirebbe.",
-  },
-  {
-    size: 'large',
-    padding: '12px',
-    use: "La pagina d'ingresso, dove il piede è l'ultima cosa che si legge e può permettersi di pesare quanto l'intestazione.",
-  },
-];
-
-/**
- * ⚠️ **I segni degli autori li passa l'applicazione**, quindi la taglia non li raggiunge da sé:
- * la misura giusta si legge da `PLAGUE_FOOT_MARK_SIZE`, esattamente come il marchio in cima legge
- * la sua da `PLAGUE_BAR_MARK_SIZE`. Qui si fa per mostrarlo; un'app che non lo fa non si rompe,
- * ha solo i segni di una misura sola.
- */
-function autoriDiEsempio(size: PlagueBarSize): readonly CreditAuthor[] {
-  const misura = PLAGUE_FOOT_MARK_SIZE[size].authorMark;
-
-  return [
-    { name: 'Superivan94', icon: <CodeIcon size={misura} className="text-brand" /> },
-    { name: 'AI-Dev', icon: <RobotIcon size={misura} className="text-plague-400" /> },
-  ];
-}
 
 /**
  * Il contenuto di esempio: lo stesso nelle tre barre, così a cambiare è solo la taglia.
@@ -143,14 +107,55 @@ export default function BarPage() {
           </div>
 
           {/* `isSticky={false}`: una barra in mostra non è una barra in servizio, e tre barre
-              appiccicate si accavallerebbero in cima alla stessa pagina. */}
-          <PlagueBar size={size} isSticky={false} className="rounded-lg border border-border">
+              appiccicate si accavallerebbero in cima alla stessa pagina.
+              ⚠️ E `isCompactOnMobile={false}` per la stessa ragione: qui le tre taglie sono
+              **il soggetto**, e con la compattazione accesa su un telefono si vedrebbero tre
+              barre identiche sotto tre nomi diversi. È il caso che la prop esiste per coprire. */}
+          <PlagueBar
+            size={size}
+            isSticky={false}
+            isCompactOnMobile={false}
+            className="rounded-lg border border-border"
+          >
             <BarContent size={size} />
           </PlagueBar>
 
           <p className="text-sm text-muted">{use}</p>
         </section>
       ))}
+
+      <TechRule>e sul telefono, la piccola</TechRule>
+
+      <section className="flex max-w-2xl flex-col gap-3">
+        <p className="text-sm text-muted">
+          La taglia che si dichiara è quella che si vede <strong>dove c&apos;è posto</strong>. Sotto
+          i <strong>640px di larghezza</strong> o i <strong>480px di altezza</strong> la barra e il
+          piede tornano a <code>small</code> da soli: il rientro scende a 8px per lato in cima e a
+          4 in fondo, e il segno a 20.
+        </p>
+        <p className="text-sm text-muted">
+          ⚠️ <strong className="text-foreground">Anche l&apos;altezza, non solo la larghezza.</strong>{' '}
+          Un telefono <em>coricato</em> è largo 844 pixel e alto 390: guardando la sola larghezza
+          passerebbe per un desktop, e una barra <code>large</code> con un piede <code>large</code>{' '}
+          si prenderebbero 122 dei suoi 390 pixel — un terzo dello schermo, proprio dove lo spazio
+          verticale è il più scarso di tutti.
+        </p>
+        <p className="text-sm text-muted">
+          Si spegne con <code>isCompactOnMobile={'{false}'}</code>, ed è quello che fanno le sei
+          lastre in mostra in questa pagina: lì le taglie sono il soggetto, e tre barre identiche
+          sotto tre nomi diversi non direbbero niente. Vale anche per una barra che non sta in una
+          pagina intera — in un pannello, in una colonna — dove «telefono» non vuol dire niente.
+        </p>
+        <p className="text-sm text-muted">
+          ⚠️ <strong className="text-foreground">Il segno dentro va compattato a parte.</strong> La
+          lastra non può ridimensionare un <code>&lt;svg&gt;</code> che non conosce, e un numero già
+          stampato dentro <code>width</code> non risponde a una media query. Perciò accanto a ogni
+          numero c&apos;è una classe che fa la stessa cosa in CSS —{' '}
+          <code>PLAGUE_BAR_MARK_CLASS</code> e <code>PLAGUE_FOOT_MARK_CLASS</code> — e si passano
+          insieme. Chi dimentica la classe si ritrova un marchio grande in una barra bassa:
+          sbagliato, ma non rotto.
+        </p>
+      </section>
 
       <TechRule>che cosa ci sta dentro</TechRule>
 
@@ -211,29 +216,7 @@ export default function BarPage() {
           un piede appiccicato lo toglie alla pagina a ogni schermata.
         </p>
 
-        {FOOT_SAMPLES.map(({ size, padding, use }) => (
-          <div key={size} className="flex flex-col gap-2">
-            <div className="flex flex-wrap items-baseline gap-3">
-              <h3 className="font-medium">{size}</h3>
-              <TechLabel className="text-brand-ink">
-                rientro {padding} · segno {PLAGUE_FOOT_MARK_SIZE[size].mark}px · autore{' '}
-                {PLAGUE_FOOT_MARK_SIZE[size].authorMark}px
-              </TechLabel>
-            </div>
-
-            <PlagueFootBar
-              size={size}
-              isSticky={false}
-              authors={autoriDiEsempio(size)}
-              version="0.1.0"
-              supportHref="https://ko-fi.com/superivan94"
-              rowClassName="px-4"
-              className="rounded-lg border border-border"
-            />
-
-            <p className="text-sm text-muted">{use}</p>
-          </div>
-        ))}
+        <FootSamples />
         <p className="max-w-2xl text-sm text-muted">
           <strong className="text-foreground">Una riga sola, in cima come in fondo.</strong>{' '}
           <code>BarRow</code> non manda a capo: se le voci non ci stanno, si scorre di lato. Una

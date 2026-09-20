@@ -209,6 +209,45 @@ describe('i pezzi del piede', () => {
     expect(screen.getByRole('link').querySelector('svg')).toHaveAttribute('width', '26');
   });
 
+  // ⚠️ **Il segno si compatta con una classe, non con l'attributo**: `width` e `height` di un
+  // `<svg>` sono proprietà geometriche, e una regola CSS le sostituisce. È l'unico modo di far
+  // rispondere a una media query un numero che un componente ha già stampato.
+  it('e sul telefono lo riporta ai 20px della taglia piccola', () => {
+    const { unmount } = render(
+      <PlagueFootBar authors={AUTORI} supportHref="https://esempio.test" size="large" />,
+    );
+    const segno = screen.getByRole('link').querySelector('svg')!;
+
+    expect(segno.getAttribute('class')).toContain('size-5');
+    expect(segno.getAttribute('class')).toContain('pb-roomy:size-[26px]');
+    unmount();
+
+    render(
+      <PlagueFootBar
+        authors={AUTORI}
+        supportHref="https://esempio.test"
+        size="large"
+        isCompactOnMobile={false}
+      />,
+    );
+    expect(screen.getByRole('link').querySelector('svg')!.getAttribute('class')).not.toContain('size-5');
+  });
+
+  it('il piede passa il modo alla sua lastra', () => {
+    const { container, unmount } = render(<PlagueFootBar authors={AUTORI} size="large" />);
+
+    // In fondo la scala è sfalsata di un gradino: `py-1` sotto la soglia, `py-3` sopra.
+    expect(container.firstElementChild!.className).toContain('py-1');
+    expect(container.firstElementChild!.className).toContain('pb-roomy:py-3');
+    unmount();
+
+    const { container: fisso } = render(
+      <PlagueFootBar authors={AUTORI} size="large" isCompactOnMobile={false} />,
+    );
+    expect(fisso.firstElementChild!.className).toContain('py-3');
+    expect(fisso.firstElementChild!.className).not.toContain('pb-roomy:');
+  });
+
   it('senza versione e senza indirizzo, il piede resta la sola firma', () => {
     render(<PlagueFootBar authors={AUTORI} />);
 

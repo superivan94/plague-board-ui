@@ -5,7 +5,7 @@ import { BarRow } from './BarRow';
 import type { CreditAuthor } from './CreditCard';
 import { CreditLine } from './CreditLine';
 import { PlagueBar } from './PlagueBar';
-import { PLAGUE_FOOT_MARK_SIZE, type PlagueBarSize } from './plagueBarSizes';
+import { PLAGUE_FOOT_MARK_CLASS, PLAGUE_FOOT_MARK_SIZE, type PlagueBarSize } from './plagueBarSizes';
 import { SupportButton } from './SupportButton';
 import { VersionTag } from './VersionTag';
 
@@ -34,6 +34,15 @@ export interface PlagueFootBarProps {
    * Oltre al rientro della lastra, la taglia decide quanto è grande il segno delle donazioni.
    */
   size?: PlagueBarSize;
+  /**
+   * Sul telefono la taglia torna `small`, segno delle donazioni compreso. **Vero di default.**
+   *
+   * ⚠️ **Vale per il segno predefinito, non per uno che arriva da fuori.** Di `supportIcon` il
+   * piede non conosce né la misura né come la porta: la lascia com'è, esattamente come fa già con
+   * la taglia. Chi passa un'icona sua e vuole che si compatti le mette addosso
+   * `PLAGUE_FOOT_MARK_CLASS[size].mark`.
+   */
+  isCompactOnMobile?: boolean;
   /** Classi aggiuntive sulla riga interna: è qui che si mette la larghezza della colonna. */
   rowClassName?: string;
   /** Classi aggiuntive sulla lastra. */
@@ -61,6 +70,14 @@ export interface PlagueFootBarProps {
  * a capo cambia l'altezza della lastra, e con una lastra appiccicata cambia quanto spazio resta
  * alla pagina sotto.
  *
+ * ⚠️ **Due compattazioni diverse, e guardano due cose diverse.** Il *contenuto* si accorcia con le
+ * container query — sotto le 32rem di **riga** — perché un piede dentro una colonna stretta deve
+ * accorciarsi anche se la finestra è larga. L'*altezza* invece torna `small` guardando la
+ * **finestra** (`isCompactOnMobile`, acceso di default): il rientro sta sulla lastra, e una
+ * container query può interrogare solo un antenato. Sulla stessa pagina le due soglie non
+ * coincidono — 544 px di finestra la prima, 640 la seconda — e va bene: una riga alta come su un
+ * telefono con ancora tutti i nomi dentro è il caso comodo, non un difetto.
+ *
  * ⚠️ **Non contiene nessun testo di un'applicazione.** Autori, versione e indirizzo delle
  * donazioni arrivano da fuori; le uniche parole sue sono quelle di casa — «Creato da», «Offrimi
  * una pozione» — e anche quelle si sostituiscono.
@@ -75,11 +92,18 @@ export function PlagueFootBar({
   creditShortLabel,
   isSticky = true,
   size = 'small',
+  isCompactOnMobile = true,
   rowClassName = 'mx-auto max-w-5xl px-4',
   className = '',
 }: PlagueFootBarProps) {
   return (
-    <PlagueBar placement="bottom" isSticky={isSticky} size={size} className={className}>
+    <PlagueBar
+      placement="bottom"
+      isSticky={isSticky}
+      size={size}
+      isCompactOnMobile={isCompactOnMobile}
+      className={className}
+    >
       {/* ⚠️ `@container` qui e non più in alto: il contenitore delle query dev'essere la riga, cioè
           la cosa che davvero si stringe. Dichiararlo sulla lastra darebbe la larghezza della
           finestra anche quando la colonna dentro è stretta. */}
@@ -103,7 +127,17 @@ export function PlagueFootBar({
               // piede: è lo stesso giro con cui chi monta un marchio in cima legge la sua misura
               // da `PLAGUE_BAR_MARK_SIZE`. Qui il passaggio è comodo perché l'icona predefinita la
               // conosciamo; quella di un autore no, e infatti quella la passa l'applicazione.
-              icon={supportIcon ?? <PotionMugIcon size={PLAGUE_FOOT_MARK_SIZE[size].mark} />}
+              // ⚠️ E sul telefono lo riporta ai 20 px della taglia piccola con una **classe**: il
+              // numero è già stampato dentro `width`, e l'unica cosa che può sostituirlo dopo è
+              // una regola CSS — `width` e `height` di un `<svg>` sono proprietà geometriche.
+              icon={
+                supportIcon ?? (
+                  <PotionMugIcon
+                    size={PLAGUE_FOOT_MARK_SIZE[size].mark}
+                    className={isCompactOnMobile ? PLAGUE_FOOT_MARK_CLASS[size].mark : ''}
+                  />
+                )
+              }
             />
           </span>
         )}

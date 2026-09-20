@@ -167,6 +167,38 @@ metà del difetto — la barra usata da una pagina server — quella sì che `ne
 
 ---
 
+### La taglia che si spegne da sé sul telefono — 2026-09-20
+
+**Esegue:** agente — sono misure del DOM e del CSS generato, e si fanno tutte da qui.
+**Ultima esecuzione:** agente, 2026-09-20 — **le due soglie scattano, e il segno le segue**.
+
+**Preparazione:** `npm run build`, poi `npm run playground` e `http://localhost:3100/barra`. La
+finestra si porta alle misure della tabella con l'emulazione del riquadro; i numeri si leggono da
+`getComputedStyle(...).paddingTop` e `getBoundingClientRect()`, **non** a occhio. Le regole del CSS
+di produzione si contano in `playground/.next/static/chunks/*.css` dopo `npm run build --workspace
+playground`.
+
+| Azione | Atteso | Ottenuto |
+|---|---|---|
+| A 1280×900, la barra (`medium`) e il piede (`small`) | rientro 12 e 4 px, segno 24 | 12 e 4, segno 24 |
+| A 375×812 | la barra torna a `small`: 8 px e segno 20 | 8 px, segno 20 |
+| L'attributo `width` del marchio, a 375 | resta 24: a cambiare è la regola, non il numero | `width="24"`, disegno **20 px** |
+| A 844×390 — il telefono **coricato** | compatta lo stesso, per l'altezza | rientro 8 e 4, segno 20 |
+| A 900×700 | torna alla taglia dichiarata | rientro 12, segno 24 |
+| Le sei lastre in mostra di `/barra` a 375, con `isCompactOnMobile={false}` | non compattano | 8/12/16 in cima, 4/8/12 in fondo |
+| Le regole `pb-roomy:` nel CSS di produzione | tutte in **un solo** `@media (min-width:40rem) and (min-height:30rem)`, **dopo** le regole di base | 13 regole a 439928, le `py-*` di base a 431523 |
+| Scorrimento laterale a 375 | nessuno | nessuno |
+
+**Che cosa protegge:** tre cose che nessun test in jsdom può vedere. La prima è **l'ordine**: le
+due classi di una taglia compattata non hanno specificità diversa, quindi se la variante finisse
+**prima** della regola di base la compattazione non succederebbe — e la pagina sembrerebbe
+semplicemente «grande», senza niente di rosso da nessuna parte. La seconda è che una classe
+`size-*` **sostituisce davvero** l'attributo `width` di un `<svg>`: è il meccanismo su cui poggia
+tutta la compattazione dei segni, ed è una proprietà del browser, non nostra. La terza è la
+soglia sull'**altezza**, che è l'unica cosa che distingue un telefono coricato da un desktop.
+
+---
+
 ### Il fumetto interrotto: clic su clic, prima che il precedente sia finito — 2026-09-17
 
 **Esegue:** agente — è nel playground, e si misura dal DOM.
