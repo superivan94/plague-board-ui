@@ -24,6 +24,18 @@ export function GlitchSection() {
         </p>
 
         <p className="text-sm text-muted">
+          <strong>Il lampo si spegne con <code>isRevealEnabled={'{false}'}</code></strong> e resta
+          il solo nome che si disturba — la striscia di mezzo qui sotto ha le stesse prop della
+          prima, meno l’interruttore. È un secondo modo di dire una cosa che <code>reveal</code>{' '}
+          dice già, e sono due domande diverse: <code>reveal</code> dice <strong>quale</strong>{' '}
+          parola, l’interruttore dice <strong>se</strong> farla succedere. Chi ha la parola in una
+          costante e il comando in un’impostazione non deve far diventare il contenuto una
+          condizione. ⚠️ Spento vuol dire <strong>non reso</strong>: la parola non finisce affatto
+          nella pagina, perché un elemento fermo a opacità zero lo troverebbero lo stesso la
+          selezione e la ricerca nella pagina.
+        </p>
+
+        <p className="text-sm text-muted">
           ⚠️ <strong>La parola nascosta porta lo stesso disturbo del nome</strong>, e le sue due
           lamelle stanno <strong>dentro</strong> di lei: ritaglio e opacità del lampo valgono per
           tutto quello che contiene, quindi compaiono e spariscono con lei. Messe accanto,
@@ -41,6 +53,20 @@ export function GlitchSection() {
             CORP
           </h2>
           <TechLabel className="text-brand-ink">con il fondo dichiarato · #030712</TechLabel>
+        </div>
+
+        {/* Stessa striscia, stesse prop, meno l'interruttore: quello che cambia è solo il lampo. */}
+        <div className="dark flex flex-col items-center gap-2 rounded-xl bg-gray-950 p-8">
+          <h2 className="font-mono text-3xl font-bold tracking-wider text-gray-100">
+            LUDORATTI{' '}
+            <GlitchText className="text-brand" reveal="EVIL" isRevealEnabled={false} background="#030712">
+              E.
+            </GlitchText>{' '}
+            CORP
+          </h2>
+          <TechLabel className="text-brand-ink">
+            lampo spento · isRevealEnabled={'{false}'}
+          </TechLabel>
         </div>
 
         <div className="flex flex-col items-center gap-2 rounded-xl border border-border p-8">

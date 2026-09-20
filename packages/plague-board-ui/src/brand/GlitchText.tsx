@@ -16,6 +16,20 @@ export interface GlitchTextProps {
    */
   reveal?: string;
   /**
+   * Se il lampo deve partire. Acceso di serie, e senza {@link reveal} non fa niente comunque.
+   *
+   * ⚠️ **È volutamente un secondo modo di dire la stessa cosa**, perché le due prop rispondono a
+   * due domande diverse: `reveal` dice **quale** parola, questa dice **se** far succedere la cosa.
+   * Chi ha la parola in una costante e l'interruttore in un'impostazione scrive
+   * `isRevealEnabled={impostazioni.easterEgg}` invece di infilare la condizione dentro il
+   * contenuto con `reveal={acceso ? 'EVIL' : undefined}`.
+   *
+   * ⚠️ **Spento vuol dire non reso, non reso e invisibile**: la parola non finisce affatto nella
+   * pagina. Un elemento fermo a opacità zero sarebbe una copia di testo che nessuno vede e che la
+   * selezione, la ricerca nella pagina e chiunque legga il DOM continuano a trovare.
+   */
+  isRevealEnabled?: boolean;
+  /**
    * Il colore di **ciò che sta dietro**, che le lamelle usano per coprire l'originale dove
    * passano.
    *
@@ -61,6 +75,10 @@ export interface GlitchTextProps {
  * un difetto, non di una preferenza rispettata. Il lampo, che nasce a opacità zero, semplicemente
  * non arriva: un easter egg nascosto resta nascosto.
  *
+ * ⚠️ **Il lampo si spegne anche a mano**, con `isRevealEnabled={false}`, e allora resta il solo
+ * nome che si disturba. Serve a chi la parola ce l'ha già scritta da qualche parte e vuole
+ * governare l'effetto da un'impostazione, senza far diventare il contenuto una condizione.
+ *
  * @example
  * ```tsx
  * <h1 className="font-mono text-4xl tracking-wider">
@@ -99,6 +117,7 @@ function GlitchSlices({ text }: { text: string }) {
 export function GlitchText({
   children,
   reveal,
+  isRevealEnabled = true,
   background = 'transparent',
   className = '',
   revealClassName = 'text-red-500',
@@ -112,7 +131,7 @@ export function GlitchText({
     >
       {children}
       <GlitchSlices text={children} />
-      {reveal ? (
+      {reveal && isRevealEnabled ? (
         <span aria-hidden="true" className={`pb-glitch-reveal animate-reveal ${revealClassName}`}>
           {reveal}
           {/* ⚠️ **Dentro** il lampo, non accanto: il ritaglio e l'opacità di `pb-reveal` valgono

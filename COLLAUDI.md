@@ -956,6 +956,7 @@ comporre; il tema si commuta scrivendo `pb-playground-theme` in `localStorage` e
 | La lastra sotto la parola intera | il colore dichiarato, o la parola nascosta si legge sopra il nome | `rgb(3, 7, 18)`; la parola misura **71 px** contro i **35** del nome che copre |
 | Le lamelle **della parola nascosta** | due, col suo testo, dentro il lampo e non accanto | 2 copie «EVIL», fondo `rgb(3, 7, 18)`, ombre `rgb(8, 145, 178)` e `rgb(190, 24, 93)` |
 | Selezionare il titolo col lampo che porta le sue copie | sempre «LUDORATTI E. CORP» | confermato: `user-select` si eredita, e le copie annidate sono già coperte |
+| La striscia con `isRevealEnabled={false}` | il nome si disturba e la parola non c'è **affatto** | nel DOM restano `E.E.E.`, zero «EVIL»; la prima striscia, stesse prop, ne ha tre |
 | Nome accessibile del titolo | il testo una volta sola | «LUDORATTI E. CORP» |
 | **Selezionare il titolo e copiarlo** | «LUDORATTI E. CORP» | ⚠️ **«LUDORATTI E.E.E.EVIL CORP»** |
 | Lo stesso, con `user-select: none` sulle copie | «LUDORATTI E. CORP» | confermato |

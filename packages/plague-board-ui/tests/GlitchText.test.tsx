@@ -40,6 +40,32 @@ describe('GlitchText', () => {
     expect(lampo(container)).toBeNull();
   });
 
+  it('col lampo spento resta il nome che si disturba, e basta', () => {
+    const { container } = render(
+      <GlitchText reveal="EVIL" isRevealEnabled={false}>
+        E.
+      </GlitchText>,
+    );
+
+    // ⚠️ Spento vuol dire **non reso**, non «reso e invisibile»: un elemento fermo a opacità zero
+    // sarebbe una copia di testo che nessuno vede e che tutto il resto continua a trovare.
+    expect(lampo(container)).toBeNull();
+    expect(container).not.toHaveTextContent('EVIL');
+    expect(lamelle(container)).toHaveLength(2);
+  });
+
+  it('il lampo è acceso senza doverlo chiedere', () => {
+    const { container } = render(<GlitchText reveal="EVIL">E.</GlitchText>);
+
+    expect(lampo(container)).not.toBeNull();
+  });
+
+  it("l'interruttore acceso non inventa un lampo senza parola", () => {
+    const { container } = render(<GlitchText isRevealEnabled>E.</GlitchText>);
+
+    expect(lampo(container)).toBeNull();
+  });
+
   it('la parola nascosta lampeggia, ed è decorativa', () => {
     const { container } = render(<GlitchText reveal="EVIL">E.</GlitchText>);
 
