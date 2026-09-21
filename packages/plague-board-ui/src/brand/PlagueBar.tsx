@@ -12,8 +12,6 @@ import {
   type PlagueBarSize,
 } from './plagueBarSizes';
 
-export type { PlagueBarPlacement };
-
 export interface PlagueBarProps {
   /** Quello che la barra contiene: marchio, collegamenti, comandi. Li decide chi la usa. */
   children: ReactNode;

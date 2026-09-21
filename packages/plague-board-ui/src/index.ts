@@ -31,7 +31,7 @@ export { ParticleBurst, type ParticleBurstHandle, type ParticleBurstProps } from
 // dice quanta ce ne deve essere. Si parlano attraverso il provider, che è l'unico contesto della
 // libreria — vedi `ToxicLevelProvider` per il perché.
 export { PlagueBackground, type PlagueBackgroundProps } from './brand/PlagueBackground';
-export { PlagueBar, type PlagueBarPlacement, type PlagueBarProps } from './brand/PlagueBar';
+export { PlagueBar, type PlagueBarProps } from './brand/PlagueBar';
 // Il piede già montato. I suoi pezzi restano pubblici: chi ne vuole uno diverso se lo compone.
 export { PlagueFootBar, type PlagueFootBarProps } from './brand/PlagueFootBar';
 // ⚠️ Le misure **non** escono da `PlagueBar.tsx`, che dichiara `'use client'`: un dato esportato
@@ -44,6 +44,7 @@ export {
   PLAGUE_BAR_MARK_SIZE,
   PLAGUE_FOOT_MARK_CLASS,
   PLAGUE_FOOT_MARK_SIZE,
+  type PlagueBarPlacement,
   type PlagueBarSize,
 } from './brand/plagueBarSizes';
 // La schermata di accesso, scomposta. ⚠️ È una superficie **condivisa**: tutte e quattro le

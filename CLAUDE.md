@@ -1101,6 +1101,18 @@ exist in target module» che **non sono veri**. Si guarda la pagina, o si crede 
   principale, quello del pacchetto è la versione breve per chi installa, e quando divergono ha
   ragione il primo. Il `LICENSE` invece si copia identico: è testo legale, non prosa, e non
   diverge.
+- ⚠️ **Spedire le mappe senza le fonti è peggio che non spedirle.** `tsc` scrive dentro ogni mappa
+  `"sources": ["../../src/…"]`, cioè un percorso **fuori** da `dist/`: con `src/` non spedito, i
+  79 `.js.map` e i 79 `.d.ts.map` — **359 KB** — sono un «vai alla definizione» che non va da
+  nessuna parte e una traccia di stack che resta compilata. Da qui `src` dentro `files`: il tarball
+  passa da 320 file a **393** e da 1,5 a **1,7 MB**, che accanto al 1,3 MB della traccia non si
+  nota, e in cambio chi installa atterra sul sorgente **commentato**, che in questo progetto è la
+  documentazione vera. L'alternativa legittima è spegnere `sourceMap` e `declarationMap` in
+  `tsconfig.build.json` e non spedire niente; la terza via — mappe sì, fonti no — la vieta un caso
+  di `publicSurface.test.ts`. ⚠️ Accanto, due cose che costano una riga l'una: `main` e `types` in
+  cima a `exports`, per chi risolve ancora alla maniera vecchia (`exports` continua a chiudere gli
+  import profondi), e **`prepublishOnly`** con dentro il gate intero, perché `npm publish` spedisce
+  il `dist/` che trova — anche quello di ieri.
 - ⚠️ **L'iniziale maiuscola di un file è una promessa, e valeva già da sola.** In `src/` i 53 file
   con l'iniziale maiuscola tengono un componente e escono dall'indice; quelli minuscoli tengono
   dati, ganci e pezzi di casa. L'unica eccezione — `IconBase`, che il suo stesso JSDoc dichiarava

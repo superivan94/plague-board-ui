@@ -142,6 +142,23 @@ describe('la superficie pubblica', () => {
     }
   });
 
+  it('le mappe dei sorgenti non puntano nel vuoto', () => {
+    // ⚠️ `tsc` scrive nelle mappe `"sources": ["../../src/…"]`, cioè un percorso **fuori** da
+    // `dist/`: se `src/` non viene spedito, chi installa si ritrova 79 `.js.map` e 79 `.d.ts.map`
+    // — 359 KB — che non risolvono niente. Non è un errore: è un «vai alla definizione» che non va
+    // da nessuna parte e una traccia di stack che resta compilata.
+    //
+    // L'alternativa legittima è spegnere le due opzioni in `tsconfig.build.json` e non spedire
+    // niente: quello che questo caso vieta è la terza via, cioè spedire le mappe senza le fonti.
+    const build: { readonly compilerOptions: Record<string, unknown> } = JSON.parse(
+      readFileSync(join(process.cwd(), 'tsconfig.build.json'), 'utf8'),
+    );
+    const conMappe =
+      Boolean(build.compilerOptions.sourceMap) || Boolean(build.compilerOptions.declarationMap);
+
+    expect(conMappe && !PACCHETTO.files.includes('src')).toBe(false);
+  });
+
   it.each(PACCHETTO.files)('`files` non spedisce un indirizzo che non c’è: %s', (voce) => {
     // L'altro verso, e quello che ha trovato qualcosa: `README.md` e `LICENSE` erano in questa
     // lista e **non nella cartella del pacchetto** — stanno nella radice del repository, dove npm

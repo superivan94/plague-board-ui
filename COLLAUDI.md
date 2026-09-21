@@ -1271,8 +1271,17 @@ di ieri.
 | `styles/theme.css` e `styles/animations.css` | ci sono | sì — 12,6 KB e 45,4 KB |
 | `assets/ludoratti.mp3` | c'è | sì, 1,3 MB, che è il grosso del pacchetto |
 | `dist/index.js` e `dist/index.d.ts` | ci sono, e sono gli indirizzi degli `exports` | sì |
-| `src/` e `tests/` | **non** ci sono | sì: `files` non li nomina |
-| Peso | ~1,5 MB | 1,5 MB compresso, 2,0 MB aperto, 320 file |
+| Le 158 mappe di `dist/` | risolvono | **no**: dentro c'è `"sources": ["../../src/…"]` e `src/` non veniva spedito — 359 KB di mappe cieche. Curato spedendo anche `src/` |
+| `tests/` | **non** c'è | sì: `files` non lo nomina |
+| Avvisi di npm (licenza, campi) | nessuno | nessuno: `PolyForm-Noncommercial-1.0.0` è un identificatore SPDX valido |
+| `npm view plague-board-ui` | 404, il nome è libero | 404 il 2026-09-22 — e resta libero finché non si pubblica |
+| Peso | — | **393 file, 1,7 MB compresso, 2,4 MB aperto** (era 320 / 1,5 / 2,0 prima di README, LICENSE e sorgenti) |
+
+⚠️ **Il momento per guardare è prima del primo publish, e non è una formalità.** Finché il nome non
+è sul registry, la superficie pubblica e la forma del pacchetto si cambiano gratis; dopo, un cambio
+incompatibile costa una minore in `0.x` — e chi ha scritto `^0.1.0` non la prende da solo, quindi
+resta fermo — e una major dalla `1.0.0`. Le tre cose trovate qui (README, LICENSE, mappe cieche)
+sarebbero state tutte scoperte da qualcun altro.
 
 ⚠️ **Il guard non sostituisce questo scenario, e viceversa.**
 [`tests/publicSurface.test.ts`](packages/plague-board-ui/tests/publicSurface.test.ts) tiene i due
