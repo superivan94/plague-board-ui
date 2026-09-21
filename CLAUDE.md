@@ -1019,6 +1019,46 @@ exist in target module» che **non sono veri**. Si guarda la pagina, o si crede 
   `animate-heartbeat` nella `className`: `scale(1.12)` sull'`<svg>` **per** `scale(1.12)` sul
   gruppo, cioè un picco a **1,25**. A schermo non si legge come un errore — si legge come un
   marchio che pulsa un po' troppo. Si trova cercando chi monta il pezzo, non guardandolo.
+- ⚠️ **Un occhio dentro una campitura `currentColor` è un buco, non una sagoma.** È il vincolo che
+  ha deciso il disegno del muso del marchio: un occhio dipinto dello stesso colore non esiste,
+  quindi gli occhi stanno nello **stesso `d`** del cuore e sono cavati con `evenodd` — che qui vale
+  perché sono *interamente dentro* la sagoma, il caso dei buchi e non quello, già registrato, delle
+  sagome affiancate. ⚠️ E `evenodd` sul cuore **senza** occhi non cambia un pixel: misurato il
+  2026-09-21 a 24, 96 e 512px, **zero** byte di differenza contro `nonzero`. Quindi la regola si
+  scrive una volta e non va accesa a condizione. ⚠️ I baffi, al contrario, sono un tratto, e si
+  dipingono **prima** della campitura: nascono dentro la sagoma e il cuore pieno ne copre la radice,
+  così non c'è nessuna intersezione fra retta e curva da calcolare. È il giunto sintetico dietro al
+  tronco del ratto che corre, applicato a un'icona. Ne discende che **il muso esiste solo da
+  pieno**: sul cuore vuoto sarebbero sei trattini che entrano nel niente.
+- ⚠️ **Un disegno arrivato a mano si misura, non si guarda — e la sonda giusta è a componenti
+  connesse.** L'utente ha disegnato il muso in Paint; una sonda sui pixel ha trovato i buchi dentro
+  la sagoma e li ha riportati in unità del `viewBox` leggendo la scala dall'anello, il cui riquadro
+  esterno è noto (1,25…22,75 su 24). Sono uscite tre cose che a occhio avevo sbagliato tutte: occhi
+  **2,23 × 1,57** e non 1,9 × 1,7; con la **punta esterna più alta** della testa interna, cioè il
+  taglio felino, mentre io l'avevo inclinato al contrario; e un tratto dei baffi di **~0,55**, dove
+  1,05 non dà baffi ma **zampe** — il primo giro sembrava una rana seduta. ⚠️ E l'errore più grosso
+  del giro prima era la posizione: occhi al centro dei lobi stanno **più esterni delle orecchie**, e
+  in un ratto è il contrario. Fuori dalla linea delle orecchie il muso diventa un rospo.
+- ⚠️ **Il pavimento di un dettaglio dentro un'icona lo decide il varco, non il dettaglio.** I due
+  occhi del marchio si fondono in una fascia sola finché lo spazio fra loro non vale più di un paio
+  di pixel dipinti: con **1,50** unità di varco sono un pixel e mezzo a 24px e l'antialiasing li
+  salda, con **2,10** sopravvivono. Da qui `RAT_ICON_MUZZLE_FLOOR` — 18 il cuore liscio, **24** gli
+  occhi, **32** i baffi — e da qui la scelta di allontanare gli occhi di 0,3 per lato invece dei
+  0,15 che la proporzione del disegno voleva: mezzo passo di forma comprato in cambio di otto pixel
+  di pavimento. ⚠️ **La tabella non la può applicare il componente**: una classe `size-*`
+  sostituisce l'attributo `width`, quindi `size` non è un testimone di quanto il segno verrà
+  dipinto. La libreria dà il numero, la scelta la fa chi monta — come per `PLAGUE_BAR_MARK_SIZE`.
+- ⚠️ **Il battito interno avvicina all'anello quello che gli sta dentro, e l'anello non si muove.**
+  `scale(1.12)` attorno a (12 · 13) con il recinto fermo: nella prima taratura **due punte di baffo
+  su tre tagliavano l'anello al picco**, cioè un lampo chiaro attraverso una riga a opacità 0,3 per
+  un ottavo di secondo ogni 3,2 s. Non si vede scorrendo la pagina e non lo trova nessun test di
+  contratto: si calcola. Rientrati i due bassi, i franchi sono **0,54 · 0,38 · 0,43**, e un test li
+  ricontrolla perché allungare un baffo è la modifica più innocua del mondo.
+- ⚠️ **Un pezzo specchiato si scrive specchiando il tracciato, non ricalcolando la geometria.**
+  L'occhio destro del marchio è l'occhio sinistro con ogni `x` portata a `24 − x`. Generandolo dal
+  lato opposto, ogni coordinata veniva arrotondata a due decimali per conto proprio e i due occhi
+  finivano a **0,04** dalla simmetria: invisibile, e comunque una cosa che il primo ritocco a mano
+  allarga. Lo specchio inverte il verso del tracciato, che con `evenodd` non conta.
 - ⚠️ **Il dente di un pezzo di puzzle non si fa con una Bézier, si fa con un arco maggiore.** Un
   dente vero ha il collo più stretto del bulbo, e la curva cubica quel sottosquadro non lo forma:
   all'inizio domina il termine `(1−t)³` del punto di partenza, quindi spingere i punti di controllo

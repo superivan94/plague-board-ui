@@ -1205,3 +1205,49 @@ che lo prende.
 
 **Che cosa protegge:** il marchio è la cosa che si vede per prima su ogni pagina di ogni
 applicazione dei Ludoratti, e il suo battito è quello che lo fa sembrare vivo invece che stampato.
+
+### Il muso del marchio: la sonda sul disegno a mano e i franchi al picco — 2026-09-21
+
+**Esegue:** agente
+
+**Ultima esecuzione:** agente, 2026-09-21
+
+**Preparazione:** `http://localhost:3100/`, sezione «il marchio», blocco `muzzle`. Tre verifiche
+diverse, e nessuna delle tre è guardare la pagina. **La forma** si legge dal disegno a mano
+dell'utente con una sonda a componenti connesse: si classificano i pixel per colore, si prendono i
+buchi *dentro* il riquadro della sagoma scura, e si riportano in unità del `viewBox` ricavando la
+scala dall'anello, il cui riquadro esterno è noto per costruzione (1,25…22,75 su 24). **Il
+pavimento** si legge sui pixel veri: si rende a 16, 18, 20, 24, 32 e 48 px e si ingrandisce col
+vicino più prossimo, perché a quelle misure quello che conta è l'antialiasing e non la geometria.
+**I franchi** si calcolano: si applica `scale(1.12)` attorno a (12 · 13) — il perno di
+`.pb-mark-beat--inner` e il picco di `pb-heartbeat` — alle punte dei baffi, e si confronta la
+distanza dal centro col bordo interno dell'anello (raggio 9,25) più mezzo tratto.
+
+| Azione | Atteso | Ottenuto |
+|---|---|---|
+| La sonda sul disegno a mano | occhi e baffi in unità del viewBox | occhi **2,23 × 1,57** centrati a (10,3 · 12,7) e (13,9 · 12,7); tre baffi per lato |
+| Il verso dell'inclinazione | punta esterna **più alta** della testa interna | sì: sinistro (9,16 · 12,34) → (11,39 · 13,23) |
+| Prima taratura, occhi al centro dei lobi | un ratto | **no, un rospo**: a (9 · 11,9) stanno più esterni delle orecchie |
+| Prima taratura, baffi a tratto 1,05 | baffi | **no, zampe**: e i due bassi si incrociavano sotto il naso |
+| `evenodd` sul cuore pieno **senza** occhi | identico a `nonzero` | **0** byte diversi a 24, 96 e 512px |
+| Occhi a 16 e 18px | due occhi | **no**: una fascia sola, con qualunque distanza |
+| Occhi a 24px, varco **1,50** | due occhi | no: due macchie saldate |
+| Occhi a 24px, varco **2,10** | due occhi | sì, col ponte sottile — è il numero che fissa il pavimento a 24 |
+| Baffi a 0,45 e 24px | baffi | tratteggi; diventano baffi a **32** |
+| Franchi delle punte, **da fermo** | > 0 | 1,41 · 1,25 · 1,28 |
+| Franchi delle punte, **al picco 1,12** | > 0 | **0,54 · 0,38 · 0,43** — nella prima taratura erano 0,54 · 0,08 · **−0,16** |
+| `muzzle` sul cuore **vuoto** | niente muso | sì: nessuna campitura, nessun baffo, tre tracciati |
+| La finta lista di preferiti, 24px | il muso solo sui due scelti | sì: la riga non scelta non ha campitura |
+| I tre gradini, **chiaro** e **scuro** | si leggono in entrambi | sì; il colore è `brand-ink`, 4,58 e 13,43 — sopra la soglia 3 della grafica che porta significato |
+| Gate | verde | build, typecheck, lint 0/0, **495 test**, dodici pagine statiche |
+
+⚠️ **Il caso dei franchi al picco è quello che nessun occhio trova.** L'anello non batte, quello che
+gli sta dentro sì: una punta di baffo che da fermo ha un'unità di margine, al picco può tagliare una
+riga a opacità 0,3 per un ottavo di secondo ogni 3,2 secondi. Non si vede scorrendo la pagina, non
+lo prende uno screenshot e non lo prende un test di contratto. Si calcola — ed è per questo che nel
+test c'è una riga che rifà quel conto a ogni run, perché allungare un baffo è la modifica più
+innocua del mondo.
+
+**Che cosa protegge:** la terza lettura del marchio — il muso del ratto — che è quella che lo rende
+un personaggio invece di un cuore; e i tre pavimenti, che sono la sola cosa che impedisce di
+accendere il muso dove diventa un cuore scheggiato.

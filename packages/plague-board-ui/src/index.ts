@@ -144,7 +144,14 @@ export { PotionMugIcon } from './icons/PotionMugIcon';
 // cuore vuoto e quello pieno, cioè anche i preferiti — e un battito che governa da sé. La deroga
 // alla regola «l'interruttore sta su chi monta» è dichiarata nel suo file: un marchio che batte è
 // identità, non decorazione.
-export { RatIcon, type RatIconBeat, type RatIconProps, type RatIconState } from './icons/RatIcon';
+export {
+  RAT_ICON_MUZZLE_FLOOR,
+  RatIcon,
+  type RatIconBeat,
+  type RatIconMuzzle,
+  type RatIconProps,
+  type RatIconState,
+} from './icons/RatIcon';
 export { RobotIcon } from './icons/RobotIcon';
 export { SkullIcon } from './icons/SkullIcon';
 // I due stati della musica: lo stesso teschio con le cuffie, uno con la sbarra.

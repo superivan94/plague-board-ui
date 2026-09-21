@@ -1,4 +1,12 @@
-import { RatIcon, type RatIconBeat, type RatIconProps, TechLabel, TechRule } from 'plague-board-ui';
+import {
+  RAT_ICON_MUZZLE_FLOOR,
+  RatIcon,
+  type RatIconBeat,
+  type RatIconMuzzle,
+  type RatIconProps,
+  TechLabel,
+  TechRule,
+} from 'plague-board-ui';
 
 /** Le quattro tarature di `animateOn`, con quello che ognuna serve a dire. */
 const BATTITI: readonly { animateOn: RatIconProps['animateOn']; a_che_serve: string }[] = [
@@ -12,6 +20,13 @@ const BATTITI: readonly { animateOn: RatIconProps['animateOn']; a_che_serve: str
 const VARIANTI: readonly { beat: RatIconBeat; a_che_serve: string }[] = [
   { beat: 'whole', a_che_serve: 'il predefinito: anello e cuore insieme, come in barra' },
   { beat: 'inner', a_che_serve: 'l’anello fa da recinto fermo e il cuore batte dentro' },
+];
+
+/** I tre gradini del muso, col loro pavimento e con quello che ognuno serve a dire. */
+const MUSI: readonly { muzzle: RatIconMuzzle; a_che_serve: string }[] = [
+  { muzzle: 'none', a_che_serve: 'il predefinito: il cuore liscio' },
+  { muzzle: 'eyes', a_che_serve: 'i due occhi: la terza lettura viene a galla' },
+  { muzzle: 'full', a_che_serve: 'occhi e baffi: è un ratto che ti guarda' },
 ];
 
 /** Una finta riga di preferiti, per far vedere i due stati al loro mestiere. */
@@ -36,10 +51,17 @@ export function MarkSection() {
         <p className="text-sm text-muted">
           <code>RatIcon</code> si legge in tre modi, e sono tutti e tre voluti: a prima vista è un{' '}
           <strong>cuore</strong>, guardandolo meglio sono <strong>due figure che si abbracciano</strong>
-          , ma le due orecchie dicono la verità — è il <strong>muso di un ratto</strong>. Sta dove
-          parla la corporazione: una barra, un piede, una schermata di accesso.{' '}
-          <strong>Non si usa come icona di dominio</strong>: un marchio che marca anche le cose
-          smette di marcare sé stesso.
+          , ma le due orecchie dicono la verità — è il <strong>muso di un ratto</strong>.
+        </p>
+
+        <p className="text-sm text-muted">
+          Da lì escono i suoi <strong>due mestieri</strong>, non uno. È il <strong>marchio</strong>,
+          e sta dove parla la corporazione: una barra, un piede, una schermata di accesso. Ed è il{' '}
+          <strong>cuore</strong>, cioè il comando dei preferiti — la prima lettura vale quanto la
+          terza, e un cuore che si riempie è la convenzione con cui il software dice «l’ho scelto».
+          Quello che non fa è <strong>prestarsi come glifo di un’altra cosa</strong>: per dire
+          «peste» c’è il biohazard, per dire «gioco» il dado. Un segno che dice tutto smette di dire
+          qualcosa.
         </p>
 
         <div className="flex flex-wrap items-end gap-10 text-brand-ink">
@@ -70,6 +92,67 @@ export function MarkSection() {
           {PREFERITI.map(({ titolo, isFilled }) => (
             <span key={titolo} className="flex items-center gap-3 py-1 text-sm">
               <RatIcon size={20} isFilled={isFilled} animateOn="filled" className="shrink-0 text-brand-ink" />
+              {titolo}
+            </span>
+          ))}
+        </div>
+
+        <p className="text-sm text-muted">
+          La terza lettura si può portare a galla: <code>muzzle</code> aggiunge al cuore pieno{' '}
+          <strong>gli occhi</strong> e, un gradino sopra, <strong>i baffi</strong>. Serve dove il
+          marchio deve avere un carattere — una schermata di accesso, una copertina, un vuoto da
+          riempire — e si lascia spento dove deve solo marcare.
+        </p>
+
+        <div className="flex flex-wrap items-end gap-10 text-brand-ink">
+          {MUSI.map(({ muzzle, a_che_serve }) => (
+            <span key={muzzle} className="flex w-48 flex-col items-center gap-2 text-center">
+              <RatIcon size={96} isFilled muzzle={muzzle} animateOn="none" />
+              <TechLabel className="text-muted">muzzle={`"${muzzle}"`}</TechLabel>
+              <span className="text-xs text-muted">{a_che_serve}</span>
+              <TechLabel className="text-muted">
+                da {RAT_ICON_MUZZLE_FLOOR[muzzle]}px
+              </TechLabel>
+            </span>
+          ))}
+        </div>
+
+        <p className="text-sm text-muted">
+          ⚠️ <strong>Ogni gradino ha la sua misura minima</strong>, ed è la cosa da guardare prima
+          di accenderlo: <code>RAT_ICON_MUZZLE_FLOOR</code> dice {RAT_ICON_MUZZLE_FLOOR.none},{' '}
+          {RAT_ICON_MUZZLE_FLOOR.eyes} e {RAT_ICON_MUZZLE_FLOOR.full} pixel. Sotto i{' '}
+          {RAT_ICON_MUZZLE_FLOOR.eyes} i due occhi si fondono in una fascia sola e il cuore sembra
+          scheggiato; sotto i {RAT_ICON_MUZZLE_FLOOR.full} i baffi sono tratteggi. La scelta resta a
+          chi monta perché una classe <code>size-*</code> sostituisce l’attributo{' '}
+          <code>width</code>: il componente non sa a che misura verrà dipinto.
+        </p>
+
+        <div className="flex flex-wrap items-end gap-8 text-brand-ink">
+          {[24, 32, 48, 96].map((size) => (
+            <span key={size} className="flex flex-col items-center gap-2">
+              <RatIcon size={size} isFilled muzzle="full" animateOn="none" />
+              <TechLabel className="text-muted">{size}px</TechLabel>
+            </span>
+          ))}
+        </div>
+
+        <p className="text-sm text-muted">
+          ⚠️ <strong>Il muso descrive lo stato pieno, non il marchio.</strong> Sul cuore vuoto non
+          compare niente — e non è una prop ignorata: è la stessa forma di{' '}
+          <code>animateOn=&quot;filled&quot;</code>, che dice in quale dei due stati si batte. In
+          una lista di preferiti vuol dire che il muso arriva quando si sceglie.
+        </p>
+
+        <div className="flex max-w-sm flex-col gap-1 rounded-xl border border-border p-4">
+          {PREFERITI.map(({ titolo, isFilled }) => (
+            <span key={`muso-${titolo}`} className="flex items-center gap-3 py-1 text-sm">
+              <RatIcon
+                size={24}
+                isFilled={isFilled}
+                muzzle="eyes"
+                animateOn="none"
+                className="shrink-0 text-brand-ink"
+              />
               {titolo}
             </span>
           ))}

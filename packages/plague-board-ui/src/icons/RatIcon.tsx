@@ -24,8 +24,92 @@ const HEART_LEFT = 'M12 10.5S10 9 9 9.5C8 10 6.5 11.5 7 13C8 15 9.83333 17.5 12 
  */
 const HEART_FILL = `${HEART_RIGHT}${HEART_LEFT.replace('M12 10.5', '')}Z`;
 
+/**
+ * I due occhi, **cavati** dalla campitura.
+ *
+ * ⚠️ Cavati e non dipinti, e non è una preferenza: la campitura è `currentColor`, quindi un occhio
+ * dello stesso colore sopra di lei non esiste. Stanno perciò nello stesso `d` del cuore, che passa
+ * a `fill-rule="evenodd"` — la regola pari/dispari li conta come buchi perché sono **interamente
+ * dentro** la sagoma. (Fosse una sagoma affiancata non funzionerebbe: là i bordi si contano
+ * insieme.) Su un cuore pieno senza occhi `evenodd` e `nonzero` danno lo stesso disegno: misurato
+ * il 2026-09-21 a 24, 96 e 512px, **zero** byte di differenza.
+ *
+ * La forma non è un triangolo esatto — l'utente l'ha disegnata a mano e chiesta così: un **cuneo**
+ * con la punta in fuori e smussata, la testa interna tonda, i due bordi curvi. Una sonda a
+ * componenti connesse ha riportato il disegno in unità del `viewBox`: occhi larghi 2,23 e alti
+ * 1,57, con la **punta esterna più alta** della testa interna, che è il taglio felino. Il varco fra
+ * le due teste è **2,10** — non 1,50 come nella prima stesura — perché è lui a decidere il
+ * pavimento: a 24px 1,50 unità fanno un pixel e mezzo e l'antialiasing fonde i due segni in uno.
+ */
+const MUZZLE_EYE_LEFT =
+  'M9.08 12.38Q9.77 13.23 10.71 13.67Q11.7 13.41 11.19 12.53Q10.21 12.18 9.12 12.3Q8.95 12.28 9.08 12.38Z';
+
+/**
+ * L'occhio destro è lo **specchio esatto** del sinistro: ogni `x` diventa `24 − x`.
+ *
+ * ⚠️ Si scrive così e non ricalcolando la geometria dal lato opposto, che è come era nato: con due
+ * coordinate arrotondate a due decimali per conto proprio, i due occhi finivano a **0,04** di
+ * distanza dalla simmetria — invisibile, e comunque una cosa che il primo ritocco a mano allarga.
+ * Lo specchio inverte il verso del tracciato, che con `evenodd` non conta.
+ */
+const MUZZLE_EYE_RIGHT = MUZZLE_EYE_LEFT.replace(
+  /(-?\d+(?:\.\d+)?) (-?\d+(?:\.\d+)?)/g,
+  (_, x: string, y: string) => `${Number((24 - Number(x)).toFixed(2))} ${y}`,
+);
+
+const MUZZLE_EYES = `${MUZZLE_EYE_LEFT}${MUZZLE_EYE_RIGHT}`;
+
+/**
+ * I baffi: tre per lato, dritti, che **nascono dentro la sagoma** e ne escono.
+ *
+ * ⚠️ Nascono dentro apposta, ed è per questo che il tracciato va dipinto **prima** della
+ * campitura: il cuore pieno copre il moncone interno, e non c'è nessuna intersezione fra retta e
+ * curva da calcolare. È lo stesso mestiere del giunto sintetico dietro al tronco del ratto che
+ * corre. Ne discende che i baffi esistono **solo da pieno**: sul cuore vuoto sarebbero sei
+ * trattini che entrano nel niente.
+ *
+ * ⚠️ E i due di sotto sono **più corti** dei due di sopra per un motivo misurato, non per gusto:
+ * col battito interno il gruppo scala 1,12 attorno a (12 · 13) mentre l'anello resta fermo, e
+ * nella prima taratura le loro punte lo tagliavano al picco. Rientrate, i franchi sono 0,54 · 0,38
+ * · 0,43 — e un test li ricontrolla, perché allungare un baffo è la modifica più innocua del mondo.
+ */
+const MUZZLE_WHISKERS =
+  'M10.3 17.2L5.75 16.35M11 17.9L7 17.95M11.55 18.3L8.9 19.1' +
+  'M13.7 17.2L18.25 16.35M13 17.9L17 17.95M12.45 18.3L15.1 19.1';
+
+/** Il tratto dei baffi. Misurato sul disegno a mano: ~0,55; sopra 0,8 non sono baffi ma zampe. */
+const MUZZLE_WHISKER_WIDTH = 0.45;
+
 /** Lo stato del marchio: il cuore col solo contorno, o pieno. */
 export type RatIconState = 'empty' | 'filled';
+
+/**
+ * Quanto muso mostra lo stato pieno: niente, i soli occhi, o occhi e baffi.
+ *
+ * È la terza lettura del marchio portata a galla — il muso del ratto — e si accende a mano perché
+ * ognuno dei tre gradini ha una **misura minima diversa**: vedi {@link RAT_ICON_MUZZLE_FLOOR}.
+ */
+export type RatIconMuzzle = 'none' | 'eyes' | 'full';
+
+/**
+ * La misura sotto la quale ogni gradino del muso smette di dire quello che disegna.
+ *
+ * Misurati il 2026-09-21 sui pixel veri, ingranditi col vicino più prossimo: a **18px** i due occhi
+ * si fondono in una fascia sola e il cuore sembra scheggiato; a **24** diventano due occhi ma i
+ * baffi sono tratteggi; a **32** i baffi sono baffi. Il 18 del gradino `none` è il pavimento
+ * storico del marchio, ed è la misura che usa la barra compatta.
+ *
+ * ⚠️ **La tabella esiste perché il componente non può decidere da sé.** Una classe `size-*`
+ * sostituisce l'attributo `width` di un `<svg>` — misurato su questa stessa barra — quindi `size`
+ * non è un testimone attendibile di quanto il segno verrà dipinto davvero. La libreria dà il
+ * numero, la scelta la fa chi monta: è la stessa divisione di `PLAGUE_BAR_MARK_SIZE` e della sua
+ * tabella di classi.
+ */
+export const RAT_ICON_MUZZLE_FLOOR: Record<RatIconMuzzle, number> = {
+  none: 18,
+  eyes: 24,
+  full: 32,
+};
 
 /**
  * Che cosa batte.
@@ -64,6 +148,19 @@ export interface RatIconProps extends IconProps {
    * dà un riferimento immobile e il battito si legge meglio.
    */
   beat?: RatIconBeat;
+  /**
+   * Quanto **muso** mostra lo stato pieno: niente, i soli occhi, o occhi e baffi.
+   *
+   * ⚠️ Descrive lo stato **pieno**, non il marchio: sul cuore vuoto non c'è campitura in cui cavare
+   * gli occhi né che copra la radice dei baffi, quindi non compare niente. Non è una prop ignorata
+   * — è la stessa forma di `animateOn: 'filled'`, che dice in quale dei due stati si batte.
+   *
+   * ⚠️ Il predefinito è `'none'` perché il marchio è già montato in una barra, in un piede e in una
+   * schermata di accesso: un muso comparso da sé cambierebbe l'identità di tutti e tre senza che
+   * nessuno l'abbia chiesto. E ogni gradino ha la sua misura minima, in
+   * {@link RAT_ICON_MUZZLE_FLOOR}.
+   */
+  muzzle?: RatIconMuzzle;
 }
 
 /**
@@ -77,16 +174,17 @@ export interface RatIconProps extends IconProps {
  * 2. guardandolo meglio sono **due figure che si abbracciano**;
  * 3. ma le due orecchie dicono la verità: è il **muso di un ratto**.
  *
- * Da qui discende come si usa. È il marchio: sta dove parla la corporazione — una barra, una
- * schermata di accesso, un piede — e **non si usa come icona di dominio**. Per dire «peste» c'è
- * {@link BiohazardIcon}, per dire «gioco» il dado: un marchio che marca anche le cose smette di
- * marcare sé stesso.
+ * Da qui discendono i suoi **due mestieri**, e sono due davvero. È il **marchio**, e sta dove parla
+ * la corporazione: una barra, una schermata di accesso, un piede. Ed è il **cuore**, cioè il
+ * comando dei preferiti — la prima delle tre letture vale quanto la terza, e `isFilled` è lì per
+ * quella. ⚠️ Quello che non fa è **prestarsi come glifo di un'altra cosa**: per dire «peste» c'è
+ * {@link BiohazardIcon}, per dire «gioco» il dado. Un segno che dice tutto smette di dire qualcosa,
+ * e la regola è quella — non «il marchio non si tocca», ma «il marchio dice quello che disegna».
  *
- * ⚠️ **Ha due stati, e la prima lettura è quella che glieli dà.** Un cuore vuoto e un cuore pieno
+ * ⚠️ **I due stati escono dalla prima lettura, non da una deroga.** Un cuore vuoto e un cuore pieno
  * sono la convenzione con cui il software dice «non l'ho scelto / l'ho scelto»: `isFilled` rende il
- * marchio anche il comando dei **preferiti**, senza che serva un secondo disegno. È l'unico posto
- * in cui questo segno esce dal mestiere di marchio, e ci esce perché lì continua a dire la stessa
- * cosa — qualcosa a cui si tiene.
+ * marchio anche il comando dei **preferiti**, senza che serva un secondo disegno — e senza che
+ * smetta di essere il marchio, perché quello che gli si chiede di dire lì è quello che già disegna.
  *
  * ⚠️ **Batte da sé, e questa è una deroga dichiarata.** La regola della tazza e del pallino dice
  * che l'interruttore di un'animazione sta su chi monta il pezzo, non dentro il disegno; qui è il
@@ -116,11 +214,15 @@ export function RatIcon({
   isFilled = false,
   animateOn = 'both',
   beat = 'whole',
+  muzzle = 'none',
   className = '',
   ...props
 }: RatIconProps) {
   const state: RatIconState = isFilled ? 'filled' : 'empty';
   const beats = animateOn === 'both' || animateOn === state;
+  // Il muso vive nella campitura: senza di lei non c'è dove cavare gli occhi né cosa copra la
+  // radice dei baffi.
+  const face = isFilled ? muzzle : 'none';
 
   // ⚠️ La variante intera scrive sullo stesso attributo che riceve `className`: si **compone**, o
   // un marchio che batte perde il colore e lo `shrink-0` che gli ha dato chi lo mette in una barra.
@@ -137,9 +239,27 @@ export function RatIcon({
         strokeWidth="1.5"
       />
       <g className={innerClass}>
+        {/* I baffi **prima** della campitura: nascono dentro la sagoma e il cuore pieno ne copre
+            la radice, così non c'è nessuna intersezione da calcolare. Invertendo l'ordine, da
+            ogni baffo spunterebbe un mozzicone in mezzo al muso. */}
+        {face === 'full' ? (
+          <path
+            d={MUZZLE_WHISKERS}
+            strokeWidth={MUZZLE_WHISKER_WIDTH}
+            strokeLinecap="round"
+          />
+        ) : null}
         {/* La campitura sta **sotto** il contorno, o il tratto tondo dei capi si vedrebbe tagliato
-            dal bordo netto del riempimento. */}
-        {isFilled ? <path d={HEART_FILL} fill="currentColor" stroke="none" /> : null}
+            dal bordo netto del riempimento. Gli occhi sono nel suo stesso `d`, cavati da
+            `evenodd`: su un cuore senza occhi quella regola non cambia un pixel. */}
+        {isFilled ? (
+          <path
+            d={face === 'none' ? HEART_FILL : `${HEART_FILL}${MUZZLE_EYES}`}
+            fill="currentColor"
+            fillRule="evenodd"
+            stroke="none"
+          />
+        ) : null}
         {/* Le due curve che formano il cuore, l'abbraccio e il muso. Si incontrano in alto al
             centro e scendono a chiudersi in punta. */}
         <path d={HEART_RIGHT} strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round" />
