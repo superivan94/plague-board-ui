@@ -160,6 +160,13 @@ export { SkullPhonesOffIcon } from './icons/SkullPhonesOffIcon';
 export { SparklesIcon } from './icons/SparklesIcon';
 export { VirusIcon } from './icons/VirusIcon';
 export type { IconProps } from './icons/types';
+// ⚠️ L'involucro, e l'unico pezzo della libreria che serve a disegnare **fuori** di lei. Esce
+// perché il confine qui sotto ha un rovescio: se i segni di un dominio non entrano, chi ne ha
+// bisogno se li disegna in casa propria — e senza questo componente ricopierebbe il nostro `<svg>`
+// con dentro la griglia, `currentColor` e la regola su `title`, cioè le tre cose che rendono
+// un'icona **nostra**. Il contratto che promettiamo è `IconBaseProps`: quattro prop che dipendono
+// dal disegno, non da chi lo monta.
+export { IconBase, type IconBaseProps } from './icons/IconBase';
 
 // ⚠️ **Qui dentro non entrano i segni di un dominio applicativo**, e il confine è stato messo alla
 // prova il 2026-09-20: sette icone per gli attributi di un gioco da tavolo — giocatori, durata,

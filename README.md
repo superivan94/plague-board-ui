@@ -10,6 +10,14 @@ divergono.
 > HeroUI non ha e non avrà mai — un ratto che attraversa lo schermo, un fumetto che dice «Squit!»,
 > un fondale appestato.
 
+> 📄 **Questo è il README principale, e non è quello che si vede su npm.** Un pacchetto spedisce
+> solo ciò che sta nella sua cartella, quindi da questa radice npm non prende niente:
+> [`packages/plague-board-ui/README.md`](packages/plague-board-ui/README.md) è un **secondo**
+> README, più corto, scritto per chi sta installando, ed è quello che finisce nel tarball e sulla
+> pagina del pacchetto. ⚠️ Due file che dicono le stesse cose **divergono**: quando succede, questo
+> ha ragione, e l'altro si accorcia invece di rincorrerlo. Una modifica che riguarda chi installa —
+> il nome di un import, una peer, un foglio di stile — si porta di là a mano.
+
 ## Installazione
 
 ```bash

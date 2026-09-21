@@ -1,15 +1,6 @@
-import { readFileSync, readdirSync } from 'node:fs';
-import { join } from 'node:path';
 import { describe, expect, it } from 'vitest';
 
-// ⚠️ Il percorso si ricava dalla cartella di lavoro e non da `import.meta.url`: i test girano in
-// jsdom, dove quell'URL è un `http://localhost/…` e `fileURLToPath` lo rifiuta. Che la cartella
-// sia quella giusta lo verifica il primo caso qui sotto.
-const SRC = join(process.cwd(), 'src');
-
-const sources = readdirSync(SRC, { recursive: true, encoding: 'utf8' })
-  .filter((name) => name.endsWith('.ts') || name.endsWith('.tsx'))
-  .map((name) => ({ name: name.replace(/\\/g, '/'), text: readFileSync(join(SRC, name), 'utf8') }));
+import { sorgenti } from './sorgenti';
 
 const isClientModule = ({ text }: { text: string }) => text.split('\n')[0] === "'use client';";
 
@@ -17,10 +8,10 @@ describe('il confine server/client', () => {
   it('trova i sorgenti da controllare', () => {
     // Se un giorno la cartella cambia nome, il caso qui sotto passerebbe su zero file senza dire
     // niente: un guard che non guarda nulla è verde per costruzione.
-    expect(sources.length).toBeGreaterThan(5);
+    expect(sorgenti.length).toBeGreaterThan(5);
   });
 
-  it.each(sources.filter(({ text }) => text.includes('render={')))(
+  it.each(sorgenti.filter(({ text }) => text.includes('render={')))(
     'chi passa `render` a HeroUI dichiara `use client`: $name',
     ({ text }) => {
       // ⚠️ Misurato il 2026-09-17 con `next build`, e il modo in cui si è visto è la parte
@@ -36,7 +27,7 @@ describe('il confine server/client', () => {
     },
   );
 
-  it.each(sources.filter(isClientModule))('$name non esporta dati, solo componenti', ({ text }) => {
+  it.each(sorgenti.filter(isClientModule))('$name non esporta dati, solo componenti', ({ text }) => {
     // ⚠️ L'altra metà dello stesso confine, e la più insidiosa perché **nessuna build diventa
     // rossa**. Un modulo `'use client'` non consegna a un componente server i valori che esporta:
     // gli consegna un riferimento al modulo. Per un componente è il meccanismo giusto; per una

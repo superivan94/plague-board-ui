@@ -1,22 +1,14 @@
-import { readFileSync, readdirSync } from 'node:fs';
-import { join } from 'node:path';
 import { describe, expect, it } from 'vitest';
 
-// ⚠️ Il percorso si ricava dalla cartella di lavoro e non da `import.meta.url`, per la stessa
-// ragione di `boundaries.test.ts`: in jsdom quell'URL è un `http://localhost/…`.
-const SRC = join(process.cwd(), 'src');
-
-const sources = readdirSync(SRC, { recursive: true, encoding: 'utf8' })
-  .filter((name) => name.endsWith('.ts') || name.endsWith('.tsx'))
-  .map((name) => ({ name: name.replace(/\\/g, '/'), text: readFileSync(join(SRC, name), 'utf8') }));
+import { sorgenti } from './sorgenti';
 
 describe('l’anello di fuoco', () => {
   it('trova i sorgenti da controllare', () => {
     // Un guard che scandaglia zero file è verde per costruzione.
-    expect(sources.length).toBeGreaterThan(5);
+    expect(sorgenti.length).toBeGreaterThan(5);
   });
 
-  it.each(sources)('$name non disegna il fuoco con `outline`', ({ text }) => {
+  it.each(sorgenti)('$name non disegna il fuoco con `outline`', ({ text }) => {
     // ⚠️ Misurato il 2026-09-20, ed è un difetto che era già **in produzione** in tre componenti:
     // `outline-none` non spegne solo il contorno, scrive `--tw-outline-style: none`, e in Tailwind
     // v4 un `outline-2` vale `outline-style: var(--tw-outline-style, solid)`. Messi insieme —

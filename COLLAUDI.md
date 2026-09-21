@@ -1251,3 +1251,36 @@ innocua del mondo.
 **Che cosa protegge:** la terza lettura del marchio — il muso del ratto — che è quella che lo rende
 un personaggio invece di un cuore; e i tre pavimenti, che sono la sola cosa che impedisce di
 accendere il muso dove diventa un cuore scheggiato.
+
+### Che cosa esce davvero da `npm pack` — 2026-09-21
+
+**Esegue:** agente — e **si rifà prima di ogni `npm publish`**, perché è l'unico momento in cui il
+pacchetto si guarda da fuori.
+
+**Ultima esecuzione:** agente, 2026-09-21
+
+**Preparazione:** dalla cartella del pacchetto, `npm pack --dry-run`. Non si legge `package.json`:
+quello dice che cosa il pacchetto **promette**, e il difetto che questo scenario cerca è
+esattamente la distanza fra la promessa e il tarball. Il gate va lanciato prima, o `dist/` è quello
+di ieri.
+
+| Azione | Atteso | Ottenuto |
+|---|---|---|
+| `README.md` nel tarball | c'è | **no** — era in `files` e stava nella radice del repository, dove npm non guarda. Curato col README del pacchetto |
+| `LICENSE` nel tarball | c'è | **no**, stesso motivo. Curato con la copia identica accanto al pacchetto |
+| `styles/theme.css` e `styles/animations.css` | ci sono | sì — 12,6 KB e 45,4 KB |
+| `assets/ludoratti.mp3` | c'è | sì, 1,3 MB, che è il grosso del pacchetto |
+| `dist/index.js` e `dist/index.d.ts` | ci sono, e sono gli indirizzi degli `exports` | sì |
+| `src/` e `tests/` | **non** ci sono | sì: `files` non li nomina |
+| Peso | ~1,5 MB | 1,5 MB compresso, 2,0 MB aperto, 320 file |
+
+⚠️ **Il guard non sostituisce questo scenario, e viceversa.**
+[`tests/publicSurface.test.ts`](packages/plague-board-ui/tests/publicSurface.test.ts) tiene i due
+elenchi allineati — ogni indirizzo che `exports` promette sta dentro una cartella che `files`
+spedisce, e ogni voce di `files` esiste sul disco — ma li legge tutti e due dal manifesto. Che cosa
+npm ci metta davvero dentro dipende anche da `.npmignore`, da `.gitignore` e da che la build sia
+stata lanciata: quello lo dice solo il tarball.
+
+**Che cosa protegge:** che chi installa il pacchetto trovi gli stili, la traccia e il testo della
+licenza. Un `@import "plague-board-ui/theme.css"` che non risolve è la prima riga del primo file di
+chi ci prova, e a noi in casa funziona.

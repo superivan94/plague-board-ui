@@ -1092,6 +1092,28 @@ exist in target module» che **non sono veri**. Si guarda la pagina, o si crede 
   terzo**, e infatti i disegni a tratto di questa libreria sono quelli col limite più basso: il
   bacillo si ferma a 20, il cocco a 24. Dove un segno deve stare accanto a un testo piccolo si
   sceglie la campitura, e a tratto ci vanno quelli che si usano grandi.
+- ⚠️ **npm non guarda fuori dalla cartella del pacchetto, e `files` non se ne lamenta.**
+  `README.md` e `LICENSE` erano in `files` e stavano nella **radice del repository**: misurato il
+  2026-09-21 con `npm pack --dry-run`, il tarball usciva con 320 file, **nessuna documentazione e
+  nessun testo di licenza** — che per un pacchetto PolyForm Noncommercial è la cosa che dice a chi
+  installa cosa può farne. Non è un errore, non è un avviso: è una riga che non spedisce niente. Da
+  qui i **due README**, con la regola scritta in cima a tutti e due — quello della radice è il
+  principale, quello del pacchetto è la versione breve per chi installa, e quando divergono ha
+  ragione il primo. Il `LICENSE` invece si copia identico: è testo legale, non prosa, e non
+  diverge.
+- ⚠️ **L'iniziale maiuscola di un file è una promessa, e valeva già da sola.** In `src/` i 53 file
+  con l'iniziale maiuscola tengono un componente e escono dall'indice; quelli minuscoli tengono
+  dati, ganci e pezzi di casa. L'unica eccezione — `IconBase`, che il suo stesso JSDoc dichiarava
+  privato — non era da tollerare ma da **togliere dalla parte giusta**: è il pezzo con cui si
+  disegna un'icona che questa libreria non avrà mai, quindi è uscito (utente, 2026-09-21), e la
+  convenzione è rimasta senza nessuna eccezione. L'alternativa legittima al guard non è spegnerlo:
+  è il **nome del file** — un pezzo che deve restare di casa comincia minuscolo.
+- ⚠️ **Un guard che legge una sintassi ha un secondo modo di essere verde per costruzione: non
+  riconoscere ciò che legge.** Il primo è noto — scandagliare zero file — e ogni guard lo tiene con
+  un `toBeGreaterThan`. Il secondo è peggiore: un lettore di `src/index.ts` che non capisce una
+  clausola non fallisce, la **salta**, e ogni caso costruito su quella lista passa perché quei nomi
+  non ci sono mai arrivati. Si cura contando: le clausole riconosciute contro le righe che
+  cominciano per `export`, che oggi sono 64 e 64.
 
 ## Memoria di sessione
 
