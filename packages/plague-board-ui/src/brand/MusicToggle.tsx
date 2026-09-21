@@ -2,9 +2,9 @@
 
 import { ToggleButton } from '@heroui/react';
 
-import { SkullPhonesIcon } from '../icons/SkullPhonesIcon';
-import { SkullPhonesOffIcon } from '../icons/SkullPhonesOffIcon';
-import { useMusic } from './MusicProvider';
+import { SkullPhonesIcon } from '../icons/SkullPhonesIcon.js';
+import { SkullPhonesOffIcon } from '../icons/SkullPhonesOffIcon.js';
+import { useMusic } from './MusicProvider.js';
 
 export interface MusicToggleProps {
   /** Il nome del comando quando la musica **non** sta suonando. */

@@ -1,4 +1,4 @@
-import type { RandomRange } from '../randomRange';
+import type { RandomRange } from '../randomRange.js';
 
 /**
  * Quanta atmosfera. Sono i quattro valori di RattInventario, con lo stesso ordine e gli stessi

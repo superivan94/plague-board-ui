@@ -1,5 +1,5 @@
-import { IconBase } from './IconBase';
-import type { IconProps } from './types';
+import { IconBase } from './IconBase.js';
+import type { IconProps } from './types.js';
 
 /**
  * La sagoma: una punta in cima e un bulbo tondo in fondo. È una goccia che **cade**, non che pende.

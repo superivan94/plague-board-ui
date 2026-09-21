@@ -2,10 +2,10 @@
 
 import { useRef, type MouseEvent, type ReactNode } from 'react';
 
-import { LUDORATTI_COPY } from '../data/copy';
-import { PotionMugIcon } from '../icons/PotionMugIcon';
-import { openInNewTab } from './openInNewTab';
-import { ParticleBurst, type ParticleBurstHandle } from './ParticleBurst';
+import { LUDORATTI_COPY } from '../data/copy.js';
+import { PotionMugIcon } from '../icons/PotionMugIcon.js';
+import { openInNewTab } from './openInNewTab.js';
+import { ParticleBurst, type ParticleBurstHandle } from './ParticleBurst.js';
 
 /**
  * Quanto al massimo si trattiene la navigazione per far vedere la fontana.

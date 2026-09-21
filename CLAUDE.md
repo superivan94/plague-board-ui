@@ -1113,6 +1113,17 @@ exist in target module» che **non sono veri**. Si guarda la pagina, o si crede 
   cima a `exports`, per chi risolve ancora alla maniera vecchia (`exports` continua a chiudere gli
   import profondi), e **`prepublishOnly`** con dentro il gate intero, perché `npm publish` spedisce
   il `dist/` che trova — anche quello di ieri.
+- ⚠️ **Ogni import relativo dei sorgenti finisce per `.js`, e non è un refuso: senza, il pacchetto
+  non si importa in Node.** `tsc` **non riscrive** gli specificatori — emette quello che legge — e
+  Node ESM non cerca l'estensione: `dist/index.js` con dentro `from './brand/BarRow'` muore con
+  `ERR_MODULE_NOT_FOUND` alla **prima riga**, a casa di chi installa. Qui non si vedeva perché un
+  bundler quell'estensione la indovina: playground verde, gate verde, e il difetto fuori solo per
+  chi fa `import` da Node — cioè un SSR che non impacchetta le dipendenze, uno script, o
+  TypeScript con `moduleResolution: node16`. Misurato il 2026-09-22 installando il tarball in un
+  progetto finto, che è l'unico posto dove si vede. Si scrive l'estensione del file **emesso** —
+  `.js` anche da un `.tsx` — e `tsc` con `moduleResolution: bundler` la risolve sul sorgente; lo
+  fanno anche vitest e Turbopack. ⚠️ **L'auto-import dell'editor la scrive senza**, quindi la regge
+  un caso di `publicSurface.test.ts` che nomina file e specificatore.
 - ⚠️ **L'iniziale maiuscola di un file è una promessa, e valeva già da sola.** In `src/` i 53 file
   con l'iniziale maiuscola tengono un componente e escono dall'indice; quelli minuscoli tengono
   dati, ganci e pezzi di casa. L'unica eccezione — `IconBase`, che il suo stesso JSDoc dichiarava

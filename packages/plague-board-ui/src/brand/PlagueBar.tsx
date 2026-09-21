@@ -10,7 +10,7 @@ import {
   PLAGUE_BAR_SAFE_PADDING,
   type PlagueBarPlacement,
   type PlagueBarSize,
-} from './plagueBarSizes';
+} from './plagueBarSizes.js';
 
 export interface PlagueBarProps {
   /** Quello che la barra contiene: marchio, collegamenti, comandi. Li decide chi la usa. */

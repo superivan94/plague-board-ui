@@ -1,13 +1,13 @@
 import type { ReactNode } from 'react';
 
-import { PotionMugIcon } from '../icons/PotionMugIcon';
-import { BarRow } from './BarRow';
-import type { CreditAuthor } from './CreditCard';
-import { CreditLine } from './CreditLine';
-import { PlagueBar } from './PlagueBar';
-import { PLAGUE_FOOT_MARK_CLASS, PLAGUE_FOOT_MARK_SIZE, type PlagueBarSize } from './plagueBarSizes';
-import { SupportButton } from './SupportButton';
-import { VersionTag } from './VersionTag';
+import { PotionMugIcon } from '../icons/PotionMugIcon.js';
+import { BarRow } from './BarRow.js';
+import type { CreditAuthor } from './CreditCard.js';
+import { CreditLine } from './CreditLine.js';
+import { PlagueBar } from './PlagueBar.js';
+import { PLAGUE_FOOT_MARK_CLASS, PLAGUE_FOOT_MARK_SIZE, type PlagueBarSize } from './plagueBarSizes.js';
+import { SupportButton } from './SupportButton.js';
+import { VersionTag } from './VersionTag.js';
 
 export interface PlagueFootBarProps {
   /** Chi ha fatto l'applicazione: il primo è quello che resta quando lo spazio manca. */

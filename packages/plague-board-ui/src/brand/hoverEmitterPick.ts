@@ -1,7 +1,7 @@
 import type { CSSProperties } from 'react';
 
-import type { RandomRange } from '../randomRange';
-import type { HoverEffect } from './hoverEffects';
+import type { RandomRange } from '../randomRange.js';
+import type { HoverEffect } from './hoverEffects.js';
 
 /**
  * Il sorteggio di `HoverEmitter`: come si pesca il prossimo elemento da far volare.

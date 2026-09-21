@@ -71,7 +71,9 @@ export const superficie: readonly Pubblico[] = clausole.flatMap(([, tipo, nomi, 
     .filter((pezzo) => pezzo.length > 0)
     .map((pezzo) => ({
       name: pezzo.replace(/^type\s+/, ''),
-      module: from.replace(/^\.\//, ''),
+      // ⚠️ Il `.js` si toglie: nei sorgenti l'estensione è quella del **file emesso**, non del file
+      // che si sta leggendo. La scrivono per Node, che senza rifiuta di risolvere.
+      module: from.replace(/^\.\//, '').replace(/\.js$/, ''),
       isType: Boolean(tipo) || pezzo.startsWith('type '),
     })),
 );

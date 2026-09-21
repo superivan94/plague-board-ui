@@ -1,5 +1,5 @@
-import { IconBase } from './IconBase';
-import type { IconProps } from './types';
+import { IconBase } from './IconBase.js';
+import type { IconProps } from './types.js';
 
 /**
  * Il guscio della tazza — parete e fondo spessi 1,6 — e il manico ad anello sul fianco destro.

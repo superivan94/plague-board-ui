@@ -1,5 +1,5 @@
-import { IconBase } from './IconBase';
-import type { IconProps } from './types';
+import { IconBase } from './IconBase.js';
+import type { IconProps } from './types.js';
 
 /**
  * Tre lobi e una base piatta, uniti in un tracciato solo.

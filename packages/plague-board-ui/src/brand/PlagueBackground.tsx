@@ -2,18 +2,18 @@
 
 import type { CSSProperties, ReactNode } from 'react';
 
-import { BiohazardIcon } from '../icons/BiohazardIcon';
-import { DripIcon } from '../icons/DripIcon';
-import { PoisonIcon } from '../icons/PoisonIcon';
-import { SkullIcon } from '../icons/SkullIcon';
-import { VirusIcon } from '../icons/VirusIcon';
-import type { IconProps } from '../icons/types';
-import { RAT_PHRASES } from '../data/phrases';
-import { PlagueChatter } from './plagueChatter';
-import { PlagueCityscape } from './plagueCityscape';
-import { ToxicBubbles } from './ToxicBubbles';
-import { TOXIC_LEVEL_SETTINGS } from './toxicLevel';
-import { useToxicLevel } from './ToxicLevelProvider';
+import { BiohazardIcon } from '../icons/BiohazardIcon.js';
+import { DripIcon } from '../icons/DripIcon.js';
+import { PoisonIcon } from '../icons/PoisonIcon.js';
+import { SkullIcon } from '../icons/SkullIcon.js';
+import { VirusIcon } from '../icons/VirusIcon.js';
+import type { IconProps } from '../icons/types.js';
+import { RAT_PHRASES } from '../data/phrases.js';
+import { PlagueChatter } from './plagueChatter.js';
+import { PlagueCityscape } from './plagueCityscape.js';
+import { ToxicBubbles } from './ToxicBubbles.js';
+import { TOXIC_LEVEL_SETTINGS } from './toxicLevel.js';
+import { useToxicLevel } from './ToxicLevelProvider.js';
 
 /** Un'icona ferma in un punto del fondale, che sale e scende. */
 interface Galleggiante {

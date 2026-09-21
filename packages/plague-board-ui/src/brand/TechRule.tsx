@@ -1,7 +1,7 @@
 import { Separator } from '@heroui/react';
 import type { ReactNode } from 'react';
 
-import { TechLabel } from './TechLabel';
+import { TechLabel } from './TechLabel.js';
 
 export interface TechRuleProps {
   /** Il nome della categoria che comincia qui. Due parole, non una frase. */

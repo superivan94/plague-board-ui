@@ -2,12 +2,12 @@
 
 import { useEffect, useRef, useState, type CSSProperties } from 'react';
 
-import { useReducedMotion } from '../hooks/useReducedMotion';
-import type { RandomRange } from '../randomRange';
-import { scegli } from './hoverEmitterPick';
-import { TETTI } from './plagueCityscape';
-import { TOXIC_LEVEL_SETTINGS } from './toxicLevel';
-import { useToxicLevel } from './ToxicLevelProvider';
+import { useReducedMotion } from '../hooks/useReducedMotion.js';
+import type { RandomRange } from '../randomRange.js';
+import { scegli } from './hoverEmitterPick.js';
+import { TETTI } from './plagueCityscape.js';
+import { TOXIC_LEVEL_SETTINGS } from './toxicLevel.js';
+import { useToxicLevel } from './ToxicLevelProvider.js';
 
 /** Un verso in scena: la chiave che ne fa un nodo nuovo, e dove e per quanto si vede. */
 interface Verso {

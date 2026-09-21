@@ -1,5 +1,5 @@
-import { IconBase } from './IconBase';
-import type { IconProps } from './types';
+import { IconBase } from './IconBase.js';
+import type { IconProps } from './types.js';
 
 /**
  * Il cranio, le due orbite, il naso e i denti, in un tracciato solo.

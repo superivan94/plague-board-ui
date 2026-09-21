@@ -2,7 +2,7 @@ import {
   RAT_MASCOT_HEIGHT,
   RAT_MASCOT_SRC,
   RAT_MASCOT_WIDTH,
-} from '../assets/ratMascotImage';
+} from '../assets/ratMascotImage.js';
 
 const RAPPORTO = RAT_MASCOT_WIDTH / RAT_MASCOT_HEIGHT;
 

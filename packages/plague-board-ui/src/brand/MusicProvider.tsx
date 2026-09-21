@@ -2,7 +2,7 @@
 
 import { createContext, useContext, useMemo, useRef, useState, type ReactNode } from 'react';
 
-import { LUDORATTI_TRACK_URL } from '../assets/ludorattiTrack';
+import { LUDORATTI_TRACK_URL } from '../assets/ludorattiTrack.js';
 
 /** Che cosa sta suonando, a che volume, e le due leve per cambiarlo. */
 export interface MusicValue {

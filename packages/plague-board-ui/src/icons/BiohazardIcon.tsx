@@ -1,5 +1,5 @@
-import { IconBase } from './IconBase';
-import type { IconProps } from './types';
+import { IconBase } from './IconBase.js';
+import type { IconProps } from './types.js';
 
 // I due tracciati del trifoglio: i tre lobi, e gli anelli che li legano al centro. Arrivano
 // invariati da `ludoratti.it`, su una griglia da 150 col margine negativo che lascia respirare il

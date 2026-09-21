@@ -1,5 +1,5 @@
-import { IconBase } from './IconBase';
-import type { IconProps } from './types';
+import { IconBase } from './IconBase.js';
+import type { IconProps } from './types.js';
 
 // Un tracciato solo, con gli occhi come sottotracciati: con `evenodd` diventano buchi, e l'icona
 // resta leggibile su qualunque fondo. Due `<path>` separati li riempirebbero invece di bucarli, e

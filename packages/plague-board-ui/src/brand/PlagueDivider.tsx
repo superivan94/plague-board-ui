@@ -1,7 +1,7 @@
 import { Separator } from '@heroui/react';
 import type { ReactNode } from 'react';
 
-import { VirusIcon } from '../icons/VirusIcon';
+import { VirusIcon } from '../icons/VirusIcon.js';
 
 export interface PlagueDividerProps {
   /** La parola in mezzo: «oppure», «Alternative Access». Una parola, non una frase. */

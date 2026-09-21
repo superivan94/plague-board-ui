@@ -3,9 +3,9 @@
 import { Card } from '@heroui/react';
 import type { ReactNode } from 'react';
 
-import { PlagueBackground } from './PlagueBackground';
-import { PlaguePanel } from './PlaguePanel';
-import { RatSwarm } from './RatSwarm';
+import { PlagueBackground } from './PlagueBackground.js';
+import { PlaguePanel } from './PlaguePanel.js';
+import { RatSwarm } from './RatSwarm.js';
 
 export interface LoginScreenProps {
   /** Il titolo della schermata. Diventa l'`h1` della pagina: vedi il perché qui sotto. */

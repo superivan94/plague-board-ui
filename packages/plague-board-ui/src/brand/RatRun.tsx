@@ -2,7 +2,7 @@
 
 import type { AnimationEvent, CSSProperties } from 'react';
 
-import { Rat, type RatProps } from './Rat';
+import { Rat, type RatProps } from './Rat.js';
 
 export interface RatRunProps extends Omit<RatProps, 'isRunning' | 'className'> {
   /** Da che lato entra. Da destra il ratto è ribaltato, perché il disegno guarda a destra. */

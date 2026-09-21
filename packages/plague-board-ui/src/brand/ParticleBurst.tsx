@@ -12,15 +12,15 @@ import {
   type Ref,
 } from 'react';
 
-import { useReducedMotion } from '../hooks/useReducedMotion';
-import { BiohazardIcon } from '../icons/BiohazardIcon';
-import { MoleculeIcon } from '../icons/MoleculeIcon';
-import { PoisonIcon } from '../icons/PoisonIcon';
-import { SkullIcon } from '../icons/SkullIcon';
-import { VirusIcon } from '../icons/VirusIcon';
-import type { IconProps } from '../icons/types';
-import type { RandomRange } from '../randomRange';
-import { EffectLayer } from './effectLayer';
+import { useReducedMotion } from '../hooks/useReducedMotion.js';
+import { BiohazardIcon } from '../icons/BiohazardIcon.js';
+import { MoleculeIcon } from '../icons/MoleculeIcon.js';
+import { PoisonIcon } from '../icons/PoisonIcon.js';
+import { SkullIcon } from '../icons/SkullIcon.js';
+import { VirusIcon } from '../icons/VirusIcon.js';
+import type { IconProps } from '../icons/types.js';
+import type { RandomRange } from '../randomRange.js';
+import { EffectLayer } from './effectLayer.js';
 
 /** Che cosa si può chiedere a uno scoppio già montato, tenendone il riferimento. */
 export interface ParticleBurstHandle {

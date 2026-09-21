@@ -1,6 +1,6 @@
-import { IconBase } from './IconBase';
-import { SKULL_PATH } from './SkullIcon';
-import type { IconProps } from './types';
+import { IconBase } from './IconBase.js';
+import { SKULL_PATH } from './SkullIcon.js';
+import type { IconProps } from './types.js';
 
 /**
  * Come il teschio si rimpicciolisce per far posto alle cuffie.

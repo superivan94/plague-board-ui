@@ -1,4 +1,4 @@
-import { CreditCard, type CreditAuthor } from './CreditCard';
+import { CreditCard, type CreditAuthor } from './CreditCard.js';
 
 /** Di quanto sfalsa il cenno di un autore rispetto al precedente. Vedi il commento nel corpo. */
 const HINT_STAGGER_MS = 2000;

@@ -1,6 +1,6 @@
 import { Button, Spinner } from '@heroui/react';
 
-import { GoogleIcon } from '../icons/GoogleIcon';
+import { GoogleIcon } from '../icons/GoogleIcon.js';
 
 export interface GoogleSignInButtonProps {
   /**

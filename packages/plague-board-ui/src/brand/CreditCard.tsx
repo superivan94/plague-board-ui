@@ -2,8 +2,8 @@
 
 import type { ReactNode } from 'react';
 
-import { HoverEmitter } from './HoverEmitter';
-import type { HoverEffect } from './hoverEffects';
+import { HoverEmitter } from './HoverEmitter.js';
+import type { HoverEffect } from './hoverEffects.js';
 
 /** Chi ha fatto una cosa: un nome, e il resto è facoltativo. */
 export interface CreditAuthor {

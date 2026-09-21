@@ -1,4 +1,4 @@
-import { TechLabel } from './TechLabel';
+import { TechLabel } from './TechLabel.js';
 
 export interface VersionTagProps {
   /** La versione **senza** la `v`: quella la mette il componente. */

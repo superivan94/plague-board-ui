@@ -20,14 +20,18 @@ const conIniziale = sorgenti.filter(({ name }) => /^[A-Z]/.test(name.split('/').
 /** I moduli di casa: quelli che l'indice non nomina. */
 const privati = sorgenti.filter(({ name, module }) => name !== 'index.ts' && !pubblici.has(module));
 
-/** Ogni modulo nominato da un `from './…'` o `from '../…'` di un altro sorgente. */
-const importati = new Set(
-  sorgenti.flatMap(({ name, text }) =>
-    [...text.matchAll(/from '(\.[^']*)'/g)].map(([, spec]) =>
-      posix.normalize(posix.join(posix.dirname(name), spec)),
-    ),
-  ),
+/** Ogni specificatore relativo dei sorgenti, col modulo a cui punta. */
+const relativi = sorgenti.flatMap(({ name, text }) =>
+  [...text.matchAll(/from '(\.[^']*)'/g)].map(([, spec]) => ({
+    da: name,
+    spec,
+    // Il `.js` è l'estensione del file **emesso**: qui si legge il modulo, che non ce l'ha.
+    module: posix.normalize(posix.join(posix.dirname(name), spec)).replace(/\.js$/, ''),
+  })),
 );
+
+/** Ogni modulo nominato da un `from './…'` o `from '../…'` di un altro sorgente. */
+const importati = new Set(relativi.map(({ module }) => module));
 
 const PACCHETTO: {
   readonly files: readonly string[];
@@ -84,6 +88,19 @@ describe('la superficie pubblica', () => {
       }
     },
   );
+
+  it.each(relativi)('$da importa $spec, con l’estensione', ({ spec }) => {
+    // ⚠️ Node ESM **non** cerca l'estensione: un `from './brand/BarRow'` dentro `dist/index.js` è
+    // un `ERR_MODULE_NOT_FOUND` a casa di chi installa, e `tsc` non lo riscrive — emette quello che
+    // legge. Misurato il 2026-09-22 installando il tarball in un progetto finto: l'import
+    // dell'ingresso pubblico moriva sulla prima riga. Un bundler invece la trova lo stesso, quindi
+    // il playground era verde e il difetto sarebbe uscito solo fuori di qui.
+    //
+    // Si scrive l'estensione del file **emesso** — `.js` anche da un `.tsx` — e `tsc` con
+    // `moduleResolution: bundler` la risolve sul sorgente. L'alternativa legittima è un bundler al
+    // posto di `tsc`, che però la build di questa libreria non ha e non vuole.
+    expect(spec.endsWith('.js')).toBe(true);
+  });
 
   it('l’indice non riesporta a blocco', () => {
     // ⚠️ `export *` non è una scorciatoia: è la differenza fra un elenco e una domanda. Con

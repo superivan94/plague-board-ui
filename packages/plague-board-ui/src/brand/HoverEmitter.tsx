@@ -2,10 +2,10 @@
 
 import { useCallback, useEffect, useRef, useState, type PointerEvent, type ReactNode } from 'react';
 
-import { useReducedMotion } from '../hooks/useReducedMotion';
-import { EffectLayer } from './effectLayer';
-import { pesca, type Effimero } from './hoverEmitterPick';
-import type { HoverEffect } from './hoverEffects';
+import { useReducedMotion } from '../hooks/useReducedMotion.js';
+import { EffectLayer } from './effectLayer.js';
+import { pesca, type Effimero } from './hoverEmitterPick.js';
+import type { HoverEffect } from './hoverEffects.js';
 
 export interface HoverEmitterProps {
   /** Quello che si sfiora: una scheda, un nome, un'icona. L'emettitore non disegna niente di suo. */

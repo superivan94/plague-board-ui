@@ -2,7 +2,7 @@
 
 import { Slider } from '@heroui/react';
 
-import { useMusic } from './MusicProvider';
+import { useMusic } from './MusicProvider.js';
 
 export interface MusicVolumeProps {
   /** Come si chiama il cursore per chi non lo vede. */

@@ -2,10 +2,10 @@
 
 import { useCallback, useEffect, useRef, useState, type CSSProperties } from 'react';
 
-import { useReducedMotion } from '../hooks/useReducedMotion';
-import type { RandomRange } from '../randomRange';
-import { TOXIC_LEVEL_SETTINGS, type ToxicLevelSettings } from './toxicLevel';
-import { useToxicLevel } from './ToxicLevelProvider';
+import { useReducedMotion } from '../hooks/useReducedMotion.js';
+import type { RandomRange } from '../randomRange.js';
+import { TOXIC_LEVEL_SETTINGS, type ToxicLevelSettings } from './toxicLevel.js';
+import { useToxicLevel } from './ToxicLevelProvider.js';
 
 /** Una bolla in volo: la chiave che ne fa un nodo nuovo, e i numeri che la disegnano. */
 interface Bolla {

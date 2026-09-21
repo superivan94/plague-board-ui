@@ -1,8 +1,8 @@
 import { Avatar, Badge } from '@heroui/react';
 import type { ReactNode } from 'react';
 
-import { BiohazardIcon } from '../icons/BiohazardIcon';
-import { SkullIcon } from '../icons/SkullIcon';
+import { BiohazardIcon } from '../icons/BiohazardIcon.js';
+import { SkullIcon } from '../icons/SkullIcon.js';
 
 /** Le tre taglie di HeroUI, in pixel. ⚠️ `md` è la base e **non ha una classe**: `.avatar--md` non esiste. */
 export const PLAGUE_AVATAR_SIZE = { sm: 32, md: 40, lg: 48 } as const;

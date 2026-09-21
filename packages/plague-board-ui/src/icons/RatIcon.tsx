@@ -1,5 +1,5 @@
-import { IconBase } from './IconBase';
-import type { IconProps } from './types';
+import { IconBase } from './IconBase.js';
+import type { IconProps } from './types.js';
 
 /** La curva destra del cuore: sale dal vertice in basso, gira attorno al lobo e torna al centro. */
 const HEART_RIGHT = 'M12 18.5C14.1667 17.5 16 15 17 13C17.5 11.5 16 10 15 9.5C14 9 12 10.5 12 10.5';

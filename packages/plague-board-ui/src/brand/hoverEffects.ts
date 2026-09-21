@@ -1,4 +1,4 @@
-import type { RandomRange } from '../randomRange';
+import type { RandomRange } from '../randomRange.js';
 
 /**
  * La taratura di un emettitore: **quanto spesso ne esce uno, quanto vive, che cosa c'è scritto e

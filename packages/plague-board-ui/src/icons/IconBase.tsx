@@ -1,6 +1,6 @@
 import type { ReactNode } from 'react';
 
-import type { IconProps } from './types';
+import type { IconProps } from './types.js';
 
 /**
  * Il contratto dell'involucro: {@link IconProps} più le quattro cose che dipendono dal **disegno**

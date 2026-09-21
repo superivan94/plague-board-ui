@@ -17,7 +17,7 @@ import {
   type RatPart,
   type RatPath,
   type RatPivot,
-} from './ratArt';
+} from './ratArt.js';
 
 /**
  * Le tre livree: i colori del pelo **misurati sulle tre reference**, uno per ogni slot del disegno

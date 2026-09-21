@@ -1293,3 +1293,36 @@ stata lanciata: quello lo dice solo il tarball.
 **Che cosa protegge:** che chi installa il pacchetto trovi gli stili, la traccia e il testo della
 licenza. Un `@import "plague-board-ui/theme.css"` che non risolve è la prima riga del primo file di
 chi ci prova, e a noi in casa funziona.
+
+### Il tarball installato in un progetto finto — 2026-09-22
+
+**Esegue:** agente — **prima di ogni `npm publish`**, e ogni volta che si tocca la forma del
+pacchetto (`exports`, `files`, `tsconfig.build.json`, la build).
+
+**Ultima esecuzione:** agente, 2026-09-22
+
+**Preparazione:** `npm pack` dentro una cartella dello scratchpad, poi un progetto vuoto con
+`"type": "module"` e `npm install ./plague-board-ui-0.1.0.tgz`. **Non si usa il playground**: quello
+vede il workspace e ha un bundler davanti, cioè esattamente le due cose che nascondono i difetti
+che si cercano qui. npm tira dentro da sé le quattro peer, ed è anche la prova che il contratto
+delle peer regge senza che l'applicazione le nomini.
+
+| Azione | Atteso | Ottenuto |
+|---|---|---|
+| `import 'plague-board-ui'` da Node | i nomi della libreria | **`ERR_MODULE_NOT_FOUND` su `./brand/BarRow`**: `tsc` non riscrive gli specificatori e Node non indovina l'estensione. Curato scrivendo `.js` nei 185 import relativi di `src/` |
+| Di nuovo, dopo la cura | idem | **76 nomi** — 134 meno i 58 tipi, che a runtime non esistono |
+| `RatIcon`, `PlagueBar`, `IconBase`, `useRandomPhrase`, `binaryRain` | funzioni | sì |
+| `RAT_ICON_MUZZLE_FLOOR`, `PLAGUE_BAR_MARK_SIZE`, `RAT_PHRASES`, `LUDORATTI_COPY` | i valori, non `undefined` | sì |
+| `plague-board-ui/dist/index.js`, `/src/index.ts`, `/package.json` | chiusi | `ERR_PACKAGE_PATH_NOT_EXPORTED` su tutti e tre |
+| `plague-board-ui/theme.css`, `/animations.css`, `/assets/ludoratti.mp3` | risolvono a un file che c'è | sì |
+| `'use client'` in cima a `dist/brand/PlagueBar.js` | c'è | sì — sopravvive a `tsc` e al tarball |
+| La mappa di `PlagueBar.js` | punta a un file spedito | `../../src/brand/PlagueBar.tsx`, e il file c'è |
+| `tsc` di un file che importa componenti **e tipi**, con `skipLibCheck: false` | pulito | pulito con `moduleResolution: bundler` **e** con `nodenext` |
+
+⚠️ **Il difetto trovato qui non lo vedeva nessun'altra passata.** Il gate era verde, il playground
+pure, e `npm pack` mostrava un tarball perfetto: l'ingresso pubblico era irreparabile solo quando
+qualcuno lo importava **senza un bundler davanti**. È la differenza fra guardare il pacchetto e
+usarlo.
+
+**Che cosa protegge:** che `import { RatIcon } from 'plague-board-ui'` funzioni davvero — in un
+bundler, in Node, e nei due modi in cui TypeScript risolve i moduli.

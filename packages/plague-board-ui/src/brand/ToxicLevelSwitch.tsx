@@ -2,9 +2,9 @@
 
 import { ToggleButton, ToggleButtonGroup } from '@heroui/react';
 
-import { TechLabel } from './TechLabel';
-import { TOXIC_LEVELS, TOXIC_LEVEL_LABELS, type ToxicLevel } from './toxicLevel';
-import { useToxicLevel } from './ToxicLevelProvider';
+import { TechLabel } from './TechLabel.js';
+import { TOXIC_LEVELS, TOXIC_LEVEL_LABELS, type ToxicLevel } from './toxicLevel.js';
+import { useToxicLevel } from './ToxicLevelProvider.js';
 
 export interface ToxicLevelSwitchProps {
   /**

@@ -2,7 +2,7 @@
 
 import { createContext, useContext, useMemo, useState, type ReactNode } from 'react';
 
-import type { ToxicLevel } from './toxicLevel';
+import type { ToxicLevel } from './toxicLevel.js';
 
 /** Quanto c'è in scena adesso, e come cambiarlo. */
 export interface ToxicLevelValue {

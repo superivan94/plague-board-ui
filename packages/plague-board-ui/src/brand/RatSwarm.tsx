@@ -2,10 +2,10 @@
 
 import { useCallback, useEffect, useImperativeHandle, useRef, useState, type Ref } from 'react';
 
-import { useReducedMotion } from '../hooks/useReducedMotion';
-import type { RandomRange } from '../randomRange';
-import { RAT_LIVERIES, type RatLivery } from './Rat';
-import { RatRun, type RatRunProps } from './RatRun';
+import { useReducedMotion } from '../hooks/useReducedMotion.js';
+import type { RandomRange } from '../randomRange.js';
+import { RAT_LIVERIES, type RatLivery } from './Rat.js';
+import { RatRun, type RatRunProps } from './RatRun.js';
 
 /** Che cosa si può chiedere a uno sciame già montato, tenendone il riferimento. */
 export interface RatSwarmHandle {

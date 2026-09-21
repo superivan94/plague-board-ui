@@ -1,5 +1,5 @@
-import { IconBase } from './IconBase';
-import type { IconProps } from './types';
+import { IconBase } from './IconBase.js';
+import type { IconProps } from './types.js';
 
 /** Il corpo: un anello **vuoto**, che è ciò che lo separa dal virione pieno di {@link VirusIcon}. */
 const COCCUS_BODY = 'M12 7.5a4.5 4.5 0 1 0 0 9a4.5 4.5 0 1 0 0-9Z';

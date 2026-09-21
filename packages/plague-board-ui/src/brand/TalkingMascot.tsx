@@ -3,8 +3,8 @@
 import { type ReactNode, useRef, useState } from 'react';
 import { usePress } from 'react-aria';
 
-import { useRandomPhrase } from '../hooks/useRandomPhrase';
-import { SpeechBubble } from './SpeechBubble';
+import { useRandomPhrase } from '../hooks/useRandomPhrase.js';
+import { SpeechBubble } from './SpeechBubble.js';
 
 export interface TalkingMascotProps {
   /** La faccia: un SVG, un `<img>`, quello che si vuole. La mascotte non ne disegna una sua. */

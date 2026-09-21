@@ -1,6 +1,6 @@
-import { IconBase } from './IconBase';
-import { SkullUnderPhones } from './SkullPhonesIcon';
-import type { IconProps } from './types';
+import { IconBase } from './IconBase.js';
+import { SkullUnderPhones } from './SkullPhonesIcon.js';
+import type { IconProps } from './types.js';
 
 /** La sbarra che spegne, in diagonale come vuole la convenzione dei comandi muti. */
 const SLASH_PATH = 'M3.2 2.6 20.8 21.4';
