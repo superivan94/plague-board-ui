@@ -1,7 +1,7 @@
 import { act, fireEvent, render, screen } from '@testing-library/react';
 import { describe, expect, it, vi } from 'vitest';
 
-import { CreditLine, PlagueBar, PlagueFootBar, SupportButton, VersionTag } from '../src';
+import { PlagueBar, PlagueFootBar, SupportButton, VersionTag } from '../src';
 import { openInNewTab } from '../src/brand/openInNewTab';
 import { particelle } from './particelle';
 import { menoMovimento } from './preferenze';
@@ -53,30 +53,8 @@ describe('la lastra alle due estremità', () => {
   });
 });
 
+// La firma da sola sta in `CreditLine.test.tsx`: qui restano gli altri pezzi e il piede montato.
 describe('i pezzi del piede', () => {
-  it('la firma tiene il primo autore sempre, e nasconde gli altri solo in un contenitore stretto', () => {
-    render(<CreditLine authors={AUTORI} />);
-
-    const primo = screen.getByText('Superivan94').closest('span[class]')!;
-    const secondo = screen.getByText('AI-Dev').closest('span[class]')!;
-
-    // Il primo autore è quello che sopravvive: in una firma «umano e AI» è la persona.
-    expect(classi(primo.parentElement!)).not.toContain('hidden');
-    // ⚠️ La forma lunga è la **base** e la corta sta dietro `@max-lg:`. Senza un `@container`
-    // sopra, una container query non si applica e resta la classe di base: così chi dimentica il
-    // contenitore vede la firma intera — un difetto che si nota —, non un autore che sparisce.
-    expect(classi(secondo.parentElement!)).not.toContain('hidden');
-    expect(classi(secondo.parentElement!)).toContain('@max-lg:hidden');
-  });
-
-  it('senza contenitore l’etichetta è quella lunga, e la corta aspetta che uno la stringa', () => {
-    render(<CreditLine authors={AUTORI} />);
-
-    expect(classi(screen.getByText('Creato da'))).not.toContain('hidden');
-    expect(classi(screen.getByText('Creato da'))).toContain('@max-lg:hidden');
-    expect(classi(screen.getByText('By:'))).toEqual(expect.arrayContaining(['hidden', '@max-lg:inline']));
-  });
-
   it('la versione porta la `v` e le cifre a larghezza fissa', () => {
     render(<VersionTag version="4.0.0" />);
 

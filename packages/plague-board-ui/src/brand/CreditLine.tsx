@@ -10,9 +10,28 @@ export interface CreditLineProps {
   label?: string;
   /** Le parole davanti ai nomi, senza spazio. */
   shortLabel?: string;
+  /**
+   * Sempre nella forma corta, qualunque sia il contenitore: {@link shortLabel} e il primo autore.
+   *
+   * Per una colonna che si sa già stretta, o per una firma che deve dire poco anche su uno schermo
+   * largo. Senza, la forma la decide il contenitore; con questa, il `@container` sopra non serve.
+   */
+  isCompact?: boolean;
   /** Classi aggiuntive sulla riga. */
   className?: string;
 }
+
+/**
+ * Le classi delle due forme, scritte per esteso.
+ *
+ * ⚠️ Una tabella e non una funzione che le compone, per la ragione di `plagueBarSizes.ts`:
+ * Tailwind le classi le cerca nel testo dei file, e `'@max-lg:' + 'hidden'` darebbe la stringa
+ * giusta e nessuna regola.
+ */
+const FORMS = {
+  auto: { label: '@max-lg:hidden', shortLabel: 'hidden @max-lg:inline', others: 'flex @max-lg:hidden' },
+  compact: { label: 'hidden', shortLabel: 'inline', others: 'hidden' },
+} as const;
 
 /**
  * **La firma: «Creato da» e chi l'ha fatta.**
@@ -34,21 +53,27 @@ export interface CreditLineProps {
  * ⚠️ **Il primo autore è quello che sopravvive.** Non è un caso da decidere ogni volta: in una
  * firma «umano e AI» il primo è la persona, ed è quella che un piede deve nominare quando ha
  * spazio per un nome solo.
+ *
+ * Chi la vuole corta a prescindere dallo spazio passa `isCompact`: le stesse due forme, scelte
+ * dalla prop invece che dal contenitore.
  */
 export function CreditLine({
   authors,
   label = 'Creato da',
   shortLabel = 'By:',
+  isCompact = false,
   className = '',
 }: CreditLineProps) {
+  const form = FORMS[isCompact ? 'compact' : 'auto'];
+
   return (
     <span className={`flex items-center gap-2 text-xs text-muted ${className}`}>
       {/* Due nodi e non uno con due classi: il testo cambia, non solo la sua misura. */}
-      <span className="@max-lg:hidden">{label}</span>
-      <span className="hidden @max-lg:inline">{shortLabel}</span>
+      <span className={form.label}>{label}</span>
+      <span className={form.shortLabel}>{shortLabel}</span>
 
       {authors.map((author, posto) => (
-        <span key={author.name} className={posto === 0 ? 'flex' : 'flex @max-lg:hidden'}>
+        <span key={author.name} className={posto === 0 ? 'flex' : form.others}>
           {/* ⚠️ **I cenni non partono insieme**, e il ritardo lo distribuisce la riga invece di
               chiederlo a chi la usa. Due schede affiancate che saltellano allo stesso istante non
               sembrano due cose vive: sembrano una cosa sola che pulsa. Due secondi bastano a

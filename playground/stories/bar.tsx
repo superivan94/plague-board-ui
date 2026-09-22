@@ -185,19 +185,23 @@ export const creditCardStory = defineStory(CreditCard, {
 
 export const creditLineStory = defineStory(CreditLine, {
   description:
-    'La firma «umano e AI»: un’etichetta e le schede degli autori. Sotto le 32rem del suo contenitore l’etichetta si accorcia e resta il primo autore.',
+    'La firma «umano e AI»: un’etichetta e una scheda per autore. Sotto le 32rem del suo contenitore l’etichetta si accorcia e resta il primo autore; con `isCompact` è corta sempre.',
   variants: [
     { name: 'i due autori', args: { authors: authors('small') }, decorators: [inContainer] },
-    { name: 'in una colonna stretta: la forma corta', args: { authors: authors('small') }, decorators: [inNarrowColumn] },
+    {
+      name: 'in una colonna stretta: si accorcia da sé',
+      args: { authors: authors('small') },
+      decorators: [inNarrowColumn],
+    },
+    { name: 'sempre corta, con isCompact', args: { authors: authors('small'), isCompact: true } },
     {
       name: 'le parole dell’applicazione',
       args: { authors: authors('small'), label: 'Scritto da', shortLabel: 'Di:' },
       decorators: [inContainer],
     },
     {
-      name: 'le parole dell’applicazione, in una colonna stretta',
-      args: { authors: authors('small'), label: 'Scritto da', shortLabel: 'Di:' },
-      decorators: [inNarrowColumn],
+      name: 'le parole dell’applicazione, corte',
+      args: { authors: authors('small'), label: 'Scritto da', shortLabel: 'Di:', isCompact: true },
     },
     { name: 'senza un contenitore sopra', args: { authors: authors('small') } },
   ],

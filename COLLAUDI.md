@@ -1345,12 +1345,13 @@ cornice si leggono dalla pagina del catalogo con `iframe.contentDocument` e
 | Le stesse a 768 | tre altezze | 49 · 37 · 65 · 65 · 41 px, con la finestra a 768×480 |
 | La grande in una cornice 768 alta 120 | — | **37**: per `pb-roomy` è un telefono coricato. È il motivo per cui a 768 e a pieno la finestra della cornice non scende sotto i 30rem |
 | `/storie/CreditLine` a 768, a colpo d'occhio | le cinque varianti | al primo giro **una sola**: ogni cornice era alta 480 anche da vuota, e l'utente vedeva «soltanto la versione estesa». Ora l'iframe resta 768×480 e l'involucro è alto quanto la variante: cinque in uno schermo, e le barre a 768 misurano ancora 37 · 49 · 65 |
-| Tutte le cornici delle 53 storie, in sviluppo | 200 senza errore | sì. `next build`: **312** cornici e 53 pagine, tutte statiche; `/` resta statica |
+| Tutte le cornici delle 53 storie, in sviluppo | 200 senza errore | sì. `next build`: **314** cornici e 53 pagine, tutte statiche; `/` resta statica |
 | `ParticleBurst`, «Sprigiona» | la fontana | 17 nodi `position: fixed` nel portale della cornice: il riferimento clonato da `WithHandle` arriva |
 | `LoginScreen` in chiaro: le voci del selettore d'angolo | ≥ 4,5 | **1,19** — curato in `PlagueBackground` con `text-foreground`: 14,52, come in scuro |
 | `CreditLine` **senza** `@container` sopra, a 768 | lunga, come dicono il suo JSDoc e `CLAUDE.md` | **corta**: «By: Superivan94». Le classi erano mobile-first dal primo commit, quindi il «resta lunga» non era mai stato misurato. Curato scrivendole al rovescio — la lunga di base, la corta dietro `@max-lg:` —, anche in `SupportButton` (utente, 2026-09-22) |
 | La stessa, dopo la cura | lunga senza contenitore, corta in uno stretto | senza contenitore «Creato da · Superivan94 · AI-Dev» a 360 **e** a 768; in un contenitore «By: · Superivan94» a 360 e la forma lunga a 768. Il piede vero: «By:» e il comando senza testo a 360, «Creato da» e «Offrimi una pozione» a 768 |
 | La firma, il comando e il piede **in una colonna stretta** (15rem), a 768 e a pieno | la forma corta anche su una finestra larga | «By: · Superivan94», «Di: · Superivan94», la sola tazza, e il piede con «By:» e la versione: la soglia è del contenitore, non della finestra |
+| `CreditLine` con `isCompact`, senza contenitore, a 360 e a 768 | corta a tutti e due | «By: · Superivan94» e «Di: · Superivan94» a 360 **e** a 768, accanto alla stessa firma senza la prop che a 768 è intera |
 | Una storia tolta dall'indice | `tsc` rosso | rosso, e l'errore nomina `DripIcon` |
 | `CloudIcon: dripIconStory` | rosso da qualche parte | `tsc` **verde** — due icone hanno lo stesso tipo —, `/storie` in sviluppo **500** con «Storie sotto il nome di un altro componente: CloudIcon» |
 
