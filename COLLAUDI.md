@@ -515,8 +515,9 @@ aperto **sopra** la pagina nuova, e non c'è nessun errore da nessuna parte.
 
 ### La barra che diventa un cassetto — 2026-09-23
 
-**Esegue:** agente, ogni volta che si aggiunge una famiglia o una voce alla barra del playground.
-**Ultima esecuzione:** agente, 2026-09-23 — tutto come atteso.
+**Esegue:** agente, ogni volta che si aggiunge una famiglia o una voce alla barra del playground;
+**autore** per il dito su un telefono vero, che lo strumento non sa imitare.
+**Ultima esecuzione:** agente, 2026-09-23 — tutto come atteso; la riga col dito mai eseguita.
 
 **Preparazione:** `npm run playground`, una scheda con `resize_window` alle quattro larghezze. La
 riga si misura con `clientWidth` e `scrollWidth` del primo figlio del `<nav>`: se il secondo supera
@@ -529,6 +530,10 @@ il primo, la barra taglia.
 | 1024 e 375 px | marchio, «pagine · <corrente>», tema | sì, contenuto pari alla colonna; a 375 il nome del pacchetto cede il posto |
 | Si preme «pagine» | il cassetto da sinistra, col fuoco dentro | `role="dialog"` di nome «Le pagine», fuoco dentro, 12 voci, la corrente con «sei qui» |
 | Esc | si chiude | nessun dialogo in pagina |
+| `BarRow` che trabocca (736 px in 312), rotella verticale e trascinamento col mouse, prima della cura | la riga scorre | **fermi a zero** (segnalato dall'utente); solo la rotella di lato arrivava in fondo |
+| La stessa, dopo: due scatti, poi dieci | la riga scorre, la pagina no | 200 px, poi 424, cioè la fine; `scrollbar-width: thin` con un puntatore preciso |
+| `PlagueBar` a 360, finestra 1400×500: uno scatto, poi un altro | la riga va in fondo, poi scende la pagina | riga a 82 (la fine) con la pagina ferma, poi pagina a 100 con la riga ferma: agli estremi la rotella non resta intrappolata |
+| Il dito su un telefono vero | la riga si trascina di lato, la barra resta nascosta | **mai eseguito**: lo strumento manda clic di mouse anche quando imita un telefono. Tocca all'utente |
 
 **Che cosa protegge:** che una voce in più non torni a tagliare la barra in silenzio. La soglia è
 `xl` perché la fila piena misura 1090 px: chi aggiunge una famiglia rimisura qui.

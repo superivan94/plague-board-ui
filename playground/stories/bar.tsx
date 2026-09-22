@@ -144,6 +144,7 @@ export const barRowStory = defineStory(BarRow, {
     },
     {
       name: 'più voci di quante ne stiano',
+      note: 'Col mouse la rotella la fa scorrere di lato, e sotto compare una barra sottile da afferrare; arrivata in fondo, la rotella torna a far scendere la pagina. Sul telefono si trascina col dito, e la barra resta nascosta.',
       args: {
         children: [
           'I manuali',

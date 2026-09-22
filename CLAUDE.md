@@ -646,6 +646,15 @@ exist in target module» che **non sono veri**. Si guarda la pagina, o si crede 
   un difetto, a 1660 px di finestra, con la fila da 1090 px chiusa in una colonna da 1024. Quando
   le voci crescono, la cura è nella pagina: una colonna che si allarga, e sotto una soglia un
   comando che apre il `Drawer` di HeroUI con tutte le voci — com'è ora la barra del playground.
+  ⚠️ **E col mouse la riga non si raggiungeva affatto**: la rotella fa scendere la pagina, il
+  trascinamento non fa niente, e restavano solo Maiusc più rotella e il trackpad — misurato il
+  2026-09-23, 736 px di voci in 312 fermi a zero. Da allora `BarRow` è client: la rotella
+  verticale la fa scorrere di lato **finché ha strada** e agli estremi torna alla pagina, e con un
+  puntatore preciso (`pointer-fine:scrollbar-thin`) la barra di scorrimento si vede. Due prezzi
+  dichiarati: l'ascoltatore è nativo e non `onWheel`, perché React registra la rotella come
+  passiva e da lì `preventDefault` non ferma la pagina; e la barra sottile, dove la riga trabocca,
+  alza la lastra di **10 px** col mouse — sul telefono no. ⚠️ Le cornici delle storie imitano la
+  larghezza di un telefono, non il suo dito: a 360 col mouse la barra sottile c'è.
 - ⚠️ **Due cose larghe quanto il loro testo non si separano disponendole: si separano nel tempo.**
   I fumetti dell'emettitore sono larghi quanto la frase che contengono — da 80 a 200 px su una
   scheda di 142 — quindi due che convivono si disturbano comunque, e allontanarli in verticale
