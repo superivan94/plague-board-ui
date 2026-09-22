@@ -25,6 +25,12 @@ export interface CreditLineProps {
  * mano se ne deve ricordare, e senza quella dichiarazione la firma resta semplicemente lunga —
  * che è il modo giusto di sbagliare.
  *
+ * ⚠️ **Resta lunga perché la forma lunga è la base, e la corta sta dietro `@max-lg:`.** Una
+ * container query senza contenitore non si applica, e vale la classe di base. Con le classi al
+ * rovescio — `hidden @lg:inline`, com'erano — dimenticare il contenitore dava «By:» e un autore
+ * solo anche su una pagina larga: il secondo spariva senza avviso. Misurato il 2026-09-22 nella
+ * storia di questo componente, che mostra apposta la variante senza contenitore.
+ *
  * ⚠️ **Il primo autore è quello che sopravvive.** Non è un caso da decidere ogni volta: in una
  * firma «umano e AI» il primo è la persona, ed è quella che un piede deve nominare quando ha
  * spazio per un nome solo.
@@ -38,11 +44,11 @@ export function CreditLine({
   return (
     <span className={`flex items-center gap-2 text-xs text-muted ${className}`}>
       {/* Due nodi e non uno con due classi: il testo cambia, non solo la sua misura. */}
-      <span className="hidden @lg:inline">{label}</span>
-      <span className="@lg:hidden">{shortLabel}</span>
+      <span className="@max-lg:hidden">{label}</span>
+      <span className="hidden @max-lg:inline">{shortLabel}</span>
 
       {authors.map((author, posto) => (
-        <span key={author.name} className={posto === 0 ? 'flex' : 'hidden @lg:flex'}>
+        <span key={author.name} className={posto === 0 ? 'flex' : 'flex @max-lg:hidden'}>
           {/* ⚠️ **I cenni non partono insieme**, e il ritardo lo distribuisce la riga invece di
               chiederlo a chi la usa. Due schede affiancate che saltellano allo stesso istante non
               sembrano due cose vive: sembrano una cosa sola che pulsa. Due secondi bastano a

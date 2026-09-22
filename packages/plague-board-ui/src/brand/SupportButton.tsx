@@ -121,7 +121,8 @@ export function SupportButton({
         className={`pb-potion-live flex items-center gap-1.5 rounded-lg border border-brand/40 px-2 py-0.5 text-xs font-medium text-brand-ink transition-colors hover:border-brand hover:bg-brand/10 focus-visible:focus-ring ${className}`}
       >
         {icon}
-        <span className="hidden @lg:inline">{label}</span>
+        {/* La forma lunga è la base, come nella firma: senza un `@container` sopra il testo resta. */}
+        <span className="@max-lg:hidden">{label}</span>
       </a>
     </ParticleBurst>
   );

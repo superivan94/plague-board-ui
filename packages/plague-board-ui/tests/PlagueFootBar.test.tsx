@@ -11,6 +11,9 @@ const AUTORI = [
   { name: 'AI-Dev' },
 ] as const;
 
+/** Le classi una per una: `@max-lg:hidden` contiene la parola `hidden`, e non è la stessa cosa. */
+const classi = (elemento: Element) => elemento.className.split(/\s+/);
+
 describe('la lastra alle due estremità', () => {
   it('in cima è un `header` col filo sotto', () => {
     const { container } = render(<PlagueBar>ciao</PlagueBar>);
@@ -51,16 +54,27 @@ describe('la lastra alle due estremità', () => {
 });
 
 describe('i pezzi del piede', () => {
-  it('la firma tiene il primo autore sempre, e nasconde gli altri quando si stringe', () => {
+  it('la firma tiene il primo autore sempre, e nasconde gli altri solo in un contenitore stretto', () => {
     render(<CreditLine authors={AUTORI} />);
 
     const primo = screen.getByText('Superivan94').closest('span[class]')!;
     const secondo = screen.getByText('AI-Dev').closest('span[class]')!;
 
     // Il primo autore è quello che sopravvive: in una firma «umano e AI» è la persona.
-    expect(primo.parentElement!.className).not.toContain('hidden');
-    expect(secondo.parentElement!.className).toContain('hidden');
-    expect(secondo.parentElement!.className).toContain('@lg:flex');
+    expect(classi(primo.parentElement!)).not.toContain('hidden');
+    // ⚠️ La forma lunga è la **base** e la corta sta dietro `@max-lg:`. Senza un `@container`
+    // sopra, una container query non si applica e resta la classe di base: così chi dimentica il
+    // contenitore vede la firma intera — un difetto che si nota —, non un autore che sparisce.
+    expect(classi(secondo.parentElement!)).not.toContain('hidden');
+    expect(classi(secondo.parentElement!)).toContain('@max-lg:hidden');
+  });
+
+  it('senza contenitore l’etichetta è quella lunga, e la corta aspetta che uno la stringa', () => {
+    render(<CreditLine authors={AUTORI} />);
+
+    expect(classi(screen.getByText('Creato da'))).not.toContain('hidden');
+    expect(classi(screen.getByText('Creato da'))).toContain('@max-lg:hidden');
+    expect(classi(screen.getByText('By:'))).toEqual(expect.arrayContaining(['hidden', '@max-lg:inline']));
   });
 
   it('la versione porta la `v` e le cifre a larghezza fissa', () => {
@@ -78,8 +92,11 @@ describe('i pezzi del piede', () => {
     expect(comando).toHaveAttribute('rel', 'noopener noreferrer');
 
     // ⚠️ Il testo si nasconde con una container query, quindi il nome accessibile non può venire
-    // da lì: viene da `aria-label`, che c'è sempre.
-    expect(comando.querySelector('span')!.className).toContain('hidden');
+    // da lì: viene da `aria-label`, che c'è sempre. E si nasconde **solo** in un contenitore
+    // stretto: senza contenitore resta, come la firma accanto.
+    const etichetta = comando.querySelector('span')!;
+    expect(classi(etichetta)).not.toContain('hidden');
+    expect(classi(etichetta)).toContain('@max-lg:hidden');
   });
 
   it('al clic sul comando i segni della peste sprigionano, e la pagina si apre dopo', () => {
