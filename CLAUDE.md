@@ -1199,6 +1199,17 @@ exist in target module» che **non sono veri**. Si guarda la pagina, o si crede 
   barra.
   L'altezza la manda la cornice con un `postMessage` misurando il contenitore della variante, non
   il documento, che non è mai più basso della finestra e farebbe solo crescere l'iframe.
+  ⚠️ **E il primo messaggio si può perdere**: l'iframe è già nell'HTML del server e si carica
+  subito, quindi una cornice veloce risponde **prima** che la pagina idrati e ascolti — la prima
+  di `HoverEmitter` restava a 120 px con le altre, identiche, a 214. Perciò la pagina, appena
+  ascolta, chiede, e la cornice risponde. ⚠️ E la cornice manda la prima altezza appena montata,
+  non al primo `ResizeObserver`: quello scatta al disegno, e in una scheda in secondo piano il
+  browser non disegna — lì restavano tutte a 120.
+- ⚠️ **Una variante identica a un'altra a schermo, e che non lo dice, è peggio di nessuna.** Chi
+  guarda cerca la differenza, non la trova, e crede che la prop non funzioni: è successo con lo
+  sfasamento del cenno di `HoverEmitter`, che su una scheda sola non si vede. Dove si può la
+  variante **mostra** la differenza — due schede affiancate, una sfasata —; dove no, perché è un
+  nome che si annuncia o un tasto da premere, porta una `note` che dice che cosa guardare.
 
 ## Memoria di sessione
 

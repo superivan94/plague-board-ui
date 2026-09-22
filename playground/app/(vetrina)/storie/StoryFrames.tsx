@@ -4,7 +4,9 @@ import { ToggleButton, ToggleButtonGroup } from '@heroui/react';
 import { TechLabel } from 'plague-board-ui';
 import { useEffect, useRef, useState } from 'react';
 
-import { isStoryHeight } from '@/app/cornice/frameMessage';
+import { isStoryHeight, storyHeightRequest } from '@/app/cornice/frameMessage';
+
+import { withInlineCode } from './withInlineCode';
 
 interface Format {
   readonly key: 'phone' | 'tablet' | 'full';
@@ -79,6 +81,10 @@ function Frame({
       if (isStoryHeight(event.data)) setContentHeight(event.data.height);
     };
     window.addEventListener('message', onMessage);
+    // ⚠️ Appena si ascolta, si chiede: una cornice già caricata prima dell'idratazione ha mandato
+    // la sua altezza a nessuno. Se invece è ancora in caricamento la domanda va persa, ma allora
+    // la cornice manderà la sua quando c'è, e qui qualcuno ascolta già.
+    frame.current?.contentWindow?.postMessage(storyHeightRequest(), window.location.origin);
     return () => window.removeEventListener('message', onMessage);
   }, []);
 
@@ -132,7 +138,8 @@ export function StoryFrames({
   frameHeight = 0,
 }: {
   name: string;
-  variants: readonly string[];
+  /** Solo quello che si legge sopra la cornice: la variante vera la rende la cornice. */
+  variants: readonly { readonly name: string; readonly note?: string }[];
   frameHeight?: number;
 }) {
   const [formatKey, setFormatKey] = useState<Format['key']>('phone');
@@ -162,8 +169,9 @@ export function StoryFrames({
       </div>
 
       {variants.map((variant, index) => (
-        <section key={variant} className="flex flex-col gap-2">
-          <h2 className="text-sm font-medium">{variant}</h2>
+        <section key={variant.name} className="flex flex-col gap-2">
+          <h2 className="text-sm font-medium">{variant.name}</h2>
+          {variant.note ? <p className="max-w-2xl text-xs text-muted">{withInlineCode(variant.note)}</p> : null}
           {/* ⚠️ La riga trabocca invece di stringere le cornici: una cornice da 768 che diventa da
               600 perché la pagina è stretta non è più il formato che dice di essere. */}
           <div className="flex flex-wrap gap-4 overflow-x-auto pb-1">
@@ -171,7 +179,7 @@ export function StoryFrames({
               <Frame
                 key={theme.key}
                 src={`/cornice/${name}/${index}/${theme.key}`}
-                title={`${name} · ${variant} · ${theme.label}`}
+                title={`${name} · ${variant.name} · ${theme.label}`}
                 caption={theme.label}
                 width={format.width}
                 windowHeight={format.windowHeight}

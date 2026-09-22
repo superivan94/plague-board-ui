@@ -55,7 +55,13 @@ export default async function StoryPage({ params }: { params: Params }) {
         )}
       </div>
 
-      <StoryFrames name={name} variants={story.variants.map((variant) => variant.name)} frameHeight={story.frameHeight} />
+      {/* Solo nomi e note, cioè testo: gli `args` possono portare funzioni, e una funzione non
+          attraversa il confine verso un componente client. */}
+      <StoryFrames
+        name={name}
+        variants={story.variants.map(({ name: variantName, note }) => ({ name: variantName, note }))}
+        frameHeight={story.frameHeight}
+      />
     </main>
   );
 }

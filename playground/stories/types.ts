@@ -29,6 +29,14 @@ export interface StoryVariant<P> {
   readonly name: string;
   readonly args: P;
   /**
+   * Che cosa guardare, quando la differenza con le altre varianti **non si vede da ferma**: un
+   * nome che si annuncia, un tasto da premere. È la descrizione di una storia sola in Storybook.
+   *
+   * ⚠️ Una variante che a schermo è identica a un'altra e non lo dice è peggio di nessuna
+   * variante: chi guarda cerca una differenza che non c'è, o crede che la prop non funzioni.
+   */
+  readonly note?: string;
+  /**
    * Quello che vale per questa variante sola — un livello tossico diverso, un antenato che accende
    * l'animazione. Sta **dentro** i decoratori della storia, come in Storybook, dove ogni variante
    * è un export coi suoi.

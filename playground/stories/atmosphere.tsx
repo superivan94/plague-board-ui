@@ -189,7 +189,11 @@ export const musicToggleStory = defineStory(MusicToggle, {
   variants: [
     { name: 'la misura predefinita', args: {} },
     { name: 'più grande', args: { size: 32 } },
-    { name: 'le parole dell’applicazione', args: { playLabel: 'Accendi la radio', pauseLabel: 'Spegni la radio' } },
+    {
+      name: 'le parole dell’applicazione',
+      note: 'A schermo è uguale alla prima: cambia il nome con cui il comando si annuncia, «Accendi la radio» e, mentre suona, «Spegni la radio». Il comando è solo un segno, e quelle parole sono il suo `aria-label`.',
+      args: { playLabel: 'Accendi la radio', pauseLabel: 'Spegni la radio' },
+    },
   ],
   decorators: [withMusic],
 });
@@ -198,7 +202,11 @@ export const musicVolumeStory = defineStory(MusicVolume, {
   description: 'Il cursore del volume, per chi vuole governarlo oltre a spegnere.',
   variants: [
     { name: 'a passi di dieci', args: { className: 'w-48' } },
-    { name: 'a passi di venticinque', args: { step: 25, className: 'w-48' } },
+    {
+      name: 'a passi di venticinque',
+      note: 'Da fermo è uguale alla prima: la differenza si sente con le frecce della tastiera, quattro passi dal silenzio al pieno invece di dieci.',
+      args: { step: 25, className: 'w-48' },
+    },
   ],
   decorators: [withMusic],
 });

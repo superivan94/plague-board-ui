@@ -83,12 +83,24 @@ export const hoverEmitterStory = defineStory(HoverEmitter, {
       },
     },
     {
-      name: 'col cenno sfasato di due secondi',
+      name: 'due schede, la seconda col cenno sfasato di due secondi',
+      note: 'Il saltello torna ogni sei secondi. Da sola una scheda sfasata non si distingue da un’altra: il ritardo serve a due schede vicine, che senza salterebbero insieme e sembrerebbero una cosa sola che pulsa. È quello che `CreditLine` fa da sé coi suoi autori.',
       args: {
         effect: { ...binaryRain(), className: 'pb-binary-digit text-plague-ink' },
         hintDelayMs: 2000,
         children: authorCard(<RobotIcon size={20} className="text-plague-ink" />, 'AI-Dev'),
       },
+      // La prima scheda è il termine di paragone: stessa taratura di casa, nessun ritardo.
+      decorators: [
+        (variant) => (
+          <span className="flex gap-4">
+            <HoverEmitter effect={comicBubbles(DEV_PHRASES)}>
+              {authorCard(<CodeIcon size={20} className="text-brand-ink" />, 'Superivan94')}
+            </HoverEmitter>
+            {variant}
+          </span>
+        ),
+      ],
     },
   ],
   // I fumetti nascono sopra la scheda: lo spazio in cima è loro.
