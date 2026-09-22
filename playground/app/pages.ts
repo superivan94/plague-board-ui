@@ -4,9 +4,9 @@ import type { ComponentType } from 'react';
 /**
  * Il registro delle pagine del playground.
  *
- * ⚠️ È l'unico posto dove una pagina si dichiara: la barra di navigazione lo legge, e al punto 3
- * lo leggerà anche l'indice delle storie. Una pagina che non è qui non si raggiunge — che è lo
- * stesso difetto che Rattoteca difende con un guard, perché una pagina orfana compila, risponde
+ * ⚠️ È l'unico posto dove una pagina si dichiara: la barra di navigazione lo legge, e lo legge
+ * anche il catalogo delle storie, per portare da un componente alla pagina che lo spiega. Una
+ * pagina che non è qui non si raggiunge — che è lo stesso difetto che Rattoteca difende con un guard, perché una pagina orfana compila, risponde
  * se digiti l'indirizzo, e l'unica cosa che non fa è farsi trovare.
  */
 
@@ -15,7 +15,7 @@ import type { ComponentType } from 'react';
  * sette e la barra una fila di nomi da leggere tutta: con tre famiglie in vista, quello che si
  * cerca sta sempre a un salto di distanza.
  */
-export type PlaygroundFamily = 'fondamenta' | 'ratto' | 'sorprese' | 'filosofia';
+export type PlaygroundFamily = 'fondamenta' | 'ratto' | 'sorprese' | 'catalogo' | 'filosofia';
 
 export interface PlaygroundFamilyInfo {
   readonly key: PlaygroundFamily;
@@ -58,7 +58,10 @@ export interface PlaygroundPage {
   components: readonly string[];
   /** Che cosa ci si trova. Una riga. */
   blurb: string;
-  /** In quale delle {@link PLAYGROUND_FAMILIES} sta — o `filosofia`, che in barra è un nome solo. */
+  /**
+   * In quale delle {@link PLAYGROUND_FAMILIES} sta — o `catalogo` e `filosofia`, che in barra sono
+   * collegamenti diretti invece di un menù.
+   */
   family: PlaygroundFamily;
   /**
    * Il segno accanto alla voce.
@@ -134,6 +137,13 @@ export const PLAYGROUND_PAGES: readonly PlaygroundPage[] = [
     components: ['HoverEmitter', 'comicBubbles', 'binaryRain'],
     blurb: 'L’easter egg che si accende quando lo sfiori, e che su un telefono si tocca.',
     family: 'sorprese',
+  },
+  {
+    href: '/storie',
+    title: 'Le storie',
+    components: [],
+    blurb: 'Ogni componente da solo, nelle sue varianti, ai tre formati e nei due temi.',
+    family: 'catalogo',
   },
   {
     href: '/stile',

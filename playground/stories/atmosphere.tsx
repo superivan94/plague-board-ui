@@ -1,0 +1,204 @@
+import {
+  GlitchText,
+  MusicProvider,
+  MusicToggle,
+  MusicVolume,
+  PlagueBackground,
+  PlaguePulse,
+  PoisonIcon,
+  PulseDot,
+  TechLabel,
+  ToxicBubbles,
+  ToxicLevelProvider,
+  ToxicLevelSwitch,
+  type ToxicLevel,
+} from 'plague-board-ui';
+
+import { MusicFromOutside } from './demos/MusicFromOutside';
+import { defineStory, type StoryDecorator } from './types';
+
+/**
+ * Il livello tossico da cui parte la variante.
+ *
+ * ⚠️ Il fondale, le bolle e il selettore non hanno una prop per il livello: lo leggono dal
+ * provider, ed è apposta — sono tre pezzi che devono dire la stessa cosa, e un livello passato a
+ * ognuno si scollerebbe dagli altri al primo cambio.
+ */
+function atLevel(level: ToxicLevel): StoryDecorator {
+  return function withLevel(variant) {
+    return <ToxicLevelProvider defaultLevel={level}>{variant}</ToxicLevelProvider>;
+  };
+}
+
+export const toxicLevelProviderStory = defineStory(ToxicLevelProvider, {
+  description:
+    'Tiene il livello tossico della pagina. Il fondale, le bolle e il selettore lo leggono da lui, quindi cambiano insieme.',
+  variants: [
+    {
+      name: 'parte da medio',
+      args: {
+        defaultLevel: 'medium',
+        children: (
+          <div className="flex flex-col gap-4">
+            <ToxicLevelSwitch />
+            <PlagueBackground className="h-48 rounded-xl" />
+          </div>
+        ),
+      },
+    },
+    {
+      name: 'parte spento',
+      args: {
+        defaultLevel: 'off',
+        children: (
+          <div className="flex flex-col gap-4">
+            <ToxicLevelSwitch />
+            <PlagueBackground className="h-48 rounded-xl" />
+          </div>
+        ),
+      },
+    },
+  ],
+});
+
+export const toxicLevelSwitchStory = defineStory(ToxicLevelSwitch, {
+  description:
+    'Il comando che dice quanta peste ci deve essere: quattro livelli che si escludono, come un gruppo di radio.',
+  variants: [
+    { name: 'le parole di casa', args: {} },
+    {
+      name: 'le parole dell’applicazione',
+      args: {
+        label: 'Livello delle emissioni',
+        labels: { off: 'Aria pulita', low: 'Nebbia', medium: 'Smog', high: 'Nube tossica' },
+      },
+    },
+  ],
+  decorators: [atLevel('medium')],
+});
+
+export const plagueBackgroundStory = defineStory(PlagueBackground, {
+  description:
+    'Il fondale della peste: la città, le gocce, le bolle e i versi, dentro il riquadro che lo ospita. Una pagina intera si ottiene con `min-h-dvh`.',
+  layout: 'fullscreen',
+  variants: [
+    { name: 'livello alto', args: { className: 'min-h-80' }, decorators: [atLevel('high')] },
+    { name: 'livello basso', args: { className: 'min-h-80' }, decorators: [atLevel('low')] },
+    { name: 'spento', args: { className: 'min-h-80' }, decorators: [atLevel('off')] },
+    {
+      name: 'con un contenuto sopra',
+      args: {
+        className: 'min-h-80 p-8',
+        children: (
+          <div className="mx-auto max-w-sm rounded-xl border border-brand/30 bg-gray-900/50 p-6 backdrop-blur-sm">
+            <span className="flex items-center gap-2">
+              <PulseDot />
+              <TechLabel className="text-brand-ink">rete della peste</TechLabel>
+            </span>
+            <p className="mt-3 font-mono text-2xl text-white">Rattoteca</p>
+          </div>
+        ),
+      },
+      decorators: [atLevel('medium')],
+    },
+  ],
+});
+
+export const toxicBubblesStory = defineStory(ToxicBubbles, {
+  description:
+    'Le bolle di gas che salgono. Stanno già dentro il fondale; da sole servono a chi vuole solo loro, in un riquadro suo.',
+  variants: [
+    { name: 'livello alto', args: {}, decorators: [atLevel('high')] },
+    { name: 'livello basso', args: {}, decorators: [atLevel('low')] },
+  ],
+  decorators: [(variant) => <div className="relative h-64 overflow-hidden rounded-xl bg-gray-950">{variant}</div>],
+});
+
+export const glitchTextStory = defineStory(GlitchText, {
+  description:
+    'Il disturbo sul nome: due fette che sfarfallano e, ogni tanto, la parola che il nome nasconde. Va addosso a un titolo scritto dall’applicazione.',
+  variants: [
+    { name: 'col lampo, su fondo dichiarato', args: { children: 'E.', reveal: 'EVIL', background: '#030712', className: 'text-brand' } },
+    {
+      name: 'col lampo spento',
+      args: { children: 'E.', reveal: 'EVIL', isRevealEnabled: false, background: '#030712', className: 'text-brand' },
+    },
+    { name: 'senza fondo', args: { children: 'E.', className: 'text-brand-ink' } },
+  ],
+  decorators: [
+    (variant) => (
+      <h2 className="font-mono text-3xl tracking-wide">
+        LUDORATTI {variant} CORP
+      </h2>
+    ),
+  ],
+});
+
+export const plaguePulseStory = defineStory(PlaguePulse, {
+  description: 'Il pulsare che mette l’occhio su un comando: avvolge, non marca.',
+  variants: [
+    {
+      name: 'attorno a un comando',
+      args: {
+        children: (
+          <button type="button" className="flex items-center gap-2 rounded-md px-4 py-2.5 text-sm font-medium text-white">
+            <PoisonIcon size={18} />
+            Avvia il protocollo
+          </button>
+        ),
+      },
+    },
+  ],
+  decorators: [(variant) => <div className="max-w-xs rounded-xl bg-gray-900 p-6">{variant}</div>],
+});
+
+export const pulseDotStory = defineStory(PulseDot, {
+  description: 'Il pallino di stato: acceso pulsa, fermo dice che la cosa c’è ma non lavora.',
+  variants: [
+    { name: 'acceso', args: {} },
+    { name: 'fermo', args: { isStatic: true, className: 'bg-muted' } },
+    { name: 'più grande', args: { size: 16 } },
+  ],
+});
+
+/** La musica si governa dal provider, quindi ogni suo comando ne vuole uno sopra. */
+const withMusic: StoryDecorator = (variant) => <MusicProvider>{variant}</MusicProvider>;
+
+export const musicProviderStory = defineStory(MusicProvider, {
+  description:
+    'Tiene la traccia e il suo volume. I comandi la governano da dove li si mette, e uno lo si può scrivere da sé con `useMusic`.',
+  variants: [
+    {
+      name: 'i due comandi di casa e uno scritto da fuori',
+      args: {
+        children: (
+          <div className="flex flex-wrap items-center gap-4">
+            <MusicToggle />
+            <MusicVolume className="w-40" />
+            <MusicFromOutside />
+          </div>
+        ),
+      },
+    },
+  ],
+});
+
+export const musicToggleStory = defineStory(MusicToggle, {
+  description:
+    'Il teschio con le cuffie: mette e toglie la musica. Suona solo quando lo si preme, mai al primo gesto qualunque.',
+  variants: [
+    { name: 'la misura predefinita', args: {} },
+    { name: 'più grande', args: { size: 32 } },
+    { name: 'le parole dell’applicazione', args: { playLabel: 'Accendi la radio', pauseLabel: 'Spegni la radio' } },
+  ],
+  decorators: [withMusic],
+});
+
+export const musicVolumeStory = defineStory(MusicVolume, {
+  description: 'Il cursore del volume, per chi vuole governarlo oltre a spegnere.',
+  variants: [
+    { name: 'a passi di dieci', args: { className: 'w-48' } },
+    { name: 'a passi di venticinque', args: { step: 25, className: 'w-48' } },
+  ],
+  decorators: [withMusic],
+});

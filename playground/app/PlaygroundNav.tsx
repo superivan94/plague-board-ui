@@ -136,6 +136,7 @@ function FamilyMenu({
 
 export function PlaygroundNav() {
   const pathname = usePathname();
+  const catalogo = PLAYGROUND_PAGES.filter((page) => page.family === 'catalogo');
   const filosofia = PLAYGROUND_PAGES.filter((page) => page.family === 'filosofia');
 
   return (
@@ -178,6 +179,16 @@ export function PlaygroundNav() {
               family={family}
               pages={PLAYGROUND_PAGES.filter((page) => page.family === family.key)}
               pathname={pathname}
+            />
+          ))}
+
+          {/* Il catalogo è una voce sola, e resta accesa anche dentro una storia: `/storie/RatRun`
+              sta nel catalogo quanto `/storie`. */}
+          {catalogo.map((page) => (
+            <NavLink
+              key={page.href}
+              page={page}
+              isCurrent={pathname === page.href || pathname.startsWith(`${page.href}/`)}
             />
           ))}
 

@@ -27,6 +27,9 @@ packages/plague-board-ui/   la libreria — l'UNICA cosa che si pubblica
 ├── styles/                 theme.css e animations.css, che viaggiano com'è senza passare da dist
 └── tests/                  i test, fuori da src/ perché tsconfig.build.json compila solo src/
 playground/                 l'app Next che guarda la libreria — non si pubblica
+├── app/(vetrina)/          le pagine che spiegano, con barra e piede; `/storie` è il catalogo
+├── app/cornice/            una variante sola in un tema solo: la pagina che il catalogo mette in un iframe
+└── stories/                una storia per componente; `index.ts` è il guard, e lo fa `tsc`
 art/reference/              le tre illustrazioni del ratto e il prompt che le ha generate — la FONTE
 scripts/genera-ratto.mjs    le ricalca in src/brand/ratArt.ts: `npm run art:ratto`
 ```
@@ -165,6 +168,16 @@ exist in target module» che **non sono veri**. Si guarda la pagina, o si crede 
   dentro leggono il tema della **pagina** e scrivono scuro su scuro. Misurato il 2026-09-17 in tema
   chiaro: l'etichetta del commutatore nella barra faceva **2,05**, il collegamento corrente
   **1,67**. Con `dark` e il velo al 90%: nessun testo sotto 4,5 su nessuna pagina.
+- ⚠️ **E `dark` da solo non fa un'isola: il colore del testo si eredita già calcolato.** La classe
+  porta dentro le variabili del tema scuro, ma `color` passa dal genitore come **valore**, e il
+  `body` di una pagina chiara l'ha già risolto scuro. Chi lo prende da `currentColor` — il
+  `ToggleButton` di HeroUI nella variante predefinita — scrive allora scuro su scuro con tutte le
+  variabili giuste: il selettore del livello nella schermata di accesso faceva **1,19** in tema
+  chiaro, e `--default-foreground` letto sullo stesso nodo era quasi bianco. La cura è
+  `text-foreground` accanto a `dark`, che fa risolvere il colore di nuovo **dentro** l'isola; la
+  barra non aveva il difetto perché `.surface` di HeroUI lo applica da sé. Misurato il 2026-09-22
+  sulla storia di `LoginScreen`: **14,52** dopo, come in scuro. Si trova solo confrontando
+  `color` con le variabili sullo stesso elemento, e si vede solo col chiaro accanto allo scuro.
 - ⚠️ **Ridichiarare una variabile di HeroUI va fatto in tutti e due i blocchi del tema.** Le nostre
   righe stanno fuori da ogni layer e vincono sul suo tema in `@layer base` **anche quando la sua è
   più specifica**: un `--muted` scritto solo in `:root` spegne pure quello del tema scuro. Misurato
@@ -608,11 +621,17 @@ exist in target module» che **non sono veri**. Si guarda la pagina, o si crede 
   simultanee sembrano una cosa sola che pulsa, ed è il motivo per cui `CreditLine` sfalsa di due
   secondi il cenno di ogni autore.
 - ⚠️ **Il piede si stringe guardando il suo contenitore, non la finestra, e le container query
-  sbagliano nella direzione giusta.** `@lg:` senza nessun `@container` sopra non è un errore: la
-  query non si applica e il pezzo resta nella sua forma **lunga**. Vuol dire che un pezzo montato
-  fuori da `PlagueFootBar` non si rompe, si comporta come se ci fosse spazio — e che dichiarare
-  `@container` sulla **riga** e non sulla lastra è ciò che fa comportare bene lo stesso piede
-  dentro una colonna stretta.
+  sbagliano nella direzione giusta — se le si scrive al rovescio della finestra.** Senza nessun
+  `@container` sopra la query non si applica e **vale la classe di base**: perciò la forma lunga
+  è la base e la corta sta dietro `@max-lg:` (`@max-lg:hidden` sulla parola lunga,
+  `hidden @max-lg:inline` sulla corta), e un pezzo montato fuori da `PlagueFootBar` si comporta
+  come se ci fosse spazio. Dichiarare `@container` sulla **riga** e non sulla lastra è ciò che fa
+  comportare bene lo stesso piede dentro una colonna stretta. ⚠️ **Questa riga prima diceva «resta
+  lunga» con le classi mobile-first** — `hidden @lg:inline` — ed era dedotto, non misurato: la
+  storia di `CreditLine` senza contenitore, il 2026-09-22, dava «By:» e un autore solo anche a 768,
+  cioè il secondo autore spariva senza avviso. Sembra l'eccezione alla regola mobile-first delle
+  media query di finestra, ed è la stessa regola: **la base è la forma in cui si vuole cadere
+  quando la variante non vale** — là la barra compatta ovunque, qui la firma intera.
 - ⚠️ **Una barra che va a capo non è una barra: è tre barre.** Misurato il 2026-09-20 a 380 px di
   finestra: la barra del playground con le voci in una flex `flex-wrap` occupava **tre righe** e
   la lastra era alta il triplo — su una lastra appiccicata è spazio tolto alla pagina a ogni
@@ -1154,6 +1173,27 @@ exist in target module» che **non sono veri**. Si guarda la pagina, o si crede 
   può essere il JSDoc sopra il codice: la mutazione di `rel="noopener noreferrer"` in `CreditCard`
   è uscita **verde** per quel motivo, e a mano è rossa. Un verde in una sonda si ricontrolla prima
   di crederci, come un rosso.
+- ⚠️ **Il guard delle storie è il compilatore, e il suo buco lo copre un controllo all'import.**
+  `StoryIndex` in `playground/stories/types.ts` ha una chiave per ogni componente, ricavata dal
+  **tipo** del pacchetto costruito, e `STORIES` la dichiara con `satisfies`: una storia che manca è
+  un errore di `tsc` che la nomina, una di troppo pure. Ma per `tsc` due componenti con le stesse
+  prop sono lo stesso tipo — le diciannove icone, `BarRow` e `TechLabel` — quindi una storia messa
+  sotto il nome sbagliato compila; la ferma un confronto per **identità** fra la chiave e
+  `story.component` al primo import dell'indice, che rende rosso `next build` e dà 500 in
+  sviluppo. Provati tutti e due il 2026-09-22 rompendo l'indice. ⚠️ `defineStory` prende le prop
+  **dal componente** (`NoInfer` sulla spec): lasciate inferire dagli `args`, un `classname` scritto
+  male passava come prop in più. ⚠️ E un file di storie **non importa ganci**: lo legge anche il
+  catalogo, che è una pagina server, per nomi e descrizioni. Le varianti con uno stato o un
+  riferimento montano un pezzo di `stories/demos/`, che dichiara `'use client'`; le funzioni negli
+  `args` invece vanno bene, perché le varianti si rendono nel client, dentro la cornice.
+- ⚠️ **Una cornice larga 768 ma bassa è un telefono coricato.** `pb-roomy` guarda anche l'altezza,
+  quindi un iframe alto quanto il suo contenuto compatterebbe la barra proprio nel formato che la
+  deve mostrare piena: la stessa barra grande misura **37** px in una cornice 768×120 e **65** in
+  una 768×480. Per questo a 768 e a pieno le cornici non scendono sotto i 30rem, mentre a 360 la
+  larghezza basta già a dire «telefono». ⚠️ E il bordo sta sull'involucro, non sull'iframe: con
+  `border-box` si prendeva due pixel, e la finestra della variante era **358** invece di 360.
+  L'altezza la manda la cornice con un `postMessage` misurando il contenitore della variante, non
+  il documento, che non è mai più basso della finestra e farebbe solo crescere l'iframe.
 
 ## Memoria di sessione
 

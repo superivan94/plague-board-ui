@@ -1326,3 +1326,37 @@ usarlo.
 
 **Che cosa protegge:** che `import { RatIcon } from 'plague-board-ui'` funzioni davvero — in un
 bundler, in Node, e nei due modi in cui TypeScript risolve i moduli.
+
+### Le storie: le cornici dicono il vero, e che cosa hanno trovato — 2026-09-22
+
+**Esegue:** agente — quando si tocca `playground/stories/`, `app/cornice/` o `StoryFrames.tsx`, e
+ogni volta che un componente cambia la sua risposta alla finestra o al contenitore.
+
+**Ultima esecuzione:** agente, 2026-09-22
+
+**Preparazione:** `npm run build` e `npm run playground`, poi `/storie/<Nome>`. Le misure dentro una
+cornice si leggono dalla pagina del catalogo con `iframe.contentDocument` e
+`iframe.contentWindow.innerWidth`: stessa origine, quindi si arriva dentro.
+
+| Azione | Atteso | Ottenuto |
+|---|---|---|
+| `/storie/PlagueBar`, formato 360: la finestra della cornice | 360 | **358** al primo giro — il bordo stava sull'involucro e se ne prendeva due. Spostata la misura sull'iframe: 360 |
+| Le cinque varianti a 360 | compatte, tranne `isCompactOnMobile={false}` | 37 · 37 · 37 · **53** · 29 px |
+| Le stesse a 768 | tre altezze | 49 · 37 · 65 · 65 · 41 px, con la finestra a 768×480 |
+| La grande in una cornice 768 alta 120 | — | **37**: per `pb-roomy` è un telefono coricato. È il motivo per cui a 768 e a pieno la cornice non scende sotto i 30rem |
+| Tutte le cornici delle 53 storie, in sviluppo | 200 senza errore | sì. `next build`: **304** cornici e 53 pagine, tutte statiche; `/` resta statica |
+| `ParticleBurst`, «Sprigiona» | la fontana | 17 nodi `position: fixed` nel portale della cornice: il riferimento clonato da `WithHandle` arriva |
+| `LoginScreen` in chiaro: le voci del selettore d'angolo | ≥ 4,5 | **1,19** — curato in `PlagueBackground` con `text-foreground`: 14,52, come in scuro |
+| `CreditLine` **senza** `@container` sopra, a 768 | lunga, come dicono il suo JSDoc e `CLAUDE.md` | **corta**: «By: Superivan94». Le classi erano mobile-first dal primo commit, quindi il «resta lunga» non era mai stato misurato. Curato scrivendole al rovescio — la lunga di base, la corta dietro `@max-lg:` —, anche in `SupportButton` (utente, 2026-09-22) |
+| La stessa, dopo la cura | lunga senza contenitore, corta in uno stretto | senza contenitore «Creato da · Superivan94 · AI-Dev» a 360 **e** a 768; in un contenitore «By: · Superivan94» a 360 e la forma lunga a 768. Il piede vero: «By:» e il comando senza testo a 360, «Creato da» e «Offrimi una pozione» a 768 |
+| Una storia tolta dall'indice | `tsc` rosso | rosso, e l'errore nomina `DripIcon` |
+| `CloudIcon: dripIconStory` | rosso da qualche parte | `tsc` **verde** — due icone hanno lo stesso tipo —, `/storie` in sviluppo **500** con «Storie sotto il nome di un altro componente: CloudIcon» |
+
+⚠️ **I due difetti li hanno trovati le storie guardando quello che nessuna pagina mostrava**: il
+selettore illeggibile c'era anche su `/accesso` in tema chiaro, ma lì nessuno guardava il chiaro
+accanto allo scuro; la firma corta c'era in qualunque pagina che montasse `CreditLine` da sola, e
+nessuna lo faceva. È la ragione per cui le cornici mostrano i due temi insieme, e per cui la storia
+di `CreditLine` tiene apposta la variante senza contenitore.
+
+**Che cosa protegge:** che un componente guardato a 360 sia guardato davvero a 360 — media query di
+finestra comprese — e che ogni storia mostri il componente che nomina.
