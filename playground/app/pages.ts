@@ -74,6 +74,14 @@ export interface PlaygroundPage {
   icon?: ComponentType<IconProps>;
 }
 
+/**
+ * Se il percorso è quello della pagina, o sta sotto di lei: `/storie/RatRun` è nel catalogo quanto
+ * `/storie`. La radice fa eccezione, o ogni indirizzo sarebbe «dentro» la tavolozza.
+ */
+export function isCurrentPage(page: PlaygroundPage, pathname: string): boolean {
+  return pathname === page.href || (page.href !== '/' && pathname.startsWith(`${page.href}/`));
+}
+
 export const PLAYGROUND_PAGES: readonly PlaygroundPage[] = [
   {
     href: '/',

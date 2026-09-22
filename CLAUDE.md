@@ -641,6 +641,11 @@ exist in target module» che **non sono veri**. Si guarda la pagina, o si crede 
   che scorre dev'essere raggiungibile da tastiera» è per i riquadri di testo. Qui dentro ci sono
   collegamenti, e il browser porta in vista quello che mette a fuoco — misurato: col fuoco
   sull'ultima voce la riga si era già portata a `scrollLeft` 543.
+  ⚠️ **Ma lo scorrimento è la rete, non la forma**: la riga ha `scrollbar-none`, e su un desktop
+  una riga che scorre senza barra **sembra tagliata** — l'utente l'ha segnalato il 2026-09-23 come
+  un difetto, a 1660 px di finestra, con la fila da 1090 px chiusa in una colonna da 1024. Quando
+  le voci crescono, la cura è nella pagina: una colonna che si allarga, e sotto una soglia un
+  comando che apre il `Drawer` di HeroUI con tutte le voci — com'è ora la barra del playground.
 - ⚠️ **Due cose larghe quanto il loro testo non si separano disponendole: si separano nel tempo.**
   I fumetti dell'emettitore sono larghi quanto la frase che contengono — da 80 a 200 px su una
   scheda di 142 — quindi due che convivono si disturbano comunque, e allontanarli in verticale

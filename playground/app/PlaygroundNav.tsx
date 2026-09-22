@@ -14,7 +14,15 @@ import {
 } from 'plague-board-ui';
 import { useState } from 'react';
 
-import { PLAYGROUND_FAMILIES, PLAYGROUND_PAGES, type PlaygroundFamilyInfo, type PlaygroundPage } from './pages';
+import { FamilyEntry } from './FamilyEntry';
+import {
+  PLAYGROUND_FAMILIES,
+  PLAYGROUND_PAGES,
+  isCurrentPage,
+  type PlaygroundFamilyInfo,
+  type PlaygroundPage,
+} from './pages';
+import { PagesDrawer } from './PagesDrawer';
 import { ThemeToggle } from './ThemeToggle';
 
 /**
@@ -52,44 +60,6 @@ function NavLink({ page, isCurrent }: { page: PlaygroundPage; isCurrent: boolean
   );
 }
 
-/** Una voce del popover: il nome di casa, i componenti che mostra, e che cosa ci si trova. */
-function FamilyEntry({ page, isCurrent, onGo }: { page: PlaygroundPage; isCurrent: boolean; onGo: () => void }) {
-  const Icon = page.icon;
-
-  return (
-    <Link
-      href={page.href}
-      aria-current={isCurrent ? 'page' : undefined}
-      // ⚠️ Il popover si chiude **qui**, sulla pressione del collegamento, e non in un effetto che
-      // guarda il percorso: con Next la barra non si smonta cambiando pagina, quindi senza questa
-      // riga il menù resterebbe aperto sopra la pagina nuova. Un effetto lo farebbe con un
-      // `setState` che `react-hooks/set-state-in-effect` rifiuta, e a ragione.
-      onClick={onGo}
-      // ⚠️ Tre segni insieme per la pagina corrente — il filo a sinistra, il fondo, e la scritta
-      // «sei qui» — perché uno solo non si notava: il fondo `default/40` da solo era una
-      // differenza di luminosità che su un pannello chiaro si perde.
-      className={`flex flex-col gap-0.5 rounded-lg border-l-2 px-3 py-2 transition-colors ${
-        isCurrent ? 'border-brand-ink bg-brand/10' : 'border-transparent hover:bg-default/50'
-      }`}
-    >
-      {/* ⚠️ `whitespace-nowrap` sul nome: senza, «La voce» si spezzava in due righe per fare posto
-          all'elenco dei componenti, che è lungo tre nomi. A mandare a capo dev'essere l'elenco,
-          che è fatto di pezzi, non il nome, che è una cosa sola. */}
-      <span className="flex flex-wrap items-baseline gap-x-2">
-        {Icon ? <Icon size={16} className="shrink-0 self-center text-brand-ink" /> : null}
-        <span className={`text-sm font-medium whitespace-nowrap ${isCurrent ? 'text-brand-ink' : ''}`}>
-          {page.title}
-        </span>
-        {isCurrent && <TechLabel className="text-brand-ink">sei qui</TechLabel>}
-        {page.components.length > 0 && (
-          <TechLabel className="text-muted">{page.components.join(' · ')}</TechLabel>
-        )}
-      </span>
-      <span className="text-xs text-muted">{page.blurb}</span>
-    </Link>
-  );
-}
-
 function FamilyMenu({
   family,
   pages,
@@ -100,7 +70,7 @@ function FamilyMenu({
   pathname: string;
 }) {
   const [isOpen, setIsOpen] = useState(false);
-  const contieneLaCorrente = pages.some((page) => page.href === pathname);
+  const contieneLaCorrente = pages.some((page) => isCurrentPage(page, pathname));
 
   return (
     <Popover isOpen={isOpen} onOpenChange={setIsOpen}>
@@ -124,7 +94,7 @@ function FamilyMenu({
             <FamilyEntry
               key={page.href}
               page={page}
-              isCurrent={pathname === page.href}
+              isCurrent={isCurrentPage(page, pathname)}
               onGo={() => setIsOpen(false)}
             />
           ))}
@@ -147,7 +117,15 @@ export function PlaygroundNav() {
           ⚠️ E dentro c'è `BarRow`, non una flex che va a capo: su un telefono le voci stavano su
           **tre righe** e la lastra diventava alta il triplo. Una riga sola che scorre di lato è
           la regola, e vale per la barra come per il piede. */}
-      <nav className="mx-auto w-full max-w-5xl px-4">
+      {/* ⚠️ **Due forme, e le sceglie il CSS.** Da `xl` — 1280 px di finestra — le voci stanno in
+          fila in una colonna di 1152 (`max-w-6xl`); sotto, passano nel cassetto e in barra resta
+          un comando solo. La soglia non è a caso: la fila piena misura **1090 px** con le voci di
+          oggi, e la colonna da 1024 di prima la tagliava anche su una finestra da 1660 con seicento
+          pixel liberi. Chi aggiunge una famiglia rimisura, e il segno che non ci sta più è la riga
+          che scorre di lato proprio a `xl`. Scelta in CSS e non misurando in JavaScript per la
+          regola della barra: il server non sa quanto è larga la finestra, e ogni caricamento su un
+          telefono farebbe saltare la lastra a pagina già disegnata. */}
+      <nav className="mx-auto w-full max-w-6xl px-4">
         <BarRow>
           {/* Il marchio, e batte. ⚠️ Scelto fra cinque candidati il 2026-09-17, e il motivo non è
               estetico: quel segno a prima vista è un cuore, poi due che si abbracciano, e solo per
@@ -170,39 +148,41 @@ export function PlaygroundNav() {
               size={PLAGUE_BAR_MARK_SIZE.medium}
               className={`shrink-0 text-brand ${PLAGUE_BAR_MARK_CLASS.medium}`}
             />
-            <TechLabel className="text-muted">plague-board-ui</TechLabel>
+            {/* Sul telefono il nome del pacchetto cede il posto al comando delle pagine. */}
+            <TechLabel className="hidden text-muted sm:inline">plague-board-ui</TechLabel>
           </span>
 
-          {PLAYGROUND_FAMILIES.map((family) => (
-            <FamilyMenu
-              key={family.key}
-              family={family}
-              pages={PLAYGROUND_PAGES.filter((page) => page.family === family.key)}
-              pathname={pathname}
-            />
-          ))}
+          <span className="hidden items-center gap-x-5 xl:flex">
+            {PLAYGROUND_FAMILIES.map((family) => (
+              <FamilyMenu
+                key={family.key}
+                family={family}
+                pages={PLAYGROUND_PAGES.filter((page) => page.family === family.key)}
+                pathname={pathname}
+              />
+            ))}
 
-          {/* Il catalogo è una voce sola, e resta accesa anche dentro una storia: `/storie/RatRun`
-              sta nel catalogo quanto `/storie`. */}
-          {catalogo.map((page) => (
-            <NavLink
-              key={page.href}
-              page={page}
-              isCurrent={pathname === page.href || pathname.startsWith(`${page.href}/`)}
-            />
-          ))}
+            {/* Il catalogo è una voce sola, e resta accesa anche dentro una storia. */}
+            {catalogo.map((page) => (
+              <NavLink key={page.href} page={page} isCurrent={isCurrentPage(page, pathname)} />
+            ))}
 
-          {filosofia.length > 0 && (
-            <span className="flex items-center gap-4">
-              {/* ⚠️ Il filo e il nome erano scritti qui a mano. Adesso sono `TechRule`, e non è un
-                  riordino: era il segno che divide due categorie di pagine, cioè una cosa che
-                  qualunque app dei Ludoratti rifarebbe uguale. Si ricompone, non si copia. */}
-              <TechRule orientation="vertical">filosofia</TechRule>
-              {filosofia.map((page) => (
-                <NavLink key={page.href} page={page} isCurrent={pathname === page.href} />
-              ))}
-            </span>
-          )}
+            {filosofia.length > 0 && (
+              <span className="flex items-center gap-4">
+                {/* ⚠️ Il filo e il nome erano scritti qui a mano. Adesso sono `TechRule`, e non è un
+                    riordino: era il segno che divide due categorie di pagine, cioè una cosa che
+                    qualunque app dei Ludoratti rifarebbe uguale. Si ricompone, non si copia. */}
+                <TechRule orientation="vertical">filosofia</TechRule>
+                {filosofia.map((page) => (
+                  <NavLink key={page.href} page={page} isCurrent={isCurrentPage(page, pathname)} />
+                ))}
+              </span>
+            )}
+          </span>
+
+          <span className="xl:hidden">
+            <PagesDrawer pathname={pathname} />
+          </span>
 
           <span className="ml-auto">
             <ThemeToggle />

@@ -513,6 +513,26 @@ react-aria **clona il figlio** e non aggiunge né `role` né `tabIndex`. ⚠️ 
 navigazione: con Next la barra non si smonta cambiando pagina, quindi un popover aperto resta
 aperto **sopra** la pagina nuova, e non c'è nessun errore da nessuna parte.
 
+### La barra che diventa un cassetto — 2026-09-23
+
+**Esegue:** agente, ogni volta che si aggiunge una famiglia o una voce alla barra del playground.
+**Ultima esecuzione:** agente, 2026-09-23 — tutto come atteso.
+
+**Preparazione:** `npm run playground`, una scheda con `resize_window` alle quattro larghezze. La
+riga si misura con `clientWidth` e `scrollWidth` del primo figlio del `<nav>`: se il secondo supera
+il primo, la barra taglia.
+
+| Azione | Atteso | Ottenuto |
+|---|---|---|
+| 1660 px, prima della cura | la fila intera | **tagliata**: 1090 px di voci in una colonna da 1024, con 600 px di finestra liberi (segnalato dall'utente) |
+| 1660 e 1280 px | la fila intera, senza scorrere | colonna **1120**, contenuto 1120 |
+| 1024 e 375 px | marchio, «pagine · <corrente>», tema | sì, contenuto pari alla colonna; a 375 il nome del pacchetto cede il posto |
+| Si preme «pagine» | il cassetto da sinistra, col fuoco dentro | `role="dialog"` di nome «Le pagine», fuoco dentro, 12 voci, la corrente con «sei qui» |
+| Esc | si chiude | nessun dialogo in pagina |
+
+**Che cosa protegge:** che una voce in più non torni a tagliare la barra in silenzio. La soglia è
+`xl` perché la fila piena misura 1090 px: chi aggiunge una famiglia rimisura qui.
+
 ### Il ratto corre attorno ai suoi perni, e la fine la dice `animationend` — 2026-09-18
 
 **Esegue:** agente — in jsdom le animazioni non girano: il test tiene il contratto (classi, perni
@@ -1354,6 +1374,9 @@ cornice si leggono dalla pagina del catalogo con `iframe.contentDocument` e
 | `CreditLine` con `isCompact`, senza contenitore, a 360 e a 768 | corta a tutti e due | «By: · Superivan94» e «Di: · Superivan94» a 360 **e** a 768, accanto alla stessa firma senza la prop che a 768 è intera |
 | `HoverEmitter`, «col cenno sfasato di due secondi» | diverso dalla pioggia binaria | **identico** (segnalato dall'utente): lo sfasamento su una scheda sola non si vede. Ora due schede affiancate, la seconda sfasata: fasi del saltello a **2000 ms** esatti l'una dall'altra, misurate con `getAnimations()` |
 | Le altezze di tutte le cornici di una storia, ricaricando | uguali per varianti uguali | al primo giro **120** sulla prima cornice di `HoverEmitter` contro 214: il suo messaggio era partito prima che la pagina ascoltasse. Con la domanda e il primo invio al montaggio, tre caricamenti su tre a 214, anche in una scheda in secondo piano |
+| «Prossima» da `BarRow` col formato a 768 | `CountedChips`, sempre a 768 | sì: cornice larga 768, il formato sta in `sessionStorage` |
+| «← tutte le storie» dopo `BarRow` → `CountedChips` → `CreditCard` | l'indice accende l'ultima | `CreditCard` con «l'ultima vista», una sola accesa, in vista |
+| La stessa cosa da `VirusIcon`, l'ultima dell'elenco | accesa e portata in vista | sì, con la pagina scorsa a 2955 px; `VirusIcon` ha solo «‹ SparklesIcon» |
 | Una storia tolta dall'indice | `tsc` rosso | rosso, e l'errore nomina `DripIcon` |
 | `CloudIcon: dripIconStory` | rosso da qualche parte | `tsc` **verde** — due icone hanno lo stesso tipo —, `/storie` in sviluppo **500** con «Storie sotto il nome di un altro componente: CloudIcon» |
 
