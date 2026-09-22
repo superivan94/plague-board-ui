@@ -195,7 +195,10 @@ exist in target module» che **non sono veri**. Si guarda la pagina, o si crede 
 - ⚠️ **Un'icona non risponde al ruolo `img` se non gliel'hai dato.** Un `<svg>` senza `role`
   esplicito per l'albero di accessibilità è un `graphics-document`, quindi un test che asserisce
   `queryByRole('img')` per dire «è decorativa» resta **verde anche togliendo l'`aria-hidden`** che
-  dovrebbe difendere. Si asserisce l'attributo.
+  dovrebbe difendere. Si asserisce l'attributo. ⚠️ **Vale anche al rovescio, per un'ancora**: un
+  `<a>` senza `href` il ruolo `link` non ce l'ha, quindi `queryByRole('link')` dà `null` anche con
+  l'ancora lì dentro — col colore al passaggio e l'anello di fuoco di un comando che non esiste.
+  Misurato il 2026-09-22 su `CreditCard`. Per dire «non c'è» si cerca l'**elemento**.
 - ⚠️ **Il `Button` di HeroUI è un controllo con una taglia: non avvolge contenuto di misura
   qualunque.** `.button` è `h-10 md:h-9 px-4 rounded-3xl`, e `.button--sm` arriva a scrivere
   `svg { size-4 }` — un segno da 56px ci finisce dentro a 16. È il rovescio della scoperta su
@@ -1137,6 +1140,20 @@ exist in target module» che **non sono veri**. Si guarda la pagina, o si crede 
   clausola non fallisce, la **salta**, e ogni caso costruito su quella lista passa perché quei nomi
   non ci sono mai arrivati. Si cura contando: le clausole riconosciute contro le righe che
   cominciano per `export`, che oggi sono 64 e 64.
+- ⚠️ **Quali contratti nessuno prova lo dice la copertura per rami, non l'elenco dei test.** Una
+  prop che nessun test passa è un ramo che nessun test percorre, e scorrendo i titoli non si vede:
+  il 2026-09-22 la copertura ha trovato i clic con ctrl e cmd di `SupportButton` e metà di
+  `CreditCard` mai esercitati, e un test intitolato «si ferma al tetto del livello» con sotto il
+  ramo del tetto **mai percorso** — quel titolo mentiva, e senza la misura non lo si sarebbe
+  saputo. Da 364 a **370 rami su 379**; i nove che restano stanno nel Context del subplan, ognuno
+  col suo perché. ⚠️ Il fornitore **non** è nelle dipendenze: si installa per la misura, senza
+  salvarlo, e si lancia dalla cartella del pacchetto —
+  `npm install --no-save @vitest/coverage-v8@4.1.11 --workspace plague-board-ui`, poi
+  `npx vitest run --coverage --coverage.provider=v8 --coverage.include='src/**'`.
+  ⚠️ **E la prova dei denti che sostituisce per testo colpisce il primo posto in cui lo trova**, che
+  può essere il JSDoc sopra il codice: la mutazione di `rel="noopener noreferrer"` in `CreditCard`
+  è uscita **verde** per quel motivo, e a mano è rossa. Un verde in una sonda si ricontrolla prima
+  di crederci, come un rosso.
 
 ## Memoria di sessione
 

@@ -1,7 +1,7 @@
 import { render, screen } from '@testing-library/react';
 import { describe, expect, it } from 'vitest';
 
-import { PlagueAvatar, PlaguePanel, ThematicBadge } from '../src';
+import { PLAGUE_AVATAR_SIZE, PlagueAvatar, PlaguePanel, ThematicBadge } from '../src';
 
 /**
  * ⚠️ **In jsdom l'immagine di un avatar non compare mai, e non è un difetto nostro.** `Avatar` di
@@ -57,6 +57,20 @@ describe('PlagueAvatar', () => {
     expect(avatar(piccolo)).toHaveClass('avatar--sm');
     expect(avatar(medio)?.className).not.toMatch(/avatar--(sm|lg)/);
     expect(avatar(grande)).toHaveClass('avatar--lg');
+  });
+
+  it('il teschio del ripiego è metà della taglia, a tutte e tre le taglie', () => {
+    // I numeri vengono da `PLAGUE_AVATAR_SIZE`, che è pubblico apposta: chi passa un ripiego suo
+    // legge lì quanto farlo grande, invece di indovinare il lato di un avatar di HeroUI.
+    for (const size of ['sm', 'md', 'lg'] as const) {
+      const { container, unmount } = render(<PlagueAvatar size={size} />);
+
+      expect(ripiego(container)?.querySelector('svg')).toHaveAttribute(
+        'width',
+        String(PLAGUE_AVATAR_SIZE[size] / 2),
+      );
+      unmount();
+    }
   });
 
   it('il segno nell’angolo sta dentro l’ancora, o non starebbe nell’angolo', () => {

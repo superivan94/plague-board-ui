@@ -185,6 +185,18 @@ describe('LoginScreen', () => {
     expect(screen.getByText('versione 0.1.0')).toBeInTheDocument();
   });
 
+  it('occupa la finestra intera, e spenta lascia l’altezza a chi la monta', () => {
+    const { container, unmount } = schermata();
+    expect(container.querySelector('.min-h-dvh')).not.toBeNull();
+    unmount();
+
+    // Spenta non vuol dire «più bassa»: vuol dire che la sua altezza non si oppone a quella che
+    // arriva da `className` — una schermata dentro un riquadro, o un layout che ha già la sua.
+    const { container: dentro } = schermata({ isFullHeight: false, className: 'h-96' });
+    expect(dentro.querySelector('.min-h-dvh')).toBeNull();
+    expect(dentro.querySelector('.h-96')).not.toBeNull();
+  });
+
   describe('i ratti', () => {
     beforeEach(() => {
       vi.useFakeTimers();

@@ -2,7 +2,6 @@ import { act, createEvent, fireEvent, render } from '@testing-library/react';
 import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest';
 
 import { HoverEmitter, binaryRain, comicBubbles, type HoverEffect } from '../src';
-import { pesca } from '../src/brand/hoverEmitterPick';
 import { menoMovimento } from './preferenze';
 
 /** Una taratura da banco: cadenza tonda, vita lunga, niente caso nelle posizioni. */
@@ -73,6 +72,29 @@ describe('HoverEmitter', () => {
     avanza(5000);
     expect(effimeri()).toHaveLength(0);
     expect(emettitore.querySelector('.pb-hover-hint')).not.toBeNull();
+  });
+
+  it('il cenno parte col ritardo che gli si dà, e senza ritardo non porta nessuno stile', () => {
+    // È ciò che tiene sfalsati i due autori del piede: due cenni uguali e simultanei, vicini, si
+    // leggono come una cosa sola che pulsa.
+    const { container, unmount } = render(
+      <HoverEmitter effect={LENTO} hintDelayMs={2000}>
+        <span>AI-Dev</span>
+      </HoverEmitter>,
+    );
+    expect(container.querySelector('.pb-hover-hint')).toHaveStyle({ animationDelay: '2000ms' });
+    unmount();
+
+    const { emettitore } = monta();
+    expect(emettitore.querySelector('.pb-hover-hint')).not.toHaveAttribute('style');
+  });
+
+  it('con un elenco vuoto non sputa niente, per quanto ci si resti sopra', () => {
+    const { emettitore } = monta({ ...LENTO, contents: [] });
+
+    entra(emettitore);
+    avanza(1000);
+    expect(effimeri()).toHaveLength(0);
   });
 
   it('al passaggio del puntatore ne esce uno subito, e poi uno a ogni giro', () => {
@@ -229,35 +251,6 @@ describe('HoverEmitter', () => {
     }
 
     expect(massimo).toBe(1);
-  });
-
-  it('con le corsie nessuno nasce all’altezza del precedente', () => {
-    // ⚠️ **Il sorteggio si prova sulla funzione, non sulla pagina**, e non è una scorciatoia: da
-    // quando gli effimeri volano in un portale, `left` e `top` sono **pixel della finestra**
-    // calcolati dal riquadro che li genera — e in jsdom ogni rettangolo misura zero, quindi
-    // dall'elemento uscirebbe sempre `0px`. Qui il riquadro glielo si dà finto, e il conto si
-    // vede per intero. Dove nasce davvero un fumetto lo dice il collaudo, in browser.
-    const riquadro = { left: 100, top: 200, width: 140, height: 40 } as DOMRect;
-    const taratura = { ...LENTO, top: [0, 300] as const, lanes: 3 };
-
-    const altezze = [0, 1, 2].map((giro) => pesca(giro, taratura, -1, riquadro).effimero.style.top);
-
-    // I due estremi e la metà, in percentuale dell'altezza del riquadro: 0, 150% e 300% di 40 px
-    // sommati al suo bordo di sopra. Tre altezze **fisse** ed equidistanti, percorse a turno.
-    expect(altezze).toStrictEqual(['200.0px', '260.0px', '320.0px']);
-  });
-
-  it('il fumetto nasce sopra il riquadro e centrato sulla sua metà', () => {
-    // ⚠️ L'altra metà della prova di sopra: qui contano gli estremi della taratura vera.
-    const riquadro = { left: 100, top: 200, width: 140, height: 40 } as DOMRect;
-    const { effimero } = pesca(0, comicBubbles(FRASI), -1, riquadro);
-
-    // `left` va dal 35% al 65% di 140 px, sommati al bordo sinistro: da 149 a 191.
-    const sinistra = Number.parseFloat(String(effimero.style.left));
-    expect(sinistra).toBeGreaterThanOrEqual(149);
-    expect(sinistra).toBeLessThanOrEqual(191);
-    // La prima corsia è −100% di 40 px: quaranta pixel **sopra** il bordo di sopra.
-    expect(effimero.style.top).toBe('160.0px');
   });
 
   it('non fa mai uscire due volte di fila lo stesso testo', () => {

@@ -48,14 +48,18 @@ describe('i versi della città', () => {
     expect(versi(container)).toHaveLength(0);
   });
 
-  it('ne fa uscire uno a ogni attesa e si ferma al tetto del livello', () => {
+  it('ne fa uscire uno a ogni attesa', () => {
+    // ⚠️ Questo caso si chiamava «e si ferma al tetto del livello», e il tetto non lo provava:
+    // controllava `<=` dopo la prima uscita e restava verde anche togliendolo. Non si prova perché
+    // con le attese di oggi **non si raggiunge**: un verso vive 3,2 s, quindi ne convivono al più
+    // due a `high` contro un tetto di tre, e uno negli altri livelli. Sta scritto nel piano, fra
+    // i rami che nessun test percorre e il perché.
     const { container } = conFondale('high');
 
     expect(versi(container)).toHaveLength(0);
 
     avanza(PRIMA_USCITA_MS);
     expect(versi(container).length).toBeGreaterThan(0);
-    expect(versi(container).length).toBeLessThanOrEqual(TOXIC_LEVEL_SETTINGS.high.maxChatter);
   });
 
   it('un verso se ne va da solo, e non si allunga la vita quando ne compare un altro', () => {

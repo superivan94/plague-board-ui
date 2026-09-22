@@ -4,6 +4,8 @@ import { describe, expect, it } from 'vitest';
 import {
   PLAGUE_BAR_MARK_CLASS,
   PLAGUE_BAR_MARK_SIZE,
+  PLAGUE_FOOT_MARK_CLASS,
+  PLAGUE_FOOT_MARK_SIZE,
   PlagueBar,
   type PlagueBarSize,
   PulseDot,
@@ -215,6 +217,27 @@ describe('PlagueBar', () => {
       expect(roomy ? pixelDiSize(roomy.replace('pb-roomy:', '')) : PLAGUE_BAR_MARK_SIZE.small).toBe(
         PLAGUE_BAR_MARK_SIZE[size],
       );
+    }
+  });
+});
+
+describe('le misure del piede', () => {
+  // ⚠️ La stessa regola della barra, su una tabella a due voci — il segno del comando e quello della
+  // firma — che fino a qui non la teneva nessuno: il piede monta le sue classi da sé, quindi i suoi
+  // test guardavano il pixel e non il numero che chi compone un piede diverso legge in tabella.
+  it('ogni classe dice lo stesso numero della sua tabella, e sul telefono torna alla piccola', () => {
+    const sizes: readonly PlagueBarSize[] = ['small', 'medium', 'large'];
+
+    for (const size of sizes) {
+      for (const pezzo of ['mark', 'authorMark'] as const) {
+        const [base, roomy] = PLAGUE_FOOT_MARK_CLASS[size][pezzo].split(' ');
+        const piccola = PLAGUE_FOOT_MARK_SIZE.small[pezzo];
+
+        expect(pixelDiSize(base)).toBe(piccola);
+        expect(roomy ? pixelDiSize(roomy.replace('pb-roomy:', '')) : piccola).toBe(
+          PLAGUE_FOOT_MARK_SIZE[size][pezzo],
+        );
+      }
     }
   });
 });

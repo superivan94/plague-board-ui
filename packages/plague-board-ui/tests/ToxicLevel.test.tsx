@@ -120,6 +120,20 @@ describe('ToxicLevelSwitch', () => {
     expect(opzione(TOXIC_LEVEL_LABELS.low)).toBeChecked();
   });
 
+  it('ripremere il livello già scelto non lo toglie', () => {
+    // ⚠️ Un gruppo a scelta singola di react-aria **può** restare senza scelta: ripremere quella
+    // corrente la toglie, e l'insieme che arriva è vuoto. Ma un livello «nessuno» non esiste —
+    // `off` è un livello, non un'assenza. Lo tengono due righe, e **ognuna basta da sola**:
+    // `disallowEmptySelection`, che non fa partire la scelta vuota, e la guardia su `undefined`,
+    // che la ignorerebbe. Misurato spegnendole: questo caso diventa rosso solo senza tutt'e due.
+    montaConSpia('medium');
+
+    fireEvent.click(opzione(TOXIC_LEVEL_LABELS.medium));
+
+    expect(screen.getByTestId('spia')).toHaveTextContent('medium');
+    expect(opzione(TOXIC_LEVEL_LABELS.medium)).toBeChecked();
+  });
+
   it('si arriva a qualunque livello con una sola scelta, anche tornando indietro', () => {
     // ⚠️ È il motivo per cui il comando non è più il ciclo di RattInventario: da «alto» a
     // «basso» di là servivano tre pressioni, e la prima portava a `off`. Un comando che esiste

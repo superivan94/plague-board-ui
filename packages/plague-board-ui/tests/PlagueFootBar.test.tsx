@@ -148,6 +148,29 @@ describe('i pezzi del piede', () => {
     vi.useRealTimers();
   });
 
+  it.each([
+    ['ctrl', { ctrlKey: true }],
+    ['cmd', { metaKey: true }],
+    ['shift', { shiftKey: true }],
+    ['alt', { altKey: true }],
+    ['il tasto centrale', { button: 1 }],
+  ])('con %s il clic resta del browser: niente fontana e niente attesa', (_, modo) => {
+    // ⚠️ Sono gesti che chi legge si aspetta — aprire in una scheda, in una finestra, salvare — e
+    // trattenerli per fare una cosa nostra è il modo più veloce di rendere antipatico un
+    // collegamento.
+    vi.useFakeTimers();
+    const apri = vi.spyOn(window, 'open').mockReturnValue(null);
+    render(<SupportButton href="https://esempio.test/dona" />);
+
+    expect(fireEvent.click(screen.getByRole('link'), modo)).toBe(true);
+    expect(particelle()).toHaveLength(0);
+    act(() => void vi.advanceTimersByTime(5000));
+    expect(apri).not.toHaveBeenCalled();
+
+    apri.mockRestore();
+    vi.useRealTimers();
+  });
+
   it('con meno movimento il comando è un collegamento e basta', () => {
     menoMovimento(true);
     vi.useFakeTimers();
