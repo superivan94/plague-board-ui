@@ -46,6 +46,19 @@ describe('PlagueBackground', () => {
     expect(screen.getByText('il contenuto')).toBeInTheDocument();
   });
 
+  it('è un’isola scura intera: il tema e anche il colore del testo', () => {
+    const { container } = conFondale('high');
+    const scena = container.firstElementChild;
+
+    // ⚠️ `dark` da sola non basta. Il colore si eredita **già calcolato**: il `body` di una pagina
+    // chiara lo risolve scuro, e chi lo prende da `currentColor` — il `ToggleButton` di HeroUI
+    // nella sua variante predefinita — scriveva scuro su scuro a **1,19** di contrasto, con tutte
+    // le variabili del tema giuste. `text-foreground` lo fa risolvere di nuovo qui dentro, ed è
+    // quello che `.surface` di HeroUI fa per la barra.
+    expect(scena).toHaveClass('dark');
+    expect(scena).toHaveClass('text-foreground');
+  });
+
   it('mette in scena tanti pezzi quanti ne dichiara il livello', () => {
     for (const livello of ['off', 'low', 'medium', 'high'] as const) {
       const { container, unmount } = conFondale(livello);

@@ -139,7 +139,11 @@ export function PlagueBackground({
   const taratura = TOXIC_LEVEL_SETTINGS[level];
 
   return (
-    <div className={`dark relative overflow-hidden bg-gray-950 ${className}`}>
+    // ⚠️ `dark` e `text-foreground` insieme: la prima porta dentro le variabili del tema scuro, la
+    // seconda il **colore del testo**, che si eredita già calcolato — senza, su una pagina chiara
+    // chi lo prende da `currentColor` scrive scuro su scuro anche con le variabili giuste. È quello
+    // che `.surface` di HeroUI fa per `PlagueBar`.
+    <div className={`dark relative overflow-hidden bg-gray-950 text-foreground ${className}`}>
       {/* ⚠️ L'`aria-hidden` sta su questo strato e non sul contenitore: su un antenato del
           contenuto nasconderebbe la pagina intera, che è l'opposto di «decorativo». */}
       <div aria-hidden="true" className="pointer-events-none absolute inset-0 overflow-hidden">
