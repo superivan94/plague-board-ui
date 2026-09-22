@@ -89,21 +89,38 @@ function authors(size: PlagueBarSize): readonly CreditAuthor[] {
 const SUPPORT_HREF = 'https://ko-fi.com/superivan94';
 
 /**
- * Dichiara il contenitore che le container query della firma interrogano.
- *
- * ⚠️ Senza, la firma non sa quanto è larga: il piede lo fa per i suoi pezzi, chi li monta a mano se
- * ne deve ricordare. La variante senza è qui apposta, per vedere che cosa succede a dimenticarlo.
- */
-const inContainer: StoryDecorator = (variant) => <div className="@container">{variant}</div>;
-
-/**
- * Un contenitore di 15rem, sotto la soglia delle 32rem **a qualunque formato**.
- *
- * ⚠️ Senza questa variante la forma corta si vedrebbe solo a 360, cioè solo quando è stretta la
- * finestra: ma la soglia è del contenitore, e la stessa firma in una colonna stretta si accorcia
- * anche su uno schermo largo. È quello che le container query danno in più delle media query.
+ * Un contenitore di 15rem, sotto la soglia delle 32rem **a qualunque formato**: il piede in una
+ * colonna stretta si accorcia anche su uno schermo largo.
  */
 const inNarrowColumn: StoryDecorator = (variant) => <div className="@container w-60">{variant}</div>;
+
+/** I due contenitori del confronto: uno sopra la soglia delle 32rem, uno sotto. Classi per esteso. */
+const WIDTHS = [
+  { className: 'w-[34rem]', label: 'in un contenitore da 34rem' },
+  { className: 'w-72', label: 'in un contenitore da 18rem' },
+] as const;
+
+/**
+ * La stessa variante in due contenitori di misura nota, bordati a tratteggio perché si veda dove
+ * finiscono.
+ *
+ * ⚠️ **Mostra la regola a qualunque formato.** Con un contenitore largo quanto la cornice, le due
+ * forme si vedevano solo cambiando formato: a 360 cinque varianti su sei dicevano «By:», a 768
+ * erano a coppie identiche, e sembravano tutte la stessa (segnalato dall'utente). Il contenitore
+ * largo nella cornice da 360 trabocca di lato, e si scorre.
+ */
+const atTwoWidths: StoryDecorator = (variant) => (
+  <div className="flex flex-col gap-3">
+    {WIDTHS.map(({ className, label }) => (
+      <div key={className} className="flex flex-col gap-1">
+        <TechLabel className="text-muted">{label}</TechLabel>
+        <div className="overflow-x-auto">
+          <div className={`@container rounded-md border border-dashed border-border p-2 ${className}`}>{variant}</div>
+        </div>
+      </div>
+    ))}
+  </div>
+);
 
 export const plagueFootBarStory = defineStory(PlagueFootBar, {
   description:
@@ -188,23 +205,29 @@ export const creditLineStory = defineStory(CreditLine, {
   description:
     'La firma «umano e AI»: un’etichetta e una scheda per autore. Sotto le 32rem del suo contenitore l’etichetta si accorcia e resta il primo autore; con `isCompact` è corta sempre.',
   variants: [
-    { name: 'i due autori', args: { authors: authors('small') }, decorators: [inContainer] },
     {
-      name: 'in una colonna stretta: si accorcia da sé',
+      name: 'si adatta al contenitore',
+      note: 'Sopra le 32rem del contenitore dice «Creato da» e tutti gli autori; sotto, «By:» e il primo soltanto. Il contenitore lo dichiara chi la monta, con `@container`: il piede lo fa da sé.',
       args: { authors: authors('small') },
-      decorators: [inNarrowColumn],
+      decorators: [atTwoWidths],
     },
-    { name: 'sempre corta, con isCompact', args: { authors: authors('small'), isCompact: true } },
     {
       name: 'le parole dell’applicazione',
+      note: '`label` è la parola della forma lunga, `shortLabel` quella della corta.',
       args: { authors: authors('small'), label: 'Scritto da', shortLabel: 'Di:' },
-      decorators: [inContainer],
+      decorators: [atTwoWidths],
     },
     {
-      name: 'le parole dell’applicazione, corte',
-      args: { authors: authors('small'), label: 'Scritto da', shortLabel: 'Di:', isCompact: true },
+      name: 'sempre corta, con isCompact',
+      note: 'Corta anche nel contenitore largo: con `isCompact` la forma la decide la prop, e il `@container` non serve più.',
+      args: { authors: authors('small'), isCompact: true },
+      decorators: [atTwoWidths],
     },
-    { name: 'senza un contenitore sopra', args: { authors: authors('small') } },
+    {
+      name: 'senza un contenitore sopra',
+      note: 'Nessun `@container` fra gli antenati: le container query non si applicano e resta la forma lunga, a qualunque larghezza. È il modo in cui si vuole che fallisca chi dimentica il contenitore — una firma intera si nota, un autore sparito no.',
+      args: { authors: authors('small') },
+    },
   ],
 });
 
@@ -212,10 +235,22 @@ export const supportButtonStory = defineStory(SupportButton, {
   description:
     'Il comando delle donazioni, vestito come una scheda autore e con la tazza che bolle. Al clic fa la fontana e poi apre la pagina; sotto le 32rem del suo contenitore resta il segno soltanto.',
   variants: [
-    { name: 'l’etichetta di casa', args: { href: SUPPORT_HREF }, decorators: [inContainer] },
-    { name: 'etichetta dell’applicazione', args: { href: SUPPORT_HREF, label: 'Sostieni la tana' }, decorators: [inContainer] },
-    { name: 'in una colonna stretta: resta la tazza', args: { href: SUPPORT_HREF }, decorators: [inNarrowColumn] },
-    { name: 'senza un contenitore sopra', args: { href: SUPPORT_HREF } },
+    {
+      name: 'si adatta al contenitore',
+      note: 'Sopra le 32rem del contenitore c’è la scritta; sotto resta la tazza, e il nome del comando lo porta `aria-label`, che c’è sempre.',
+      args: { href: SUPPORT_HREF },
+      decorators: [atTwoWidths],
+    },
+    {
+      name: 'le parole dell’applicazione',
+      args: { href: SUPPORT_HREF, label: 'Sostieni la tana' },
+      decorators: [atTwoWidths],
+    },
+    {
+      name: 'senza un contenitore sopra',
+      note: 'Senza `@container` resta la scritta, a qualunque larghezza: come la firma, cade nella forma intera.',
+      args: { href: SUPPORT_HREF },
+    },
   ],
 });
 

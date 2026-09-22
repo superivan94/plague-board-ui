@@ -1224,6 +1224,11 @@ exist in target module» che **non sono veri**. Si guarda la pagina, o si crede 
   sfasamento del cenno di `HoverEmitter`, che su una scheda sola non si vede. Dove si può la
   variante **mostra** la differenza — due schede affiancate, una sfasata —; dove no, perché è un
   nome che si annuncia o un tasto da premere, porta una `note` che dice che cosa guardare.
+  ⚠️ **E una forma che dipende dal contenitore non si lascia decidere alla cornice.** La storia di
+  `CreditLine` aveva sei varianti che differivano per il perché — un contenitore, una prop, una
+  colonna stretta — e a 360 cinque dicevano «By:»: sembravano tutte la stessa. Ora la regola si
+  mostra con la stessa variante in **due contenitori di misura nota**, uno sopra la soglia e uno
+  sotto, e ogni variante si distingue dalle altre a qualunque formato.
 
 ## Memoria di sessione
 
