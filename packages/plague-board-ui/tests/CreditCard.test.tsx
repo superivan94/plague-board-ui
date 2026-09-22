@@ -33,6 +33,25 @@ describe('CreditCard', () => {
     expect(screen.getByText('AI-Dev')).toBeInTheDocument();
   });
 
+  it('senza indirizzo il cursore resta la freccia, e il nome si può ancora selezionare', () => {
+    render(<CreditCard name="AI-Dev" />);
+    const classi = screen.getByText('AI-Dev').className.split(/\s+/);
+
+    // ⚠️ Sopra un testo che non è un comando il browser mostra il cursore di testo, e su una scheda
+    // sembra un campo da scrivere. Si cambia il cursore e basta: la selezione resta, perché un
+    // nome è una cosa che si copia.
+    expect(classi).toContain('cursor-default');
+    expect(classi).not.toContain('select-none');
+  });
+
+  it('con un indirizzo il cursore resta quello del collegamento', () => {
+    render(<CreditCard name="Superivan94" href="https://esempio.test/io" />);
+
+    // Il `<span>` sta dentro l'ancora, ed è lui l'elemento sotto il puntatore: con `cursor-default`
+    // addosso, la manina del collegamento sparirebbe.
+    expect(screen.getByText('Superivan94').className.split(/\s+/)).not.toContain('cursor-default');
+  });
+
   it('senza effetto non monta l’emettitore, quindi niente cenno', () => {
     const { container } = render(<CreditCard name="AI-Dev" />);
 

@@ -56,9 +56,16 @@ export interface CreditCardProps extends CreditAuthor {
  * `noopener`, la pagina che si apre può riscrivere l'indirizzo di quella che l'ha aperta.
  */
 export function CreditCard({ name, icon, href, effect, hintDelayMs, className = '' }: CreditCardProps) {
+  // ⚠️ Senza indirizzo la scheda porta la freccia: sopra un testo che non è un comando il browser
+  // mostra il cursore di testo, e una scheda sembrerebbe un campo da scrivere. Il nome resta
+  // selezionabile, perché è una cosa che si copia. **Solo** senza indirizzo: questo `<span>` sta
+  // dentro l'ancora, ed è lui l'elemento sotto il puntatore — con la freccia addosso, la manina del
+  // collegamento sparirebbe.
   const corpo = (
     <span
-      className={`flex items-center gap-1.5 rounded-lg border border-border px-2 py-0.5 text-xs font-medium transition-colors ${className}`}
+      className={`flex items-center gap-1.5 rounded-lg border border-border px-2 py-0.5 text-xs font-medium transition-colors ${
+        href ? '' : 'cursor-default'
+      } ${className}`}
     >
       {icon}
       {name}
