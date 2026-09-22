@@ -2,14 +2,15 @@
 
 import { ToggleButton, ToggleButtonGroup } from '@heroui/react';
 import { TechLabel } from 'plague-board-ui';
-import { useEffect, useRef, useState } from 'react';
+import { useEffect, useRef, useState, useSyncExternalStore } from 'react';
 
 import { isStoryHeight, storyHeightRequest } from '@/app/cornice/frameMessage';
 
+import { readFormat, subscribe, writeFormat, type FormatKey } from './catalogMemory';
 import { withInlineCode } from './withInlineCode';
 
 interface Format {
-  readonly key: 'phone' | 'tablet' | 'full';
+  readonly key: FormatKey;
   readonly label: string;
   /**
    * La larghezza della **finestra** della variante, cioè dell'iframe senza il bordo — quella che le
@@ -142,7 +143,9 @@ export function StoryFrames({
   variants: readonly { readonly name: string; readonly note?: string }[];
   frameHeight?: number;
 }) {
-  const [formatKey, setFormatKey] = useState<Format['key']>('phone');
+  // ⚠️ Il formato non è uno stato della pagina: resta scelto passando da una storia all'altra con
+  // «Prossima», che è il modo in cui si controlla il catalogo intero a 768. Vedi `catalogMemory.ts`.
+  const formatKey = useSyncExternalStore(subscribe, readFormat, (): FormatKey => 'phone');
   const format = FORMATS.find((candidate) => candidate.key === formatKey) ?? FORMATS[0];
 
   return (
@@ -156,7 +159,7 @@ export function StoryFrames({
           selectedKeys={[format.key]}
           onSelectionChange={(keys) => {
             const next = FORMATS.find((candidate) => keys.has(candidate.key));
-            if (next) setFormatKey(next.key);
+            if (next) writeFormat(next.key);
           }}
           aria-label="Formato"
         >

@@ -1,19 +1,21 @@
 import type { Metadata } from 'next';
-import Link from 'next/link';
-import { TechLabel, TechRule } from 'plague-board-ui';
 
-import { STORIES, STORY_NAMES } from '@/stories';
+import { STORIES } from '@/stories';
 
-import { withInlineCode } from './withInlineCode';
+import { STORY_GROUPS } from './catalog';
+import { StoryCards, type StoryCardGroup } from './StoryCards';
 
 export const metadata: Metadata = { title: 'Le storie — plague-board-ui' };
 
-const isIcon = (name: string) => name.endsWith('Icon') || name === 'IconBase';
-
-const GROUPS = [
-  { title: 'i componenti', names: STORY_NAMES.filter((name) => !isIcon(name)) },
-  { title: 'le icone', names: STORY_NAMES.filter(isIcon) },
-];
+// Solo testo verso le schede, che sono client: una storia porta componenti e funzioni.
+const GROUPS: readonly StoryCardGroup[] = STORY_GROUPS.map((group) => ({
+  title: group.title,
+  stories: group.names.map((name) => ({
+    name,
+    description: STORIES[name].description,
+    count: STORIES[name].variants.length,
+  })),
+}));
 
 export default function StoriesPage() {
   return (
@@ -32,31 +34,7 @@ export default function StoriesPage() {
         </p>
       </div>
 
-      {GROUPS.map((group) => (
-        <section key={group.title} className="flex flex-col gap-4">
-          <TechRule>{group.title}</TechRule>
-          <ul className="grid gap-3 sm:grid-cols-2">
-            {group.names.map((name) => {
-              const story = STORIES[name];
-              const count = story.variants.length;
-              return (
-                <li key={name}>
-                  <Link
-                    href={`/storie/${name}`}
-                    className="flex h-full flex-col gap-1 rounded-lg border border-border p-4 transition-colors hover:border-brand-ink focus-visible:focus-ring"
-                  >
-                    <span className="font-mono text-sm font-medium">{name}</span>
-                    <span className="text-xs text-muted">{withInlineCode(story.description)}</span>
-                    <TechLabel className="mt-auto pt-1 text-muted">
-                      {count} {count === 1 ? 'variante' : 'varianti'}
-                    </TechLabel>
-                  </Link>
-                </li>
-              );
-            })}
-          </ul>
-        </section>
-      ))}
+      <StoryCards groups={GROUPS} />
     </main>
   );
 }

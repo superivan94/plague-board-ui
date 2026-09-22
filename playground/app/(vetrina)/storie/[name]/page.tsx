@@ -5,7 +5,9 @@ import { notFound } from 'next/navigation';
 import { PLAYGROUND_PAGES } from '@/app/pages';
 import { STORIES, STORY_NAMES, isStoryName } from '@/stories';
 
+import { RememberStory } from '../RememberStory';
 import { StoryFrames } from '../StoryFrames';
+import { StoryPager } from '../StoryPager';
 import { withInlineCode } from '../withInlineCode';
 
 type Params = Promise<{ name: string }>;
@@ -33,10 +35,14 @@ export default async function StoryPage({ params }: { params: Params }) {
 
   return (
     <main className="flex flex-col gap-8 px-4 py-12 sm:px-8">
+      <RememberStory name={name} />
       <div className="flex max-w-3xl flex-col gap-2">
-        <Link href="/storie" className="w-fit text-sm text-muted hover:text-foreground focus-visible:focus-ring">
-          ← tutte le storie
-        </Link>
+        <div className="flex flex-wrap items-center justify-between gap-x-6 gap-y-1">
+          <Link href="/storie" className="w-fit text-sm text-muted hover:text-foreground focus-visible:focus-ring">
+            ← tutte le storie
+          </Link>
+          <StoryPager name={name} placement="top" />
+        </div>
         <h1 className="font-mono text-2xl font-semibold">{name}</h1>
         <p className="text-sm text-muted">{withInlineCode(story.description)}</p>
         {pages.length > 0 && (
@@ -62,6 +68,8 @@ export default async function StoryPage({ params }: { params: Params }) {
         variants={story.variants.map(({ name: variantName, note }) => ({ name: variantName, note }))}
         frameHeight={story.frameHeight}
       />
+
+      <StoryPager name={name} placement="bottom" />
     </main>
   );
 }
