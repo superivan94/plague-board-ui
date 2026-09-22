@@ -1343,7 +1343,8 @@ cornice si leggono dalla pagina del catalogo con `iframe.contentDocument` e
 | `/storie/PlagueBar`, formato 360: la finestra della cornice | 360 | **358** al primo giro — il bordo stava sull'involucro e se ne prendeva due. Spostata la misura sull'iframe: 360 |
 | Le cinque varianti a 360 | compatte, tranne `isCompactOnMobile={false}` | 37 · 37 · 37 · **53** · 29 px |
 | Le stesse a 768 | tre altezze | 49 · 37 · 65 · 65 · 41 px, con la finestra a 768×480 |
-| La grande in una cornice 768 alta 120 | — | **37**: per `pb-roomy` è un telefono coricato. È il motivo per cui a 768 e a pieno la cornice non scende sotto i 30rem |
+| La grande in una cornice 768 alta 120 | — | **37**: per `pb-roomy` è un telefono coricato. È il motivo per cui a 768 e a pieno la finestra della cornice non scende sotto i 30rem |
+| `/storie/CreditLine` a 768, a colpo d'occhio | le cinque varianti | al primo giro **una sola**: ogni cornice era alta 480 anche da vuota, e l'utente vedeva «soltanto la versione estesa». Ora l'iframe resta 768×480 e l'involucro è alto quanto la variante: cinque in uno schermo, e le barre a 768 misurano ancora 37 · 49 · 65 |
 | Tutte le cornici delle 53 storie, in sviluppo | 200 senza errore | sì. `next build`: **312** cornici e 53 pagine, tutte statiche; `/` resta statica |
 | `ParticleBurst`, «Sprigiona» | la fontana | 17 nodi `position: fixed` nel portale della cornice: il riferimento clonato da `WithHandle` arriva |
 | `LoginScreen` in chiaro: le voci del selettore d'angolo | ≥ 4,5 | **1,19** — curato in `PlagueBackground` con `text-foreground`: 14,52, come in scuro |

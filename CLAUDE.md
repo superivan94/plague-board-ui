@@ -1189,9 +1189,14 @@ exist in target module» che **non sono veri**. Si guarda la pagina, o si crede 
 - ⚠️ **Una cornice larga 768 ma bassa è un telefono coricato.** `pb-roomy` guarda anche l'altezza,
   quindi un iframe alto quanto il suo contenuto compatterebbe la barra proprio nel formato che la
   deve mostrare piena: la stessa barra grande misura **37** px in una cornice 768×120 e **65** in
-  una 768×480. Per questo a 768 e a pieno le cornici non scendono sotto i 30rem, mentre a 360 la
-  larghezza basta già a dire «telefono». ⚠️ E il bordo sta sull'involucro, non sull'iframe: con
-  `border-box` si prendeva due pixel, e la finestra della variante era **358** invece di 360.
+  una 768×480. Per questo a 768 e a pieno la **finestra** della cornice non scende sotto i 30rem,
+  mentre a 360 la larghezza basta già a dire «telefono». ⚠️ **Ma quello che se ne vede segue il
+  contenuto**: l'iframe è alto 480 e l'involucro che lo taglia è alto quanto la variante. Con
+  un'altezza sola ogni variante a 768 si prendeva uno schermo intero di vuoto, la seconda finiva
+  sotto il bordo, e sulla firma l'utente vedeva soltanto la forma lunga. ⚠️ E il bordo sta
+  sull'involucro, `box-content`, non sull'iframe: con `border-box` si prendeva due pixel, prima
+  dalla finestra della variante — **358** invece di 360 — e poi dall'area visibile, che mozzava la
+  barra.
   L'altezza la manda la cornice con un `postMessage` misurando il contenitore della variante, non
   il documento, che non è mai più basso della finestra e farebbe solo crescere l'iframe.
 

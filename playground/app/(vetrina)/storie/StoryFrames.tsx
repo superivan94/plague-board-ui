@@ -15,7 +15,8 @@ interface Format {
    */
   readonly width: number | null;
   /**
-   * L'altezza sotto la quale la cornice non scende.
+   * L'altezza sotto la quale la **finestra** della variante non scende — l'iframe, non quello che
+   * se ne vede.
    *
    * ⚠️ **A 768 e a pieno è 30rem, e non per estetica.** La variante `pb-roomy` di `theme.css`
    * guarda larghezza **e** altezza — un telefono coricato è largo 844 px e alto 390 — quindi una
@@ -23,13 +24,13 @@ interface Format {
    * barra si compatterebbe proprio nella cornice che dovrebbe mostrarla piena. A 360 la larghezza
    * basta già a dire «telefono», e l'altezza può seguire il contenuto.
    */
-  readonly minHeight: number;
+  readonly windowHeight: number;
 }
 
 const FORMATS: readonly Format[] = [
-  { key: 'phone', label: '360', width: 360, minHeight: 0 },
-  { key: 'tablet', label: '768', width: 768, minHeight: 480 },
-  { key: 'full', label: 'pieno', width: null, minHeight: 480 },
+  { key: 'phone', label: '360', width: 360, windowHeight: 0 },
+  { key: 'tablet', label: '768', width: 768, windowHeight: 480 },
+  { key: 'full', label: 'pieno', width: null, windowHeight: 480 },
 ];
 
 const THEMES = [
@@ -46,18 +47,27 @@ const FIRST_HEIGHT = 120;
  * ⚠️ L'altezza la **manda la cornice**, con un messaggio, invece di leggerla da qui: un
  * `ResizeObserver` di questa finestra puntato dentro un altro documento è una di quelle cose che
  * funzionano finché non smettono, mentre dentro la cornice osserva il suo e basta.
+ *
+ * ⚠️ **Le altezze sono due, e non per pignoleria.** L'iframe è alto almeno `windowHeight`, perché è
+ * la finestra che le media query leggono; l'involucro invece è alto quanto il contenuto e taglia il
+ * resto, che è vuoto. Con una sola altezza, a 768 ogni variante si prendeva uno schermo intero di
+ * niente e la seconda finiva sotto il bordo: sulla firma si vedeva soltanto la forma lunga.
  */
 function Frame({
   src,
   title,
   caption,
   width,
+  windowHeight,
   minHeight,
 }: {
   src: string;
   title: string;
   caption: string;
   width: number | null;
+  /** Il minimo della finestra della variante: vedi {@link Format.windowHeight}. */
+  windowHeight: number;
+  /** Il minimo di quello che si vede: la `frameHeight` della storia, per chi occupa la finestra. */
   minHeight: number;
 }) {
   const frame = useRef<HTMLIFrameElement>(null);
@@ -90,14 +100,19 @@ function Frame({
       {/* ⚠️ Il bordo sta sull'involucro e la misura sull'iframe: con `border-box` i due pixel del
           bordo si mangerebbero la finestra della variante — 358 invece di 360, misurato — e
           l'altezza, con una barra di scorrimento in ogni cornice. */}
-      <div className="overflow-hidden rounded-lg border border-border">
+      {/* `box-content`: l'altezza scritta è quella del contenuto, e il bordo si aggiunge fuori. Con
+          `border-box` i due pixel si toglievano all'area visibile e la barra usciva mozzata. */}
+      <div
+        className="box-content overflow-hidden rounded-lg border border-border"
+        style={{ height: Math.max(minHeight, contentHeight) }}
+      >
         <iframe
           ref={frame}
           src={src}
           title={title}
           loading="lazy"
           className="block max-w-none"
-          style={{ width: width ?? '100%', height: Math.max(minHeight, contentHeight) }}
+          style={{ width: width ?? '100%', height: Math.max(windowHeight, minHeight, contentHeight) }}
         />
       </div>
     </figure>
@@ -159,7 +174,8 @@ export function StoryFrames({
                 title={`${name} · ${variant} · ${theme.label}`}
                 caption={theme.label}
                 width={format.width}
-                minHeight={Math.max(format.minHeight, frameHeight)}
+                windowHeight={format.windowHeight}
+                minHeight={frameHeight}
               />
             ))}
           </div>
