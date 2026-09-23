@@ -75,6 +75,13 @@ export {
   type PlagueAvatarSize,
 } from './brand/PlagueAvatar.js';
 export { PlaguePanel, type PlaguePanelProps } from './brand/PlaguePanel.js';
+// Il comando del profilo nell'intestazione, fatto coi due pezzi qui sopra e il `Dropdown` di HeroUI.
+export {
+  ProfileMenu,
+  type ProfileMenuItem,
+  type ProfileMenuProps,
+  type ProfileMenuRank,
+} from './brand/ProfileMenu.js';
 export { ThematicBadge, type ThematicBadgeColor, type ThematicBadgeProps } from './brand/ThematicBadge.js';
 // Il pulsare che mette l'occhio su un comando. ⚠️ Niente a che vedere con `PulseDot`, che è un
 // pallino di stato: questo avvolge, quello marca.

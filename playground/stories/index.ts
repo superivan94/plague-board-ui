@@ -45,7 +45,13 @@ import {
   sparklesIconStory,
   virusIconStory,
 } from './icons';
-import { countedChipsStory, plagueAvatarStory, plaguePanelStory, thematicBadgeStory } from './profile';
+import {
+  countedChipsStory,
+  plagueAvatarStory,
+  plaguePanelStory,
+  profileMenuStory,
+  thematicBadgeStory,
+} from './profile';
 import { ratMascotStory, ratRunStory, ratStory, ratSwarmStory } from './rat';
 import {
   plagueAlertStory,
@@ -103,6 +109,7 @@ export const STORIES = {
   PlagueToastRegion: plagueToastRegionStory,
   PoisonIcon: poisonIconStory,
   PotionMugIcon: potionMugIconStory,
+  ProfileMenu: profileMenuStory,
   PulseDot: pulseDotStory,
   Rat: ratStory,
   RatIcon: ratIconStory,

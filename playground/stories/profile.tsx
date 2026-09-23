@@ -5,6 +5,7 @@ import {
   PlagueAvatar,
   PlaguePanel,
   PoisonIcon,
+  ProfileMenu,
   RAT_MASCOT_SRC,
   SparklesIcon,
   ThematicBadge,
@@ -86,4 +87,36 @@ export const countedChipsStory = defineStory(CountedChips, {
       args: { children: TAGS.slice(0, 2).map((tag) => <ThematicBadge key={tag}>{tag}</ThematicBadge>) },
     },
   ],
+});
+
+/** Nella storia il menù non porta da nessuna parte: le voci si scelgono e basta. */
+const nowhere = () => {};
+
+export const profileMenuStory = defineStory(ProfileMenu, {
+  description:
+    'Il comando del profilo nell’intestazione: il ritratto col nome e il grado, e un menù con chi è entrato, le voci dell’applicazione e l’uscita.',
+  frameHeight: 320,
+  variants: [
+    {
+      name: 'col grado e le voci',
+      note: 'Sul telefono resta il ritratto: il nome si vede da `sm` in su.',
+      args: {
+        name: 'Superivan94',
+        email: 'superivan94@ludoratti.it',
+        avatarSrc: RAT_MASCOT_SRC,
+        rank: { label: 'Signore Dabbonico', color: 'warning' },
+        items: [
+          { key: 'profile', label: 'La tua cartella clinica' },
+          { key: 'settings', label: 'Parametri del Grande Piano' },
+        ],
+        onAction: nowhere,
+        onSignOut: nowhere,
+      },
+    },
+    {
+      name: 'senza ritratto né grado',
+      args: { name: 'Ratto Zero', onSignOut: nowhere, signOutLabel: 'Esci' },
+    },
+  ],
+  decorators: [(variant) => <div className="flex justify-end">{variant}</div>],
 });
