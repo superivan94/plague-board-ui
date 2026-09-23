@@ -1103,6 +1103,33 @@ finale sui colori.
 scelto; e i due blocchi del tema con gli stessi colori della scena, che è il modo in cui un pezzo
 sparisce in un tema solo senza che niente diventi rosso.
 
+### Il segno dentro i controlli di HeroUI misura quello che dice — 2026-09-23
+
+**Esegue:** agente
+**Ultima esecuzione:** agente, 2026-09-23
+
+**Preparazione:** `npm run build` e **riavvio** del dev server (classi nuove). Le cornici di
+`MusicToggle` e di `GoogleSignInButton` caricate in un iframe fuori schermo, misurando
+`getBoundingClientRect()` del primo `button` e del suo `svg`. Segnalato dall'utente: nella storia di
+`MusicToggle` «più grande» e «le parole dell'applicazione» erano uguali alla prima.
+
+| Azione | Atteso | Ottenuto |
+|---|---|---|
+| Prima: `MusicToggle size={32}` | un teschio da 32 | attributi `32`, **16×16** a schermo in un bottone da 32: `.toggle-button--sm svg { size-4 }` |
+| Prima: `GoogleSignInButton` | il marchio a 20, come il cerchio dell'attesa | attributo `20`, **16×16** a schermo |
+| La misura predefinita di `MusicToggle` | 22 | **22×22** in un bottone da **38** |
+| `size={32}` | 32 | **32×32** in un bottone da **48** |
+| Il marchio di Google | 20 | **20×20**; il cerchio dell'attesa 20, che ruotando misura fino a 25,6 di riquadro |
+| Il nome annunciato sotto ogni variante | quello dell'`aria-label` | «Metti la musica», «Metti la musica», «Accendi la radio» |
+| Denti: via la classe dal teschio, via `size-5` dal marchio | due rossi | confermato |
+
+⚠️ **Premere il comando nella cornice non si è provato**: farebbe partire la traccia vera nel
+browser di chi guarda. Che il nome cambi con lo stato lo dice il test di `MusicToggle` su
+`aria-label`, e l'osservatore della demo lo legge dal DOM.
+
+**Che cosa protegge:** una prop di misura che il componente accetta e HeroUI ignora — la forma
+peggiore di prop, perché a schermo non si vede niente e chi l'ha passata crede solo che non serva.
+
 ### La schermata di accesso, e l'attesa che sembrava un comando spento — 2026-09-20
 
 **Esegue:** agente

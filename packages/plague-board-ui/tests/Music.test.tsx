@@ -164,6 +164,30 @@ describe('MusicToggle', () => {
     });
   });
 
+  it('il segno misura quanto dice `size`, anche dentro il comando di HeroUI', () => {
+    spiaAudio('suona');
+    const { unmount } = render(
+      <MusicProvider src="/x.mp3">
+        <MusicToggle size={32} />
+      </MusicProvider>,
+    );
+
+    // ⚠️ L'attributo `width` non basta: `.toggle-button--sm svg` di HeroUI scrive `size-4` e lo
+    // sostituisce, e misurato il 2026-09-23 il teschio era **16×16** con `size={32}` — e anche a 22,
+    // la misura predefinita, che quindi non si era mai vista. La misura passa da una variabile sul
+    // comando a una utility sul segno, che sta in un layer più in alto di quello di HeroUI.
+    expect(comando().style.getPropertyValue('--pb-music-size')).toBe('32px');
+    expect(comando().querySelector('svg')?.getAttribute('class')).toContain('size-(--pb-music-size)');
+    unmount();
+
+    render(
+      <MusicProvider src="/x.mp3">
+        <MusicToggle />
+      </MusicProvider>,
+    );
+    expect(comando().style.getPropertyValue('--pb-music-size')).toBe('22px');
+  });
+
   it('accetta altri nomi, perché le parole non sono sue', () => {
     spiaAudio('suona');
     render(

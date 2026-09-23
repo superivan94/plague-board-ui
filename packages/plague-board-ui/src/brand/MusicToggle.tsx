@@ -1,6 +1,7 @@
 'use client';
 
 import { ToggleButton } from '@heroui/react';
+import type { CSSProperties } from 'react';
 
 import { SkullPhonesIcon } from '../icons/SkullPhonesIcon.js';
 import { SkullPhonesOffIcon } from '../icons/SkullPhonesOffIcon.js';
@@ -11,7 +12,7 @@ export interface MusicToggleProps {
   playLabel?: string;
   /** Il nome del comando mentre suona. */
   pauseLabel?: string;
-  /** Il lato del segno, in pixel. */
+  /** Il lato del segno, in pixel. Il comando è largo e alto il segno più un rem. */
   size?: number;
   /** Classi aggiuntive sul comando. */
   className?: string;
@@ -34,6 +35,14 @@ export interface MusicToggleProps {
  *
  * ⚠️ **È un `ToggleButton`, quindi porta `aria-pressed`**: la sbarra sul teschio dice «muto» a chi
  * guarda, e l'attributo lo dice a chi ascolta. Un comando che cambia solo icona è muto due volte.
+ *
+ * ⚠️ **E il suo `svg` HeroUI lo vuole a 16 px**, qualunque cosa dica l'attributo: `.toggle-button
+ * svg` scrive `size-4`, e anche la taglia `lg` lascia il segno a 16. Misurato il 2026-09-23 —
+ * `size={32}` dava un teschio di 16×16 in un bottone da 32, e la misura predefinita non si era mai
+ * vista. Per questo la misura non va sull'icona come numero ma come **variabile sul comando**, che
+ * una utility porta sul segno e sul bottone: le utility stanno in un layer più in alto dei
+ * componenti di HeroUI, e vincono senza `!important`. Se il Tailwind di chi installa non le genera,
+ * resta la misura di HeroUI — più piccola, mai rotta.
  */
 export function MusicToggle({
   playLabel = 'Metti la musica',
@@ -50,9 +59,15 @@ export function MusicToggle({
       isSelected={isPlaying}
       onChange={setPlaying}
       aria-label={isPlaying ? pauseLabel : playLabel}
-      className={className}
+      // Il bottone è il segno più un rem, che è la proporzione di HeroUI: 16 px di segno in 32.
+      className={`size-[calc(var(--pb-music-size)_+_1rem)] ${className}`}
+      style={{ '--pb-music-size': `${size}px` } as CSSProperties}
     >
-      {isPlaying ? <SkullPhonesIcon size={size} /> : <SkullPhonesOffIcon size={size} />}
+      {isPlaying ? (
+        <SkullPhonesIcon size={size} className="size-(--pb-music-size)" />
+      ) : (
+        <SkullPhonesOffIcon size={size} className="size-(--pb-music-size)" />
+      )}
     </ToggleButton>
   );
 }

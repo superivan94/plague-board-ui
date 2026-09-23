@@ -219,6 +219,14 @@ exist in target module» che **non sono veri**. Si guarda la pagina, o si crede 
   d'uscita: letto nel sorgente, clona il figlio e pretende che sia **già** focalizzabile e con un
   ruolo interattivo — non aggiunge né `role` né `tabIndex`. Il pezzo giusto è `usePress` su un
   `<button>` proprio.
+  ⚠️ **E l'icona dentro un `Button` o un `ToggleButton` non misura quello che dice il suo `size`.**
+  `.button svg` e `.toggle-button svg` scrivono `size-4` e sostituiscono l'attributo, a qualunque
+  taglia — anche la `lg` del `ToggleButton` lascia il segno a 16. Misurato il 2026-09-23: il teschio
+  di `MusicToggle` era **16×16** con `size={32}` (e la misura predefinita, 22, non si era mai vista),
+  il marchio di Google 16 con `size={20}` accanto a un cerchio d'attesa da 20. Non somiglia a un
+  difetto: somiglia a due varianti uguali. La misura si impone con una **utility sul segno**, che sta
+  in un layer più in alto dei componenti di HeroUI — `size-5` quando è fissa, una variabile sul
+  controllo (`--pb-music-size`) quando è una prop.
 - ⚠️ **`usePress` non fa scattare `onPress` al rilascio: aspetta il `click`** — e se entro 80ms non
   arriva, **lo sintetizza**, perché iOS e Android non lo emettono dopo una pressione lunga. È la
   ragione concreta per preferirlo a un `onClick`: tenere premuta una mascotte su un telefono, con
@@ -1265,7 +1273,11 @@ exist in target module» che **non sono veri**. Si guarda la pagina, o si crede 
   guarda cerca la differenza, non la trova, e crede che la prop non funzioni: è successo con lo
   sfasamento del salto di `HoverEmitter`, che su una scheda sola non si vede. Dove si può la
   variante **mostra** la differenza — due schede affiancate, una sfasata —; dove no, perché è un
-  nome che si annuncia o un tasto da premere, porta una `note` che dice che cosa guardare.
+  tasto da premere, porta una `note` che dice che cosa guardare. ⚠️ **E un nome che si annuncia si
+  può mostrare**: la nota sulle parole di `MusicToggle` non è bastata (utente, 2026-09-23), e
+  `stories/demos/WithAccessibleName` scrive sotto il comando l'`aria-label` letto dal DOM, che cambia
+  quando il comando cambia stato. Quando due varianti sembrano uguali, prima di scrivere la nota si
+  **misura**: sotto «più grande» c'era una prop che non faceva niente.
   ⚠️ **E una forma che dipende dal contenitore non si lascia decidere alla cornice.** La storia di
   `CreditLine` aveva sei varianti che differivano per il perché — un contenitore, una prop, una
   colonna stretta — e a 360 cinque dicevano «By:»: sembravano tutte la stessa. Ora la regola si

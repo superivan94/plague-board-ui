@@ -15,6 +15,7 @@ import {
 } from 'plague-board-ui';
 
 import { MusicFromOutside } from './demos/MusicFromOutside';
+import { WithAccessibleName } from './demos/WithAccessibleName';
 import { defineStory, type StoryDecorator } from './types';
 
 /**
@@ -204,17 +205,23 @@ export const musicProviderStory = defineStory(MusicProvider, {
 
 export const musicToggleStory = defineStory(MusicToggle, {
   description:
-    'Il teschio con le cuffie: mette e toglie la musica. Suona solo quando lo si preme, mai al primo gesto qualunque.',
+    'Il teschio con le cuffie: mette e toglie la musica. Suona solo quando lo si preme, mai al primo gesto qualunque. Sotto ogni variante c’è il nome con cui il comando si annuncia, che a schermo non si vede.',
   variants: [
-    { name: 'la misura predefinita', args: {} },
-    { name: 'più grande', args: { size: 32 } },
+    { name: 'la misura predefinita, 22 px', args: {} },
+    { name: 'più grande, 32 px', args: { size: 32 } },
     {
       name: 'le parole dell’applicazione',
-      note: 'A schermo è uguale alla prima: cambia il nome con cui il comando si annuncia, «Accendi la radio» e, mentre suona, «Spegni la radio». Il comando è solo un segno, e quelle parole sono il suo `aria-label`.',
+      note: 'Cambia solo il nome con cui il comando si annuncia: premilo e passa da «Accendi la radio» a «Spegni la radio». Il segno è lo stesso della prima.',
       args: { playLabel: 'Accendi la radio', pauseLabel: 'Spegni la radio' },
     },
   ],
-  decorators: [withMusic],
+  // Dal più esterno: la musica, poi il nome, che legge il comando dal DOM.
+  decorators: [
+    withMusic,
+    function withName(variant) {
+      return <WithAccessibleName>{variant}</WithAccessibleName>;
+    },
+  ],
 });
 
 export const musicVolumeStory = defineStory(MusicVolume, {

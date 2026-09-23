@@ -91,8 +91,15 @@ export function GoogleSignInButton({
       className={className}
     >
       {/* Venti e non ventiquattro: il marchio di Google riempie il suo riquadro più delle icone
-          di casa, e accanto a un testo alla stessa taglia sembrerebbe più grande. */}
-      {isPending ? <Spinner aria-hidden="true" className="size-5" /> : <GoogleIcon size={20} />}
+          di casa, e accanto a un testo alla stessa taglia sembrerebbe più grande. ⚠️ La classe
+          accanto al numero non è un doppione: `.button svg` di HeroUI scrive `size-4` e
+          sostituisce l'attributo, e senza il marchio usciva a 16 — più piccolo del cerchio
+          dell'attesa, che porta la stessa `size-5`, quindi il comando cambiava taglia. */}
+      {isPending ? (
+        <Spinner aria-hidden="true" className="size-5" />
+      ) : (
+        <GoogleIcon size={20} className="size-5" />
+      )}
       {label}
     </Button>
   );

@@ -78,6 +78,16 @@ describe('GoogleSignInButton', () => {
     expect(marchio).toHaveAttribute('aria-hidden', 'true');
   });
 
+  it('il marchio misura 20 anche dentro il `Button` di HeroUI, come il cerchio che lo sostituisce', () => {
+    const { container } = render(<GoogleSignInButton onPress={vi.fn()} />);
+
+    // ⚠️ `.button svg` di HeroUI scrive `size-4` e sostituisce l'attributo: misurato il 2026-09-23,
+    // `width="20"` e 16 px a schermo, mentre il cerchio dell'attesa — che porta `size-5` — ne misura
+    // 20. Il comando cambiava taglia passando da un'icona all'altra. La classe sul segno vince,
+    // perché sta in un layer più in alto di quello di HeroUI.
+    expect(container.querySelector('svg')?.getAttribute('class')).toContain('size-5');
+  });
+
   it('in attesa non parte niente, ma il comando resta raggiungibile dalla tastiera', () => {
     const accedi = vi.fn();
     render(<GoogleSignInButton onPress={accedi} isPending />);
