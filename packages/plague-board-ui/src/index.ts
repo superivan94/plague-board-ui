@@ -147,6 +147,18 @@ export {
   type ToxicLevelValue,
 } from './brand/ToxicLevelProvider.js';
 export { ToxicLevelSwitch, type ToxicLevelSwitchProps } from './brand/ToxicLevelSwitch.js';
+// Il tema: il commutatore è controllato, e lo script che lo applica prima del primo disegno sta
+// in un modulo senza `'use client'`, perché si chiama da una pagina server.
+export { ThemeSwitch, type ThemeSwitchProps } from './brand/ThemeSwitch.js';
+export {
+  HEROUI_THEME_STORAGE_KEY,
+  THEME_PREFERENCES,
+  THEME_PREFERENCE_LABELS,
+  isThemePreference,
+  themeBootScript,
+  type ThemeBootOptions,
+  type ThemePreference,
+} from './brand/themePreference.js';
 export { VersionTag, type VersionTagProps } from './brand/VersionTag.js';
 
 // Le icone. `IconProps` è pubblico perché è il contratto che deve rispettare chi sostituisce
@@ -170,6 +182,9 @@ export { DripIcon, type DripIconProps } from './icons/DripIcon.js';
 // qui apposta — è lui a fermare in compilazione chi prova a uniformarla alle altre.
 export { GoogleIcon, type GoogleIconProps } from './icons/GoogleIcon.js';
 export { MoleculeIcon } from './icons/MoleculeIcon.js';
+// I tre segni del commutatore del tema: il sole, la luna, lo schermo del sistema.
+export { MonitorIcon } from './icons/MonitorIcon.js';
+export { MoonIcon } from './icons/MoonIcon.js';
 export { PoisonIcon } from './icons/PoisonIcon.js';
 export { PotionMugIcon } from './icons/PotionMugIcon.js';
 // ⚠️ Il marchio, e l'unica icona con un **contratto suo** oltre a `IconProps`: ha due stati — il
@@ -190,6 +205,7 @@ export { SkullIcon } from './icons/SkullIcon.js';
 export { SkullPhonesIcon } from './icons/SkullPhonesIcon.js';
 export { SkullPhonesOffIcon } from './icons/SkullPhonesOffIcon.js';
 export { SparklesIcon } from './icons/SparklesIcon.js';
+export { SunIcon } from './icons/SunIcon.js';
 export { VirusIcon } from './icons/VirusIcon.js';
 export type { IconProps } from './icons/types.js';
 // ⚠️ L'involucro, e l'unico pezzo della libreria che serve a disegnare **fuori** di lei. Esce

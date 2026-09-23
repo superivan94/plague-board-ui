@@ -35,6 +35,8 @@ import {
   googleIconStory,
   iconBaseStory,
   moleculeIconStory,
+  monitorIconStory,
+  moonIconStory,
   poisonIconStory,
   potionMugIconStory,
   ratIconStory,
@@ -43,6 +45,7 @@ import {
   skullPhonesIconStory,
   skullPhonesOffIconStory,
   sparklesIconStory,
+  sunIconStory,
   virusIconStory,
 } from './icons';
 import {
@@ -61,6 +64,7 @@ import {
   plagueLoaderStory,
   plagueToastRegionStory,
 } from './states';
+import { themeSwitchStory } from './theme';
 import type { ComponentName, StoryIndex } from './types';
 import { hoverEmitterStory, particleBurstStory, speechBubbleStory, talkingMascotStory } from './voice';
 
@@ -90,6 +94,8 @@ export const STORIES = {
   IconBase: iconBaseStory,
   LoginScreen: loginScreenStory,
   MoleculeIcon: moleculeIconStory,
+  MonitorIcon: monitorIconStory,
+  MoonIcon: moonIconStory,
   MusicProvider: musicProviderStory,
   MusicToggle: musicToggleStory,
   MusicVolume: musicVolumeStory,
@@ -122,11 +128,13 @@ export const STORIES = {
   SkullPhonesOffIcon: skullPhonesOffIconStory,
   SparklesIcon: sparklesIconStory,
   SpeechBubble: speechBubbleStory,
+  SunIcon: sunIconStory,
   SupportButton: supportButtonStory,
   TalkingMascot: talkingMascotStory,
   TechLabel: techLabelStory,
   TechRule: techRuleStory,
   ThematicBadge: thematicBadgeStory,
+  ThemeSwitch: themeSwitchStory,
   ToxicBubbles: toxicBubblesStory,
   ToxicLevelProvider: toxicLevelProviderStory,
   ToxicLevelSwitch: toxicLevelSwitchStory,

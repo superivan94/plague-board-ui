@@ -9,6 +9,8 @@ import {
   GoogleIcon,
   IconBase,
   MoleculeIcon,
+  MonitorIcon,
+  MoonIcon,
   PoisonIcon,
   PotionMugIcon,
   RatIcon,
@@ -17,6 +19,7 @@ import {
   SkullPhonesIcon,
   SkullPhonesOffIcon,
   SparklesIcon,
+  SunIcon,
   VirusIcon,
   type IconProps,
 } from 'plague-board-ui';
@@ -168,4 +171,13 @@ export const sparklesIconStory = iconStory(SparklesIcon, 'Le scintille: l’acce
 export const virusIconStory = iconStory(
   VirusIcon,
   'Il virione: l’unico contagio a campitura piena, che resta riconoscibile anche quando il dettaglio è sparito.',
+);
+
+export const sunIconStory = iconStory(SunIcon, 'Il sole: il tema chiaro, nel commutatore del tema.');
+
+export const moonIconStory = iconStory(MoonIcon, 'La luna: il tema scuro, nel commutatore del tema.');
+
+export const monitorIconStory = iconStory(
+  MonitorIcon,
+  'Lo schermo: il tema del sistema, cioè quello che la persona ha già scelto nel suo dispositivo.',
 );

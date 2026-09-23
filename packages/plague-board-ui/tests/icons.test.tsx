@@ -12,6 +12,8 @@ import {
   DripIcon,
   IconBase,
   MoleculeIcon,
+  MonitorIcon,
+  MoonIcon,
   type IconProps,
   PoisonIcon,
   PotionMugIcon,
@@ -21,6 +23,7 @@ import {
   SkullPhonesIcon,
   SkullPhonesOffIcon,
   SparklesIcon,
+  SunIcon,
   VirusIcon,
 } from '../src';
 
@@ -72,6 +75,9 @@ const icons: readonly IconEntry[] = [
   { name: 'CoccusIcon', Icon: CoccusIcon, paint: 'stroke' },
   { name: 'CloudIcon', Icon: CloudIcon, paint: 'fill' },
   { name: 'DiceIcon', Icon: DiceIcon, paint: 'fill' },
+  { name: 'SunIcon', Icon: SunIcon, paint: 'fill' },
+  { name: 'MoonIcon', Icon: MoonIcon, paint: 'fill' },
+  { name: 'MonitorIcon', Icon: MonitorIcon, paint: 'fill' },
   // ⚠️ Le ultime due non sono nostre: sono icone disegnate **fuori** con `IconBase`, come farebbe
   // un'applicazione, e stanno qui perché quel contratto è pubblico. Chi disegna i segni del suo
   // dominio deve ottenere le stesse sette cose delle icone di casa senza saperlo.
