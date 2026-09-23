@@ -47,7 +47,14 @@ import {
 } from './icons';
 import { countedChipsStory, plagueAvatarStory, plaguePanelStory, thematicBadgeStory } from './profile';
 import { ratMascotStory, ratRunStory, ratStory, ratSwarmStory } from './rat';
-import { plagueEmptyStateStory, plagueLoaderStory } from './states';
+import {
+  plagueAlertStory,
+  plagueConfirmDialogStory,
+  plagueDialogStory,
+  plagueEmptyStateStory,
+  plagueLoaderStory,
+  plagueToastRegionStory,
+} from './states';
 import type { ComponentName, StoryIndex } from './types';
 import { hoverEmitterStory, particleBurstStory, speechBubbleStory, talkingMascotStory } from './voice';
 
@@ -81,15 +88,19 @@ export const STORIES = {
   MusicToggle: musicToggleStory,
   MusicVolume: musicVolumeStory,
   ParticleBurst: particleBurstStory,
+  PlagueAlert: plagueAlertStory,
   PlagueAvatar: plagueAvatarStory,
   PlagueBackground: plagueBackgroundStory,
   PlagueBar: plagueBarStory,
+  PlagueConfirmDialog: plagueConfirmDialogStory,
+  PlagueDialog: plagueDialogStory,
   PlagueDivider: plagueDividerStory,
   PlagueEmptyState: plagueEmptyStateStory,
   PlagueFootBar: plagueFootBarStory,
   PlagueLoader: plagueLoaderStory,
   PlaguePanel: plaguePanelStory,
   PlaguePulse: plaguePulseStory,
+  PlagueToastRegion: plagueToastRegionStory,
   PoisonIcon: poisonIconStory,
   PotionMugIcon: potionMugIconStory,
   PulseDot: pulseDotStory,

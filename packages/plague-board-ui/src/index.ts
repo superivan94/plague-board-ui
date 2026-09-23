@@ -89,6 +89,20 @@ export {
   type PlagueEmptyStateHeadingLevel,
   type PlagueEmptyStateProps,
 } from './brand/PlagueEmptyState.js';
+export { PlagueDialog, type PlagueDialogProps, type PlagueDialogSize } from './brand/PlagueDialog.js';
+export {
+  PlagueConfirmDialog,
+  type PlagueConfirmDialogProps,
+  type PlagueConfirmTone,
+} from './brand/PlagueConfirmDialog.js';
+export { PlagueAlert, type PlagueAlertProps } from './brand/PlagueAlert.js';
+// ⚠️ Le notifiche si mandano con `toast()` di HeroUI, che qui non si riesporta: vedi la regione.
+export {
+  PlagueToastRegion,
+  type PlagueToastPlacement,
+  type PlagueToastRegionProps,
+} from './brand/PlagueToastRegion.js';
+export { type PlagueStatus } from './brand/statusIcons.js';
 // Il personaggio, non il marchio: `RatIcon` è l'emblema, questo è il ratto che cammina.
 export { RAT_LIVERIES, Rat, type RatLivery, type RatProps } from './brand/Rat.js';
 export { RatRun, type RatRunProps } from './brand/RatRun.js';

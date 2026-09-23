@@ -1,6 +1,8 @@
 import { Card } from '@heroui/react';
 import type { ReactNode } from 'react';
 
+import { PLAGUE_SURFACE_CLASS } from './plagueSurface.js';
+
 export interface PlaguePanelProps {
   /** Che cosa poggia sul pannello. Si compone coi pezzi di `Card` di HeroUI. */
   children: ReactNode;
@@ -44,9 +46,7 @@ export interface PlaguePanelProps {
  */
 export function PlaguePanel({ children, className = '' }: PlaguePanelProps) {
   return (
-    <Card
-      className={`border border-brand-ink/50 bg-surface bg-linear-to-br from-brand-ink/10 to-transparent ${className}`}
-    >
+    <Card className={`${PLAGUE_SURFACE_CLASS} ${className}`}>
       {children}
     </Card>
   );
