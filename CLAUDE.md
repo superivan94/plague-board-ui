@@ -1273,7 +1273,13 @@ exist in target module» che **non sono veri**. Si guarda la pagina, o si crede 
   mentre a 360 la larghezza basta già a dire «telefono». ⚠️ **Ma quello che se ne vede segue il
   contenuto**: l'iframe è alto 480 e l'involucro che lo taglia è alto quanto la variante. Con
   un'altezza sola ogni variante a 768 si prendeva uno schermo intero di vuoto, la seconda finiva
-  sotto il bordo, e sulla firma l'utente vedeva soltanto la forma lunga. ⚠️ E il bordo sta
+  sotto il bordo, e sulla firma l'utente vedeva soltanto la forma lunga. ⚠️ **Tranne per chi vive
+  nella finestra**: una storia con `frameHeight` sta in `position: fixed`, attaccata alla finestra e
+  non al contenuto, e l'involucro alto `frameHeight` tagliava il fondo di una finestra da 480 — la
+  navigazione fissa e le notifiche in basso erano riquadri vuoti a 768 e a pieno, trovato
+  dall'utente il 2026-09-23. Lì l'involucro mostra la finestra intera. ⚠️ E un pezzo in `fixed` si
+  collauda **dentro il catalogo**, non aprendo la sua cornice da sola: lì la finestra è quella del
+  browser, e il taglio non c'è. ⚠️ E il bordo sta
   sull'involucro, `box-content`, non sull'iframe: con `border-box` si prendeva due pixel, prima
   dalla finestra della variante — **358** invece di 360 — e poi dall'area visibile, che mozzava la
   barra.

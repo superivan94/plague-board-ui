@@ -29,7 +29,11 @@ export const plagueDockStory = defineStory(PlagueDock, {
     { name: 'in alto', args: { placement: 'top', children: sections } },
     { name: 'a sinistra, in verticale', args: { placement: 'left', children: sections } },
     { name: 'a destra, in verticale', args: { placement: 'right', children: sections } },
-    { name: 'si ritira dopo 3 secondi', args: { autoHideMs: 3000, children: sections } },
+    {
+      name: 'si ritira dopo 3 secondi',
+      note: 'Il conto parte quando la cornice si carica: se ci arrivi scorrendo è già ritirata. «Ricomincia» per vederla raccogliersi.',
+      args: { autoHideMs: 3000, children: sections },
+    },
     { name: 'senza ritiro', args: { autoHideMs: 0, children: sections } },
   ],
 });

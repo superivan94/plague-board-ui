@@ -75,6 +75,13 @@ function Frame({
 }) {
   const frame = useRef<HTMLIFrameElement>(null);
   const [contentHeight, setContentHeight] = useState(FIRST_HEIGHT);
+  const windowFloor = Math.max(windowHeight, minHeight, contentHeight);
+  // ⚠️ **Chi vive nella finestra la mostra tutta.** Una storia dichiara `frameHeight` proprio perché
+  // quello che mostra sta in `position: fixed`, cioè attaccato alla **finestra** e non al contenuto:
+  // con l'involucro alto `frameHeight` e la finestra alta 480, tutto quello che si attacca al fondo
+  // finiva sotto il taglio. Misurato il 2026-09-23 sulla navigazione fissa: finestra 480, involucro
+  // 361, pannello a 406–468 — le tre varianti in basso erano riquadri vuoti, e le notifiche pure.
+  const visibleHeight = minHeight > 0 ? windowFloor : Math.max(minHeight, contentHeight);
 
   useEffect(() => {
     const onMessage = (event: MessageEvent<unknown>) => {
@@ -111,7 +118,7 @@ function Frame({
           `border-box` i due pixel si toglievano all'area visibile e la barra usciva mozzata. */}
       <div
         className="box-content overflow-hidden rounded-lg border border-border"
-        style={{ height: Math.max(minHeight, contentHeight) }}
+        style={{ height: visibleHeight }}
       >
         <iframe
           ref={frame}
@@ -119,7 +126,7 @@ function Frame({
           title={title}
           loading="lazy"
           className="block max-w-none"
-          style={{ width: width ?? '100%', height: Math.max(windowHeight, minHeight, contentHeight) }}
+          style={{ width: width ?? '100%', height: windowFloor }}
         />
       </div>
     </figure>

@@ -59,6 +59,9 @@ export interface StorySpec<P> {
    * L'altezza della cornice in pixel, per chi **non ne ha una sua**. ⚠️ Serve a quello che vive in
    * `position: fixed` — un ratto che attraversa, uno sciame —, che non occupa spazio nella pagina:
    * senza, la cornice si stringerebbe a zero e il ratto correrebbe dentro una riga invisibile.
+   * ⚠️ **Dichiararla vuol dire «vivo nella finestra»**, e allora della finestra si vede tutto: a 768
+   * e a pieno la finestra non scende sotto i 480, e quello che sta attaccato al fondo — una
+   * navigazione, una notifica — se ne tagliasse una parte non si vedrebbe.
    */
   readonly frameHeight?: number;
 }
