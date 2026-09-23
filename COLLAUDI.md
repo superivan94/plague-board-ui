@@ -1507,3 +1507,36 @@ di `CreditLine` tiene apposta la variante senza contenitore.
 
 **Che cosa protegge:** che un componente guardato a 360 sia guardato davvero a 360 — media query di
 finestra comprese — e che ogni storia mostri il componente che nomina.
+
+### I pezzi comuni: attesa, vuoto, dialoghi, avvisi, profilo, tema, navigazione — 2026-09-23
+
+**Esegue:** agente — i test tengono i contratti (ruoli, nomi, chi chiama chi, il conto del ritiro);
+quello che solo un browser dice è che cosa si vede e con che contrasto, nei due temi.
+**Ultima esecuzione:** agente, 2026-09-23.
+
+**Preparazione:** `npm run build`, **riavviare** il dev server (le classi sono nuove), poi le storie
+di ogni pezzo in `/storie`. Contrasti col metodo della tela 1×1 e degli strati composti.
+
+| Azione | Atteso | Ottenuto |
+|---|---|---|
+| `PlagueLoader` piccolo dentro il bottone di Google in attesa | il marchio a 20 px, muto | **20×20**, `pb-heartbeat 1.2s`, dentro un `aria-hidden` |
+| Lo stesso dentro un `Button` qualunque | alto quanto il testo | **14×14**, cioè `1em` del bottone |
+| `PlagueEmptyState` nei due temi | la mascotte, il titolo di casa, leggibili | la mascotte a 96, «Nessuna traccia nelle fogne» in `foreground` |
+| `PlagueConfirmDialog` aperto dal suo comando | `alertdialog` col nome del titolo, bordo verde, teschio | `role="alertdialog"`, nome «Estingui il ceppo», bordo `brand-ink/50`, sfumatura, «Annulla» ed «Elimina» |
+| `PlagueAlert`, i cinque toni | titolo e segno sopra 4,5 nei due temi | minimo **5,72** (avviso in chiaro), massimo 17,72 |
+| `PlagueToastRegion`, quattro notifiche | idem, e la croce in italiano | minimo **5,72**, «Chiudi» su tutte, il marchio che batte nell'attesa |
+| `ProfileMenu` aperto | nome, email, grado, le voci, l'uscita in rosso | tutto; l'uscita rossa solo dopo averla messa in `[data-slot="label"]` |
+| Il rosso dell'uscita | ≥ 4,5 | **3,57** in chiaro e **3,97** in scuro ❌ — è `--danger` di HeroUI: va alla passata sui colori |
+| `ThemeSwitch`, si sceglie «scuro» | la scelta passa, il riquadro di prova diventa scuro | `aria-checked` sul terzo, riquadro con `dark` |
+| I tre segni a 168 px | un sole, una luna, uno schermo | i raggi staccati, la falce aperta in alto a destra, la cornice col piede |
+| `PlagueDock` in basso | centrata sul bordo, voce corrente in lime | 325×63 a metà finestra, «Catalogo» `aria-current="page"` |
+| Dopo 8 s senza toccarla | si raccoglie al centro, resta il marchio | `scale(0.15)`, `visibility: hidden`, `inert`; comando 44 px «Mostra la navigazione», `aria-expanded="false"` |
+| A sinistra | in verticale | 95×222 attaccata al bordo |
+| Le voci nell'isola scura | ≥ 4,5 | **6,47** le altre, **7,76** la corrente |
+
+⚠️ **Due misure che i test non danno.** Il rosso di `danger` sotto soglia è un token di HeroUI, e
+lo si vede solo misurando. E la navigazione in `prefers-reduced-motion` il riquadro del browser
+non la emula: lì vale il test che rilegge la riga `transition: none` nel foglio.
+
+**Che cosa protegge:** che i pezzi nati dal giro delle due app sembrino **nostri** in tutti e due i
+temi — il punto d'arrivo era «c'è, e sembra dei Ludoratti», non «c'è».

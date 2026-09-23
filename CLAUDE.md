@@ -1299,6 +1299,32 @@ exist in target module» che **non sono veri**. Si guarda la pagina, o si crede 
   colonna stretta — e a 360 cinque dicevano «By:»: sembravano tutte la stessa. Ora la regola si
   mostra con la stessa variante in **due contenitori di misura nota**, uno sopra la soglia e uno
   sotto, e ogni variante si distingue dalle altre a qualunque formato.
+- ⚠️ **HeroUI 3 ha i mattoni degli stati, e parla inglese dove nessuno guarda.** Il giro delle due
+  app del 2026-09-23 ha portato nove pezzi — attesa, vuoto, dialogo, conferma, avviso, notifiche,
+  profilo, tema, navigazione fissa — e tutti stanno sopra un suo componente. Quello che ogni volta
+  va ridetto: lo `Spinner` nasce `role="status"` col nome «Loading», il `CloseButton` di `Modal` e
+  `Toast` nasce «Close», e l'`Alert` **un ruolo non ce l'ha** — è un `<div>`, e un avviso che non si
+  annuncia non avvisa nessuno. ⚠️ E `role="status"` il nome **non lo prende dal contenuto**, come
+  fa un bottone: un `sr-only` dentro lo lascia senza nome, e la frase va in `aria-label`.
+- ⚠️ **Tre cose di HeroUI che si scoprono solo guardando.** La voce `danger` di un `Dropdown` è
+  rossa **solo** dentro `[data-slot="label"]`: col testo nudo nella voce restava bianca come le
+  altre, con `menu-item--danger` presente. Gli angoli di `Toast.Provider` si scrivono **con lo
+  spazio** — `"bottom end"` — e il trattino lo rifiuta `tsc`. E dentro un `Dialog` di react-aria il
+  titolo è già un `h2`: il `level={2}` che avevo scritto non cambiava niente, e l'ha detto una
+  mutazione rimasta verde.
+- ⚠️ **La regola di «meno movimento» ferma le animazioni, non le transizioni.** In fondo ad
+  `animations.css` c'è `animation: none`: la navigazione che si ritira, fatta di `transition`, con
+  la preferenza accesa si raccoglieva lo stesso. Ogni pezzo fatto di transizioni vuole la sua riga
+  `transition: none` nello stesso blocco — come `.pb-dock-panel`.
+- ⚠️ **Lo script del tema scrive quello che scrive `useTheme` di HeroUI, e niente di più.** La prima
+  versione di `themeBootScript` metteva anche `style.colorScheme`: il gancio non lo aggiorna, quindi
+  dopo il passaggio al chiaro sarebbe rimasto scuro — barre di scorrimento e campi del browser
+  compresi. Il `color-scheme` lo dà già il CSS di HeroUI sulla classe.
+- ⚠️ **Un controllo che conta solo in combinazione non lo prova un test che guarda un gesto per
+  volta.** Nella navigazione fissa, «col puntatore sopra non si ritira» restava verde anche
+  togliendo il controllo, perché entrare col puntatore **ferma** il conto e basta. Il controllo
+  conta quando si **preme** col puntatore sopra — il clic fa ripartire il conto — e il test ora
+  preme. Stessa cosa per il fuoco e un tasto.
 
 ## Memoria di sessione
 
