@@ -5,27 +5,34 @@ import { GlitchText, TechLabel, TechRule } from 'plague-board-ui';
  *
  * ⚠️ Sta in un file suo perché la pagina aveva passato le trecento righe, non perché serva
  * altrove: è la stessa ragione per cui `/corsa` ha `SwarmDemo` e `/voce` ha `PhraseBrowser`.
- * Resta un componente **server** — il disturbo è tutto in CSS e non gli serve nessuno stato.
+ * Resta un componente **server** — l'effetto è tutto in CSS e non gli serve nessuno stato.
  */
 export function GlitchSection() {
   return (
     <>
-      <TechRule>il nome che si disturba</TechRule>
+      <TechRule>l’effetto glitch</TechRule>
 
       <div className="flex flex-col gap-3">
         <p className="text-sm text-muted">
-          <code>GlitchText</code> sdoppia una parola in due copie sfalsate di due pixel, una ciano e
-          una rosa, e ne mostra una fetta orizzontale alla volta. Con <code>reveal</code>, ogni tre
-          secondi la parola che il nome sta nascondendo prova a uscire: due sbirciate rotte da sei
-          centesimi, due colpi interi da quarantacinque millesimi e poi la tenuta, 165 ms —{' '}
+          <code>GlitchText</code> è l’<strong>effetto glitch</strong> sul nome: sdoppia una parola
+          in due copie sfalsate di due pixel, una ciano e una rosa, e ne mostra una fetta
+          orizzontale alla volta. Con <code>reveal</code>, ogni tre secondi la parola che il nome
+          sta nascondendo prova a uscire: due sbirciate rotte da sei centesimi, due colpi interi da
+          quarantacinque millesimi e poi la tenuta, 165 ms —{' '}
           <strong>un tubo al neon che prende la corrente</strong>. È il terzo pezzo del registro{' '}
           <strong>futuro distopico</strong> dell’aggregatore, dopo la città e le gocce che stanno
           già qui sopra dentro <code>PlagueBackground</code>.
         </p>
 
         <p className="text-sm text-muted">
-          <strong>Il lampo si spegne con <code>isRevealEnabled={'{false}'}</code></strong> e resta
-          il solo nome che si disturba — la striscia di mezzo qui sotto ha le stesse prop della
+          ⚠️ <strong>Mentre la parola nascosta è accesa, il nome si spegne</strong>, con le sue
+          copie: sotto di lei non resta niente da coprire, quindi non le serve nessun fondo. Vale
+          sul chiaro come sullo scuro, e sul fondale della peste, che non è un colore solo.
+        </p>
+
+        <p className="text-sm text-muted">
+          <strong>La parola nascosta si spegne con <code>isRevealEnabled={'{false}'}</code></strong>{' '}
+          e resta il solo effetto glitch — la striscia di mezzo qui sotto ha le stesse prop della
           prima, meno l’interruttore. È un secondo modo di dire una cosa che <code>reveal</code>{' '}
           dice già, e sono due domande diverse: <code>reveal</code> dice <strong>quale</strong>{' '}
           parola, l’interruttore dice <strong>se</strong> farla succedere. Chi ha la parola in una
@@ -36,10 +43,10 @@ export function GlitchSection() {
         </p>
 
         <p className="text-sm text-muted">
-          ⚠️ <strong>La parola nascosta porta lo stesso disturbo del nome</strong>, e le sue due
-          lamelle stanno <strong>dentro</strong> di lei: ritaglio e opacità del lampo valgono per
-          tutto quello che contiene, quindi compaiono e spariscono con lei. Messe accanto,
-          girerebbero sopra il nome anche nei tre secondi in cui il lampo non c’è.
+          ⚠️ <strong>La parola nascosta porta lo stesso effetto glitch del nome</strong>, e le sue
+          due copie stanno <strong>dentro</strong> di lei: ritaglio e opacità della parola valgono
+          per tutto quello che contiene, quindi compaiono e spariscono con lei. Messe accanto,
+          girerebbero sopra il nome anche nei tre secondi in cui la parola non c’è.
         </p>
 
         {/* La striscia resta scura nei due temi, e porta `dark` addosso: è la stessa regola delle
@@ -55,7 +62,7 @@ export function GlitchSection() {
           <TechLabel className="text-brand-ink">con il fondo dichiarato · #030712</TechLabel>
         </div>
 
-        {/* Stessa striscia, stesse prop, meno l'interruttore: quello che cambia è solo il lampo. */}
+        {/* Stessa striscia, stesse prop, meno l'interruttore: quello che cambia è solo la parola. */}
         <div className="dark flex flex-col items-center gap-2 rounded-xl bg-gray-950 p-8">
           <h2 className="font-mono text-3xl font-bold tracking-wider text-gray-100">
             LUDORATTI{' '}
@@ -65,26 +72,33 @@ export function GlitchSection() {
             CORP
           </h2>
           <TechLabel className="text-brand-ink">
-            lampo spento · isRevealEnabled={'{false}'}
+            parola spenta · isRevealEnabled={'{false}'}
           </TechLabel>
         </div>
 
+        {/* Sul fondo della pagina, che cambia col tema: è il caso in cui un fondo dichiarato
+            sbaglierebbe in uno dei due, e la parola deve reggere lo stesso. */}
         <div className="flex flex-col items-center gap-2 rounded-xl border border-border p-8">
           <h2 className="font-mono text-3xl font-bold tracking-wider">
-            LUDORATTI <GlitchText className="text-brand-ink">E.</GlitchText> CORP
+            LUDORATTI{' '}
+            <GlitchText className="text-brand-ink" reveal="EVIL">
+              E.
+            </GlitchText>{' '}
+            CORP
           </h2>
-          <TechLabel className="text-muted">senza fondo · il valore predefinito</TechLabel>
+          <TechLabel className="text-muted">sul fondo della pagina · senza fondo dichiarato</TechLabel>
         </div>
 
         <p className="text-sm text-muted">
           ⚠️{' '}
-          <strong>Le lamelle coprono l’originale, quindi devono sapere che colore hanno dietro.</strong>{' '}
-          Con <code>background</code> il disturbo è <strong>netto</strong>, perché ogni fetta
+          <strong>Le copie del nome coprono l’originale, quindi devono sapere che colore hanno dietro.</strong>{' '}
+          Con <code>background</code> l’effetto è <strong>netto</strong>, perché ogni fetta
           sostituisce il testo invece di sovrapporsi; senza, le due copie si limitano a sdoppiare i
           bordi. Il valore predefinito è <code>transparent</code> ed è una scelta sul{' '}
           <strong>modo di sbagliare</strong>: un colore sbagliato dipinge un rettangolo in mezzo
           alla parola, trasparente al massimo attenua l’effetto. Sopra il fondale della peste si
-          passa <code>#030712</code>.
+          passa <code>#030712</code>. Vale per le copie soltanto: la parola nascosta non ne ha
+          bisogno.
         </p>
 
         <p className="text-sm text-muted">
@@ -96,10 +110,10 @@ export function GlitchSection() {
         </p>
 
         <p className="text-sm text-muted">
-          ⚠️ <strong>Con «meno movimento» non resta niente</strong>: le lamelle nascono collassate e
-          sono i fotogrammi ad aprirle, il lampo nasce a opacità zero. Ferme resterebbero due copie
-          integre spostate di due pixel, che è l’aspetto di un difetto e non di una preferenza
-          rispettata.
+          ⚠️ <strong>Con «meno movimento» resta il nome, fermo</strong>: le copie nascono collassate
+          e sono i fotogrammi ad aprirle, la parola nascosta nasce a opacità zero, e il nome non si
+          spegne più. Ferme, le copie resterebbero due testi integri spostati di due pixel, che è
+          l’aspetto di un difetto e non di una preferenza rispettata.
         </p>
       </div>
     </>

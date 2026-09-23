@@ -116,14 +116,19 @@ export const toxicBubblesStory = defineStory(ToxicBubbles, {
 
 export const glitchTextStory = defineStory(GlitchText, {
   description:
-    'Il disturbo sul nome: due fette che sfarfallano e, ogni tanto, la parola che il nome nasconde. Va addosso a un titolo scritto dall’applicazione.',
+    'L’effetto glitch sul nome: due copie sfalsate, una ciano e una rosa, che si vedono a fette. Con `reveal`, ogni tre secondi la parola nascosta prende il posto del nome. Va addosso a un titolo scritto dall’applicazione.',
   variants: [
-    { name: 'col lampo, su fondo dichiarato', args: { children: 'E.', reveal: 'EVIL', background: '#030712', className: 'text-brand' } },
     {
-      name: 'col lampo spento',
-      args: { children: 'E.', reveal: 'EVIL', isRevealEnabled: false, background: '#030712', className: 'text-brand' },
+      name: 'con la parola EVIL',
+      note: 'Ogni tre secondi la parola EVIL passa due volte a fette e poi compare intera, sfarfallando. Mentre è accesa «E.» si spegne, quindi non serve nessun fondo sotto: vale sul chiaro come sullo scuro.',
+      args: { children: 'E.', reveal: 'EVIL', className: 'text-brand-ink' },
     },
-    { name: 'senza fondo', args: { children: 'E.', className: 'text-brand-ink' } },
+    { name: 'solo l’effetto glitch', args: { children: 'E.', className: 'text-brand-ink' } },
+    {
+      name: 'con la parola EVIL spenta',
+      note: 'Le prop della prima più `isRevealEnabled={false}`: resta l’effetto glitch, uguale alla variante senza `reveal`, e la parola non finisce nella pagina.',
+      args: { children: 'E.', reveal: 'EVIL', isRevealEnabled: false, className: 'text-brand-ink' },
+    },
   ],
   decorators: [
     (variant) => (

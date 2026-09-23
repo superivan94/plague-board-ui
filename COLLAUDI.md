@@ -1026,6 +1026,48 @@ diversi e ognuno si ripara da solo — l'albero di accessibilità con `aria-hidd
 identici. E protegge la sola cosa che un easter egg di testo deve fare: **farsi leggere** quando
 compare.
 
+⚠️ **La riga «La lastra sotto la parola intera» non vale più dal 2026-09-23**: la lastra non c'è, e
+al suo posto il nome si spegne. Lo scenario qui sotto.
+
+### La parola nascosta sul chiaro: il nome si spegne invece di farsi coprire — 2026-09-23
+
+**Esegue:** agente
+**Ultima esecuzione:** agente, 2026-09-23
+
+**Preparazione:** `npm run build` e **riavvio** del dev server — `pb-glitch-name--with-reveal` è
+una classe nuova. Una scheda propria su `http://localhost:3100/cornice/GlitchText/0/light` (poi
+`/dark`), le animazioni ferme con `getAnimations()` messe in pausa e portate a `currentTime`, il
+titolo ingrandito a 110 px solo per guardarlo. Segnalato dall'utente: «la versione con la scritta
+evil ha delle strisce nere e la scritta evil compare con un suo sfondo nero».
+
+| Azione | Atteso | Ottenuto |
+|---|---|---|
+| Prima, ferma a 1000 · 2430 · 2850 ms, fondo `#030712` sul chiaro | — | una barra nera sotto «E.», la fetta di «EVIL» su nero, la parola intera dentro un rettangolo nero |
+| Prima, lo stesso col fondo trasparente | — | niente nero, ma nella tenuta la `E.` traspare verde dentro la «V» |
+| Il nome e la parola, campionati **ogni millisecondo** sui 3000 del ciclo | mai accesi insieme, mai spenti insieme | **0** e **0**; la parola accesa 374 ms in tutto |
+| I tempi della parola visti dal nome | invariati | **60 · 60 · 45 · 45 · 165 ms**, buio di **31** e **29** fra i colpi interi |
+| Le due animazioni | stessa durata, stessa curva, stesso istante di partenza | `pb-conceal` e `pb-reveal` a **3000 ms**, `steps(1)`, `startTime` uguale |
+| Il fondo della parola e delle lamelle, senza `background` | trasparente | `rgba(0, 0, 0, 0)` tutti e due |
+| Ferma a 1000 · 2430 · 2550 · 2850 ms, chiaro e scuro | nessun rettangolo; nelle sbirciate la sola fetta; nella tenuta «EVIL» senza la `E.` sotto | confermato nei due temi |
+| Il riquadro sul fondo della pagina di `/atmosfera` | la parola senza fondo | quello che sembrava un fondo rosa, rimpicciolito, è l'alone `text-shadow` della parola: sfondo calcolato trasparente |
+| Contrasti, tema **chiaro**, 30 px | ≥ 3, testo grande | la `E.` in `text-brand-ink` **4,58** · «EVIL» in `text-red-500` **3,49** · titolo 16,25 |
+| Contrasti, tema **scuro** | ≥ 4,5 | la `E.` 13,43 · «EVIL» 5,32 · titolo 19,74 |
+| Denti: una soglia di `pb-conceal` spostata, la riga di «meno movimento» tolta, la classe mai messa | tre rossi, ognuno sul suo caso | confermato, un caso per mutazione |
+| Gate | verde | build, typecheck, lint 0/0, **931 test**, 308 cornici, `/` statica |
+
+⚠️ **Prima di togliere la lastra la domanda era che cosa facesse**, e la risposta era tenere il nome
+fuori da sotto la parola. Il fondo trasparente toglieva il nero e rimetteva quel difetto; spegnere
+il nome toglie tutti e due, e vale anche sul fondale della peste, che non è un colore solo — dove
+una lastra di `#030712` sarebbe stata un rettangolo appena più scuro della città.
+
+⚠️ **«EVIL» sul chiaro fa 3,49**: passa la soglia del testo grande e non quella del testo normale.
+È una parola decorativa e fuori dal nome accessibile, e il colore si rifinisce nella passata finale
+sulle tinte; sotto i 24 px la leva è `revealClassName`.
+
+**Che cosa protegge:** una parola che ne sostituisce un'altra senza sapere che cosa c'è dietro — il
+modo in cui una lastra fallisce non si vede sul fondo per cui è stata scelta, e si vede solo col
+chiaro accanto allo scuro, fermando l'animazione nell'istante giusto.
+
 ### La schermata di accesso, e l'attesa che sembrava un comando spento — 2026-09-20
 
 **Esegue:** agente

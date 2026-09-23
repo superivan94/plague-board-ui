@@ -283,6 +283,49 @@
   }
 }
 
+/* Il nome mentre la parola nascosta passa: spento esattamente quando lei è accesa, soglia per
+ * soglia — sbirciate comprese, così a ogni istante se ne vede uno solo dei due.
+ *
+ * ⚠️ **Sono le stesse soglie di `pb-reveal`, rovesciate, e vanno ritoccate insieme.** Un'animazione
+ * non passa da un elemento al suo fratello, e il nome e la parola sono fratelli: le due curve sono
+ * due `@keyframes`, e un test in `GlitchText.test.tsx` le rilegge da questo file e le confronta.
+ * Fa il mestiere che faceva la lastra sotto la parola, e lo fa su qualunque fondo. */
+@keyframes pb-conceal {
+  0% {
+    opacity: 1;
+  }
+  80% {
+    opacity: 0;
+  }
+  82% {
+    opacity: 1;
+  }
+  84% {
+    opacity: 0;
+  }
+  86% {
+    opacity: 1;
+  }
+  88% {
+    opacity: 0;
+  }
+  89.5% {
+    opacity: 1;
+  }
+  90.5% {
+    opacity: 0;
+  }
+  92% {
+    opacity: 1;
+  }
+  93% {
+    opacity: 0;
+  }
+  98.5% {
+    opacity: 1;
+  }
+}
+
 /* Il battito del marchio: due colpi e poi una pausa lunga, come un cuore.
  *
  * ⚠️ È fatto per il segno del ratto, e il motivo è nel disegno: quel marchio a prima vista è un
@@ -727,16 +770,15 @@
  * ⚠️ E l'alone prende `currentColor` invece del rosso scritto a mano di `ludoratti.it`: chi
  * cambia il colore della parola si porta dietro il suo alone, senza doverne cambiare due.
  *
- * ⚠️ **Porta lo stesso fondo delle lamelle**, e per la stessa ragione: nel terzo tempo la parola
- * si vede **intera**, e sotto c'è ancora il nome che sta nascondendo — «EVIL» sopra «E.» con la
- * `E.` che spunta fra le lettere non si legge. Dove il fondo è dichiarato la parola posa su una
- * lastra e copre il nome per due decimi e mezzo, che è quello che deve fare; dove non lo è, resta
- * la sovrapposizione di `ludoratti.it`. */
+ * ⚠️ **Non posa su nessun fondo.** Nel terzo tempo la parola si vede intera, e «EVIL» sopra «E.»
+ * con la `E.` che spunta fra le lettere non si legge: a toglierla di mezzo è il nome che si spegne
+ * (`.pb-glitch-name--with-reveal`, qui sotto), non una lastra. La lastra c'era, del colore di
+ * `--pb-glitch-bg`, e sul tema chiaro con un fondo scuro dichiarato era un'etichetta nera attorno
+ * alla parola (utente, 2026-09-23). */
 .pb-glitch-reveal {
   position: absolute;
   top: 0;
   left: 50%;
-  background: var(--pb-glitch-bg, transparent);
   /* I fotogrammi sono soglie: ogni valore tiene fino al successivo, e un lampo è un interruttore,
      non una dissolvenza. Vince sull'`ease` predefinito dell'utility perché sta fuori dai layer. */
   animation-timing-function: steps(1, end);
@@ -753,6 +795,23 @@
      `pointer-events: none` allargherebbe la zona sensibile di un titolo che è un collegamento. */
   user-select: none;
   pointer-events: none;
+}
+
+/* Il nome, quando c'è una parola che lo sostituisce: si spegne mentre lei è accesa.
+ *
+ * ⚠️ **La durata la prende dall'utility della parola invece di riscriverla**: `var(--animate-reveal)`
+ * porta i suoi tre secondi e il suo `infinite`, e qui cambia solo il nome dei fotogrammi. Due tempi
+ * scritti due volte divergono al primo ritocco, e un nome che si spegne fuori tempo si vede — per un
+ * istante non c'è né lui né la parola, o ci sono tutti e due. Le due animazioni partono insieme
+ * perché i due elementi ricevono la classe nello stesso aggiornamento, al montaggio come quando
+ * l'interruttore si riaccende.
+ *
+ * ⚠️ E la curva a gradini, come la parola: senza, fra una soglia e l'altra il nome **sfumerebbe**, e
+ * i due si vedrebbero sovrapposti a metà. */
+.pb-glitch-name--with-reveal {
+  animation: var(--animate-reveal);
+  animation-name: pb-conceal;
+  animation-timing-function: steps(1, end);
 }
 
 /* ─────────────────────────────────────────────────────────────────────────────
@@ -1093,6 +1152,10 @@
      marchio è una classe nostra e non una utility. Ferma, resta al primo fotogramma, cioè alla
      sua taglia vera. */
   .pb-mark-beat,
+  /* Anche questa è nostra. Ferma, il nome resta **acceso**: la parola che lo sostituirebbe con
+     l'animazione spenta non compare mai, e un nome che sparisce ogni tre secondi per niente
+     sembrerebbe un guasto. */
+  .pb-glitch-name--with-reveal,
   [class*='animate-'],
   .pb-rat--running .pb-rat-part,
   .pb-rat--running .pb-rat-body,

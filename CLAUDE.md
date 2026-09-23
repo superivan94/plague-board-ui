@@ -905,8 +905,8 @@ exist in target module» che **non sono veri**. Si guarda la pagina, o si crede 
   parola: l'utente l'ha detto il 2026-09-20 guardandolo — «si vede due volte incompleta, ma è
   troppo difficile da leggere». Le fasce restano, perché sono il segnale che tenta di passare, ma
   dopo serve un tempo in cui la parola è **intera**, e che duri più di tutte le fasce messe insieme:
-  60 + 60 ms di sbirciate contro **255 ms** di parola. Con una parola **sopra un'altra** servono
-  anche la lastra sotto — sennò il nome spunta fra le lettere — e `steps(1, end)`, o i tempi
+  60 + 60 ms di sbirciate contro **255 ms** di parola. Con una parola **sopra un'altra** il nome
+  sotto va tolto di mezzo — sennò spunta fra le lettere — e serve `steps(1, end)`, o i tempi
   diventano dissolvenze, cioè un respiro invece di un guasto. ⚠️ E l'attesa fra un lampo e
   l'altro è una misura a sé: cinque secondi facevano credere che non ci fosse niente da aspettare,
   tre no.
@@ -925,6 +925,24 @@ exist in target module» che **non sono veri**. Si guarda la pagina, o si crede 
   **dentro** di lei. ⚠️ E il dentro non è un dettaglio: opacità e `clip-path` valgono per tutto il
   sottoalbero, quindi le copie compaiono e spariscono col lampo; messe accanto girerebbero sopra il
   nome anche nei tre secondi in cui il lampo non c'è.
+- ⚠️ **Per coprire un testo con un altro non si dipinge una lastra: si spegne il testo sotto.** La
+  parola nascosta di `GlitchText` posava su una lastra del colore di `background`, e la lastra è
+  giusta solo sul fondo che dichiara: nella storia `#030712` valeva in tutti e due i temi, e sul
+  chiaro ogni lamella era una striscia nera e la parola un'etichetta — l'utente l'ha trovato il
+  2026-09-23, fermando le animazioni. Ora il nome, lamelle comprese, si spegne negli istanti in cui
+  la parola è accesa, e vale su qualunque fondo, anche su uno che non è un colore solo. ⚠️ **Il
+  prezzo sono due animazioni sorelle da tenere in passo**, perché un'animazione non passa da un
+  fratello all'altro: la durata la prende una dall'altra (`animation: var(--animate-reveal)` e poi
+  `animation-name: pb-conceal`), le soglie sono le stesse rovesciate e le tiene un test che le
+  rilegge da `animations.css`; partono insieme perché la classe arriva ai due elementi nello stesso
+  aggiornamento. Misurato campionando un millisecondo alla volta: su 3000 istanti, **nessuno** con
+  tutti e due accesi o tutti e due spenti. ⚠️ E la classe nostra va aggiunta a mano alla regola di
+  «meno movimento», o fermo il nome sparirebbe ogni tre secondi per niente.
+- ⚠️ **Un JSDoc separato dalla sua dichiarazione da un'altra funzione non arriva al `.d.ts`.**
+  `GlitchSlices`, messo fra il blocco di `GlitchText` e la sua `export function`, ha lasciato il
+  componente pubblico senza una riga di documentazione per chi installa, e nessuna build se n'è
+  accorta. Trovato il 2026-09-23; una scansione dei 65 componenti di `dist/` non ne ha trovati
+  altri.
 - ⚠️ **In HeroUI 3 l'attesa di un comando è `isPending`, non `isDisabled` — e si veste da
   comando spento.** La prop arriva da `react-aria` e il `Button` di HeroUI la inoltra intatta: fa
   la cosa giusta dove conta — non parte niente, il fuoco **resta** sul comando invece di cadere sul
