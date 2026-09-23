@@ -178,6 +178,16 @@ export default function AtmosferaPage() {
         </p>
 
         <p className="text-sm text-muted">
+          <strong>La tabella è la taratura predefinita, e si ritocca voce per voce</strong> con la
+          prop <code>settings</code> di <code>ToxicLevelProvider</code>: si scrive solo quello che
+          cambia, il resto resta com’è. Un verso resta in scena 3,2 s, quindi con queste attese ad
+          «alto» se ne accavallano al più due e il tetto di tre non scatta. Scatta quando la
+          frequenza sale: con un verso ogni mezzo secondo ce ne sarebbero sei insieme, ed è il tetto
+          a tenere la città leggibile. Le due varianti di <code>ToxicLevelProvider</code> nel
+          catalogo lo mostrano.
+        </p>
+
+        <p className="text-sm text-muted">
           ⚠️ <strong>I ratti che attraversano il fondale non sono suoi</strong>: <code>RatSwarm</code>{' '}
           è un componente a parte, con la sua cadenza e il suo tetto, e qui continua a passare anche a
           livello spento. Una schermata che vuole un comando solo per tutto legge il livello con{' '}

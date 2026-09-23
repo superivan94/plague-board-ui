@@ -31,9 +31,15 @@ function atLevel(level: ToxicLevel): StoryDecorator {
   };
 }
 
+/** Un verso ogni mezzo secondo circa, cioè più fitto di quanto un verso resti in scena. */
+const FAST_CHATTER = { chatterEveryMs: [400, 700], maxChatter: 3 } as const;
+
+/** Il fondale alto quanto basta a leggere i versi, che nascono sopra i palazzi. */
+const sceneForChatter = <PlagueBackground className="h-64 rounded-xl" />;
+
 export const toxicLevelProviderStory = defineStory(ToxicLevelProvider, {
   description:
-    'Tiene il livello tossico della pagina. Il fondale, le bolle e il selettore lo leggono da lui, quindi cambiano insieme.',
+    'Tiene il livello tossico della pagina e quanto vale ogni livello. Il fondale, le bolle e il selettore lo leggono da lui, quindi cambiano insieme; con `settings` si ritocca la taratura, voce per voce.',
   variants: [
     {
       name: 'parte da medio',
@@ -58,6 +64,16 @@ export const toxicLevelProviderStory = defineStory(ToxicLevelProvider, {
           </div>
         ),
       },
+    },
+    {
+      name: 'versi fitti, al massimo tre',
+      note: 'Un verso ogni mezzo secondo, e ciascuno resta 3,2 s: senza tetto ce ne sarebbero sei insieme. Con le attese predefinite il tetto non si raggiunge mai.',
+      args: { defaultLevel: 'high', settings: { high: FAST_CHATTER }, children: sceneForChatter },
+    },
+    {
+      name: 'versi fitti, al massimo uno',
+      note: 'La stessa frequenza col tetto a uno: un verso nuovo esce solo quando il precedente è sparito.',
+      args: { defaultLevel: 'high', settings: { high: { ...FAST_CHATTER, maxChatter: 1 } }, children: sceneForChatter },
     },
   ],
 });

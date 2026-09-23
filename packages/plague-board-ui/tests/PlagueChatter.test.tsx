@@ -49,17 +49,38 @@ describe('i versi della città', () => {
   });
 
   it('ne fa uscire uno a ogni attesa', () => {
-    // ⚠️ Questo caso si chiamava «e si ferma al tetto del livello», e il tetto non lo provava:
-    // controllava `<=` dopo la prima uscita e restava verde anche togliendolo. Non si prova perché
-    // con le attese di oggi **non si raggiunge**: un verso vive 3,2 s, quindi ne convivono al più
-    // due a `high` contro un tetto di tre, e uno negli altri livelli. Sta scritto nel piano, fra
-    // i rami che nessun test percorre e il perché.
     const { container } = conFondale('high');
 
     expect(versi(container)).toHaveLength(0);
 
     avanza(PRIMA_USCITA_MS);
     expect(versi(container).length).toBeGreaterThan(0);
+  });
+
+  it.each([3, 1])('con la frequenza alzata, si ferma al tetto del livello: %i', (tetto) => {
+    // ⚠️ Con le attese predefinite il tetto **non si raggiunge**: un verso vive 3,2 s e ad `high`
+    // il successivo arriva dopo almeno 2,5, quindi ne convivono al più due contro un tetto di
+    // tre. Diventa vero quando chi monta il provider alza la frequenza: un verso ogni decimo di
+    // secondo, e in un secondo senza tetto ce ne sarebbero dieci.
+    const { container } = render(
+      <ToxicLevelProvider defaultLevel="high" settings={{ high: { chatterEveryMs: [100, 100], maxChatter: tetto } }}>
+        <PlagueBackground />
+      </ToxicLevelProvider>,
+    );
+
+    avanza(1000);
+    expect(versi(container)).toHaveLength(tetto);
+  });
+
+  it('con la sola frequenza alzata, il tetto resta quello del livello', () => {
+    const { container } = render(
+      <ToxicLevelProvider defaultLevel="high" settings={{ high: { chatterEveryMs: [100, 100] } }}>
+        <PlagueBackground />
+      </ToxicLevelProvider>,
+    );
+
+    avanza(1000);
+    expect(versi(container)).toHaveLength(TOXIC_LEVEL_SETTINGS.high.maxChatter);
   });
 
   it('un verso se ne va da solo, e non si allunga la vita quando ne compare un altro', () => {

@@ -744,6 +744,9 @@ un'altra scheda: `rattinventario.ludoratti.it/progettoE`, che è la pagina da cu
 | **Quarto giro** — il cursore del volume, montato lontano dall'interruttore | lo comanda lo stesso | gruppo `role="group"` largo **192 px** con nome «Volume della musica», `value 40`, `step 10`; `audio.volume` 0,4 |
 | Si abbassa il volume da tastiera mentre suona | il volume scende e **la musica non si interrompe** | da 40 a 30, `audio.volume` 0,3, `paused: false`, la traccia resta al suo punto |
 | `Slider` di HeroUI senza i suoi sotto-pezzi | non rende niente da afferrare | un `<div role="group">` **vuoto**: nessuna traccia, nessun `<input type="range">` |
+| **Quinto giro** (2026-09-23) — i versi ad `alto`, contati per 110 s | fino al tetto, **3** | **29** versi, **mai più di 2** insieme, due insieme per 2,8 s in tutto: il tetto non scattava mai, perché un verso vive 3,2 s e il successivo arriva dopo almeno 2,5 |
+| La variante «versi fitti, al massimo tre» di `ToxicLevelProvider` — un verso ogni 0,4–0,7 s | tre, non sei | **13** in 15 s, al massimo **3** insieme |
+| La variante «al massimo uno», stessa frequenza | uno per volta | **4** in 15 s, al massimo **1** |
 
 ⚠️ **Il contrasto si misura risolvendo il colore su una tela, non leggendo la stringa.** Oggi
 `getComputedStyle` restituisce `lab(96.5432 -0.0000596046 0)` e `oklab(0.657609 …)`: una regex che
@@ -761,6 +764,12 @@ lo riscrive: al secondo giro di questo collaudo la città era nel DOM — quattr
 contati — e misurava **0×0**, perché `inset-x-0`, `h-[28%]`, `bg-gray-900/80`, `bg-brand/50` e
 `text-brand/70` non erano mai state generate. Si riconosce così: il markup c'è, i `getComputedStyle`
 danno valori iniziali, e cercando la classe fra le `cssRules` non si trova.
+
+⚠️ **I versi insieme si contano con un `MutationObserver`, non campionando.** Due versi convivono
+per meno di un secondo, e un campione ogni 100 ms nel riquadro del browser ha detto «al massimo
+uno» per 65 s — perché lo abbia mancato non è stato misurato; l'osservatore, che registra ogni
+nascita e ogni rimozione, ha trovato sei sovrapposizioni in 110 s. Un campionamento che risponde «meno» di quanto
+succede è la stessa forma di un contrasto letto da una stringa: una risposta plausibile e falsa.
 
 ⚠️ **Quello che questo collaudo non prova è `prefers-reduced-motion`**: il riquadro del browser non
 emula la preferenza. Lì vale il test, che monta le bolle con `matchMedia` truccato e verifica che a

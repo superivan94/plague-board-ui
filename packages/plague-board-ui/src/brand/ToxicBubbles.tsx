@@ -4,7 +4,7 @@ import { useCallback, useEffect, useRef, useState, type CSSProperties } from 're
 
 import { useReducedMotion } from '../hooks/useReducedMotion.js';
 import type { RandomRange } from '../randomRange.js';
-import { TOXIC_LEVEL_SETTINGS, type ToxicLevelSettings } from './toxicLevel.js';
+import type { ToxicLevelSettings } from './toxicLevel.js';
 import { useToxicLevel } from './ToxicLevelProvider.js';
 
 /** Una bolla in volo: la chiave che ne fa un nodo nuovo, e i numeri che la disegnano. */
@@ -58,12 +58,12 @@ const pesca = (key: number, taratura: ToxicLevelSettings): Bolla => {
  * bolle ferme al punto di partenza.
  */
 export function ToxicBubbles() {
-  const { level } = useToxicLevel();
+  const { level, settings } = useToxicLevel();
   const menoMovimento = useReducedMotion();
   const [bolle, setBolle] = useState<readonly Bolla[]>([]);
   const prossimaChiave = useRef(0);
 
-  const taratura = TOXIC_LEVEL_SETTINGS[level];
+  const taratura = settings[level];
   const { maxBubbles } = taratura;
   const [attesaMin, attesaMax] = taratura.bubbleEveryMs;
 

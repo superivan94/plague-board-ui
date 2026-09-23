@@ -1,7 +1,9 @@
-import { fireEvent, render, screen } from '@testing-library/react';
-import { describe, expect, it, vi } from 'vitest';
+import { act, fireEvent, render, renderHook, screen } from '@testing-library/react';
+import type { ReactNode } from 'react';
+import { afterEach, describe, expect, it, vi } from 'vitest';
 
 import {
+  PlagueBackground,
   TOXIC_LEVELS,
   TOXIC_LEVEL_LABELS,
   TOXIC_LEVEL_SETTINGS,
@@ -9,6 +11,7 @@ import {
   ToxicLevelSwitch,
   useToxicLevel,
   type ToxicLevel,
+  type ToxicLevelOverrides,
 } from '../src';
 
 /** Una spia che scrive a schermo il livello che legge dal contesto. */
@@ -16,6 +19,12 @@ function Spia() {
   const { level } = useToxicLevel();
   return <p data-testid="spia">{level}</p>;
 }
+
+/** Il provider attorno a un gancio, con la taratura ritoccata che si vuole provare. */
+const taratoCon = (settings?: ToxicLevelOverrides) =>
+  function Tarato({ children }: { children: ReactNode }) {
+    return <ToxicLevelProvider settings={settings}>{children}</ToxicLevelProvider>;
+  };
 
 const opzione = (etichetta: string) => screen.getByRole('radio', { name: etichetta });
 
@@ -73,6 +82,22 @@ describe('ToxicLevelProvider e useToxicLevel', () => {
     expect(screen.getByTestId('spia')).toHaveTextContent('high');
   });
 
+  it('senza `settings` la taratura è quella della tabella', () => {
+    const { result } = renderHook(() => useToxicLevel(), { wrapper: taratoCon() });
+
+    expect(result.current.settings).toStrictEqual(TOXIC_LEVEL_SETTINGS);
+  });
+
+  it('con `settings` ritocca solo le voci scritte, e solo nel livello scritto', () => {
+    // Il ritocco è per voce, non per livello: il perché sta su `resolveToxicLevelSettings`.
+    const { result } = renderHook(() => useToxicLevel(), {
+      wrapper: taratoCon({ high: { chatterEveryMs: [800, 1500] } }),
+    });
+
+    expect(result.current.settings.high).toStrictEqual({ ...TOXIC_LEVEL_SETTINGS.high, chatterEveryMs: [800, 1500] });
+    expect(result.current.settings.medium).toStrictEqual(TOXIC_LEVEL_SETTINGS.medium);
+  });
+
   it('fuori dal provider dice che cosa manca, invece di rispondere un valore inventato', () => {
     // ⚠️ Un valore predefinito silenzioso qui sarebbe il difetto peggiore: il selettore
     // funzionerebbe, il fondale pure, e non si parlerebbero — ognuno col suo stato. L'errore
@@ -82,6 +107,37 @@ describe('ToxicLevelProvider e useToxicLevel', () => {
     expect(() => render(<Spia />)).toThrowError(/ToxicLevelProvider/);
 
     errori.mockRestore();
+  });
+});
+
+describe('la taratura ritoccata arriva a tutto il fondale', () => {
+  afterEach(() => {
+    vi.useRealTimers();
+  });
+
+  it('le icone e le gocce la leggono dal provider', () => {
+    const { container } = render(
+      <ToxicLevelProvider defaultLevel="high" settings={{ high: { floaters: 1, drips: 0 } }}>
+        <PlagueBackground />
+      </ToxicLevelProvider>,
+    );
+
+    expect(container.querySelectorAll('.animate-float')).toHaveLength(1);
+    expect(container.querySelectorAll('.animate-drip')).toHaveLength(0);
+  });
+
+  it('e le bolle anche', () => {
+    // In jsdom `animationend` non arriva, quindi nessuna bolla se ne va: dopo un secondo con una
+    // bolla ogni decimo, quelle in scena sono esattamente il tetto.
+    vi.useFakeTimers();
+    const { container } = render(
+      <ToxicLevelProvider defaultLevel="high" settings={{ high: { bubbleEveryMs: [100, 100], maxBubbles: 2 } }}>
+        <PlagueBackground />
+      </ToxicLevelProvider>,
+    );
+
+    act(() => void vi.advanceTimersByTime(1000));
+    expect(container.querySelectorAll('.pb-toxic-bubble')).toHaveLength(2);
   });
 });
 

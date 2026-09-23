@@ -13,7 +13,6 @@ import { RAT_PHRASES } from '../data/phrases.js';
 import { PlagueChatter } from './plagueChatter.js';
 import { PlagueCityscape } from './plagueCityscape.js';
 import { ToxicBubbles } from './ToxicBubbles.js';
-import { TOXIC_LEVEL_SETTINGS } from './toxicLevel.js';
 import { useToxicLevel } from './ToxicLevelProvider.js';
 
 /** Un'icona ferma in un punto del fondale, che sale e scende. */
@@ -144,8 +143,8 @@ export function PlagueBackground({
   className = '',
   contentClassName = '',
 }: PlagueBackgroundProps) {
-  const { level } = useToxicLevel();
-  const taratura = TOXIC_LEVEL_SETTINGS[level];
+  const { level, settings } = useToxicLevel();
+  const taratura = settings[level];
 
   return (
     // ⚠️ `text-foreground` resta anche senza `dark`: serve a chi mette il fondale dentro un'isola

@@ -107,6 +107,7 @@ export {
   TOXIC_LEVEL_LABELS,
   TOXIC_LEVEL_SETTINGS,
   type ToxicLevel,
+  type ToxicLevelOverrides,
   type ToxicLevelSettings,
 } from './brand/toxicLevel.js';
 export {

@@ -728,6 +728,17 @@ exist in target module» che **non sono veri**. Si guarda la pagina, o si crede 
   nucleo si accende (in `toxic`, con l'opacità) e il riflesso diventa verde; e una sacca di gas in
   un liquido si deforma, quindi il `border-radius` oscilla. Il cerchio resta come ripiego di «meno
   movimento», che è il caso in cui la deformazione non c'è.
+- ⚠️ **Un tetto che le attese non fanno mai scattare è una manopola che non gira, e a schermo non
+  si vede.** `maxChatter` ad `alto` valeva 3, ma un verso vive 3,2 s e il successivo arriva dopo
+  almeno 2,5: misurati il 2026-09-23 su `/atmosfera`, 29 versi in 110 s e mai più di due insieme —
+  e la tabella della pagina prometteva «max 3». Dato che la taratura era una costante che nessuna
+  prop poteva cambiare, il tetto non scattava **per nessuno**. La cura scelta dall'utente è stata
+  renderlo vero invece di toglierlo: la prop `settings` di `ToxicLevelProvider` ritocca la tabella
+  voce per voce, e con un verso ogni mezzo secondo è il tetto a tenere la città leggibile — le due
+  varianti «versi fitti» del catalogo lo mostrano, 3 e 1. ⚠️ **La domanda da fare a ogni tetto è
+  «chi lo può raggiungere?»**: `maxBubbles`, a carta nello stesso stato (9 su 16), resta perché fa
+  un altro mestiere — le bolle se ne vanno con `animationend`, che può non arrivare, e lì il tetto è
+  la rete; i versi se ne vanno con un timer, che arriva sempre.
 - ⚠️ **Una scena che di notte fa luce, di giorno si ridisegna: non si schiarisce.** Il fondale è
   stato scuro nei due temi fino al 2026-09-23 — scelta mai proposta, contro la decisione «due temi
   per ogni componente» — e ora segue la pagina coi colori `--pb-scene-*` di `theme.css`. Di giorno

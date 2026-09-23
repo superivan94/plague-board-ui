@@ -6,7 +6,6 @@ import { useReducedMotion } from '../hooks/useReducedMotion.js';
 import type { RandomRange } from '../randomRange.js';
 import { scegli } from './hoverEmitterPick.js';
 import { TETTI } from './plagueCityscape.js';
-import { TOXIC_LEVEL_SETTINGS } from './toxicLevel.js';
 import { useToxicLevel } from './ToxicLevelProvider.js';
 
 /** Un verso in scena: la chiave che ne fa un nodo nuovo, e dove e per quanto si vede. */
@@ -21,6 +20,13 @@ interface Verso {
 }
 
 const fra = ([min, max]: RandomRange) => min + Math.random() * (max - min);
+
+/**
+ * Quanto resta in scena un verso. È il numero che decide se `maxChatter` conta: un'attesa più
+ * corta di questa fa accavallare i versi, e il JSDoc di `ToxicLevelSettings` lo cita — chi lo
+ * cambia aggiorna anche quello.
+ */
+const VITA_MS = 3200;
 
 /**
  * Da che parte il fumetto si appoggia al punto in cui nasce.
@@ -58,7 +64,7 @@ export interface PlagueChatterProps {
  * sparirebbe altrettanto bruscamente — cioè più movimento, non meno.
  */
 export function PlagueChatter({ phrases }: PlagueChatterProps) {
-  const { level } = useToxicLevel();
+  const { level, settings } = useToxicLevel();
   const menoMovimento = useReducedMotion();
   const [versi, setVersi] = useState<readonly Verso[]>([]);
   const prossimaChiave = useRef(0);
@@ -67,7 +73,7 @@ export function PlagueChatter({ phrases }: PlagueChatterProps) {
   // sono nati solo finché nessuno cambia livello a metà.
   const scadenze = useRef(new Map<number, ReturnType<typeof setTimeout>>());
 
-  const taratura = TOXIC_LEVEL_SETTINGS[level];
+  const taratura = settings[level];
   const { maxChatter } = taratura;
   const [attesaMin, attesaMax] = taratura.chatterEveryMs;
 
@@ -106,7 +112,7 @@ export function PlagueChatter({ phrases }: PlagueChatterProps) {
             left: x,
             top: tetto.y - 4 - Math.random() * 6,
             ancoraggio: ancoraggioPer(x),
-            vitaMs: 3200,
+            vitaMs: VITA_MS,
           };
 
           // ⚠️ La scadenza si arma **fuori** dall'aggiornamento e prima di lui, per due motivi.

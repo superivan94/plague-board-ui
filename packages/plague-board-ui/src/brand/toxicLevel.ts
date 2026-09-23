@@ -43,7 +43,8 @@ export interface ToxicLevelSettings {
   /** Quante gocce colano dal bordo di sopra. */
   readonly drips: number;
   /**
-   * Ogni quanto esce un verso dalla città, in millisecondi. L'attesa si ripesca a ogni giro.
+   * Ogni quanto esce un verso dalla città, in millisecondi. L'attesa si ripesca a ogni giro, e un
+   * verso resta in scena 3,2 s: un'attesa più corta li fa accavallare, fino a {@link maxChatter}.
    *
    * ⚠️ **La città invece non è qui, e non ci deve stare** (scelta dell'utente, 2026-09-20): i
    * palazzi ci sono sempre e le loro finestre sfarfallano sempre, perché il livello dice quanto
@@ -51,7 +52,14 @@ export interface ToxicLevelSettings {
    * **ratti** che ci abitano, cioè questi versi.
    */
   readonly chatterEveryMs: RandomRange;
-  /** Quanti versi al massimo insieme. Zero vuol dire che la città tace. */
+  /**
+   * Quanti versi al massimo insieme. Zero vuol dire che la città tace.
+   *
+   * ⚠️ **Con le attese predefinite non si raggiunge**: ad `high` il verso successivo arriva dopo
+   * almeno 2,5 s, quindi se ne accavallano al più due contro un tetto di tre. Conta quando si alza
+   * la frequenza con la prop `settings` di `ToxicLevelProvider`: con un verso ogni mezzo secondo
+   * ce ne sarebbero sei insieme, ed è lui a tenere la città leggibile.
+   */
   readonly maxChatter: number;
   /** Ogni quanto nasce una bolla, in millisecondi. L'attesa si ripesca a ogni giro. */
   readonly bubbleEveryMs: RandomRange;
@@ -76,6 +84,9 @@ export interface ToxicLevelSettings {
  * verso: resta il fondo e la città, che sta lì a qualunque livello. Di là `off` lasciava il velo al
  * 20% e cambiava il testo in «INTRUDER DETECTED», cioè faceva una battuta invece di obbedire — e
  * quel testo era della pagina, non del comando.
+ *
+ * È la taratura **predefinita**: un'applicazione la ritocca, voce per voce, con la prop `settings`
+ * di `ToxicLevelProvider`, e il fondale legge quella ritoccata.
  */
 export const TOXIC_LEVEL_SETTINGS: Record<ToxicLevel, ToxicLevelSettings> = {
   off: {
@@ -123,3 +134,31 @@ export const TOXIC_LEVEL_SETTINGS: Record<ToxicLevel, ToxicLevelSettings> = {
     bubbleRiseMs: [4000, 7000],
   },
 };
+
+/**
+ * Una taratura ritoccata: per ogni livello, solo le voci che cambiano. Quello che non si scrive
+ * resta quello di {@link TOXIC_LEVEL_SETTINGS}.
+ *
+ * ⚠️ **È fatta di soli numeri e stringhe**, come la taratura di `HoverEmitter`: così una pagina
+ * server la può passare al provider, che è un componente client, senza che il prerender muoia su
+ * una funzione che non attraversa il confine.
+ */
+export type ToxicLevelOverrides = Partial<Record<ToxicLevel, Partial<ToxicLevelSettings>>>;
+
+/**
+ * La tabella predefinita con sopra i ritocchi, livello per livello e voce per voce.
+ *
+ * ⚠️ **Il ritocco è per voce, non per livello**: chi alza la frequenza dei versi ad `high` non
+ * deve riscrivere le altre otto voci di quel livello, né ritrovarsi le bolle a zero perché non le
+ * ha nominate.
+ */
+export function resolveToxicLevelSettings(
+  overrides: ToxicLevelOverrides = {},
+): Record<ToxicLevel, ToxicLevelSettings> {
+  const ritocca = (level: ToxicLevel): ToxicLevelSettings => ({
+    ...TOXIC_LEVEL_SETTINGS[level],
+    ...overrides[level],
+  });
+
+  return { off: ritocca('off'), low: ritocca('low'), medium: ritocca('medium'), high: ritocca('high') };
+}
