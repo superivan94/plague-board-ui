@@ -78,7 +78,7 @@ describe('GoogleSignInButton', () => {
     expect(marchio).toHaveAttribute('aria-hidden', 'true');
   });
 
-  it('il marchio misura 20 anche dentro il `Button` di HeroUI, come il cerchio che lo sostituisce', () => {
+  it('il marchio misura 20 anche dentro il `Button` di HeroUI, come l’attesa che lo sostituisce', () => {
     const { container } = render(<GoogleSignInButton onPress={vi.fn()} />);
 
     // ⚠️ `.button svg` di HeroUI scrive `size-4` e sostituisce l'attributo: misurato il 2026-09-23,
@@ -102,21 +102,22 @@ describe('GoogleSignInButton', () => {
     expect(comando()).not.toBeDisabled();
   });
 
-  it('in attesa il marchio lascia il posto al cerchio che gira, e il cerchio è muto', () => {
+  it('in attesa il marchio di Google lascia il posto al nostro che batte, ed è muto', () => {
     const { container, rerender } = render(<GoogleSignInButton onPress={vi.fn()} />);
 
-    expect(container.querySelector('[data-slot="spinner"]')).toBeNull();
+    expect(container.querySelector('.pb-loader-beat')).toBeNull();
 
     rerender(<GoogleSignInButton onPress={vi.fn()} isPending />);
 
     // ⚠️ Il segno visibile lo mette il componente: lo stato `pending` di HeroUI è **solo**
     // `pointer-events: none`, quindi senza questo scambio il comando resterebbe identico a com'era
     // e chi ha premuto non saprebbe che sta succedendo qualcosa.
-    const cerchio = container.querySelector('[data-slot="spinner"]');
-    expect(cerchio).not.toBeNull();
-    // Il suo `role="status"` con dentro «Loading» annuncerebbe una parola inglese che nessuno può
-    // cambiare: l'annuncio dell'attesa lo fa già react-aria, con l'etichetta vera del comando.
-    expect(cerchio).toHaveAttribute('aria-hidden', 'true');
+    const battito = container.querySelector('.pb-loader-beat');
+    expect(battito).not.toBeNull();
+    expect(container.querySelector('[data-slot="spinner"]')).toBeNull();
+    // L'annuncio dell'attesa lo fa già react-aria, con l'etichetta vera del comando: il `role`
+    // di `PlagueLoader` qui dentro sarebbe un secondo annuncio per lo stesso fatto.
+    expect(battito?.closest('[aria-hidden="true"]')).not.toBeNull();
   });
 });
 

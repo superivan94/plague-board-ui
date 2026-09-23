@@ -380,6 +380,17 @@
   transform-origin: 12px 13px;
 }
 
+/* L'attesa piccola di `PlagueLoader`: lo stesso battito del marchio, quasi tre volte più svelto.
+ *
+ * ⚠️ **Lo stesso keyframe, non uno suo**: due battiti diversi sarebbero due marchi. Cambia solo il
+ * passo — i due colpi stanno nel primo terzo del ciclo, quindi a 1,2 s fanno «tu-tum» e una pausa
+ * breve, che si legge come «sta lavorando» invece del respiro calmo dell'intestazione. Sta su un
+ * `<span>` attorno al segno, non sull'`<svg>`: lì c'è già `pb-mark-beat` quando chi monta lo accende. */
+.pb-loader-beat {
+  transform-origin: center;
+  animation: pb-heartbeat 1.2s ease-in-out infinite;
+}
+
 /* ─────────────────────────────────────────────────────────────────────────────
  * Le utility. `@theme` le GENERA — è la differenza con `:root`, che dichiara e basta.
  * ───────────────────────────────────────────────────────────────────────────── */
@@ -1187,6 +1198,8 @@
      marchio è una classe nostra e non una utility. Ferma, resta al primo fotogramma, cioè alla
      sua taglia vera. */
   .pb-mark-beat,
+  /* Il battito svelto dell'attesa: fermo, il marchio resta alla sua taglia e la frase dice il resto. */
+  .pb-loader-beat,
   /* Anche questa è nostra. Ferma, il nome resta **acceso**: la parola che lo sostituirebbe con
      l'animazione spenta non compare mai, e un nome che sparisce ogni tre secondi per niente
      sembrerebbe un guasto. */

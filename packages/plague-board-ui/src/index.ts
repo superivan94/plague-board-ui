@@ -80,6 +80,10 @@ export { ThematicBadge, type ThematicBadgeColor, type ThematicBadgeProps } from 
 // pallino di stato: questo avvolge, quello marca.
 export { PlaguePulse, type PlaguePulseProps } from './brand/PlaguePulse.js';
 export { PulseDot, type PulseDotProps } from './brand/PulseDot.js';
+// Gli stati che ogni applicazione mostra più spesso — l'attesa, il vuoto, la conferma, l'avviso —
+// trovati nel giro delle due app del 2026-09-23: ci sono in tutte e due, e in nessuna erano a tema.
+// ⚠️ Stanno tutti **sopra** un pezzo di HeroUI, come la scheda del profilo; qui c'è l'aspetto.
+export { PlagueLoader, type PlagueLoaderProps, type PlagueLoaderVariant } from './brand/PlagueLoader.js';
 // Il personaggio, non il marchio: `RatIcon` è l'emblema, questo è il ratto che cammina.
 export { RAT_LIVERIES, Rat, type RatLivery, type RatProps } from './brand/Rat.js';
 export { RatRun, type RatRunProps } from './brand/RatRun.js';

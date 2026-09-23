@@ -1,6 +1,7 @@
-import { Button, Spinner } from '@heroui/react';
+import { Button } from '@heroui/react';
 
 import { GoogleIcon } from '../icons/GoogleIcon.js';
+import { PlagueLoader } from './PlagueLoader.js';
 
 export interface GoogleSignInButtonProps {
   /**
@@ -66,9 +67,10 @@ export interface GoogleSignInButtonProps {
  * poco, è ridichiarare `--border` in `theme.css` nei due blocchi del tema — come si è già fatto con
  * `--accent-soft-foreground`.
  *
- * ⚠️ **E il cerchio è muto.** Lo `Spinner` di HeroUI nasce `role="status"` con dentro «Loading»,
- * una parola inglese che nessuno può tradurre; l'annuncio dell'attesa lo fa già `react-aria`, con
- * l'etichetta vera del comando. Due annunci per lo stesso fatto sono peggio di uno.
+ * ⚠️ **E l'attesa è muta.** È {@link PlagueLoader}, il marchio che batte, al posto dello `Spinner`
+ * di HeroUI; il suo `role="status"` qui dentro si spegne con `aria-hidden`, perché l'annuncio lo fa
+ * già `react-aria` con l'etichetta vera del comando. Due annunci per lo stesso fatto sono peggio di
+ * uno.
  *
  * @example
  * ```tsx
@@ -94,9 +96,12 @@ export function GoogleSignInButton({
           di casa, e accanto a un testo alla stessa taglia sembrerebbe più grande. ⚠️ La classe
           accanto al numero non è un doppione: `.button svg` di HeroUI scrive `size-4` e
           sostituisce l'attributo, e senza il marchio usciva a 16 — più piccolo del cerchio
-          dell'attesa, che porta la stessa `size-5`, quindi il comando cambiava taglia. */}
+          dell'attesa, quindi il comando cambiava taglia. L'attesa è alta `1em`, e `text-xl` la
+          porta agli stessi venti. */}
       {isPending ? (
-        <Spinner aria-hidden="true" className="size-5" />
+        <span aria-hidden="true" className="inline-flex text-xl leading-none">
+          <PlagueLoader />
+        </span>
       ) : (
         <GoogleIcon size={20} className="size-5" />
       )}
