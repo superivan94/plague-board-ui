@@ -1533,6 +1533,13 @@ di ogni pezzo in `/storie`. Contrasti col metodo della tela 1×1 e degli strati 
 | Dopo 8 s senza toccarla | si raccoglie al centro, resta il marchio | `scale(0.15)`, `visibility: hidden`, `inert`; comando 44 px «Mostra la navigazione», `aria-expanded="false"` |
 | A sinistra | in verticale | 95×222 attaccata al bordo |
 | Le voci nell'isola scura | ≥ 4,5 | **6,47** le altre, **7,76** la corrente |
+| **Dentro il catalogo**, `/storie/PlagueDock` a pieno — trovato dall'utente | il pannello in ognuna delle dodici cornici | ❌ prima: finestra 480, involucro 361, pannello a 406–468, tre varianti vuote; ✅ dopo `dad1a35`: involucro 481, **12 su 12** visibili a pieno, a 768 e a 360 |
+| `/storie/PlagueToastRegion` a pieno, «Si è rotto» | la notifica nel riquadro | 412–464 su 481 |
+
+⚠️ **Un pezzo in `position: fixed` si guarda dentro il catalogo, non nella sua cornice aperta da
+sola.** Il primo giro di questo collaudo l'aveva fatto nella cornice, dove la finestra è quella
+del browser e il fondo si vede sempre: il taglio dell'involucro non c'era, e le varianti vuote non
+le ha viste nessuno finché non ci è passato l'utente.
 
 ⚠️ **Due misure che i test non danno.** Il rosso di `danger` sotto soglia è un token di HeroUI, e
 lo si vede solo misurando. E la navigazione in `prefers-reduced-motion` il riquadro del browser
