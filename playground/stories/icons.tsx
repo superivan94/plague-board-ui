@@ -130,8 +130,8 @@ export const potionMugIconStory = defineStory(PotionMugIcon, {
     'La tazza del comando delle donazioni. Le bolle si muovono solo dentro un antenato `.pb-potion-live`: fuori, la stessa tazza resta ferma.',
   variants: [
     { name: 'ferma, 56 px', args: { size: 56 } },
-    { name: 'viva, 56 px', args: { size: 56 }, decorators: [live] },
-    { name: 'viva, 24 px', args: { size: 24 }, decorators: [live] },
+    { name: 'animata, 56 px', args: { size: 56 }, decorators: [live] },
+    { name: 'animata, 24 px', args: { size: 24 }, decorators: [live] },
   ],
   decorators: [inPlagueInk],
 });
