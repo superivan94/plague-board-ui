@@ -380,6 +380,52 @@
   transform-origin: 12px 13px;
 }
 
+/* La navigazione fissa di `PlagueDock` che si ritira: si raccoglie verso il **proprio centro** —
+ * `scale` sui due assi attorno a `center`, e l'opacità che scende — e al suo posto, nella stessa
+ * cella della griglia, spunta il comando che la fa ricrescere.
+ *
+ * ⚠️ **Transizioni e non keyframe**, perché i due versi sono lo stesso movimento: ricrescere è la
+ * stessa transizione all'indietro, e un keyframe per verso si scollerebbe dall'altro al primo
+ * ritocco. `visibility` aspetta la fine della chiusura (`0s` di durata, 350ms di ritardo) così il
+ * pannello si vede rimpicciolire e poi sparisce davvero; riaprendo torna visibile subito.
+ *
+ * ⚠️ **La curva in chiusura accelera e in apertura rallenta**: si raccoglie come risucchiata e
+ * ricresce come un respiro. Con la stessa curva nei due versi sembrerebbe un'animazione al
+ * rovescio, cioè un filmato che torna indietro. */
+.pb-dock-panel {
+  transform-origin: center;
+  transition:
+    transform 350ms cubic-bezier(0, 0, 0.2, 1),
+    opacity 300ms ease,
+    visibility 0s;
+}
+
+.pb-dock-panel[data-collapsed='true'] {
+  transform: scale(0.15);
+  opacity: 0;
+  visibility: hidden;
+  transition:
+    transform 350ms cubic-bezier(0.4, 0, 1, 1),
+    opacity 300ms ease,
+    visibility 0s linear 350ms;
+}
+
+/* Il comando spunta quando il pannello è quasi raccolto: il ritardo è la chiusura meno un soffio. */
+.pb-dock-toggle {
+  animation: pb-dock-pop 250ms cubic-bezier(0.2, 0, 0, 1.4) 200ms both;
+}
+
+@keyframes pb-dock-pop {
+  from {
+    transform: scale(0);
+    opacity: 0;
+  }
+  to {
+    transform: scale(1);
+    opacity: 1;
+  }
+}
+
 /* L'attesa piccola di `PlagueLoader`: lo stesso battito del marchio, quasi tre volte più svelto.
  *
  * ⚠️ **Lo stesso keyframe, non uno suo**: due battiti diversi sarebbero due marchi. Cambia solo il
@@ -1200,6 +1246,8 @@
   .pb-mark-beat,
   /* Il battito svelto dell'attesa: fermo, il marchio resta alla sua taglia e la frase dice il resto. */
   .pb-loader-beat,
+  /* Il comando della navigazione ritirata: fermo, c'è subito, alla sua taglia. */
+  .pb-dock-toggle,
   /* Anche questa è nostra. Ferma, il nome resta **acceso**: la parola che lo sostituirebbe con
      l'animazione spenta non compare mai, e un nome che sparisce ogni tre secondi per niente
      sembrerebbe un guasto. */
@@ -1217,5 +1265,12 @@
 
   .pb-rat-run {
     animation-duration: 1ms !important;
+  }
+
+  /* ⚠️ Una transizione la regola qui sopra non la tocca — dice `animation`, non `transition` — e la
+     navigazione che si ritira è fatta di transizioni: senza questa riga, con «meno movimento» si
+     raccoglierebbe lo stesso. Così è uno scambio secco. */
+  .pb-dock-panel {
+    transition: none !important;
   }
 }

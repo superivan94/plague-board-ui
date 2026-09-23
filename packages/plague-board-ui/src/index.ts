@@ -32,6 +32,10 @@ export { ParticleBurst, type ParticleBurstHandle, type ParticleBurstProps } from
 // libreria — vedi `ToxicLevelProvider` per il perché.
 export { PlagueBackground, type PlagueBackgroundProps } from './brand/PlagueBackground.js';
 export { PlagueBar, type PlagueBarProps } from './brand/PlagueBar.js';
+// La navigazione fissa, con lo stile della barra: le sezioni principali attaccate a un lato, che si
+// ritira da sola. Le voci sono a parte perché il collegamento è dell'applicazione.
+export { PlagueDock, type PlagueDockPlacement, type PlagueDockProps } from './brand/PlagueDock.js';
+export { PlagueDockItem, type PlagueDockItemProps, type PlagueDockLinkProps } from './brand/PlagueDockItem.js';
 // Il piede già montato. I suoi pezzi restano pubblici: chi ne vuole uno diverso se lo compone.
 export { PlagueFootBar, type PlagueFootBarProps } from './brand/PlagueFootBar.js';
 // ⚠️ Le misure **non** escono da `PlagueBar.tsx`, che dichiara `'use client'`: un dato esportato

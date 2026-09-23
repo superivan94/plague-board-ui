@@ -24,6 +24,7 @@ import {
   techRuleStory,
   versionTagStory,
 } from './bar';
+import { plagueDockItemStory, plagueDockStory } from './dock';
 import {
   bacillusIconStory,
   biohazardIconStory,
@@ -107,6 +108,8 @@ export const STORIES = {
   PlagueConfirmDialog: plagueConfirmDialogStory,
   PlagueDialog: plagueDialogStory,
   PlagueDivider: plagueDividerStory,
+  PlagueDock: plagueDockStory,
+  PlagueDockItem: plagueDockItemStory,
   PlagueEmptyState: plagueEmptyStateStory,
   PlagueFootBar: plagueFootBarStory,
   PlagueLoader: plagueLoaderStory,
