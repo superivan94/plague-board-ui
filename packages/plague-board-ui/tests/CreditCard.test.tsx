@@ -52,21 +52,21 @@ describe('CreditCard', () => {
     expect(screen.getByText('Superivan94').className.split(/\s+/)).not.toContain('cursor-default');
   });
 
-  it('senza effetto non monta l’emettitore, quindi niente cenno', () => {
+  it('senza effetto non monta l’emettitore, quindi niente salto', () => {
     const { container } = render(<CreditCard name="AI-Dev" />);
 
     expect(container.querySelector('.pb-hover-hint')).toBeNull();
   });
 
-  it('con un effetto si avvolge nell’emettitore, e gli passa il ritardo del cenno', () => {
+  it('con un effetto si avvolge nell’emettitore, e gli passa il ritardo del salto', () => {
     const { container } = render(
       <CreditCard name="AI-Dev" href="https://esempio.test/ai" effect={binaryRain()} hintDelayMs={2000} />,
     );
 
     // Il collegamento resta dentro l'emettitore: l'easter egg si aggiunge alla scheda, non la
     // sostituisce.
-    const cenno = container.querySelector('.pb-hover-hint');
-    expect(cenno).toHaveStyle({ animationDelay: '2000ms' });
-    expect(cenno?.querySelector('a')).toHaveAttribute('href', 'https://esempio.test/ai');
+    const salto = container.querySelector('.pb-hover-hint');
+    expect(salto).toHaveStyle({ animationDelay: '2000ms' });
+    expect(salto?.querySelector('a')).toHaveAttribute('href', 'https://esempio.test/ai');
   });
 });

@@ -69,7 +69,7 @@ function authorCard(icon: ReactNode, name: string) {
 
 export const hoverEmitterStory = defineStory(HoverEmitter, {
   description:
-    'L’easter egg che si accende finché lo sfiori, e che su un telefono parte al tocco per tre secondi. Da fermo fa un cenno.',
+    'L’easter egg che si accende finché lo sfiori, e che su un telefono parte al tocco per tre secondi. Da fermo fa l’animazione del salto.',
   variants: [
     {
       name: 'i fumetti',
@@ -83,8 +83,8 @@ export const hoverEmitterStory = defineStory(HoverEmitter, {
       },
     },
     {
-      name: 'due schede, la seconda col cenno sfasato di due secondi',
-      note: 'Il saltello torna ogni sei secondi. Da sola una scheda sfasata non si distingue da un’altra: il ritardo serve a due schede vicine, che senza salterebbero insieme e sembrerebbero una cosa sola che pulsa. È quello che `CreditLine` fa da sé coi suoi autori.',
+      name: 'due schede, la seconda con l’animazione del salto sfasata di due secondi',
+      note: 'Il salto torna ogni sei secondi. Da sola una scheda sfasata non si distingue da un’altra: il ritardo serve a due schede vicine, che senza salterebbero insieme e sembrerebbero una cosa sola che pulsa. È quello che `CreditLine` fa da sé coi suoi autori.',
       args: {
         effect: { ...binaryRain(), className: 'pb-binary-digit text-plague-ink' },
         hintDelayMs: 2000,

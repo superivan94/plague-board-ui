@@ -441,7 +441,7 @@ il legame viene reciso, e se questa pagina si muove, senza andare da nessuna par
 | Il colore dei segni | verde di casa, non quello del testo della pagina | `rgb(163, 230, 53)`, cioè il lime del marchio. ⚠️ Va detto sulla particella: nel portale `currentColor` è quello del `body`, non quello del comando |
 | Si preme due volte di fila | il secondo getto non parte finché il primo non è finito | 16 particelle e basta: due getti sovrapposti non si leggono come due |
 | Dove stanno le particelle, e i fumetti della firma | fuori dal piede, non tagliati dalla riga che scorre | tutti nel portale sul `body`, `position: fixed`, `z-index` **50**: il fumetto «EVVAI! FUNZIONA!» sta 3 px sopra il bordo del piede e si legge intero |
-| I cenni delle due schede autore | non partono insieme | `animation-delay` **0s** e **2s**: due schede che saltellano allo stesso istante sembrano una cosa sola che pulsa |
+| I salti delle due schede autore | non partono insieme | `animation-delay` **0s** e **2s**: due schede che saltano allo stesso istante sembrano una cosa sola che pulsa |
 | Si preme la tazza e si guarda **quando** cambia pagina | dopo un pezzo di fontana, e comunque entro il secondo | apertura a **904 ms** dal clic: la fontana dichiara 1728, il comando taglia a `MAX_WAIT_MS` = 900 perché oltre il secondo la scheda non si aprirebbe su Firefox |
 | Si preme la tazza e si guarda **come** si apre | una scheda sola, e questa pagina ferma dov'è | **una** chiamata, `('https://ko-fi.com/superivan94', '_blank')` — niente `noopener` fra le opzioni — `opener` a `null` subito dopo, e `location` invariata. Misurato a 1660 px e a 375 |
 | Quanto dura il credito che il clic concede | abbastanza da coprire l'attesa, ma non è la stessa cosa ovunque | `navigator.userActivation.isActive` **vero** a 4211 ms, **falso** a 5201: cinque secondi su Chromium. Firefox ne dichiara uno, Safari zero — da lì il tetto a 900 ms |
@@ -633,7 +633,7 @@ non lo toglie; la cura è non far nascere ciò che non può arrivare in fondo.
 
 ### L'emettitore: sfiorare, toccare, e chi arriva in fondo — 2026-09-19
 
-**Esegue:** agente — la cadenza, la raffica del tocco, il cenno e il silenzio sotto «meno
+**Esegue:** agente — la cadenza, la raffica del tocco, il salto e il silenzio sotto «meno
 movimento» li tiene `tests/HoverEmitter.test.tsx` coi timer finti; quello che solo un browser vero
 dice è che i pointer event **veri** arrivino come quelli costruiti a mano, che niente venga
 tagliato dai riquadri, e che una taratura costruita da una pagina server attraversi il confine.
@@ -648,8 +648,8 @@ dopo un decimo di secondo, che è quanto dura un tocco vero.
 
 | Azione | Atteso | Ottenuto |
 |---|---|---|
-| Si carica la pagina | tre emettitori fermi, ognuno col suo cenno acceso | 3 nodi `.pb-hover-hint`, animazione `pb-hover-hint` di 6000 ms, iterazioni infinite |
-| Si porta il mouse sulla scheda di Superivan94 | un fumetto per volta, e il cenno di **quella** scheda si spegne | i cenni passano da 3 a 2; `left: 48.4%; top: -77.5%; animation-duration: 3s` |
+| Si carica la pagina | tre emettitori fermi, ognuno col suo salto acceso | 3 nodi `.pb-hover-hint`, animazione `pb-hover-hint` di 6000 ms, iterazioni infinite |
+| Si porta il mouse sulla scheda di Superivan94 | un fumetto per volta, e il salto di **quella** scheda si spegne | i salti passano da 3 a 2; `left: 48.4%; top: -77.5%; animation-duration: 3s` |
 | Si campiona ogni 120 ms per undici secondi e si conta quanti ce ne sono insieme | **mai più di uno**, e fra l'uno e l'altro la scena resta vuota | `maxN` **1** su 90 letture, 5 delle quali a scena vuota; nascite a 2860, 3115 e 3240 ms l'una dall'altra, cioè i 3200 dichiarati |
 | Si guarda dove nascono, uno dopo l'altro | ogni volta da un'altra parte: tre altezze a turno | `-77,5%`, `-55%`, `-100%`, in giro — e il fondo del fumetto sta fra **6 e 23 px** sopra il bordo della scheda, cioè dove la sua punta indica qualcosa |
 | Si guarda quanto sbordano dalla scheda | poco, e da tutti e due i lati: il fumetto si **centra** sul punto in cui nasce | mai oltre il bordo destro (**−13 px** il più sporgente) e al massimo **24 px** oltre il sinistro, su una scheda larga 142 |
@@ -657,7 +657,7 @@ dopo un decimo di secondo, che è quanto dura un tocco vero.
 | Si guarda se due frasi di fila sono uguali | mai: si pesca fra le altre | **0** ripetizioni su 11 uscite, 10 frasi diverse |
 | Si misura la frase più lunga dentro un fumetto vero | sotto il `max-width`, o si scrive sul niente | «SONO UN MAGO DELLA PROGRAMMAZIONE!» fa **179 px** — sui 180 di RattInventario era a un pixel dal bordo, ed è il motivo dei 200 di adesso. Nessuna delle ventidue supera il riquadro |
 | Si porta il mouse su AI-Dev | la pioggia sale e si assesta | 4, 8, 12, 16, 17, 18 campionando ogni 300 ms: è l'equilibrio fra 80 ms di cadenza e 0,8–1,8 s di vita |
-| Si porta il mouse altrove | smette di generarne, e i diciotto in volo **finiscono la loro corsa** | 18, 10, 5, 3, 1, 0, 0 in due secondi e mezzo — nessuno sparito di colpo, e i tre cenni tornano |
+| Si porta il mouse altrove | smette di generarne, e i diciotto in volo **finiscono la loro corsa** | 18, 10, 5, 3, 1, 0, 0 in due secondi e mezzo — nessuno sparito di colpo, e i tre salti tornano |
 | Si manda un `pointerover` col dito e lo si alza dopo 120 ms | la raffica continua da sé per tre secondi, poi si spegne | 2, 4, 3, 5, 4, 2, 2, 1, 0 a mezzo secondo l'uno: genera fino ai 3 s di `tapMs`, poi solo drena |
 | Il colore della pioggia nei due temi | segue `plague-ink`, che cambia col tema | `#15803d` in chiaro, `#4ade80` in scuro, su fasce leggibili in tutti e due |
 | Le tre regole nel CSS **generato** | ci sono tutte: fotogrammi, classe, e la riga di «meno movimento» | `@keyframes pb-hover-hint`, `.pb-hover-hint { …6s…infinite… }`, e `.pb-hover-hint` dentro `@media (prefers-reduced-motion: reduce)` |
@@ -1420,7 +1420,7 @@ cornice si leggono dalla pagina del catalogo con `iframe.contentDocument` e
 | La stessa, dopo la cura | lunga senza contenitore, corta in uno stretto | senza contenitore «Creato da · Superivan94 · AI-Dev» a 360 **e** a 768; in un contenitore «By: · Superivan94» a 360 e la forma lunga a 768. Il piede vero: «By:» e il comando senza testo a 360, «Creato da» e «Offrimi una pozione» a 768 |
 | La firma, il comando e il piede **in una colonna stretta** (15rem), a 768 e a pieno | la forma corta anche su una finestra larga | «By: · Superivan94», «Di: · Superivan94», la sola tazza, e il piede con «By:» e la versione: la soglia è del contenitore, non della finestra |
 | `CreditLine` con `isCompact`, senza contenitore, a 360 e a 768 | corta a tutti e due | «By: · Superivan94» e «Di: · Superivan94» a 360 **e** a 768, accanto alla stessa firma senza la prop che a 768 è intera |
-| `HoverEmitter`, «col cenno sfasato di due secondi» | diverso dalla pioggia binaria | **identico** (segnalato dall'utente): lo sfasamento su una scheda sola non si vede. Ora due schede affiancate, la seconda sfasata: fasi del saltello a **2000 ms** esatti l'una dall'altra, misurate con `getAnimations()` |
+| `HoverEmitter`, «col cenno sfasato di due secondi» — oggi «con l'animazione del salto sfasata di due secondi» | diverso dalla pioggia binaria | **identico** (segnalato dall'utente): lo sfasamento su una scheda sola non si vede. Ora due schede affiancate, la seconda sfasata: fasi del salto a **2000 ms** esatti l'una dall'altra, misurate con `getAnimations()` |
 | Le altezze di tutte le cornici di una storia, ricaricando | uguali per varianti uguali | al primo giro **120** sulla prima cornice di `HoverEmitter` contro 214: il suo messaggio era partito prima che la pagina ascoltasse. Con la domanda e il primo invio al montaggio, tre caricamenti su tre a 214, anche in una scheda in secondo piano |
 | «Prossima» da `BarRow` col formato a 768 | `CountedChips`, sempre a 768 | sì: cornice larga 768, il formato sta in `sessionStorage` |
 | «← tutte le storie» dopo `BarRow` → `CountedChips` → `CreditCard` | l'indice accende l'ultima | `CreditCard` con «l'ultima vista», una sola accesa, in vista |

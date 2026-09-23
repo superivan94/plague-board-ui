@@ -54,8 +54,8 @@ const RULES = [
     'L’altezza non si pesca libera: gira per corsie, che sono altezze fisse percorse a turno, così ogni fumetto compare da un’altra parte. E il testo si pesca fra gli altri, mai quello appena uscito. Sono le due cose che fanno sembrare corto un mazzo di frasi anche quando non lo è.',
   ],
   [
-    'Da fermo fa un cenno',
-    'Un easter egg che si scopre solo passandoci sopra non si scopre affatto. Il contenuto avvolto fa un saltello ogni sei secondi — tutto il movimento sta negli ultimi settecento millisecondi — e si ferma mentre l’emettitore sputa, perché lì il cenno ha già fatto il suo mestiere.',
+    'Da fermo fa l’animazione del salto',
+    'Un easter egg che si scopre solo passandoci sopra non si scopre affatto. Il contenuto avvolto fa un salto ogni sei secondi — tutto il movimento sta negli ultimi settecento millisecondi — e si ferma mentre l’emettitore sputa, perché lì il salto ha già fatto il suo mestiere.',
   ],
   [
     'Quello che vola sborda',
@@ -149,7 +149,7 @@ export default function TouchPage() {
           prerender qui, non a runtime da qualche parte.
         </p>
         <p className="max-w-2xl text-sm text-muted">
-          <strong className="text-foreground">Con «meno movimento» non esce niente</strong>, cenno
+          <strong className="text-foreground">Con «meno movimento» non esce niente</strong>, salto
           compreso, e non è un guasto: sotto quella preferenza le animazioni degli effimeri sono
           spente, quindi un fumetto comparirebbe fermo e di colpo, resterebbe piantato due secondi e
           mezzo e sparirebbe altrettanto bruscamente — più movimento di prima, non meno. La

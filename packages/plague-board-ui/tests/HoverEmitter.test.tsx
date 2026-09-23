@@ -66,7 +66,7 @@ describe('HoverEmitter', () => {
     window.matchMedia = matchMediaVero;
   });
 
-  it('da fermo non sputa niente, e fa il cenno', () => {
+  it('da fermo non sputa niente, e fa l’animazione del salto', () => {
     const { emettitore } = monta();
 
     avanza(5000);
@@ -74,8 +74,8 @@ describe('HoverEmitter', () => {
     expect(emettitore.querySelector('.pb-hover-hint')).not.toBeNull();
   });
 
-  it('il cenno parte col ritardo che gli si dà, e senza ritardo non porta nessuno stile', () => {
-    // È ciò che tiene sfalsati i due autori del piede: due cenni uguali e simultanei, vicini, si
+  it('il salto parte col ritardo che gli si dà, e senza ritardo non porta nessuno stile', () => {
+    // È ciò che tiene sfalsati i due autori del piede: due salti uguali e simultanei, vicini, si
     // leggono come una cosa sola che pulsa.
     const { container, unmount } = render(
       <HoverEmitter effect={LENTO} hintDelayMs={2000}>
@@ -114,7 +114,7 @@ describe('HoverEmitter', () => {
     expect(effimeri()).toHaveLength(4);
   });
 
-  it('mentre sputa il cenno si ferma, e riprende all’uscita', () => {
+  it('mentre sputa il salto si ferma, e riprende all’uscita', () => {
     const { emettitore } = monta();
 
     entra(emettitore);

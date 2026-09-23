@@ -26,9 +26,9 @@ export interface HoverEmitterProps {
    */
   tapMs?: number;
   /**
-   * Di quanto ritarda il **cenno** rispetto agli altri, in millisecondi.
+   * Di quanto ritarda l'**animazione del salto** rispetto agli altri, in millisecondi.
    *
-   * ⚠️ **Serve quando ce n'è più di uno vicino.** Due schede affiancate col cenno che parte nello
+   * ⚠️ **Serve quando ce n'è più di uno vicino.** Due schede affiancate col salto che parte nello
    * stesso istante non sembrano due cose vive: sembrano una cosa sola che pulsa, ed è brutto da
    * guardare — l'ha notato l'utente sulla firma del piede, dove gli autori sono due.
    * {@link CreditLine} lo distribuisce da sé; chi monta le schede a mano ci pensa lui.
@@ -69,16 +69,16 @@ export interface HoverEmitterProps {
  * due cose che fanno sembrare corto un mazzo di frasi anche quando non lo è, e si vedono solo
  * restando col puntatore fermo per una decina di secondi.
  *
- * ⚠️ **Da fermo fa un cenno, ed è l'altra metà della portabilità.** Un easter egg che si scopre
- * solo passandoci sopra non si scopre affatto: chi guarda non ha motivo di provare. Il contenuto
- * avvolto porta quindi `pb-hover-hint` — un saltello di tre pixel ogni sei secondi — che si spegne
- * mentre l'emettitore sputa, perché lì il cenno l'ha già fatto il suo mestiere.
+ * ⚠️ **Da fermo fa l'animazione del salto, ed è l'altra metà della portabilità.** Un easter egg
+ * che si scopre solo passandoci sopra non si scopre affatto: chi guarda non ha motivo di provare.
+ * Il contenuto avvolto porta quindi `pb-hover-hint` — un salto di tre pixel ogni sei secondi — che
+ * si spegne mentre l'emettitore sputa, perché lì il salto ha già fatto il suo mestiere.
  *
  * ⚠️ **Con `prefers-reduced-motion` non esce niente, e non è un guasto.** Sotto quella preferenza
  * `animations.css` spegne le animazioni degli effimeri: un fumetto comparirebbe **fermo e di
  * colpo**, resterebbe piantato il suo paio di secondi e sparirebbe altrettanto bruscamente — cioè
  * più movimento di prima, non meno. Un easter egg è decorazione pura, e chi ha chiesto meno
- * movimento ottiene una pagina che sta ferma, cenno compreso. Se una pagina deve spiegarlo a chi
+ * movimento ottiene una pagina che sta ferma, salto compreso. Se una pagina deve spiegarlo a chi
  * guarda, la preferenza si legge con {@link useReducedMotion}: è la differenza fra «la libreria
  * obbedisce» e «la libreria è rotta».
  *
@@ -203,7 +203,7 @@ export function HoverEmitter({
       onPointerLeave={esce}
       onPointerCancel={esce}
     >
-      {/* Il cenno sta su un involucro suo e non sul contenitore, che è il riquadro che si misura:
+      {/* Il salto sta su un involucro suo e non sul contenitore, che è il riquadro che si misura:
           una `transform` addosso a quello sposterebbe anche il punto da cui nascono gli effimeri. */}
       <span
         className={attivo ? 'inline-flex' : 'pb-hover-hint inline-flex'}

@@ -1,6 +1,6 @@
 import { CreditCard, type CreditAuthor } from './CreditCard.js';
 
-/** Di quanto sfalsa il cenno di un autore rispetto al precedente. Vedi il commento nel corpo. */
+/** Di quanto sfalsa il salto di un autore rispetto al precedente. Vedi il commento nel corpo. */
 const HINT_STAGGER_MS = 2000;
 
 export interface CreditLineProps {
@@ -74,8 +74,8 @@ export function CreditLine({
 
       {authors.map((author, posto) => (
         <span key={author.name} className={posto === 0 ? 'flex' : form.others}>
-          {/* ⚠️ **I cenni non partono insieme**, e il ritardo lo distribuisce la riga invece di
-              chiederlo a chi la usa. Due schede affiancate che saltellano allo stesso istante non
+          {/* ⚠️ **I salti non partono insieme**, e il ritardo lo distribuisce la riga invece di
+              chiederlo a chi la usa. Due schede affiancate che saltano allo stesso istante non
               sembrano due cose vive: sembrano una cosa sola che pulsa. Due secondi bastano a
               rompere la simmetria su un ciclo da sei. */}
           <CreditCard {...author} hintDelayMs={posto * HINT_STAGGER_MS} />

@@ -34,7 +34,7 @@ export interface CreditAuthor {
 }
 
 export interface CreditCardProps extends CreditAuthor {
-  /** Di quanto ritarda il cenno: vedi {@link HoverEmitterProps.hintDelayMs}. */
+  /** Di quanto ritarda l'animazione del salto: vedi {@link HoverEmitterProps.hintDelayMs}. */
   hintDelayMs?: number;
   /** Classi aggiuntive sulla scheda. */
   className?: string;

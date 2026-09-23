@@ -452,8 +452,9 @@ exist in target module» che **non sono veri**. Si guarda la pagina, o si crede 
   tempo** che si spegne da sé e che alzare il dito non interrompe. ⚠️ E resta il problema di
   prima: un easter egg che si scopre solo passandoci sopra non si scopre affatto — in
   RattInventario le schede della firma non danno **nessun** segno di essere vive. Per questo
-  `HoverEmitter` fa un cenno da fermo (`pb-hover-hint`, un saltello ogni sei secondi), e lo spegne
-  mentre sputa.
+  `HoverEmitter` fa da fermo l'animazione del salto (`pb-hover-hint`, un salto ogni sei secondi),
+  e la spegne mentre sputa. ⚠️ Il nome è «salto», non «cenno»: l'utente l'ha chiesto il
+  2026-09-23, per il playground e per il codice.
 - ⚠️ **Una prop che deve arrivare a un componente client da una pagina server si progetta come
   dato, non come funzione.** È il terzo lato del confine, dopo `render` e i dati esportati da un
   modulo `'use client'`: un oggetto con dentro una funzione **non si serializza**, e il prerender
@@ -587,7 +588,7 @@ exist in target module» che **non sono veri**. Si guarda la pagina, o si crede 
   `SupportButton` a mettere. Così la stessa tazza dentro una tabella resta ferma, e una classe di
   troppo non fa niente invece di far muovere qualcosa. ⚠️ **E le bolle vanno in tre tracciati
   separati**: in un `d` solo si muoverebbero in blocco, e tre bolle simultanee sono un lampeggio —
-  la stessa regola dei due autori che sfalsano il cenno di due secondi. ⚠️ I `px` di una
+  la stessa regola dei due autori che sfalsano il salto di due secondi. ⚠️ I `px` di una
   `transform` su un elemento SVG sono **unità del viewBox**, non pixel dello schermo, e `scale`
   vuole `transform-box: fill-box` o conta dall'origine del viewBox e la bolla scappa di lato.
   Misurato: da `+2` a `−3,5` di salita, scala da 0,4 a 1,1, opacità 0 → 1 → 0; 3,4 s a riposo,
@@ -617,9 +618,9 @@ exist in target module» che **non sono veri**. Si guarda la pagina, o si crede 
   su una keyframe vale per l'intervallo che comincia lì), perché una sola curva sulla classe le
   sostituirebbe entrambe. ⚠️ E le particelle partono **una dopo l'altra**: senza quei venti-trenta
   millisecondi di scarto l'una dall'altra, sedici segni che partono insieme tornano a leggersi come
-  uno scoppio. Vale la stessa regola per due cose vicine che fanno lo stesso cenno: uguali e
+  uno scoppio. Vale la stessa regola per due cose vicine che fanno lo stesso salto: uguali e
   simultanee sembrano una cosa sola che pulsa, ed è il motivo per cui `CreditLine` sfalsa di due
-  secondi il cenno di ogni autore.
+  secondi il salto di ogni autore.
 - ⚠️ **Il piede si stringe guardando il suo contenitore, non la finestra, e le container query
   sbagliano nella direzione giusta — se le si scrive al rovescio della finestra.** Senza nessun
   `@container` sopra la query non si applica e **vale la classe di base**: perciò la forma lunga
@@ -726,7 +727,7 @@ exist in target module» che **non sono veri**. Si guarda la pagina, o si crede 
   faceva sembrare i palazzi sette segnaposto in attesa di dati. ⚠️ E ogni luce ha la **sua**
   durata e il suo ritardo: sette finestre con lo stesso ciclo calano insieme, e insieme non sono
   sette luci — sono un temporale. È la stessa regola dei due autori del piede, che sfalsano il
-  cenno di due secondi.
+  salto di due secondi.
 - ⚠️ **Un fumetto centrato sul punto in cui nasce esce dal riquadro quando quel punto è vicino a un
   bordo.** Largo 180 px sopra un palazzo al 10% di un fondale da 736 comincia a −45 px, cioè
   mozzato — ed è lo stesso difetto degli 81 px del fumetto della firma, dall'altro lato. La cura è
@@ -1239,7 +1240,7 @@ exist in target module» che **non sono veri**. Si guarda la pagina, o si crede 
   browser non disegna — lì restavano tutte a 120.
 - ⚠️ **Una variante identica a un'altra a schermo, e che non lo dice, è peggio di nessuna.** Chi
   guarda cerca la differenza, non la trova, e crede che la prop non funzioni: è successo con lo
-  sfasamento del cenno di `HoverEmitter`, che su una scheda sola non si vede. Dove si può la
+  sfasamento del salto di `HoverEmitter`, che su una scheda sola non si vede. Dove si può la
   variante **mostra** la differenza — due schede affiancate, una sfasata —; dove no, perché è un
   nome che si annuncia o un tasto da premere, porta una `note` che dice che cosa guardare.
   ⚠️ **E una forma che dipende dal contenitore non si lascia decidere alla cornice.** La storia di

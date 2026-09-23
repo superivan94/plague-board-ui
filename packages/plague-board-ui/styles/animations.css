@@ -404,8 +404,8 @@
 
 /* ─────────────────────────────────────────────────────────────────────────────
  * `HoverEmitter`. Le prime due classi non sono utility: sono **elementi effimeri** che
- * l'emettitore sputa in pagina, e portano con sé geometria e animazione insieme. La terza è il
- * cenno che fa da fermo, e sta su ciò che avvolge.
+ * l'emettitore sputa in pagina, e portano con sé geometria e animazione insieme. La terza è
+ * l'animazione del salto che fa da fermo, e sta su ciò che avvolge.
  * ───────────────────────────────────────────────────────────────────────────── */
 
 /* ⚠️ **Le due classi qui sotto sono `fixed`, non `absolute`.** Gli effimeri non vivono dentro il
@@ -471,8 +471,8 @@
   border-left: 4px solid transparent;
 }
 
-/* Il cenno che dice «qui c'è qualcosa»: un saltello con lo stiracchiamento di chi si sgranchisce,
- * e poi cinque secondi e mezzo di immobilità. Un easter egg che si scopre solo passandoci sopra
+/* L'animazione del salto, che dice «qui c'è qualcosa»: un salto con lo stiracchiamento di chi si
+ * sgranchisce, e poi cinque secondi e mezzo di immobilità. Un easter egg che si scopre solo passandoci sopra
  * non si scopre affatto — in RattInventario le due schede in fondo alla pagina non danno **nessun**
  * segno di essere vive — e su un telefono, dove «sopra» non esiste, è l'unica cosa che invita a
  * toccare. ⚠️ Tutto il movimento sta negli ultimi 700 ms del ciclo: è il rapporto fra i due tempi
@@ -496,7 +496,7 @@
 
 /* ⚠️ È una classe e non un'utility `animate-*` di proposito: la scrive la libreria su un nodo
  * suo, e un'utility esiste solo se il Tailwind di chi installa ha scandagliato il `dist` del
- * pacchetto. Con la classe il cenno funziona comunque. */
+ * pacchetto. Con la classe il salto funziona comunque. */
 .pb-hover-hint {
   transform-origin: bottom center;
   animation: pb-hover-hint 6s ease-in-out infinite;
@@ -754,7 +754,7 @@
 
 /* ⚠️ **La durata diversa è ciò che rende il disturbo irregolare.** Con lo stesso ciclo le due
  * lamelle si aprirebbero e chiuderebbero insieme per sempre, e due fette simultanee si leggono
- * come un unico sfarfallio — la stessa regola dei due autori del piede, che sfalsano il cenno.
+ * come un unico sfarfallio — la stessa regola dei due autori del piede, che sfalsano il salto.
  * Il valore sovrascrive quello dell'utility `animate-glitch` perché questa riga sta **fuori da
  * ogni layer**, e le nostre vincono su `@layer utilities` senza dipendere dall'ordine. */
 .pb-glitch-slice--pink {
