@@ -23,8 +23,9 @@ export interface PlagueFootBarProps {
    * l'unico segno che il piede può dimensionare da sé, perché è l'unico che conosce.
    */
   supportIcon?: ReactNode;
-  /** Le parole davanti ai nomi, con spazio e senza. */
+  /** Le parole davanti ai nomi, con spazio. */
   creditLabel?: string;
+  /** Le parole davanti ai nomi, senza spazio. */
   creditShortLabel?: string;
   /** Resta attaccato in fondo mentre la pagina scorre. Vero di default. */
   isSticky?: boolean;

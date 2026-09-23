@@ -974,7 +974,12 @@ exist in target module» che **non sono veri**. Si guarda la pagina, o si crede 
   `GlitchSlices`, messo fra il blocco di `GlitchText` e la sua `export function`, ha lasciato il
   componente pubblico senza una riga di documentazione per chi installa, e nessuna build se n'è
   accorta. Trovato il 2026-09-23; una scansione dei 65 componenti di `dist/` non ne ha trovati
-  altri.
+  altri. ⚠️ **Da allora lo tiene `tests/documentation.test.ts`**, che legge i sorgenti col parser
+  di TypeScript e chiede a `getJSDocCommentsAndTags` che cosa `tsc` legherà a ogni nome pubblico —
+  cioè risponde come il compilatore, non come un `grep`, che il blocco staccato lo troverebbe lo
+  stesso. Vuole la documentazione su ogni nome che esce dall'indice e su ogni membro delle sue
+  interfacce, con due sole eccezioni: l'intestazione delle `…Props`, dove si legge il commento
+  della prop, e `children`. Al primo giro ha trovato tre tipi e `creditShortLabel` senza niente.
 - ⚠️ **In HeroUI 3 l'attesa di un comando è `isPending`, non `isDisabled` — e si veste da
   comando spento.** La prop arriva da `react-aria` e il `Button` di HeroUI la inoltra intatta: fa
   la cosa giusta dove conta — non parte niente, il fuoco **resta** sul comando invece di cadere sul

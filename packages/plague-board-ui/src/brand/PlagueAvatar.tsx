@@ -7,6 +7,7 @@ import { SkullIcon } from '../icons/SkullIcon.js';
 /** Le tre taglie di HeroUI, in pixel. ⚠️ `md` è la base e **non ha una classe**: `.avatar--md` non esiste. */
 export const PLAGUE_AVATAR_SIZE = { sm: 32, md: 40, lg: 48 } as const;
 
+/** Una delle tre taglie del ritratto: `sm`, `md` o `lg`. */
 export type PlagueAvatarSize = keyof typeof PLAGUE_AVATAR_SIZE;
 
 export interface PlagueAvatarProps {

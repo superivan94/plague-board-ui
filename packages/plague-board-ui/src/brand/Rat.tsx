@@ -34,6 +34,7 @@ export const RAT_LIVERIES: Record<'grey' | 'white' | 'brown', Record<RatBodySlot
   brown: { fur: '#a86040', shade: '#884838', belly: '#f8e0c0', bellyShade: '#e0c0a0', pink: '#f8b0a8', pinkShade: '#f09898', eye: '#d01820', ink: '#100020', highlight: '#ffffff' },
 };
 
+/** Il nome di una delle tre livree: `grey`, `white` o `brown`. */
 export type RatLivery = keyof typeof RAT_LIVERIES;
 
 const RATIO = RAT_VIEW_BOX.width / RAT_VIEW_BOX.height;

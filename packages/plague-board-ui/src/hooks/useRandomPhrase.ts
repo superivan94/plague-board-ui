@@ -2,6 +2,7 @@
 
 import { useCallback, useState } from 'react';
 
+/** Quello che {@link useRandomPhrase} restituisce: la frase in scena e il modo di cambiarla. */
 export interface RandomPhrase {
   /** Quella detta per ultima, o `null` finché non si è chiesto niente. */
   phrase: string | null;
