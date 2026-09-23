@@ -97,8 +97,8 @@ export function GlitchSection() {
           bordi. Il valore predefinito è <code>transparent</code> ed è una scelta sul{' '}
           <strong>modo di sbagliare</strong>: un colore sbagliato dipinge un rettangolo in mezzo
           alla parola, trasparente al massimo attenua l’effetto. Sopra il fondale della peste si
-          passa <code>#030712</code>. Vale per le copie soltanto: la parola nascosta non ne ha
-          bisogno.
+          passa <code>var(--pb-scene)</code>, che segue il tema come lui. Vale per le copie
+          soltanto: la parola nascosta non ne ha bisogno.
         </p>
 
         <p className="text-sm text-muted">

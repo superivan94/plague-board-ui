@@ -1068,6 +1068,41 @@ sulle tinte; sotto i 24 px la leva è `revealClassName`.
 modo in cui una lastra fallisce non si vede sul fondo per cui è stata scelta, e si vede solo col
 chiaro accanto allo scuro, fermando l'animazione nell'istante giusto.
 
+### Il fondale nei due temi, col marchio gigante — 2026-09-23
+
+**Esegue:** agente
+**Ultima esecuzione:** agente, 2026-09-23
+
+**Preparazione:** `npm run build` e **riavvio** del dev server — `pb-scene-mark`, `bg-(--pb-scene)`
+e le altre sono classi nuove. Il riquadro del browser **davanti**: con `document.hidden` bolle e
+versi non nascono, per costruzione. Cornici `/cornice/LoginScreen/0/{light,dark}` col livello
+«alto», `/cornice/PlagueBackground/4/light` (la scena scura su pagina chiara), e `/atmosfera` nei due
+temi scrivendo `pb-playground-theme` e ricaricando. Contrasti col metodo della tela 1×1, strati
+traslucidi composti dal basso.
+
+| Azione | Atteso | Ottenuto |
+|---|---|---|
+| Prima: le due cornici di `LoginScreen` | — | **identiche al pixel**: il fondale portava `dark` in tutti e due i temi |
+| Il simbolo gigante di `ludoratti.it`, sul sito vivo | — | biohazard 1000×1000 su 1660×1250, `lime-900/20` che pulsa a metà: **1,10** · 1,04 |
+| Prima, un prototipo a stili iniettati | una scena chiara leggibile | nebbia, marchio, bolle, versi e ratti: regge, e diventa la tavolozza di `theme.css` |
+| Il fondo della scena | `#eef2ea` di giorno, `#030712` di notte | `rgb(238, 242, 234)` e `rgb(3, 7, 18)` |
+| Il marchio | 80% del lato corto, pieno, col muso, che respira | 1000×1000 in 1660×1250, `pb-scene-breathe`, nessun `pb-mark-beat` |
+| Il marchio, contrasto | si vede e non disturba | chiaro **1,17** · 1,10 respirando; scuro **1,12** · 1,06 |
+| Testi di `LoginScreen`, **chiaro** | ≥ 4,5 | titolo 17,72 · sottotitolo 7,73 · Google 17,72 · livello scelto 5,93 · non scelto 14,87 · verso della città 8,65 |
+| Testi di `LoginScreen`, **scuro** | invariati | titolo 17,27 · sottotitolo 6,91 · livello scelto 10,90 · non scelto **14,52**, come registrato · verso 17,25 |
+| La scena dentro `dark text-foreground` su pagina chiara | notte: scena, pannello e marchio | fondo `rgb(3, 7, 18)`, pannello scuro, titolo quasi bianco, marchio `rgba(163, 230, 53, 0.08)` |
+| La scheda di `/atmosfera` sul fondale | ≥ 4,5 | chiaro 17,07 · 7,45 · etichetta **4,81**; scuro 18,09 · 7,24 · 12,31 |
+| Denti: `dark` rimesso, marchio che batte, marchio tolto, riga di «meno movimento» tolta, una variabile tolta dal blocco scuro | cinque rossi, ognuno sul suo caso | confermato |
+| Gate | verde | build, typecheck, lint 0/0, **936 test**, 310 cornici, `/` statica |
+
+⚠️ **Il filo di `PlagueDivider` nel pannello chiaro fa 1,98**, e `/accesso` lo dichiarava già: con
+la schermata che ora esiste anche di giorno, quel filo lì si vede davvero. Resta per la passata
+finale sui colori.
+
+**Che cosa protegge:** la schermata di accesso di quattro applicazioni nel tema che la persona ha
+scelto; e i due blocchi del tema con gli stessi colori della scena, che è il modo in cui un pezzo
+sparisce in un tema solo senza che niente diventi rosso.
+
 ### La schermata di accesso, e l'attesa che sembrava un comando spento — 2026-09-20
 
 **Esegue:** agente

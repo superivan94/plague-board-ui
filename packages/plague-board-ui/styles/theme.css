@@ -126,6 +126,34 @@
    * significato è **3**, non 4,5, e nemmeno quella era raggiunta. Col lime-700 fa **4,58**.
    * Una riga qui vale per ogni comando dell'applicazione, nostro o di HeroUI. */
   --focus: #4d7c0f; /* lime-700 — 4,58 sul fondo chiaro di HeroUI */
+
+  /* ⚠️ **La scena di `PlagueBackground`, di giorno.** Fino al 2026-09-23 il fondale era scuro in
+   * tutti e due i temi, e la schermata di accesso con lui. Di giorno la peste è una **nebbia**: il
+   * fondo è un grigio appena verde, i palazzi sono sagome tenui invece che ombre, e ciò che di
+   * notte **fa luce** — il nucleo delle bolle, il loro alone, le finestre — diventa un verde più
+   * scuro e pieno, perché sul chiaro una luce non si vede. Valori scelti su un prototipo nella
+   * cornice di `LoginScreen`; le intensità della grafica decorativa si decidono guardando, non da
+   * una soglia (vedi il marchio). Un test, `tests/scena.test.ts`, tiene i due blocchi con gli stessi
+   * nomi. */
+  --pb-scene: #eef2ea;
+  --pb-scene-fade: #dce4d4; /* la fascia sotto la città, che sfuma verso l'alto */
+  --pb-scene-block: rgb(55 65 81 / 0.16); /* gray-700 al 16% */
+  --pb-scene-window: rgb(101 163 13 / 0.75); /* lime-600 */
+  --pb-scene-floater: rgb(22 163 74 / 0.24); /* plague-600 */
+  --pb-scene-drip: rgb(101 163 13 / 0.8); /* lime-600 */
+  /* ⚠️ Il marchio gigante fa **1,17** di contrasto sulla nebbia, e si vede bene: è grande mezza
+   * schermata, e una figura così si legge a contrasti che un testo non reggerebbe. */
+  --pb-scene-mark: rgb(54 83 20 / 0.1); /* lime-900 al 10% */
+  --pb-scene-bubble-rim: rgb(22 163 74 / 0.55);
+  --pb-scene-bubble-glint: rgb(101 163 13 / 0.35);
+  --pb-scene-bubble-core: rgb(34 197 94 / 0.22);
+  --pb-scene-bubble-core-edge: rgb(34 197 94 / 0.1);
+  --pb-scene-bubble-film: rgb(22 163 74 / 0.18);
+  --pb-scene-bubble-glow: transparent; /* di giorno il gas non fa luce */
+  --pb-scene-bubble-inner-glow: transparent;
+  --pb-scene-chatter-bg: rgb(255 255 255 / 0.92);
+  --pb-scene-chatter-text: #365314; /* lime-900 */
+  --pb-scene-chatter-border: rgb(101 163 13 / 0.5);
 }
 
 .dark,
@@ -135,6 +163,25 @@
   --muted: #a1a1aa; /* zinc-400 — 6,50 sul fondo scuro di HeroUI */
   --accent-soft-foreground: #a3e635; /* il lime pieno — 12,74 sul lime al 15% del fondo scuro */
   --focus: #a3e635; /* il lime pieno: in scuro l'anello si vede, ed è il colore del marchio */
+
+  /* La scena di notte: sono i valori che il fondale aveva prima di seguire il tema, invariati. */
+  --pb-scene: #030712; /* gray-950, il nero di `ludoratti.it` */
+  --pb-scene-fade: #030712;
+  --pb-scene-block: rgb(17 24 39 / 0.8); /* gray-900 all'80% */
+  --pb-scene-window: rgb(163 230 53 / 0.5); /* il lime del marchio */
+  --pb-scene-floater: rgb(74 222 128 / 0.22); /* plague-400, il `#4ade8038` di prima */
+  --pb-scene-drip: rgb(163 230 53 / 0.7);
+  --pb-scene-mark: rgb(163 230 53 / 0.08); /* 1,12 sul nero: il biohazard di là, a 1,10, non si vede */
+  --pb-scene-bubble-rim: rgb(74 222 128 / 0.65);
+  --pb-scene-bubble-glint: rgb(190 242 100 / 0.4);
+  --pb-scene-bubble-core: rgb(0 255 0 / 0.24);
+  --pb-scene-bubble-core-edge: rgb(34 197 94 / 0.12);
+  --pb-scene-bubble-film: rgb(74 222 128 / 0.26);
+  --pb-scene-bubble-glow: rgb(0 255 0 / 0.26);
+  --pb-scene-bubble-inner-glow: rgb(0 255 0 / 0.12);
+  --pb-scene-chatter-bg: rgb(3 7 18 / 0.92);
+  --pb-scene-chatter-text: #d9f99d;
+  --pb-scene-chatter-border: rgb(163 230 53 / 0.35);
 }
 
 /* ─────────────────────────────────────────────────────────────────────────────

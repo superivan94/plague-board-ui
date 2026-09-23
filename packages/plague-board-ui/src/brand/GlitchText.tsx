@@ -38,7 +38,7 @@ export interface GlitchTextProps {
    * nitido; con uno sbagliato dipingono un rettangolo in mezzo alla parola, cioè un difetto
    * evidente. Trasparente le lamelle si limitano a sdoppiare i bordi in ciano e rosa: l'effetto
    * è più tenue, ma non c'è nessun fondo da indovinare. Chi sa che cosa ha dietro lo passa —
-   * sopra {@link PlagueBackground} è `#030712`.
+   * sopra {@link PlagueBackground} è `var(--pb-scene)`, che segue il tema come il fondale.
    *
    * ⚠️ **Vale per le lamelle e basta.** La parola nascosta non posa su nessun fondo: mentre è
    * accesa il nome si spegne, quindi sotto di lei non c'è niente da coprire.

@@ -77,29 +77,41 @@ export const toxicLevelSwitchStory = defineStory(ToxicLevelSwitch, {
   decorators: [atLevel('medium')],
 });
 
+/** Un contenuto qualunque sopra il fondale, coi colori del tema: di giorno chiaro, di notte scuro. */
+const panelOnScene = (
+  <div className="mx-auto max-w-sm rounded-xl border border-brand-ink/40 bg-surface/70 p-6 backdrop-blur-sm">
+    <span className="flex items-center gap-2">
+      <PulseDot />
+      <TechLabel className="text-brand-ink">rete della peste</TechLabel>
+    </span>
+    <p className="mt-3 font-mono text-2xl text-foreground">Rattoteca</p>
+  </div>
+);
+
 export const plagueBackgroundStory = defineStory(PlagueBackground, {
   description:
-    'Il fondale della peste: la città, le gocce, le bolle e i versi, dentro il riquadro che lo ospita. Una pagina intera si ottiene con `min-h-dvh`.',
+    'Il fondale della peste: il marchio al centro, la città, le gocce, le bolle e i versi, dentro il riquadro che lo ospita. Segue il tema: di notte la città buia, di giorno una nebbia verde-grigia. Una pagina intera si ottiene con `min-h-dvh`.',
   layout: 'fullscreen',
   variants: [
     { name: 'livello alto', args: { className: 'min-h-80' }, decorators: [atLevel('high')] },
     { name: 'livello basso', args: { className: 'min-h-80' }, decorators: [atLevel('low')] },
-    { name: 'spento', args: { className: 'min-h-80' }, decorators: [atLevel('off')] },
     {
-      name: 'con un contenuto sopra',
-      args: {
-        className: 'min-h-80 p-8',
-        children: (
-          <div className="mx-auto max-w-sm rounded-xl border border-brand/30 bg-gray-900/50 p-6 backdrop-blur-sm">
-            <span className="flex items-center gap-2">
-              <PulseDot />
-              <TechLabel className="text-brand-ink">rete della peste</TechLabel>
-            </span>
-            <p className="mt-3 font-mono text-2xl text-white">Rattoteca</p>
-          </div>
-        ),
-      },
-      decorators: [atLevel('medium')],
+      name: 'spento',
+      note: 'Il livello spegne il gas — velo, icone, gocce, bolle e versi. La città e il marchio restano: sono il posto, non il gas.',
+      args: { className: 'min-h-80' },
+      decorators: [atLevel('off')],
+    },
+    { name: 'con un contenuto sopra', args: { className: 'min-h-80 p-8', children: panelOnScene }, decorators: [atLevel('medium')] },
+    {
+      name: 'scuro anche nel tema chiaro',
+      note: 'Avvolto in un contenitore `dark text-foreground`: la scena e quello che ci sta sopra restano di notte in tutti e due i temi, senza nessuna prop.',
+      args: { className: 'min-h-80 p-8', children: panelOnScene },
+      decorators: [
+        atLevel('medium'),
+        function inDarkIsland(variant) {
+          return <div className="dark text-foreground">{variant}</div>;
+        },
+      ],
     },
   ],
 });
@@ -111,7 +123,9 @@ export const toxicBubblesStory = defineStory(ToxicBubbles, {
     { name: 'livello alto', args: {}, decorators: [atLevel('high')] },
     { name: 'livello basso', args: {}, decorators: [atLevel('low')] },
   ],
-  decorators: [(variant) => <div className="relative h-64 overflow-hidden rounded-xl bg-gray-950">{variant}</div>],
+  // Il fondo della scena, che segue il tema come i colori delle bolle: su un nero fisso, di giorno,
+  // le bolle chiare sarebbero su un fondo che non è il loro.
+  decorators: [(variant) => <div className="relative h-64 overflow-hidden rounded-xl bg-(--pb-scene)">{variant}</div>],
 });
 
 export const glitchTextStory = defineStory(GlitchText, {

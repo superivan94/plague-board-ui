@@ -89,11 +89,13 @@ export const TETTI = CITTA.map((palazzo) => ({
 }));
 
 /**
- * **Lo skyline distopico**, in fondo al fondale: quattro sagome scure che salgono dal bordo, con
- * le finestre accese che ogni tanto perdono la tensione.
+ * **Lo skyline distopico**, in fondo al fondale: quattro sagome che salgono dal bordo, con le
+ * finestre accese che ogni tanto perdono la tensione.
  *
  * È la scena di `ludoratti.it`, dove dice in un colpo solo dove siamo — una città, di notte, e
- * qualcuno è ancora sveglio. Non è un'icona e non si annuncia: è il posto.
+ * qualcuno è ancora sveglio. Non è un'icona e non si annuncia: è il posto. ⚠️ **I colori sono
+ * della scena** (`--pb-scene-*` in `theme.css`): di notte sagome scure e finestre lime, di giorno
+ * sagome tenui nella nebbia e finestre di un verde più scuro, perché sul chiaro una luce non si vede.
  *
  * ⚠️ **Non dipende dal livello dell'atmosfera**, per scelta dell'utente il 2026-09-20: il livello
  * dice quanto gas c'è in giro, e la corrente di una città non c'entra. Le finestre sono sempre
@@ -102,19 +104,19 @@ export const TETTI = CITTA.map((palazzo) => ({
 export function PlagueCityscape() {
   return (
     <div
-      className="absolute inset-x-0 bottom-0 bg-gradient-to-t from-gray-950 to-transparent"
+      className="absolute inset-x-0 bottom-0 bg-gradient-to-t from-(--pb-scene-fade) to-transparent"
       style={{ height: `${BANDA_CITTA}%` }}
     >
       {CITTA.map((palazzo) => (
         <div
           key={`${palazzo.left ?? ''}${palazzo.right ?? ''}`}
-          className="pb-city-block absolute bottom-0 bg-gray-900/80"
+          className="pb-city-block absolute bottom-0 bg-(--pb-scene-block)"
           style={{ left: palazzo.left, right: palazzo.right, width: palazzo.w, height: palazzo.h }}
         >
           {palazzo.finestre.map((finestra) => (
             <span
               key={`${finestra.top}${finestra.left ?? finestra.right}`}
-              className="pb-city-window absolute bg-brand/50"
+              className="pb-city-window absolute bg-(--pb-scene-window)"
               style={
                 {
                   top: finestra.top,

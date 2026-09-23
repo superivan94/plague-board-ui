@@ -1,38 +1,20 @@
-import { readFileSync } from 'node:fs';
-import { join } from 'node:path';
-
 import { render, screen } from '@testing-library/react';
 import { describe, expect, it } from 'vitest';
 
 import { GlitchText } from '../src';
+import { animazioni, blocco, fermatiDaMenoMovimento } from './fogli';
 
 const lamelle = (container: HTMLElement) => container.querySelectorAll('.pb-glitch-slice');
 const lampo = (container: HTMLElement) => container.querySelector('.pb-glitch-reveal');
 const nome = (container: HTMLElement) => container.querySelector('.pb-glitch-name');
 const radice = (container: HTMLElement) => container.firstElementChild as HTMLElement;
 
-/** Il foglio delle animazioni, senza commenti: i tempi dei fotogrammi stanno solo lì. */
-const ANIMATIONS = readFileSync(join(process.cwd(), 'styles', 'animations.css'), 'utf8').replace(
-  /\/\*[\s\S]*?\*\//g,
-  '',
-);
-
 /** Le opacità di un blocco `@keyframes`, soglia per soglia: `'80%' → '1'`. */
 function keyframeOpacities(name: string): Map<string, string> {
-  const header = ANIMATIONS.indexOf(`@keyframes ${name} {`);
-  if (header < 0) throw new Error(`In animations.css non c'è @keyframes ${name}`);
-  const open = ANIMATIONS.indexOf('{', header);
-  let depth = 0;
-  let close = open;
-  for (let i = open; i < ANIMATIONS.length; i++) {
-    if (ANIMATIONS[i] === '{') depth++;
-    if (ANIMATIONS[i] === '}' && --depth === 0) {
-      close = i;
-      break;
-    }
-  }
   const opacities = new Map<string, string>();
-  for (const [, selectors, declarations] of ANIMATIONS.slice(open + 1, close).matchAll(/([\d.%,\s]+)\{([^}]*)\}/g)) {
+  for (const [, selectors, declarations] of blocco(animazioni, `@keyframes ${name} {`).matchAll(
+    /([\d.%,\s]+)\{([^}]*)\}/g,
+  )) {
     const opacity = /opacity:\s*([\d.]+)/.exec(declarations)?.[1];
     if (opacity === undefined) continue;
     for (const selector of selectors.split(',')) opacities.set(selector.trim(), opacity);
@@ -157,14 +139,10 @@ describe('GlitchText', () => {
   });
 
   it('con «meno movimento» il nome resta acceso', () => {
-    const fermate = /@media \(prefers-reduced-motion: reduce\) \{([\s\S]*?)\{\s*animation: none !important/.exec(
-      ANIMATIONS,
-    )?.[1];
-
     // ⚠️ La parola nasce a opacità zero e con l'animazione spenta non compare; il nome, se la sua
     // animazione restasse accesa, sparirebbe ogni tre secondi per niente. La regola generica non
     // lo prende: `[class*='animate-']` vale per le utility, e questa è una classe nostra.
-    expect(fermate).toContain('.pb-glitch-name--with-reveal');
+    expect(fermatiDaMenoMovimento).toContain('.pb-glitch-name--with-reveal');
   });
 
   it('la parola nascosta resta fuori dal nome accessibile', () => {

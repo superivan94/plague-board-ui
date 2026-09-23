@@ -30,10 +30,19 @@ export default function AtmosferaPage() {
         <div className="flex flex-col gap-2">
           <h1 className="text-2xl font-semibold">L’atmosfera</h1>
           <p className="text-sm text-muted">
-            Il fondale della peste: la <strong>città distopica</strong> in fondo, un velo verde, le
-            icone che galleggiano, le gocce che colano e le bolle di gas che salgono da dietro i
-            palazzi. Serve dove una schermata deve dire «rete della peste» prima di dire qualunque
-            altra cosa — l’accesso, una pagina d’ingresso, un pannello che si presenta.
+            Il fondale della peste: il <strong>marchio dei Ludoratti</strong> al centro, grande e
+            tenue, la <strong>città distopica</strong> in fondo, un velo verde, le icone che
+            galleggiano, le gocce che colano e le bolle di gas che salgono da dietro i palazzi. Serve
+            dove una schermata deve dire «rete della peste» prima di dire qualunque altra cosa —
+            l’accesso, una pagina d’ingresso, un pannello che si presenta.
+          </p>
+          <p className="text-sm text-muted">
+            <strong>Segue il tema.</strong> Di notte è la città buia, con le finestre accese e il gas
+            che fa luce; di giorno una nebbia verde-grigia, coi palazzi tenui e le bolle che non
+            brillano più, perché sul chiaro una luce non si vede. Chi la vuole scura anche su una
+            pagina chiara la mette dentro un contenitore <code>dark text-foreground</code>. Il
+            marchio respira ogni quattro secondi e non batte: a quella misura il battito sarebbe
+            troppo movimento dietro al contenuto.
           </p>
           <p className="text-sm text-muted">
             La scena viene da <code>ludoratti.it</code>, che è la pagina della corporazione e quindi
@@ -51,13 +60,13 @@ export default function AtmosferaPage() {
         <ToxicLevelProvider defaultLevel="medium">
           <div className="flex flex-col gap-3">
             <PlagueBackground className="min-h-[26rem] rounded-xl p-8" contentClassName="flex h-full flex-col">
-              <div className="mx-auto max-w-sm rounded-xl border border-brand/30 bg-gray-900/50 p-6 shadow-2xl backdrop-blur-sm">
+              <div className="mx-auto max-w-sm rounded-xl border border-brand-ink/40 bg-surface/70 p-6 shadow-2xl backdrop-blur-sm">
                 <div className="mb-4 flex items-center gap-2">
                   <PulseDot size={10} />
                   <TechLabel className="text-brand-ink">rete della peste</TechLabel>
                 </div>
 
-                <h2 className="font-mono text-2xl tracking-wide text-white">Rattoteca</h2>
+                <h2 className="font-mono text-2xl tracking-wide text-foreground">Rattoteca</h2>
                 <p className="mt-2 text-sm text-muted">
                   Entra nella tana per gestire i manuali della diffusione
                 </p>

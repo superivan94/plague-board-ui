@@ -720,6 +720,29 @@ exist in target module» che **non sono veri**. Si guarda la pagina, o si crede 
   nucleo si accende (in `toxic`, con l'opacità) e il riflesso diventa verde; e una sacca di gas in
   un liquido si deforma, quindi il `border-radius` oscilla. Il cerchio resta come ripiego di «meno
   movimento», che è il caso in cui la deformazione non c'è.
+- ⚠️ **Una scena che di notte fa luce, di giorno si ridisegna: non si schiarisce.** Il fondale è
+  stato scuro nei due temi fino al 2026-09-23 — scelta mai proposta, contro la decisione «due temi
+  per ogni componente» — e ora segue la pagina coi colori `--pb-scene-*` di `theme.css`. Di giorno
+  è una **nebbia** (`#eef2ea`): i palazzi diventano sagome tenui invece che ombre, e tutto ciò che
+  di notte brilla — il nucleo e l'alone delle bolle, le finestre, le gocce — diventa un verde più
+  scuro e pieno, perché sul chiaro una luce non si vede. La scena scura su una pagina chiara resta
+  possibile senza prop: un contenitore `dark text-foreground`, e le variabili seguono la classe.
+  `tests/scena.test.ts` tiene i due blocchi con gli stessi nomi. ⚠️ **Una variabile che contiene
+  `var(--altra)` la risolve dove è dichiarata**: l'alone delle bolle ha la misura
+  (`var(--pb-toxic-size)`) nella regola e solo il **colore** nella variabile, o sulla radice — dove
+  nessuna bolla ha una misura — sarebbe sempre quella di ripiego.
+- ⚠️ **Il simbolo gigante di `ludoratti.it` il censimento non l'aveva visto, perché non si vede.**
+  È un biohazard a `80vmin` in `lime-900/20` che pulsa a metà opacità: misurato il 2026-09-23 sul
+  sito vivo, contrasto **1,10** al massimo e **1,04** al minimo. Lo ha trovato l'utente, e nel
+  sorgente (`App.tsx:50`) c'era da sempre: un censimento fatto **guardando** perde ciò che quasi non
+  si vede, uno fatto **leggendo il sorgente** no. Nel fondale è diventato il marchio dei Ludoratti
+  (utente), pieno col muso, all'80% del lato corto in unità di contenitore — `80cqmin` su uno
+  strato `absolute inset-0` con `container-type: size`, perché il fondale sta dentro il riquadro che
+  lo ospita e un `vmin` uscirebbe da una scheda. Respira e non batte: a mille pixel lo
+  `scale(1.12)` del battito sono centoventi di movimento dietro al contenuto. ⚠️ **L'intensità di
+  una figura così si sceglie guardando, non da una soglia**: sulla nebbia **1,17** si vede bene, sul
+  nero 1,10 di là no, e il nostro **1,12** sì — grande mezza schermata, si legge a contrasti che un
+  testo non reggerebbe, e il rapporto di WCAG schiaccia le differenze vicino al nero.
 - ⚠️ **Un lampeggio e un respiro sono la stessa animazione con due curve di tempo.** Una luce che
   va e viene con una curva morbida dice «sto caricando»; un **calo di tensione** dice che la
   corrente è marcia, e la differenza la fa `steps(1, end)`, che tiene ogni valore fino al

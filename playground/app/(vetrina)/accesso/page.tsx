@@ -152,6 +152,11 @@ export default function AccessoPage() {
           pezzi — <code>PlagueBackground</code>, <code>PlaguePanel</code>, <code>RatSwarm</code> —
           che restano pubblici e non sanno di lei.
         </p>
+        <p className="text-sm text-muted">
+          <strong>Segue il tema, come il suo fondale</strong>: di giorno la nebbia e un pannello
+          chiaro, di notte la città buia e un pannello scuro. Un’applicazione che vuole l’accesso
+          scuro sempre la mette dentro un contenitore <code>dark text-foreground</code>.
+        </p>
 
         <ScreenDemo />
 

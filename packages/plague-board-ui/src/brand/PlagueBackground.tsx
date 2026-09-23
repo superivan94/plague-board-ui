@@ -5,6 +5,7 @@ import type { CSSProperties, ReactNode } from 'react';
 import { BiohazardIcon } from '../icons/BiohazardIcon.js';
 import { DripIcon } from '../icons/DripIcon.js';
 import { PoisonIcon } from '../icons/PoisonIcon.js';
+import { RatIcon } from '../icons/RatIcon.js';
 import { SkullIcon } from '../icons/SkullIcon.js';
 import { VirusIcon } from '../icons/VirusIcon.js';
 import type { IconProps } from '../icons/types.js';
@@ -32,9 +33,9 @@ interface Galleggiante {
  * posizioni scritte a mano sono anche più affidabili di sei a caso: si può garantire che nessuna
  * cada sopra un'altra, e che la colonna centrale — dove di solito sta il contenuto — resti sgombra.
  *
- * ⚠️ **Il verde è `plague-400` con l'alfa dentro**, non il lime del marchio: la regola della
- * direzione dice «la malattia — `plague-400`: icone, fondali, stati». Il lime resta alle gocce e a
- * quello che sta sopra il fondale.
+ * ⚠️ **Il verde è quello della malattia**, non il lime del marchio: la regola della direzione dice
+ * «la malattia — `plague-400`: icone, fondali, stati». Il lime resta alle gocce e a quello che sta
+ * sopra il fondale. Il colore vero è `--pb-scene-floater`, che di giorno scende di due gradini.
  */
 const GALLEGGIANTI: readonly Galleggiante[] = [
   { Icon: PoisonIcon, size: 34, top: '12%', left: '7%', delay: '0s' },
@@ -116,9 +117,17 @@ export interface PlagueBackgroundProps {
  * avrebbe il difetto di agganciarsi al primo antenato con una `transform`, e non si potrebbe
  * contenere in nessun riquadro.
  *
- * ⚠️ **Resta scuro nei due temi, quindi porta `dark` addosso.** È la stessa regola delle lastre
- * della barra: senza quella classe, i token di HeroUI e i nostri `*-ink` dentro il contenuto
- * leggerebbero il tema della **pagina** e scriverebbero scuro su scuro.
+ * ⚠️ **Segue il tema della pagina.** Di notte è la scena di `ludoratti.it`; di giorno una nebbia
+ * verde-grigia, coi palazzi tenui e il gas che non fa più luce. I colori sono `--pb-scene-*` in
+ * `theme.css`, scritti nei due temi. Fino al 2026-09-23 portava `dark` addosso e restava scuro
+ * sempre, schermata di accesso compresa — contro la decisione «due temi per ogni componente».
+ * **Chi vuole la scena scura su una pagina chiara** la avvolge in un'isola `dark text-foreground`:
+ * le variabili della scena seguono la classe come tutte le altre, e non serve nessuna prop.
+ *
+ * ⚠️ **Al centro c'è il marchio dei Ludoratti, grande l'80% del lato corto**, dietro a tutto il
+ * resto. Di là, al suo posto, c'è un biohazard che quasi non si vede (1,10 di contrasto); il marchio
+ * è stato scelto dall'utente. Come la città, non dipende dal livello. Respira e non batte: vedi
+ * `.pb-scene-mark` in `animations.css`.
  *
  * @example
  * ```tsx
@@ -139,17 +148,24 @@ export function PlagueBackground({
   const taratura = TOXIC_LEVEL_SETTINGS[level];
 
   return (
-    // ⚠️ `dark` e `text-foreground` insieme: la prima porta dentro le variabili del tema scuro, la
-    // seconda il **colore del testo**, che si eredita già calcolato — senza, su una pagina chiara
-    // chi lo prende da `currentColor` scrive scuro su scuro anche con le variabili giuste. È quello
-    // che `.surface` di HeroUI fa per `PlagueBar`.
-    <div className={`dark relative overflow-hidden bg-gray-950 text-foreground ${className}`}>
+    // ⚠️ `text-foreground` resta anche senza `dark`: serve a chi mette il fondale dentro un'isola
+    // `dark` su una pagina chiara. Il colore del testo si eredita **già calcolato**, e senza questa
+    // classe chi lo prende da `currentColor` — il `ToggleButton` di HeroUI — scriverebbe col colore
+    // risolto fuori dall'isola: il selettore del livello faceva 1,19.
+    <div className={`relative overflow-hidden bg-(--pb-scene) text-foreground ${className}`}>
       {/* ⚠️ L'`aria-hidden` sta su questo strato e non sul contenitore: su un antenato del
           contenuto nasconderebbe la pagina intera, che è l'opposto di «decorativo». */}
       <div aria-hidden="true" className="pointer-events-none absolute inset-0 overflow-hidden">
         {/* Il velo sfuma invece di scattare: cambiare livello è un gesto, e uno stacco secco
             sembrerebbe un lampo di pagina sbagliata. */}
         <div className={`absolute inset-0 transition-opacity duration-700 ${taratura.hazeClass}`} style={CHIAZZE} />
+
+        {/* Il marchio gigante, subito sopra il velo: tutto il resto della scena gli passa davanti.
+            Pieno e col muso, perché a quella misura si leggono tutte e tre le sue letture — il
+            cuore, l'abbraccio, il ratto. */}
+        <div className="pb-scene-mark-frame absolute inset-0 flex items-center justify-center">
+          <RatIcon isFilled muzzle="full" animateOn="none" className="pb-scene-mark" />
+        </div>
 
         {GOCCE.slice(0, taratura.drips).map(({ left, w, h, durata, ritardo }) => (
           <span
@@ -171,7 +187,7 @@ export function PlagueBackground({
               } as CSSProperties
             }
           >
-            <DripIcon size={w} height={h} className="block text-brand/70" />
+            <DripIcon size={w} height={h} color="var(--pb-scene-drip)" className="block" />
           </span>
         ))}
 
@@ -181,7 +197,7 @@ export function PlagueBackground({
             className="absolute animate-float"
             style={{ top, left, animationDelay: delay, animationDuration: '7s' }}
           >
-            <Icon size={size} color="#4ade8038" />
+            <Icon size={size} color="var(--pb-scene-floater)" />
           </span>
         ))}
 

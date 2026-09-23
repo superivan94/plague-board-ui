@@ -13,6 +13,7 @@ import {
 // monta da fuori, quindi da `src/index.ts` non esce. Qui servono i suoi numeri per non riscriverli.
 import { CITTA, FINESTRE_TOTALI } from '../src/brand/plagueCityscape';
 import { fineAnimazione } from './animazioni';
+import { fermatiDaMenoMovimento } from './fogli';
 import { menoMovimento, paginaNascosta } from './preferenze';
 
 const avanza = (ms: number) => act(() => void vi.advanceTimersByTime(ms));
@@ -22,6 +23,7 @@ const galleggianti = (container: HTMLElement) => container.querySelectorAll('.an
 const bolle = (container: HTMLElement) => container.querySelectorAll('.pb-toxic-bubble');
 const palazzi = (container: HTMLElement) => container.querySelectorAll('.pb-city-block');
 const finestre = (container: HTMLElement) => container.querySelectorAll('.pb-city-window');
+const marchio = (container: HTMLElement) => container.querySelector('.pb-scene-mark');
 
 const conFondale = (level: ToxicLevel) =>
   render(
@@ -46,17 +48,50 @@ describe('PlagueBackground', () => {
     expect(screen.getByText('il contenuto')).toBeInTheDocument();
   });
 
-  it('è un’isola scura intera: il tema e anche il colore del testo', () => {
+  it('segue il tema della pagina: nessun `dark` addosso, e il fondo è quello della scena', () => {
     const { container } = conFondale('high');
     const scena = container.firstElementChild;
 
-    // ⚠️ `dark` da sola non basta. Il colore si eredita **già calcolato**: il `body` di una pagina
-    // chiara lo risolve scuro, e chi lo prende da `currentColor` — il `ToggleButton` di HeroUI
-    // nella sua variante predefinita — scriveva scuro su scuro a **1,19** di contrasto, con tutte
-    // le variabili del tema giuste. `text-foreground` lo fa risolvere di nuovo qui dentro, ed è
-    // quello che `.surface` di HeroUI fa per la barra.
-    expect(scena).toHaveClass('dark');
+    // ⚠️ Fino al 2026-09-23 il fondale portava `dark` in tutti e due i temi, e la schermata di
+    // accesso era solo scura — contro la decisione «due temi per ogni componente». Chi vuole la
+    // scena scura su una pagina chiara la avvolge in un'isola `dark`, come le altre superfici.
+    expect(scena).not.toHaveClass('dark');
+    expect(scena).toHaveClass('bg-(--pb-scene)');
+    // Resta: dentro un'isola `dark` il colore del testo va risolto di nuovo qui, o chi lo prende da
+    // `currentColor` scrive col colore già calcolato fuori — il 1,19 del selettore del livello.
     expect(scena).toHaveClass('text-foreground');
+  });
+
+  it('il marchio gigante sta nella scena a ogni livello, pieno, col muso e fermo', () => {
+    // ⚠️ Come la città, non dipende dal livello: il livello dice quanto gas c'è, il marchio è chi
+    // abita il posto. E non batte: a quella misura lo `scale(1.12)` del battito sono centinaia di
+    // pixel che si muovono dietro al contenuto — respira, e il respiro sta in `animations.css`.
+    for (const livello of ['off', 'low', 'medium', 'high'] as const) {
+      const { container, unmount } = conFondale(livello);
+      const disegno = marchio(container);
+
+      expect(disegno).not.toBeNull();
+      expect(disegno?.closest('[aria-hidden="true"]')).not.toBeNull();
+      expect(disegno?.querySelector('path[fill="currentColor"]')).not.toBeNull();
+      expect(disegno?.querySelector('path[stroke-linecap]:not([stroke-linejoin])')).not.toBeNull();
+      expect(disegno?.getAttribute('class')).not.toContain('pb-mark-beat');
+      expect(disegno?.querySelector('.pb-mark-beat')).toBeNull();
+      unmount();
+    }
+  });
+
+  it('il marchio sta dietro a tutto il resto della scena', () => {
+    const { container } = conFondale('high');
+    const disegno = marchio(container)!;
+
+    // Le gocce, le icone e la città gli passano davanti: è lo sfondo dello sfondo.
+    for (const pezzo of [gocce(container)[0], galleggianti(container)[0], palazzi(container)[0]]) {
+      expect(disegno.compareDocumentPosition(pezzo) & Node.DOCUMENT_POSITION_FOLLOWING).toBeTruthy();
+    }
+  });
+
+  it('con «meno movimento» il marchio smette di respirare', () => {
+    expect(fermatiDaMenoMovimento).toContain('.pb-scene-mark');
   });
 
   it('mette in scena tanti pezzi quanti ne dichiara il livello', () => {
