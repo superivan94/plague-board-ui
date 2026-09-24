@@ -1,6 +1,6 @@
 'use client';
 
-import { ToggleButton, ToggleButtonGroup } from '@heroui/react';
+import { ToggleButton, ToggleButtonGroup, useIsHydrated } from '@heroui/react';
 
 import { MonitorIcon } from '../icons/MonitorIcon.js';
 import { MoonIcon } from '../icons/MoonIcon.js';
@@ -18,8 +18,8 @@ const SEGNI = { light: SunIcon, dark: MoonIcon, system: MonitorIcon } as const;
 export interface ThemeSwitchProps {
   /**
    * La scelta di adesso. Accetta una stringa qualunque perché `useTheme` e `next-themes` danno una
-   * stringa — e `undefined` prima dell'idratazione: quello che non è `light` o `dark` vale come
-   * «del sistema».
+   * stringa, a volte `undefined`: quello che non è `light` o `dark` vale come «del sistema». Si
+   * mostra solo a idratazione finita — prima, il commutatore dice «del sistema» come sul server.
    */
   value: string | undefined;
   /** Una scelta nuova. Salvarla e applicarla è di chi lo monta: di solito, il gancio del tema. */
@@ -46,6 +46,12 @@ export interface ThemeSwitchProps {
  * impostazioni del suo dispositivo non deve ripeterla qui. Il commutatore di oggi di Rattoteca la
  * supporta sotto e la nasconde — con `system` mostra «chiaro» qualunque cosa faccia il sistema.
  *
+ * ⚠️ **Fino all'idratazione mostra «del sistema», qualunque `value` riceva.** I due ganci leggono
+ * `localStorage` già al primo render del client, mentre il server non ce l'ha e rende il valore di
+ * serie: due scelte diverse fra l'HTML e l'idratazione, e React **non ripara** gli attributi.
+ * Misurato il 2026-09-24 nella barra del playground: pagina chiara, commutatore fermo su «del
+ * sistema». Aspettare qui vuol dire che nessuna applicazione deve ricordarsi di farlo.
+ *
  * @example
  * ```tsx
  * const { theme, setTheme } = useTheme();   // da '@heroui/react'
@@ -59,7 +65,8 @@ export function ThemeSwitch({
   labels = THEME_PREFERENCE_LABELS,
   className = '',
 }: ThemeSwitchProps) {
-  const scelta: ThemePreference = value === 'light' || value === 'dark' ? value : 'system';
+  const idratato = useIsHydrated();
+  const scelta: ThemePreference = idratato && (value === 'light' || value === 'dark') ? value : 'system';
 
   return (
     <ToggleButtonGroup

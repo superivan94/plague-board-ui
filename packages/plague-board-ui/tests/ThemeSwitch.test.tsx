@@ -1,4 +1,6 @@
-import { fireEvent, render, screen } from '@testing-library/react';
+import { act, fireEvent, render, screen, within } from '@testing-library/react';
+import { hydrateRoot } from 'react-dom/client';
+import { renderToString } from 'react-dom/server';
 import { afterEach, describe, expect, it, vi } from 'vitest';
 
 import { THEME_PREFERENCE_LABELS, ThemeSwitch, themeBootScript } from '../src';
@@ -38,6 +40,25 @@ describe('ThemeSwitch', () => {
     render(<ThemeSwitch value={undefined} onChange={vi.fn()} />);
 
     expect(opzione(THEME_PREFERENCE_LABELS.system)).toBeChecked();
+  });
+
+  it('si idrata con quello che ha reso il server, e poi mostra la scelta vera', async () => {
+    // ⚠️ È il caso di `useTheme` di HeroUI, misurato nella barra del playground: sul server il
+    // gancio non sa niente e dà il valore di serie, nel client legge `localStorage` **già al primo
+    // render**. Due valori diversi fra HTML e idratazione, e React non ripara gli attributi: il
+    // commutatore restava su «del sistema» con la pagina chiara. `next-themes` fa lo stesso.
+    const contenitore = document.createElement('div');
+    contenitore.innerHTML = renderToString(<ThemeSwitch value="system" onChange={vi.fn()} />);
+    document.body.appendChild(contenitore);
+    const errori = vi.spyOn(console, 'error').mockImplementation(() => {});
+
+    const radice = await act(async () => hydrateRoot(contenitore, <ThemeSwitch value="light" onChange={vi.fn()} />));
+
+    expect(errori).not.toHaveBeenCalled();
+    expect(within(contenitore).getByRole('radio', { name: THEME_PREFERENCE_LABELS.light })).toBeChecked();
+    act(() => radice.unmount());
+    contenitore.remove();
+    errori.mockRestore();
   });
 
   it('i nomi delle scelte e del gruppo sono di chi lo monta', () => {
