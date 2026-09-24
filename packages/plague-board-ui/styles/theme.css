@@ -5,28 +5,235 @@
  * `bg-brand` e `text-brand` sono riscritte a mano più sotto, mentre `animate-scale-bounce` non
  * esiste affatto: la classe non è mai stata generata e il rimbalzo non è mai partito.
  *
- * ⚠️ Qui i colori sono STATICI, e per ora è voluto. Un colore diventa consapevole del tema solo
- * quando si sa che cosa deve fare in tutti e due, e in RattInventario il tema chiaro non è mai
- * stato implementato: la risposta oggi non esiste per la maggior parte di questi valori. A dirla
- * sarà il playground, che li mette affiancati nei due temi — quello che stona si promuove allora.
+ * I valori sono MISURATI sulle due fonti vive — `ludoratti.it` e `rattinventario.ludoratti.it` —
+ * e il contrasto di ognuno contro i due fondi del tema è stato calcolato prima di decidere che
+ * cosa cambia col tema e che cosa no.
  *
- * I valori sono MISURATI sul progetto vivo, non scelti: i quattro verdi vengono dai bordi di
- * `plague-animations.css`, il verde tossico dalle icone (dove compare quasi sempre con
- * trasparenza), il ciano dalle variabili `--color-brand*` di `globals.css`.
+ * ⚠️ **Le due fonti non andavano d'accordo, e la scelta è stata fatta il 2026-09-16.** L'una è la
+ * pagina del marchio, l'altra è un'applicazione che quel marchio lo indossa: quando divergono
+ * vince la prima. Da lì viene il verde, da lì viene il nero.
  */
 
-@theme {
-  /* Il marchio: ciano. È il colore dell'applicazione, non della peste. */
-  --color-brand: #00acc1;
-  --color-brand-light: #5ddef4;
-  --color-brand-dark: #007c91;
+/* ─────────────────────────────────────────────────────────────────────────────
+ * I colori statici. Due verdi, e non è un doppione: hanno due mestieri.
+ *
+ * `brand` è il verde della **corporazione** — il logo, il nome, i bordi delle schede, il pallino
+ * che pulsa accanto a un titolo. `plague` è il verde della **malattia** — le icone, i bordi che
+ * pulsano, il livello tossico. Il primo dice chi siamo, il secondo di che cosa parliamo, e su
+ * `ludoratti.it` convivono già così.
+ * ───────────────────────────────────────────────────────────────────────────── */
 
-  /* La peste: la scala verde degli accenti e dei bordi. */
+@theme {
+  /* Il marchio: il verde acido di `ludoratti.it`, misurato sul sito (`rgb(163, 230, 53)`).
+   * ⚠️ Fino al 2026-09-16 qui c'era il ciano `#00acc1`. Non era il colore del marchio: era
+   * l'accento di **RattInventario**, e la pagina della corporazione non lo usa in nessun punto.
+   * È uscito perché l'accento di un'applicazione lo sceglie l'applicazione. */
+  --color-brand: #a3e635;
+  --color-brand-light: #bef264;
+  --color-brand-dark: #4d7c0f;
+
+  /* La peste: la scala verde degli accenti e dei bordi di RattInventario. Sono i quattro verdi di
+   * `plague-pulse` — di là ci sono arrivati a mano, qui hanno un nome. */
   --color-plague-400: #4ade80;
   --color-plague-500: #22c55e;
   --color-plague-600: #16a34a;
   --color-plague-700: #15803d;
 
-  /* Il verde tossico delle icone. Pieno è acido: si usa quasi sempre con trasparenza. */
+  /* Il verde tossico delle icone.
+   * ⚠️ Non ha un equivalente in tema chiaro, e non è una dimenticanza: contro il bianco fa **1,37**
+   * di contrasto, cioè è invisibile. È una luce, non un inchiostro — serve a far brillare qualcosa
+   * su un fondo scuro, e si usa con l'opacità: `text-toxic/40`, non `#00ff0040` scritto a mano
+   * come di là. */
   --color-toxic: #00ff00;
+}
+
+/* ⚠️ **Il grigio dei Ludoratti non sta qui, ed è una scelta: è quello di Tailwind.**
+ *
+ * `ludoratti.it` posa su `#030712` e le sue schede su `#111827`, che sono esattamente `gray-950` e
+ * `gray-900` — il manifest dichiara lo stesso `#030712` come `theme-color`. Dichiararli di nuovo
+ * vorrebbe dire **sovrascrivere** la scala di chi installa la libreria, che è il difetto che
+ * RattInventario ha davvero: là `--color-gray-*` è ridefinito, quindi `bg-gray-800` vale `#1e1e1e`
+ * invece del `#1f2937` di Tailwind, e nessuno se lo aspetta.
+ *
+ * Una scala `ash` neutra è esistita qui per due commit, col nero di RattInventario. È uscita
+ * quando la fonte del nero è diventata la pagina del marchio: un token che vale quanto uno
+ * predefinito è un token da togliere. */
+
+/* ─────────────────────────────────────────────────────────────────────────────
+ * I due soli colori che il tema cambia, e il motivo è misurato.
+ *
+ * Un verde **scritto come testo** non può restare lo stesso: contro il bianco il lime fa 1,51 di
+ * contrasto e il verde della peste 1,74 — sotto ogni soglia leggibile. Contro il nero fanno 13,35
+ * e 11,55. La tinta quindi scende di tono in tema chiaro e risale in tema scuro, e siccome ogni
+ * componente che scrive in verde ha lo stesso problema, la scelta sta qui una volta sola.
+ *
+ * ⚠️ `@theme inline` e non `@theme`: con `inline` l'utility generata punta **alla variabile**
+ * invece che al valore, quindi ridichiarare la variabile più sotto cambia davvero il colore. Senza
+ * `inline`, Tailwind incollerebbe il valore del tema chiaro dentro la classe e il blocco `.dark`
+ * non servirebbe a niente.
+ * ───────────────────────────────────────────────────────────────────────────── */
+
+@theme inline {
+  /* Il verde del marchio con cui si SCRIVE — non quello con cui si riempie. */
+  --color-brand-ink: var(--pb-brand-ink);
+  /* Il verde della peste con cui si scrive, stessa storia. */
+  --color-plague-ink: var(--pb-plague-ink);
+}
+
+/* ⚠️ I due blocchi si scrivono in quest'ordine e con questi selettori apposta.
+ *
+ * Hanno la **stessa specificità**, quindi a decidere è la posizione: lo scuro sta sotto e vince
+ * quando `.dark` è acceso. E sono classi qualunque, non `:root.dark`, perché il tema dev'essere
+ * commutabile **su un contenitore**: il playground mostra ogni componente nei due temi
+ * affiancati, cioè due isole nella stessa pagina, e con `:root.dark` sarebbe impossibile.
+ * `[data-theme]` c'è perché è il secondo aggancio che HeroUI 3 riconosce — e `.light` è il primo,
+ * dichiarato dal suo `themes/default/variables.css`. */
+
+:root,
+.light,
+[data-theme='light'] {
+  --pb-brand-ink: #4d7c0f; /* lime-700 — 4,99 sul bianco */
+  --pb-plague-ink: #15803d; /* plague-700 — 5,02 sul bianco */
+
+  /* ⚠️ Il grigio del testo secondario di HeroUI, ridichiarato di un gradino. Il suo fa **4,43**
+   * sul proprio fondo chiaro, cioè manca il 4,5 per sette centesimi: misurato il 2026-09-17 su
+   * ogni testo del playground. Non si vede a occhio, e proprio per questo passerebbe.
+   *
+   * ⚠️ E va ridichiarato **in tutti e due i blocchi**. Queste righe stanno fuori da ogni layer,
+   * quindi vincono sul tema di HeroUI che sta in `@layer base` — anche quando la sua è più
+   * specifica. Scritto solo qui, questo `:root` spegnerebbe pure il grigio del tema scuro, che
+   * crollerebbe a 2,62: misurato, sbagliandolo. */
+  --muted: #52525b; /* zinc-600 — 7,46 sul fondo chiaro di HeroUI */
+
+  /* ⚠️ **Il testo di una superficie con l'accento tenue, ridichiarato per lo stesso motivo del
+   * grigio.** HeroUI lo ricava da `--accent` con un `color-mix(in oklab, accent 70%, foreground
+   * 30%)`, e quella ricetta è tarata su un accento **scuro**: col nostro lime esce `#75a238` su un
+   * fondo che è lime al 15% sul chiaro, cioè **2,76**. Misurato il 2026-09-20 sull'opzione scelta
+   * di un `ToggleButtonGroup`, che è la forma con cui la libreria fa scegliere fra poche cose — e
+   * quindi è il testo che dice **quale** si è scelto.
+   *
+   * ⚠️ In chiaro scende **un gradino più giù di `--pb-brand-ink`**, e non per gusto: il fondo qui
+   * non è il bianco ma il bianco già tinto di lime al 15%, quindi il lime-700 che sul bianco fa
+   * 4,99 lì si ferma a 4,31. Il valore è scritto per esteso e non con una `var()`: una `var()`
+   * dentro una proprietà personalizzata si risolve sull'elemento che la dichiara, quindi su
+   * un'isola `.dark` dentro una pagina chiara resterebbe congelata sul valore del chiaro. */
+  --accent-soft-foreground: #3f6212; /* lime-800 — 6,11 sul lime al 15% del fondo chiaro; il lime-700 di `--pb-brand-ink` lì si ferma a 4,31 */
+
+  /* ⚠️ **L'anello di fuoco, ridichiarato per lo stesso motivo dell'accento tenue.** HeroUI ricava
+   * `--focus` dal nostro `--accent`, cioè dal lime pieno, e un anello sottile di lime su una
+   * pagina chiara fa **1,38**: un comando che con la tastiera non si trova. È il numero che
+   * `CLAUDE.md` aveva già registrato per la mascotte — la soglia della grafica che porta
+   * significato è **3**, non 4,5, e nemmeno quella era raggiunta. Col lime-700 fa **4,58**.
+   * Una riga qui vale per ogni comando dell'applicazione, nostro o di HeroUI. */
+  --focus: #4d7c0f; /* lime-700 — 4,58 sul fondo chiaro di HeroUI */
+
+  /* ⚠️ **La scena di `PlagueBackground`, di giorno.** Fino al 2026-09-23 il fondale era scuro in
+   * tutti e due i temi, e la schermata di accesso con lui. Di giorno la peste è una **nebbia**: il
+   * fondo è un grigio appena verde, i palazzi sono sagome tenui invece che ombre, e ciò che di
+   * notte **fa luce** — il nucleo delle bolle, il loro alone, le finestre — diventa un verde più
+   * scuro e pieno, perché sul chiaro una luce non si vede. Valori scelti su un prototipo nella
+   * cornice di `LoginScreen`; le intensità della grafica decorativa si decidono guardando, non da
+   * una soglia (vedi il marchio). Un test, `tests/scena.test.ts`, tiene i due blocchi con gli stessi
+   * nomi. */
+  --pb-scene: #eef2ea;
+  --pb-scene-fade: #dce4d4; /* la fascia sotto la città, che sfuma verso l'alto */
+  --pb-scene-block: rgb(55 65 81 / 0.16); /* gray-700 al 16% */
+  --pb-scene-window: rgb(101 163 13 / 0.75); /* lime-600 */
+  --pb-scene-floater: rgb(22 163 74 / 0.24); /* plague-600 */
+  --pb-scene-drip: rgb(101 163 13 / 0.8); /* lime-600 */
+  /* ⚠️ Il marchio gigante fa **1,17** di contrasto sulla nebbia, e si vede bene: è grande mezza
+   * schermata, e una figura così si legge a contrasti che un testo non reggerebbe. */
+  --pb-scene-mark: rgb(54 83 20 / 0.1); /* lime-900 al 10% */
+  --pb-scene-bubble-rim: rgb(22 163 74 / 0.55);
+  --pb-scene-bubble-glint: rgb(101 163 13 / 0.35);
+  --pb-scene-bubble-core: rgb(34 197 94 / 0.22);
+  --pb-scene-bubble-core-edge: rgb(34 197 94 / 0.1);
+  --pb-scene-bubble-film: rgb(22 163 74 / 0.18);
+  --pb-scene-bubble-glow: transparent; /* di giorno il gas non fa luce */
+  --pb-scene-bubble-inner-glow: transparent;
+  --pb-scene-chatter-bg: rgb(255 255 255 / 0.92);
+  --pb-scene-chatter-text: #365314; /* lime-900 */
+  --pb-scene-chatter-border: rgb(101 163 13 / 0.5);
+}
+
+.dark,
+[data-theme='dark'] {
+  --pb-brand-ink: #a3e635; /* il lime del marchio — 13,35 sul nero */
+  --pb-plague-ink: #4ade80; /* plague-400 — 11,55 sul nero, ed è il verde del testo di là */
+  --muted: #a1a1aa; /* zinc-400 — 6,50 sul fondo scuro di HeroUI */
+  --accent-soft-foreground: #a3e635; /* il lime pieno — 12,74 sul lime al 15% del fondo scuro */
+  --focus: #a3e635; /* il lime pieno: in scuro l'anello si vede, ed è il colore del marchio */
+
+  /* La scena di notte: sono i valori che il fondale aveva prima di seguire il tema, invariati. */
+  --pb-scene: #030712; /* gray-950, il nero di `ludoratti.it` */
+  --pb-scene-fade: #030712;
+  --pb-scene-block: rgb(17 24 39 / 0.8); /* gray-900 all'80% */
+  --pb-scene-window: rgb(163 230 53 / 0.5); /* il lime del marchio */
+  --pb-scene-floater: rgb(74 222 128 / 0.22); /* plague-400, il `#4ade8038` di prima */
+  --pb-scene-drip: rgb(163 230 53 / 0.7);
+  --pb-scene-mark: rgb(163 230 53 / 0.08); /* 1,12 sul nero: il biohazard di là, a 1,10, non si vede */
+  --pb-scene-bubble-rim: rgb(74 222 128 / 0.65);
+  --pb-scene-bubble-glint: rgb(190 242 100 / 0.4);
+  --pb-scene-bubble-core: rgb(0 255 0 / 0.24);
+  --pb-scene-bubble-core-edge: rgb(34 197 94 / 0.12);
+  --pb-scene-bubble-film: rgb(74 222 128 / 0.26);
+  --pb-scene-bubble-glow: rgb(0 255 0 / 0.26);
+  --pb-scene-bubble-inner-glow: rgb(0 255 0 / 0.12);
+  --pb-scene-chatter-bg: rgb(3 7 18 / 0.92);
+  --pb-scene-chatter-text: #d9f99d;
+  --pb-scene-chatter-border: rgb(163 230 53 / 0.35);
+}
+
+/* ─────────────────────────────────────────────────────────────────────────────
+ * La vestizione di HeroUI.
+ *
+ * HeroUI 3 dichiara le sue utility con `@theme inline` sopra a variabili grezze — `--accent`,
+ * `--success`, `--focus` — che il suo tema definisce in `@layer base`. Vestirlo quindi non vuol
+ * dire riscrivere un componente: vuol dire ridichiarare quelle variabili. Queste righe stanno
+ * **fuori da ogni layer** apposta, così vincono senza dipendere dall'ordine degli import.
+ *
+ * ⚠️ Si tocca il minimo che si sa: l'accento e il verde di conferma. I grigi di HeroUI restano
+ * suoi — decisione dell'utente, 2026-09-16 — e il resto si guarda quando i componenti ci sono.
+ * ───────────────────────────────────────────────────────────────────────────── */
+
+:root,
+:host {
+  /* L'accento primario: il lime del marchio.
+   * ⚠️ **Etichetta scura, non bianca.** Il lime è un colore chiaro: col bianco sopra fa **1,51**,
+   * col quasi-nero **11,89**. In RattInventario il pulsante primario è `bg-brand text-white` in 22
+   * punti e fa 2,74 — qui non si ripete. */
+  --accent: #a3e635;
+  --accent-hover: #84cc16;
+  --accent-foreground: #171717;
+
+  /* Il verde di conferma diventa quello della peste, col bianco sopra: 5,02.
+   * È già così di là, ed è l'unico caso in cui il verde acceso e quello scuro si scambiano i
+   * ruoli — qui il riempimento è scuro perché l'etichetta è chiara. */
+  --success: #15803d;
+  --success-hover: #16a34a;
+  --success-foreground: #ffffff;
+}
+
+/* ─────────────────────────────────────────────────────────────────────────────
+ * `pb-roomy` — «c'è posto».
+ *
+ * La soglia oltre la quale una lastra dei Ludoratti porta la taglia che le è stata chiesta. Sotto,
+ * barra e piede tornano a `small`: è quello che fa `isCompactOnMobile`, acceso di default.
+ *
+ * ⚠️ **Due condizioni, non una.** La larghezza da sola — `sm:`, cioè queste stesse 40rem — lascia
+ * fuori il caso in cui lo spazio verticale è più scarso di tutti: un telefono **coricato** è largo
+ * 844 px e alto 390, quindi passerebbe per un desktop mentre una barra `large` e un piede `large`
+ * gli prendono un terzo dello schermo. La seconda condizione è lì per lui, e prende di rimbalzo
+ * anche una finestra bassa sul desktop. Soglie scelte con l'utente il 2026-09-20.
+ *
+ * ⚠️ **È una variante e non una utility perché deve poter vestire qualunque proprietà**: il
+ * rientro della lastra, il rientro dell'incavo, la misura di un segno. E sta in `theme.css`, cioè
+ * nel foglio che chi installa la libreria importa comunque: senza, le classi `pb-roomy:*` non
+ * generano nessuna regola e le lastre restano **compatte ovunque** — meno bello, mai rotto.
+ * ───────────────────────────────────────────────────────────────────────────── */
+
+@custom-variant pb-roomy {
+  @media (min-width: 40rem) and (min-height: 30rem) {
+    @slot;
+  }
 }

@@ -1,9 +1,1276 @@
-/* Le animazioni dei Ludoratti, tutte qui.
+/* Le animazioni dei Ludoratti, in un file solo.
  *
- * ⚠️ In RattInventario vivono in CINQUE posti — un foglio di stile, il `globals.css`, e tre
- * `<style>` incorporati dentro i componenti — più due copie morte che hanno già divergato dalla
- * viva. Il motivo per cui questo file esiste è che sia l'unico.
+ * ⚠️ **In RattInventario stanno in cinque posti**, e due sono copie morte che hanno già divergato:
+ * `styles/plague-animations.css` (viva), `app/plague-animations.css` (116 righe che nessuno
+ * importa), `ui/PlagueAnimations.tsx` (128 righe iniettate a runtime, senza chiamanti), più nove
+ * `@keyframes` dentro tre `<style>` incorporati nei componenti. Questo file è la cosa che quelle
+ * copie le toglie.
  *
- * Le regole arrivano col componente che le usa: un `@keyframes` senza il suo componente è un
- * pezzo di CSS che nessuno cancellerà mai più.
+ * ⚠️ **I `@keyframes` stanno al livello più esterno, non dentro `@theme`, ed è una scelta.**
+ * L'idioma di Tailwind v4 li vorrebbe dentro, così vengono emessi solo quando l'utility
+ * corrispondente è usata. Ma qui alcune animazioni non si raggiungono da un'utility: le chiamano
+ * le classi in fondo al file — `.binary-digit` e `.comic-bubble-footer` — e Tailwind non lo può
+ * sapere. Dentro `@theme`, quelle due classi punterebbero a un'animazione **che non esiste**, in
+ * silenzio: è la forma esatta del difetto `animate-scale-bounce` di RattInventario. Il prezzo è
+ * un chilobyte sempre presente; il guadagno è che non si può sbagliare.
+ *
+ * ⚠️ **I nomi dei fotogrammi portano `pb-`, i nomi delle utility no.** Un `@keyframes float` senza
+ * prefisso si scontrerebbe con quello che un'applicazione ha già — e RattInventario ce l'ha —
+ * mentre `animate-float` è il nome con cui si scrive, e deve restare leggibile.
  */
+
+/* ─────────────────────────────────────────────────────────────────────────────
+ * Le sei della peste. Vengono dalla copia VIVA di `styles/plague-animations.css`.
+ * ───────────────────────────────────────────────────────────────────────────── */
+
+@keyframes pb-float {
+  0%,
+  100% {
+    transform: translateY(0px);
+  }
+  50% {
+    transform: translateY(-20px);
+  }
+}
+
+@keyframes pb-float-delayed {
+  0%,
+  100% {
+    transform: translateY(-10px);
+  }
+  50% {
+    transform: translateY(-30px);
+  }
+}
+
+/* Il pulsare del richiamo: cambiano insieme fondo, bordo e alone. ⚠️ I quattro verdi sono quelli
+ * di `plague-400…700`, che qui restano scritti per esteso perché un `@keyframes` non può leggere
+ * una variabile del tema senza `@property`. */
+@keyframes pb-plague-pulse {
+  0%,
+  100% {
+    background-color: #15803d;
+    border-color: #22c55e;
+    box-shadow:
+      0 10px 15px -3px rgb(34 197 94 / 0.2),
+      0 4px 6px -2px rgb(34 197 94 / 0.05);
+  }
+  50% {
+    background-color: #16a34a;
+    border-color: #4ade80;
+    box-shadow:
+      0 10px 15px -3px rgb(34 197 94 / 0.4),
+      0 4px 6px -2px rgb(34 197 94 / 0.1);
+  }
+}
+
+@keyframes pb-skull-sway {
+  0%,
+  50%,
+  100% {
+    transform: rotate(-6deg);
+  }
+  25%,
+  75% {
+    transform: rotate(6deg);
+  }
+}
+
+@keyframes pb-biohazard-sway {
+  0%,
+  50%,
+  100% {
+    transform: rotate(4deg);
+  }
+  25%,
+  75% {
+    transform: rotate(-4deg);
+  }
+}
+
+@keyframes pb-virus-spin {
+  from {
+    transform: rotate(0deg);
+  }
+  to {
+    transform: rotate(360deg);
+  }
+}
+
+/* ─────────────────────────────────────────────────────────────────────────────
+ * Le tre che stavano in `globals.css` di RattInventario.
+ * ───────────────────────────────────────────────────────────────────────────── */
+
+/* ⚠️ Questa è la prova del difetto che questo file evita: di là `animate-scale-bounce` **non
+ * esiste**, perché il token stava in `:root` e l'utility non è mai stata generata. Il rimbalzo del
+ * clic sulla mascotte e quello della spunta non sono mai partiti. */
+@keyframes pb-scale-bounce {
+  0%,
+  100% {
+    transform: scale(1);
+  }
+  50% {
+    transform: scale(1.15);
+  }
+}
+
+@keyframes pb-float-up {
+  0% {
+    opacity: 0;
+    transform: translateY(0px);
+  }
+  10%,
+  90% {
+    opacity: 1;
+  }
+  100% {
+    opacity: 0;
+    transform: translateY(-40px);
+  }
+}
+
+/* Il fumetto dell'emettitore ha i suoi fotogrammi, e non quelli di `pb-bubble-pop`, perché i suoi
+ * tempi sono scanditi: **0,25 s per entrare, 2,5 di lettura, 0,25 per uscire** — il ritmo chiesto
+ * dall'utente il 2026-09-20, che su tre secondi di vita cade all'8,33% e al 91,67%. `SpeechBubble`
+ * condivideva quei fotogrammi e non ha lo stesso mestiere: lì il fumetto aspetta di essere letto e
+ * la sua durata la decide chi lo apre. ⚠️ Le soglie sono **percentuali**, quindi si stirano con la
+ * durata: sono giuste per i tre secondi che `comicBubbles` dichiara. */
+@keyframes pb-comic-pop {
+  0% {
+    opacity: 0;
+    transform: scale(0.3) translateY(10px);
+  }
+  6% {
+    opacity: 1;
+    transform: scale(1.08) translateY(-4px);
+  }
+  8.33%,
+  91.67% {
+    opacity: 1;
+    transform: scale(1) translateY(0);
+  }
+  100% {
+    opacity: 0;
+    transform: scale(0.85) translateY(-8px);
+  }
+}
+
+@keyframes pb-bubble-pop {
+  0% {
+    opacity: 0;
+    transform: scale(0.3) translateY(10px);
+  }
+  15% {
+    opacity: 1;
+    transform: scale(1.1) translateY(-5px);
+  }
+  25%,
+  85% {
+    opacity: 1;
+    transform: scale(1) translateY(0px);
+  }
+  100% {
+    opacity: 0;
+    transform: scale(0.8) translateY(-10px);
+  }
+}
+
+/* ─────────────────────────────────────────────────────────────────────────────
+ * Le tre di `ludoratti.it`, che a RattInventario mancano del tutto.
+ * ───────────────────────────────────────────────────────────────────────────── */
+
+/* La goccia che cola dall'alto e si allunga cadendo. ⚠️ L'altezza è una variabile perché la
+ * distanza da percorrere dipende da dove sta il contenitore, e un valore fisso la fa sparire a
+ * metà o uscire dallo schermo. */
+@keyframes pb-drip {
+  0% {
+    opacity: 0;
+    transform: translateY(-16px) scaleY(1);
+  }
+  6% {
+    opacity: 1;
+  }
+  85% {
+    opacity: 1;
+    transform: translateY(var(--pb-drip-distance, 100vh)) scaleY(1.6);
+  }
+  100% {
+    opacity: 0;
+    transform: translateY(var(--pb-drip-distance, 100vh)) scaleY(1.6);
+  }
+}
+
+/* Il disturbo sul nome: si applica a due pseudo-elementi sfalsati, uno ciano e uno rosa. */
+@keyframes pb-glitch {
+  0% {
+    clip-path: inset(10% 0 80% 0);
+  }
+  20% {
+    clip-path: inset(50% 0 20% 0);
+  }
+  40% {
+    clip-path: inset(25% 0 55% 0);
+  }
+  60% {
+    clip-path: inset(70% 0 5% 0);
+  }
+  80% {
+    clip-path: inset(40% 0 45% 0);
+  }
+  100% {
+    clip-path: inset(85% 0 5% 0);
+  }
+}
+
+/* Il lampo: quello che c'è sotto il nome prova a uscire, e alla terza ci riesce.
+ *
+ * ⚠️ **Le due sbirciate rotte non bastano, perché una parola tagliata a metà non si legge.** Di là
+ * sono le sole due, sei centesimi l'una e mai intera: l'utente il 2026-09-20 ha detto che si
+ * intravede e non si riesce a leggere. Qui restano — sono il «segnale che tenta di passare» — ma
+ * dopo la parola arriva **tutta**, con `inset(0)`.
+ *
+ * ⚠️ **E non arriva in un colpo solo: prima sfarfalla.** Un'unica comparsa lunga, sempre chiesta
+ * dall'utente, si leggeva bene e sembrava una scritta che si accende invece di un guasto. I tempi
+ * interi sono tre — **45, 45 e 165 ms**, separati da trenta millesimi di buio — che è il modo in
+ * cui un tubo al neon prende la corrente: due colpi che non tengono, e poi la tenuta. Il totale
+ * acceso resta lo stesso, ma non c'è più nessun singolo tempo lungo.
+ *
+ * ⚠️ **Le percentuali sono soglie, non transizioni**: la curva a gradini sulla classe tiene ogni
+ * valore fino al fotogramma dopo, quindi un fotogramma «spento» subito dopo uno acceso è quanto
+ * dura l'acceso. Senza, i valori si interpolerebbero e i colpi diventerebbero dissolvenze — cioè
+ * un respiro invece di un calo di tensione. È la stessa scelta delle finestre della città, e qui
+ * è ciò che rende possibile uno stacco da trenta millesimi: una dissolvenza così corta non si
+ * vedrebbe affatto. */
+@keyframes pb-reveal {
+  0% {
+    opacity: 0;
+  }
+  /* Prima sbirciata: la fascia alta. */
+  80% {
+    opacity: 1;
+    clip-path: inset(10% 0 55% 0);
+  }
+  82% {
+    opacity: 0;
+  }
+  /* Seconda: la fascia bassa, che non si sovrappone alla prima. */
+  84% {
+    opacity: 1;
+    clip-path: inset(55% 0 10% 0);
+  }
+  86% {
+    opacity: 0;
+  }
+  /* E poi passa — ma la tensione non tiene subito: due colpi corti e poi la tenuta. */
+  88% {
+    opacity: 1;
+    clip-path: inset(0);
+  }
+  89.5% {
+    opacity: 0;
+  }
+  90.5% {
+    opacity: 1;
+  }
+  92% {
+    opacity: 0;
+  }
+  93% {
+    opacity: 1;
+  }
+  98.5% {
+    opacity: 0;
+  }
+}
+
+/* Il nome mentre la parola nascosta passa: spento esattamente quando lei è accesa, soglia per
+ * soglia — sbirciate comprese, così a ogni istante se ne vede uno solo dei due.
+ *
+ * ⚠️ **Sono le stesse soglie di `pb-reveal`, rovesciate, e vanno ritoccate insieme.** Un'animazione
+ * non passa da un elemento al suo fratello, e il nome e la parola sono fratelli: le due curve sono
+ * due `@keyframes`, e un test in `GlitchText.test.tsx` le rilegge da questo file e le confronta.
+ * Fa il mestiere che faceva la lastra sotto la parola, e lo fa su qualunque fondo. */
+@keyframes pb-conceal {
+  0% {
+    opacity: 1;
+  }
+  80% {
+    opacity: 0;
+  }
+  82% {
+    opacity: 1;
+  }
+  84% {
+    opacity: 0;
+  }
+  86% {
+    opacity: 1;
+  }
+  88% {
+    opacity: 0;
+  }
+  89.5% {
+    opacity: 1;
+  }
+  90.5% {
+    opacity: 0;
+  }
+  92% {
+    opacity: 1;
+  }
+  93% {
+    opacity: 0;
+  }
+  98.5% {
+    opacity: 1;
+  }
+}
+
+/* Il battito del marchio: due colpi e poi una pausa lunga, come un cuore.
+ *
+ * ⚠️ È fatto per il segno del ratto, e il motivo è nel disegno: quel marchio a prima vista è un
+ * cuore, poi due figure che si abbracciano, e solo alla fine — per via delle orecchie — il muso di
+ * un ratto. Un marchio a forma di cuore che batte dice «vivo» meglio di qualunque pallino, e lo
+ * dice raccontando la prima delle sue tre letture.
+ *
+ * ⚠️ L'ampiezza è piccola apposta: sta in una barra, sopra una pagina che si legge. Un battito
+ * vistoso in cima allo schermo si smette di vedere dopo un minuto e si comincia a subire. */
+@keyframes pb-heartbeat {
+  0%,
+  16%,
+  32%,
+  100% {
+    transform: scale(1);
+  }
+  8% {
+    transform: scale(1.12);
+  }
+  24% {
+    transform: scale(1.07);
+  }
+}
+
+/* Il battito, montato dentro il marchio invece che addosso da fuori. Due varianti, due classi.
+ *
+ * ⚠️ **L'animazione la prende dalla utility invece di riscriverla**: `--animate-heartbeat` è
+ * dichiarata in `@theme` qui sotto, quindi vive su `:root` ed è la stessa cosa che ottiene chi
+ * scrive `animate-heartbeat` a mano. Due copie della stessa durata divergono al primo ritocco.
+ *
+ * ⚠️ **E non si usa la utility direttamente dentro il componente.** Una utility di Tailwind esiste
+ * solo se qualcuno la **genera**, e a generarla è chi installa, scandagliando `dist/`: se il suo
+ * `@source` non ci arriva, la classe non produce nessuna regola e il marchio non anima — in
+ * silenzio, che è la forma esatta del difetto `animate-scale-bounce`. Le nostre classi stanno in
+ * questo file, che viaggia com'è. */
+.pb-mark-beat {
+  transform-origin: center;
+  animation: var(--animate-heartbeat);
+}
+
+/* La variante col recinto fermo: batte il cuore e l'anello no. Sta sul `<g>` interno.
+ *
+ * ⚠️ **`transform-box: view-box` non è un di più, e per questo la classe è separata.** Le due
+ * unità qui sotto sono coordinate del `viewBox` — 12 · 13 è il cuore del cuore, un po' sotto il
+ * centro del riquadro perché sopra ci sono le orecchie — e valgono solo se il riquadro di
+ * riferimento è quello del `viewBox`. Sull'`<svg>` esterno, che nel flusso è un elemento
+ * sostituito, gli stessi numeri tornerebbero **pixel dello schermo**: a 96px il marchio pulserebbe
+ * attorno a un punto vicino allo spigolo in alto a sinistra. È la stessa regola misurata sul ratto
+ * che corre, dove i perni delle zampe sono scritti dal generatore. */
+.pb-mark-beat--inner {
+  transform-box: view-box;
+  transform-origin: 12px 13px;
+}
+
+/* La navigazione fissa di `PlagueDock` che si ritira: si raccoglie verso il **proprio centro** —
+ * `scale` sui due assi attorno a `center`, e l'opacità che scende — e al suo posto, nella stessa
+ * cella della griglia, spunta il comando che la fa ricrescere.
+ *
+ * ⚠️ **Transizioni e non keyframe**, perché i due versi sono lo stesso movimento: ricrescere è la
+ * stessa transizione all'indietro, e un keyframe per verso si scollerebbe dall'altro al primo
+ * ritocco. `visibility` aspetta la fine della chiusura (`0s` di durata, 350ms di ritardo) così il
+ * pannello si vede rimpicciolire e poi sparisce davvero; riaprendo torna visibile subito.
+ *
+ * ⚠️ **La curva in chiusura accelera e in apertura rallenta**: si raccoglie come risucchiata e
+ * ricresce come un respiro. Con la stessa curva nei due versi sembrerebbe un'animazione al
+ * rovescio, cioè un filmato che torna indietro. */
+.pb-dock-panel {
+  transform-origin: center;
+  transition:
+    transform 350ms cubic-bezier(0, 0, 0.2, 1),
+    opacity 300ms ease,
+    visibility 0s;
+}
+
+.pb-dock-panel[data-collapsed='true'] {
+  transform: scale(0.15);
+  opacity: 0;
+  visibility: hidden;
+  transition:
+    transform 350ms cubic-bezier(0.4, 0, 1, 1),
+    opacity 300ms ease,
+    visibility 0s linear 350ms;
+}
+
+/* Il comando spunta quando il pannello è quasi raccolto: il ritardo è la chiusura meno un soffio. */
+.pb-dock-toggle {
+  animation: pb-dock-pop 250ms cubic-bezier(0.2, 0, 0, 1.4) 200ms both;
+}
+
+@keyframes pb-dock-pop {
+  from {
+    transform: scale(0);
+    opacity: 0;
+  }
+  to {
+    transform: scale(1);
+    opacity: 1;
+  }
+}
+
+/* L'attesa piccola di `PlagueLoader`: lo stesso battito del marchio, quasi tre volte più svelto.
+ *
+ * ⚠️ **Lo stesso keyframe, non uno suo**: due battiti diversi sarebbero due marchi. Cambia solo il
+ * passo — i due colpi stanno nel primo terzo del ciclo, quindi a 1,2 s fanno «tu-tum» e una pausa
+ * breve, che si legge come «sta lavorando» invece del respiro calmo dell'intestazione. Sta su un
+ * `<span>` attorno al segno, non sull'`<svg>`: lì c'è già `pb-mark-beat` quando chi monta lo accende. */
+.pb-loader-beat {
+  transform-origin: center;
+  animation: pb-heartbeat 1.2s ease-in-out infinite;
+}
+
+/* ─────────────────────────────────────────────────────────────────────────────
+ * Le utility. `@theme` le GENERA — è la differenza con `:root`, che dichiara e basta.
+ * ───────────────────────────────────────────────────────────────────────────── */
+
+@theme {
+  --animate-float: pb-float 6s ease-in-out infinite;
+  --animate-float-delayed: pb-float-delayed 8s ease-in-out 2s infinite;
+  --animate-plague-pulse: pb-plague-pulse 2s ease-in-out infinite;
+  --animate-skull-sway: pb-skull-sway 4s linear infinite;
+  --animate-biohazard-sway: pb-biohazard-sway 5s linear infinite;
+  --animate-virus-spin: pb-virus-spin 6s linear infinite;
+  --animate-scale-bounce: pb-scale-bounce 0.4s ease-in-out;
+  --animate-float-up: pb-float-up 1.2s linear forwards;
+  --animate-bubble-pop: pb-bubble-pop 2.5s ease-out forwards;
+  --animate-drip: pb-drip 8s ease-in infinite;
+  --animate-glitch: pb-glitch 2.5s infinite reverse;
+  /* ⚠️ Tre secondi e non cinque, chiesto dall'utente il 2026-09-20: fra un lampo e l'altro
+   * l'attesa era abbastanza lunga da far credere che non ci fosse niente da aspettare. */
+  --animate-reveal: pb-reveal 3s infinite;
+  --animate-heartbeat: pb-heartbeat 3.2s ease-in-out infinite;
+}
+
+/* ─────────────────────────────────────────────────────────────────────────────
+ * `HoverEmitter`. Le prime due classi non sono utility: sono **elementi effimeri** che
+ * l'emettitore sputa in pagina, e portano con sé geometria e animazione insieme. La terza è
+ * l'animazione del salto che fa da fermo, e sta su ciò che avvolge.
+ * ───────────────────────────────────────────────────────────────────────────── */
+
+/* ⚠️ **Le due classi qui sotto sono `fixed`, non `absolute`.** Gli effimeri non vivono dentro il
+ * riquadro che li ha generati: ci volano **sopra**, in un portale sul `body`, perché un antenato
+ * che nasconde il traboccamento li mozzerebbe — e nella riga di una barra quell'antenato è
+ * obbligatorio. Chi li genera misura il proprio riquadro al momento e scrive `left`/`top` in
+ * coordinate della finestra. */
+
+/* La cifra binaria che sale dalla scheda dello sviluppatore AI. */
+.pb-binary-digit {
+  position: fixed;
+  pointer-events: none;
+  font-family: ui-monospace, monospace;
+  font-weight: bold;
+  animation: pb-float-up linear forwards;
+  z-index: 5;
+}
+
+/* Il fumetto minuscolo che compare sopra la scheda dell'autore umano.
+ *
+ * ⚠️ **Si centra sul punto in cui nasce**, e per farlo usa `translate` e non `transform`: le due
+ * proprietà si compongono — prima `translate`, poi `transform` — quindi lo spostamento di mezza
+ * larghezza convive con la `transform` che l'animazione scrive fotogramma per fotogramma. Scritto
+ * dentro `pb-bubble-pop` avrebbe spostato anche `SpeechBubble`, che quei fotogrammi li condivide;
+ * scritto come `margin-left: -50%` sarebbe stata mezza larghezza **del contenitore**, non del
+ * fumetto. Senza, una frase lunga ancorata a sinistra sborda a destra di ottanta pixel dalla
+ * scheda che l'ha detta. */
+.pb-comic-bubble {
+  position: fixed;
+  translate: -50% 0;
+  min-width: 80px;
+  /* ⚠️ 200 e non i 180 di RattInventario: la frase più lunga di là — «SONO UN MAGO DELLA
+     PROGRAMMAZIONE!» — misurata sul browser vero ne occupa **179**, cioè aveva un pixel di
+     margine. Il fumetto non manda a capo, quindi una frase più larga del riquadro si scrive sul
+     niente; i venti pixel in più sono il posto dove sta il guard sulla lunghezza delle frasi. */
+  max-width: 200px;
+  padding: 2px 6px;
+  border: 1px solid rgb(255 255 255 / 0.3);
+  border-radius: 6px;
+  background: rgb(0 0 0 / 0.9);
+  color: #fff;
+  font-size: 8px;
+  text-align: center;
+  white-space: nowrap;
+  pointer-events: none;
+  /* Tre secondi, quanto `comicBubbles` dà di vita a un fumetto: chi genera l'elemento riscrive
+     comunque la durata qui sopra, e questa riga serve a non mentire a chi legge il foglio. */
+  animation: pb-comic-pop 3s ease-out forwards;
+  z-index: 20;
+}
+
+/* La punta del fumetto, che di là è uno pseudo-elemento con tre bordi. */
+.pb-comic-bubble::after {
+  content: '';
+  position: absolute;
+  bottom: -4px;
+  left: 50%;
+  width: 0;
+  height: 0;
+  transform: translateX(-50%);
+  border-top: 4px solid rgb(0 0 0 / 0.9);
+  border-right: 4px solid transparent;
+  border-left: 4px solid transparent;
+}
+
+/* L'animazione del salto, che dice «qui c'è qualcosa»: un salto con lo stiracchiamento di chi si
+ * sgranchisce, e poi cinque secondi e mezzo di immobilità. Un easter egg che si scopre solo passandoci sopra
+ * non si scopre affatto — in RattInventario le due schede in fondo alla pagina non danno **nessun**
+ * segno di essere vive — e su un telefono, dove «sopra» non esiste, è l'unica cosa che invita a
+ * toccare. ⚠️ Tutto il movimento sta negli ultimi 700 ms del ciclo: è il rapporto fra i due tempi
+ * a renderlo poco invaso, non l'ampiezza. */
+@keyframes pb-hover-hint {
+  0%,
+  88%,
+  100% {
+    transform: translateY(0) scale(1, 1);
+  }
+  91% {
+    transform: translateY(-3px) scale(0.97, 1.05);
+  }
+  95% {
+    transform: translateY(0) scale(1.04, 0.95);
+  }
+  98% {
+    transform: translateY(0) scale(1, 1);
+  }
+}
+
+/* ⚠️ È una classe e non un'utility `animate-*` di proposito: la scrive la libreria su un nodo
+ * suo, e un'utility esiste solo se il Tailwind di chi installa ha scandagliato il `dist` del
+ * pacchetto. Con la classe il salto funziona comunque. */
+.pb-hover-hint {
+  transform-origin: bottom center;
+  animation: pb-hover-hint 6s ease-in-out infinite;
+}
+
+/* ─────────────────────────────────────────────────────────────────────────────
+ * `PotionMugIcon`. Le bolle che scappano dalla tazza.
+ * ───────────────────────────────────────────────────────────────────────────── */
+
+/* ⚠️ I `px` qui sono **unità del viewBox**, non pixel dello schermo: una `transform` su un
+ * elemento SVG lavora nel sistema di coordinate utente, quindi 3,5 su una griglia da 24 restano
+ * proporzionati a qualunque misura l'icona venga resa. */
+@keyframes pb-potion-bubble {
+  0% {
+    opacity: 0;
+    transform: translateY(2px) scale(0.4);
+  }
+  25% {
+    opacity: 1;
+  }
+  75% {
+    opacity: 0.85;
+  }
+  100% {
+    opacity: 0;
+    transform: translateY(-3.5px) scale(1.1);
+  }
+}
+
+/* ⚠️ **Le bolle salgono solo dentro chi lo chiede.** Un'icona che si anima da sola ovunque la si
+ * metta è invadente, e `PotionMugIcon` è pubblica: la classe sta sul **comando**, non sul disegno.
+ * Chi monta il piede se la trova accesa; chi usa la tazza dentro una tabella no.
+ *
+ * ⚠️ E serve `transform-box: fill-box`, o `scale` conterebbe dall'origine del viewBox e la bolla
+ * si allontanerebbe invece di gonfiarsi — è la stessa trappola del perno delle zampe del ratto,
+ * dall'altro lato. */
+.pb-potion-live .pb-potion-bubble {
+  transform-box: fill-box;
+  transform-origin: center;
+  animation: pb-potion-bubble 3.4s ease-out infinite;
+}
+
+/* Le tre non partono insieme: tre bolle simultanee sono un lampeggio, tre sfalsate sono una
+ * pozione che ribolle. È la stessa regola dei due autori che si sfalsano di due secondi. */
+.pb-potion-live .pb-potion-bubble-b {
+  animation-delay: 1.15s;
+}
+
+.pb-potion-live .pb-potion-bubble-c {
+  animation-delay: 2.3s;
+}
+
+/* Sotto il dito o il puntatore la pozione bolle più forte. Il fuoco conta quanto il passaggio:
+ * chi arriva da tastiera vede la stessa cosa. */
+.pb-potion-live:hover .pb-potion-bubble,
+.pb-potion-live:focus-visible .pb-potion-bubble {
+  animation-duration: 1.5s;
+}
+
+/* ─────────────────────────────────────────────────────────────────────────────
+ * `ParticleBurst`. Un segno che parte dal centro, vola via e svanisce.
+ * ───────────────────────────────────────────────────────────────────────────── */
+
+/* ⚠️ **È una fontana, non un'esplosione** — chiesto dall'utente il 2026-09-20, e la differenza non
+ * è la velocità: è che una fontana ha **un apice**. La particella sale rallentando, si ferma un
+ * istante in alto, e ricade accelerando; il primo giro le mandava dritte per dritte in tutte le
+ * direzioni e sembrava una girandola.
+ *
+ * ⚠️ **Le quattro variabili le scrive chi la genera**, perché un `@keyframes` è fisso e ogni
+ * particella ha la sua parabola: quanto va di lato (`--pb-dx`), quanto sale (`--pb-apex`,
+ * negativo), dove finisce (`--pb-dy`, sotto la partenza) e quanto gira (`--pb-spin`). Un
+ * fotogramma per ogni traiettoria non si scrive.
+ *
+ * ⚠️ **Le due curve di tempo stanno nei fotogrammi, non nella classe**: salita che decelera,
+ * caduta che accelera. È l'unica cosa che fa sembrare che ci sia la gravità, e con una curva sola
+ * per tutto il volo non si ottiene. */
+@keyframes pb-particle-fountain {
+  0% {
+    opacity: 0;
+    transform: translate(0, 0) scale(0.4) rotate(0deg);
+    animation-timing-function: cubic-bezier(0.2, 0.7, 0.4, 1);
+  }
+  12% {
+    opacity: 1;
+  }
+  55% {
+    opacity: 1;
+    transform: translate(calc(var(--pb-dx, 0px) * 0.55), var(--pb-apex, -60px)) scale(1)
+      rotate(calc(var(--pb-spin, 0deg) * 0.55));
+    animation-timing-function: cubic-bezier(0.5, 0, 0.85, 0.5);
+  }
+  100% {
+    opacity: 0;
+    transform: translate(var(--pb-dx, 0px), var(--pb-dy, 0px)) scale(0.9) rotate(var(--pb-spin, 0deg));
+  }
+}
+
+/* ⚠️ Il centraggio è sulla proprietà `translate` e non dentro la `transform`, per lo stesso motivo
+ * del fumetto: le due si compongono, quindi la particella nasce **centrata sul punto** mentre
+ * l'animazione continua a scrivere la sua `transform` fotogramma per fotogramma. */
+/* ⚠️ **`fixed`, perché le particelle non vivono dentro il pezzo che le ha sprigionate.** Lì
+ * sarebbero tagliate dal primo antenato che nasconde il traboccamento — e nel piede dei Ludoratti
+ * quell'antenato c'è di sicuro: la riga che scorre di lato **deve** tagliare, o non scorrerebbe.
+ * Misurato il 2026-09-20: dentro la riga si vedeva sì e no un terzo dello scoppio. Il componente
+ * le mette in un portale sul `body` e scrive qui il punto da cui partono, in coordinate della
+ * finestra. */
+.pb-particle {
+  position: fixed;
+  translate: -50% -50%;
+  pointer-events: none;
+  /* ⚠️ Niente curva di tempo qui: la mettono i fotogrammi, uno per la salita e uno per la caduta.
+     Una curva scritta sulla classe le sostituirebbe tutte e due, e la fontana tornerebbe a essere
+     un lancio uniforme. */
+  animation: pb-particle-fountain forwards;
+  will-change: transform, opacity;
+}
+
+/* ─────────────────────────────────────────────────────────────────────────────
+ * La città in fondo al fondale: le finestre che sfarfallano, e i versi che ne escono.
+ * ───────────────────────────────────────────────────────────────────────────── */
+
+/* ⚠️ **È un calo di tensione, non un respiro.** Una finestra che pulsa con un `animate-pulse` —
+ * cioè un'opacità che va e viene con una curva morbida — dice «questo elemento sta caricando»;
+ * una città mezza abbandonata dice un'altra cosa, e la dice con scatti secchi e rari. Il ritmo lo
+ * fa la **curva a gradini** sulla classe: senza, i fotogrammi ravvicinati si interpolerebbero e
+ * tornerebbe un lampeggio morbido.
+ *
+ * ⚠️ E ogni finestra ha la **sua** durata e il suo ritardo, scritti dal componente: sette finestre
+ * che calano insieme sono un temporale, non una città. Chiesto dall'utente il 2026-09-20. */
+@keyframes pb-window-flicker {
+  0%,
+  40% {
+    opacity: 1;
+  }
+  41% {
+    opacity: 0.12;
+  }
+  42% {
+    opacity: 0.9;
+  }
+  43% {
+    opacity: 0.28;
+  }
+  45%,
+  77% {
+    opacity: 1;
+  }
+  78% {
+    opacity: 0.1;
+  }
+  79% {
+    opacity: 0.85;
+  }
+  80% {
+    opacity: 0.18;
+  }
+  82%,
+  100% {
+    opacity: 1;
+  }
+}
+
+.pb-city-window {
+  /* `steps(1, end)` tiene ogni valore fino al fotogramma dopo: è quello che rende lo scatto un
+     contatto che salta invece di una luce che respira. */
+  animation: pb-window-flicker var(--pb-window-duration, 5s) steps(1, end) var(--pb-window-delay, 0s)
+    infinite;
+}
+
+/* ⚠️ **Il verso che esce dalla città è `absolute`, al contrario del fumetto dell'emettitore.**
+ * Quello vola in un portale sul `body` perché deve uscire dal riquadro che l'ha generato; questo
+ * è **scenografia**, vive dentro il fondale e ci resta — se sbordasse passerebbe sopra il
+ * contenuto, che è esattamente il difetto che il fondale esiste per non avere.
+ *
+ * ⚠️ E i colori sono quelli della scena, in `theme.css` — di notte fondo `gray-950` con bordo e
+ * testo lime, di giorno un fumetto bianco col testo verde scuro — mentre `.pb-comic-bubble` è
+ * bianco su nero, che è la scheda autore di RattInventario. */
+.pb-city-chatter {
+  position: absolute;
+  /* Il valore predefinito centra il fumetto sul punto; chi lo genera lo riscrive quando il palazzo
+     è troppo vicino a un bordo — vedi `plagueChatter.tsx`. */
+  translate: -50% 0;
+  max-width: 180px;
+  padding: 2px 6px;
+  border: 1px solid var(--pb-scene-chatter-border);
+  border-radius: 6px;
+  background: var(--pb-scene-chatter-bg);
+  color: var(--pb-scene-chatter-text);
+  font-size: 9px;
+  text-align: center;
+  /* ⚠️ **Qui si va a capo, e `.pb-comic-bubble` no.** Là il fumetto esce da una scheda larga 142 px
+     e una frase su due righe le coprirebbe il nome; qui è scenografia sopra una città, e due righe
+     stanno benissimo. Il guadagno è che le frasi lunghe — «Corvax, rendi tutti pazzi per giochi da
+     tavolo» ne misura duecento — non escono più dal riquadro. */
+  white-space: normal;
+  pointer-events: none;
+  animation: pb-comic-pop var(--pb-chatter-duration, 3200ms) ease-out forwards;
+}
+
+.pb-city-chatter::after {
+  content: '';
+  position: absolute;
+  bottom: -4px;
+  left: 50%;
+  width: 0;
+  height: 0;
+  transform: translateX(-50%);
+  border-top: 4px solid var(--pb-scene-chatter-bg);
+  border-right: 4px solid transparent;
+  border-left: 4px solid transparent;
+}
+
+/* Il marchio gigante dietro alla scena: il posto di `ludoratti.it`, dove al centro c'è un
+ * biohazard grande l'80% del lato corto della finestra — lì a **1,10** di contrasto, cioè quasi
+ * invisibile. Qui è il marchio dei Ludoratti, per scelta dell'utente il 2026-09-23.
+ *
+ * ⚠️ **La misura è in unità di contenitore, non della finestra**: il fondale sta dentro il
+ * riquadro che lo ospita, e dentro una scheda un `80vmin` uscirebbe dalla scheda. Il riquadro del
+ * marchio è `absolute inset-0`, quindi ha una misura sua anche senza contenuto, ed è la condizione
+ * perché `container-type: size` valga.
+ *
+ * ⚠️ **Respira e non batte.** Il battito di `RatIcon` è uno `scale(1.12)`: su mille pixel sono
+ * centoventi di movimento dietro al contenuto. Il respiro è quello del simbolo di là — opacità da
+ * 1 a 0,6 in quattro secondi — e con «meno movimento» si ferma pieno. */
+.pb-scene-mark-frame {
+  container-type: size;
+}
+
+.pb-scene-mark {
+  width: 80cqmin;
+  height: 80cqmin;
+  color: var(--pb-scene-mark);
+  animation: pb-scene-breathe 4s ease-in-out infinite;
+}
+
+@keyframes pb-scene-breathe {
+  50% {
+    opacity: 0.6;
+  }
+}
+
+/* ─────────────────────────────────────────────────────────────────────────────
+ * `GlitchText`. Il disturbo sul nome, terzo pezzo del registro dell'aggregatore.
+ * ───────────────────────────────────────────────────────────────────────────── */
+
+.pb-glitch {
+  position: relative;
+  display: inline-block;
+}
+
+/* La copia sfalsata. ⚠️ **Nasce collassata**, e sono i fotogrammi ad aprirla per una fetta alla
+ * volta: con «meno movimento» la regola in fondo al file spegne l'animazione, e senza questo
+ * `clip-path` di partenza resterebbero due copie **integre** spostate di due pixel — cioè
+ * l'aspetto di un difetto, non di una preferenza rispettata.
+ *
+ * ⚠️ **`white-space: pre` non è cosmesi.** La copia è larga quanto il contenitore, e il testo
+ * dentro è lo stesso: un arrotondamento sotto il pixel basta a mandarlo a capo, e una lamella su
+ * due righe si legge come un secondo testo comparso sotto al primo.
+ *
+ * ⚠️ **`user-select: none` è l'`aria-hidden` degli appunti.** Misurato il 2026-09-20 sulla demo:
+ * selezionando il titolo e copiandolo usciva «LUDORATTI E.E.E.EVIL CORP». Un attributo ARIA parla
+ * ai lettori di schermo e non dice niente alla selezione, che è una gamma nel DOM: le copie vanno
+ * tolte da tutt'e due i mondi. E `pointer-events: none` perché una lastra decorativa sopra il
+ * testo non deve intercettare né il puntatore né l'inizio di una selezione. */
+.pb-glitch-slice {
+  position: absolute;
+  top: 0;
+  width: 100%;
+  height: 100%;
+  overflow: hidden;
+  background: var(--pb-glitch-bg, transparent);
+  white-space: pre;
+  clip-path: inset(50% 0 50% 0);
+  user-select: none;
+  pointer-events: none;
+}
+
+/* I due colori sono quelli di `ludoratti.it` e restano **statici**: lo sdoppiamento cromatico è
+ * una convenzione — un segnale rotto si separa nei suoi canali — e non un colore del marchio da
+ * accordare al tema. Il verde della peste qui direbbe «peste», non «guasto». */
+.pb-glitch-slice--cyan {
+  left: 2px;
+  text-shadow: -2px 0 #0891b2;
+}
+
+/* ⚠️ **La durata diversa è ciò che rende il disturbo irregolare.** Con lo stesso ciclo le due
+ * lamelle si aprirebbero e chiuderebbero insieme per sempre, e due fette simultanee si leggono
+ * come un unico sfarfallio — la stessa regola dei due autori del piede, che sfalsano il salto.
+ * Il valore sovrascrive quello dell'utility `animate-glitch` perché questa riga sta **fuori da
+ * ogni layer**, e le nostre vincono su `@layer utilities` senza dipendere dall'ordine. */
+.pb-glitch-slice--pink {
+  left: -2px;
+  text-shadow: -2px 0 #be185d;
+  animation-duration: 2s;
+}
+
+/* Il lampo. ⚠️ Nasce a **opacità zero**: spenta l'animazione non compare mai, che è il ripiego
+ * giusto per un easter egg — chi ha chiesto meno movimento non si ritrova una parola in più
+ * ferma sopra il nome.
+ *
+ * ⚠️ E l'alone prende `currentColor` invece del rosso scritto a mano di `ludoratti.it`: chi
+ * cambia il colore della parola si porta dietro il suo alone, senza doverne cambiare due.
+ *
+ * ⚠️ **Non posa su nessun fondo.** Nel terzo tempo la parola si vede intera, e «EVIL» sopra «E.»
+ * con la `E.` che spunta fra le lettere non si legge: a toglierla di mezzo è il nome che si spegne
+ * (`.pb-glitch-name--with-reveal`, qui sotto), non una lastra. La lastra c'era, del colore di
+ * `--pb-glitch-bg`, e sul tema chiaro con un fondo scuro dichiarato era un'etichetta nera attorno
+ * alla parola (utente, 2026-09-23). */
+.pb-glitch-reveal {
+  position: absolute;
+  top: 0;
+  left: 50%;
+  /* I fotogrammi sono soglie: ogni valore tiene fino al successivo, e un lampo è un interruttore,
+     non una dissolvenza. Vince sull'`ease` predefinito dell'utility perché sta fuori dai layer. */
+  animation-timing-function: steps(1, end);
+  /* `translate` e non `transform`: la seconda la scriverebbero i fotogrammi, e si sostituirebbero
+     a questa invece di sommarsi. È la stessa riga che centra i fumetti della firma. */
+  translate: -50% 0;
+  width: max-content;
+  opacity: 0;
+  text-shadow:
+    0 0 5px currentColor,
+    0 0 10px currentColor;
+  /* Come le lamelle: fuori dagli appunti e fuori dalla strada del puntatore. ⚠️ Qui pesa il
+     doppio, perché la parola nascosta è **larga quanto sé stessa** e sborda dal nome: senza
+     `pointer-events: none` allargherebbe la zona sensibile di un titolo che è un collegamento. */
+  user-select: none;
+  pointer-events: none;
+}
+
+/* Il nome, quando c'è una parola che lo sostituisce: si spegne mentre lei è accesa.
+ *
+ * ⚠️ **La durata la prende dall'utility della parola invece di riscriverla**: `var(--animate-reveal)`
+ * porta i suoi tre secondi e il suo `infinite`, e qui cambia solo il nome dei fotogrammi. Due tempi
+ * scritti due volte divergono al primo ritocco, e un nome che si spegne fuori tempo si vede — per un
+ * istante non c'è né lui né la parola, o ci sono tutti e due. Le due animazioni partono insieme
+ * perché i due elementi ricevono la classe nello stesso aggiornamento, al montaggio come quando
+ * l'interruttore si riaccende.
+ *
+ * ⚠️ E la curva a gradini, come la parola: senza, fra una soglia e l'altra il nome **sfumerebbe**, e
+ * i due si vedrebbero sovrapposti a metà. */
+.pb-glitch-name--with-reveal {
+  animation: var(--animate-reveal);
+  animation-name: pb-conceal;
+  animation-timing-function: steps(1, end);
+}
+
+/* ─────────────────────────────────────────────────────────────────────────────
+ * `ToxicBubbles`. La bolla di gas che sale dal fondo del riquadro, ondeggiando.
+ * ───────────────────────────────────────────────────────────────────────────── */
+
+/* ⚠️ **La bolla è due elementi, e non è un vezzo**: la salita e l'ondeggiamento sono due
+ * `transform` sullo stesso asse, e una proprietà si scrive una volta sola. Fuori la **colonna**,
+ * che sale; dentro la **pelle**, che ondeggia e si gonfia.
+ *
+ * ⚠️ **La colonna è alta quanto il riquadro, ed è così che si misura la salita.** Un `translateY`
+ * in percentuale conta l'altezza **dell'elemento**, non del contenitore: una bolla da 40 px che
+ * sale del 100% si sposta di 40 px. Con la colonna a `h-full`, invece, `-100%` è esattamente
+ * l'altezza del fondale, qualunque essa sia — dentro una scheda come su una pagina intera. È la
+ * stessa ragione per cui non serve una container query: la percentuale ce l'ha già, basta darla
+ * all'elemento giusto.
+ *
+ * ⚠️ **Niente SVG e nessun `id`.** Di là ogni bolla portava una sfumatura radiale e un filtro di
+ * sfocatura con due identificatori suoi, sedici volte; qui è un cerchio con un bordo, due
+ * sfumature nel fondo e un alone — cioè quello che fa leggere «bolla» invece di «pallina verde»:
+ * il **bordo**, che di là non c'era affatto. */
+@keyframes pb-toxic-rise {
+  0% {
+    opacity: 0;
+    transform: translateY(18%);
+  }
+  14% {
+    opacity: 1;
+  }
+  82% {
+    opacity: 0.85;
+  }
+  100% {
+    opacity: 0;
+    transform: translateY(-100%);
+  }
+}
+
+/* L'ondeggiamento laterale: quanto si sposta lo scrive chi genera la bolla, perché una bolla
+ * grande che ondeggia come una piccola sembra trascinata. */
+@keyframes pb-toxic-sway {
+  0%,
+  100% {
+    transform: translateX(0);
+  }
+  25% {
+    transform: translateX(var(--pb-toxic-sway, 12px));
+  }
+  75% {
+    transform: translateX(calc(var(--pb-toxic-sway, 12px) * -1));
+  }
+}
+
+/* ⚠️ Il gonfiarsi sta sulla proprietà `scale` e non dentro la `transform`, così convive con
+ * l'ondeggiamento sullo stesso elemento: il browser applica prima `translate`, poi `rotate` e
+ * `scale`, e solo alla fine la `transform`. È lo stesso meccanismo con cui il fumetto si centra
+ * mentre la sua animazione gli scrive la `transform`. */
+@keyframes pb-toxic-swell {
+  from {
+    scale: 0.55;
+  }
+  to {
+    scale: 1.1;
+  }
+}
+
+/* ⚠️ **Il tremolio è ciò che distingue un gas da una bolla di sapone.** Una bolla di sapone è una
+ * sfera perfetta e resta tale; una sacca di gas in un liquido si deforma di continuo. Con il solo
+ * `border-radius: 9999px` il disegno leggeva «sapone» — segnalato dall'utente il 2026-09-20 — e
+ * nessun colore lo correggeva, perché il problema era la **forma**. Spegnendo l'animazione (meno
+ * movimento) resta il cerchio della classe, che è il ripiego giusto. */
+@keyframes pb-toxic-wobble {
+  0%,
+  100% {
+    border-radius: 52% 48% 46% 54% / 50% 46% 54% 50%;
+  }
+  33% {
+    border-radius: 46% 54% 53% 47% / 55% 52% 48% 45%;
+  }
+  66% {
+    border-radius: 54% 46% 50% 50% / 45% 53% 47% 55%;
+  }
+}
+
+.pb-toxic-bubble {
+  position: absolute;
+  top: 0;
+  bottom: 0;
+  display: flex;
+  align-items: flex-end;
+  /* La corsia è un punto, non un bordo: la colonna si centra sulla x che le viene data, così una
+     bolla grande non esce a destra solo perché è grande. Sta su `translate` e non nella
+     `transform` per lo stesso motivo del fumetto — la `transform` la scrive l'animazione. */
+  translate: -50% 0;
+  pointer-events: none;
+  animation: pb-toxic-rise var(--pb-toxic-rise-duration, 6000ms) linear forwards;
+  will-change: transform, opacity;
+}
+
+/* ⚠️ Le misure che dipendono dal diametro si ricavano da `--pb-toxic-size`, scritto una volta
+ * sola da chi genera la bolla: un alone da 12 px fisso è un velo su una bolla da 90 e una nuvola
+ * su una da 20. */
+.pb-toxic-bubble-skin {
+  display: block;
+  width: var(--pb-toxic-size, 40px);
+  height: var(--pb-toxic-size, 40px);
+  /* Il cerchio è il ripiego per chi ha chiesto meno movimento: la forma vera la scrive
+     `pb-toxic-wobble`, perché una sacca di gas non è mai una sfera. */
+  border-radius: 9999px;
+  /* Il bordo è della malattia, non del marchio. I colori della bolla sono della **scena**, in
+     `theme.css`: di notte il gas fa luce, di giorno no, e i gradienti qui sotto cambiano solo tinta. */
+  border: 1px solid var(--pb-scene-bubble-rim);
+  /* ⚠️ **Un gas tossico fa luce da dentro; una bolla di sapone la riflette.** È tutta qui la
+     differenza fra i due disegni, e il primo giro l'aveva sbagliata — riflesso quasi bianco,
+     centro vuoto, densità al bordo: il vocabolario del vetro. I tre gradienti sono adesso il
+     **riflesso verde** (nessun bianco: il bianco è l'occhiello del sapone), il **nucleo che
+     brilla** in `toxic` — l'unico posto, con l'alone, dove quel verde puro compare, e sempre con
+     l'opacità, come vuole il tema — e la pellicola al bordo che lo chiude. */
+  /* ⚠️ `transparent` alle estremità e non la tinta con l'alfa a zero: i gradienti si interpolano
+     premoltiplicati, quindi non sporcano di grigio, e ogni colore resta scritto una volta sola. */
+  background:
+    radial-gradient(circle at 32% 27%, var(--pb-scene-bubble-glint), transparent 26%),
+    radial-gradient(
+      circle at 50% 58%,
+      var(--pb-scene-bubble-core),
+      var(--pb-scene-bubble-core-edge) 52%,
+      transparent 78%
+    ),
+    radial-gradient(circle at 50% 50%, transparent 64%, var(--pb-scene-bubble-film) 100%);
+  /* L'alone è il gas che filtra fuori: più largo e più acceso di quello di una bolla di vetro.
+     ⚠️ La misura resta qui e il colore sta nella variabile: una variabile che contenesse anche
+     `var(--pb-toxic-size)` la risolverebbe sulla radice, dove la bolla non c'è, cioè sempre a 40px. */
+  box-shadow:
+    0 0 calc(var(--pb-toxic-size, 40px) * 0.34) var(--pb-scene-bubble-glow),
+    inset 0 0 calc(var(--pb-toxic-size, 40px) * 0.3) var(--pb-scene-bubble-inner-glow);
+  animation:
+    pb-toxic-sway var(--pb-toxic-sway-duration, 3000ms) ease-in-out infinite,
+    pb-toxic-wobble var(--pb-toxic-sway-duration, 3000ms) ease-in-out infinite,
+    pb-toxic-swell var(--pb-toxic-rise-duration, 6000ms) linear forwards;
+  will-change: transform, scale;
+}
+
+/* ─────────────────────────────────────────────────────────────────────────────
+ * La corsa del ratto. Il disegno è un pupazzo articolato — tronco, coda, quattro zampe, e i pezzi
+ * che pendono dai kit — e ogni pezzo porta il proprio perno come `transform-origin`, scritto dal
+ * componente nelle unità della cornice. Qui c'è solo il **tempo**: che cosa ruota, di quanto, e con
+ * che sfasamento. Si accende tutto con una classe sola, `pb-rat--running`, e da fermo niente si muove.
+ *
+ * ⚠️ **Il passo è fluido, non a scatti**: rotazioni continue con `ease-in-out` e `alternate`,
+ * decisione dell'utente. Le zampe vanno a coppie diagonali — posteriore vicina con anteriore
+ * lontana, e viceversa — come un galoppo: le due coppie sono la stessa animazione, una dritta e una
+ * `alternate-reverse`. Mezzo passo dura **0,2 s** — scelto dall'utente col cursore della velocità
+ * della lente, a ×1,5 dei 0,3 di prima (e 0,42 all'inizio); i pendagli vanno al doppio, 0,4 s,
+ * perché sono pesi che oscillano, non arti che spingono.
+ *
+ * ⚠️ **Il corpo ondeggia, non solo sobbalza**: il gruppo che contiene tutto — kit compresi, così
+ * l'ampolla sale e scende col dorso — sale di sei unità e **beccheggia** di ±2,5° attorno al
+ * baricentro, in fase col passo. E la coda è **tre segmenti annidati**, ognuno col suo giunto:
+ * la stessa oscillazione con ampiezza crescente verso la punta e un ritardo a ogni segmento, che è
+ * ciò che fa un'onda che corre lungo la coda invece di una coda rigida che dondola. Le unità sono
+ * quelle del `viewBox` — il ratto è alto 176 — e sei unità sono tre pixel a 88px di altezza.
+ * ───────────────────────────────────────────────────────────────────────────── */
+
+@keyframes pb-rat-gallop {
+  from {
+    transform: rotate(-14deg);
+  }
+  to {
+    transform: rotate(14deg);
+  }
+}
+
+/* Le zampe lontane oscillano meno: sono dietro, e la loro radice è un arto disegnato da zero. */
+@keyframes pb-rat-gallop-far {
+  from {
+    transform: rotate(-10deg);
+  }
+  to {
+    transform: rotate(10deg);
+  }
+}
+
+/* Un segmento della coda. Sono cinque, annidati: la punta somma le rotazioni di tutti. */
+@keyframes pb-rat-wave {
+  from {
+    transform: rotate(-3.5deg);
+  }
+  to {
+    transform: rotate(3.5deg);
+  }
+}
+
+@keyframes pb-rat-bob {
+  from {
+    transform: translateY(0) rotate(2.5deg);
+  }
+  to {
+    transform: translateY(-6px) rotate(-2.5deg);
+  }
+}
+
+@keyframes pb-rat-tilt {
+  from {
+    transform: rotate(-3deg);
+  }
+  to {
+    transform: rotate(3deg);
+  }
+}
+
+@keyframes pb-rat-sway {
+  from {
+    transform: rotate(-9deg);
+  }
+  to {
+    transform: rotate(9deg);
+  }
+}
+
+/* La traversata: dal bordo sinistro oltre il destro, o il contrario. ⚠️ `100vw` e non la larghezza
+ * del genitore: il ratto attraversa lo **schermo**, come di là, e il genitore è una fascia a tutta
+ * larghezza con `overflow-hidden`. Il `-100%` è la larghezza del ratto stesso: parte tutto fuori. */
+@keyframes pb-rat-cross-left {
+  from {
+    transform: translateX(-100%);
+  }
+  to {
+    transform: translateX(100vw);
+  }
+}
+
+@keyframes pb-rat-cross-right {
+  from {
+    transform: translateX(100vw);
+  }
+  to {
+    transform: translateX(-100%);
+  }
+}
+
+/* ⚠️ La cornice è misurata sul ratto **fermo**: correndo, il corpo sale di sei unità e i piedi
+ * scendono oltre il bordo, e l'`<svg>` per default taglia ciò che esce dal `viewBox` — il tappo
+ * dell'ampolla sparisce in cima al sobbalzo, le dita in fondo al passo. Il disegno può sbordare. */
+.pb-rat {
+  overflow: visible;
+}
+
+/* ⚠️ `transform-box: view-box` è ciò che fa valere il perno nelle unità del disegno. È il valore
+ * predefinito degli elementi SVG, scritto perché è la riga da cui dipende tutto. */
+.pb-rat-body,
+.pb-rat-part,
+.pb-rat-collar-pawn,
+.pb-rat-vial-bottle,
+.pb-rat-vial-dice {
+  transform-box: view-box;
+}
+
+.pb-rat--running .pb-rat-leg-back-near {
+  animation: pb-rat-gallop 0.2s ease-in-out infinite alternate;
+}
+
+.pb-rat--running .pb-rat-leg-front-far {
+  animation: pb-rat-gallop-far 0.2s ease-in-out infinite alternate;
+}
+
+.pb-rat--running .pb-rat-leg-front-near {
+  animation: pb-rat-gallop 0.2s ease-in-out infinite alternate-reverse;
+}
+
+.pb-rat--running .pb-rat-leg-back-far {
+  animation: pb-rat-gallop-far 0.2s ease-in-out infinite alternate-reverse;
+}
+
+/* L'onda della coda: stessa oscillazione su cinque segmenti, ognuno 30 ms dopo quello prima. Il
+ * ritardo piccolo (un sesto del mezzo passo) tiene sotto i 4° l'angolo fra due segmenti vicini, che il giunto
+ * nasconde; con tre segmenti e un decimo di ritardo si arrivava a 15°, e le fessure si vedevano. */
+.pb-rat--running .pb-rat-tail-1 {
+  animation: pb-rat-wave 0.2s ease-in-out infinite alternate;
+}
+
+.pb-rat--running .pb-rat-tail-2 {
+  animation: pb-rat-wave 0.2s ease-in-out -0.03s infinite alternate;
+}
+
+.pb-rat--running .pb-rat-tail-3 {
+  animation: pb-rat-wave 0.2s ease-in-out -0.06s infinite alternate;
+}
+
+.pb-rat--running .pb-rat-tail-4 {
+  animation: pb-rat-wave 0.2s ease-in-out -0.09s infinite alternate;
+}
+
+.pb-rat--running .pb-rat-tail-5 {
+  animation: pb-rat-wave 0.2s ease-in-out -0.12s infinite alternate;
+}
+
+.pb-rat--running .pb-rat-body {
+  animation: pb-rat-bob 0.2s ease-in-out infinite alternate;
+}
+
+/* I pendagli vanno in ritardo sul passo — è il movimento secondario che li fa sembrare pesanti. */
+.pb-rat--running .pb-rat-collar-pawn,
+.pb-rat--running .pb-rat-vial-dice {
+  animation: pb-rat-sway 0.4s ease-in-out -0.133s infinite alternate;
+}
+
+.pb-rat--running .pb-rat-vial-bottle {
+  animation: pb-rat-tilt 0.4s ease-in-out -0.067s infinite alternate-reverse;
+}
+
+/* Il contenitore che attraversa. La durata la scrive `RatRun` in linea, perché è una prop. */
+.pb-rat-run {
+  animation-timing-function: linear;
+  animation-fill-mode: forwards;
+  will-change: transform;
+}
+
+.pb-rat-run--left {
+  animation-name: pb-rat-cross-left;
+}
+
+.pb-rat-run--right {
+  animation-name: pb-rat-cross-right;
+}
+
+/* ⚠️ Chi ha chiesto meno movimento lo ottiene, e vale per tutto il file in una riga sola.
+ * Il ratto che corre fa eccezione in un punto: la traversata non si spegne ma dura un millisecondo,
+ * così `animationend` arriva, `onDone` arriva, e chi ha messo il ratto lo toglie — con `none` il
+ * ratto resterebbe fermo a metà schermo per sempre. Le zampe invece si fermano. */
+@media (prefers-reduced-motion: reduce) {
+  .pb-binary-digit,
+  .pb-comic-bubble,
+  .pb-hover-hint,
+  .pb-particle,
+  .pb-potion-live .pb-potion-bubble,
+  .pb-toxic-bubble,
+  .pb-toxic-bubble-skin,
+  /* Ferma, la finestra resta **accesa**: è il primo fotogramma, ed è il ripiego giusto — una
+     città spenta sembrerebbe un guasto, non una preferenza rispettata. */
+  .pb-city-window,
+  .pb-city-chatter,
+  /* ⚠️ Serve la riga sua: `[class*='animate-']` qui sotto non la prende, perché il battito del
+     marchio è una classe nostra e non una utility. Ferma, resta al primo fotogramma, cioè alla
+     sua taglia vera. */
+  .pb-mark-beat,
+  /* Il battito svelto dell'attesa: fermo, il marchio resta alla sua taglia e la frase dice il resto. */
+  .pb-loader-beat,
+  /* Il comando della navigazione ritirata: fermo, c'è subito, alla sua taglia. */
+  .pb-dock-toggle,
+  /* Anche questa è nostra. Ferma, il nome resta **acceso**: la parola che lo sostituirebbe con
+     l'animazione spenta non compare mai, e un nome che sparisce ogni tre secondi per niente
+     sembrerebbe un guasto. */
+  .pb-glitch-name--with-reveal,
+  /* Fermo, il marchio della scena resta pieno: il primo fotogramma è a opacità 1. */
+  .pb-scene-mark,
+  [class*='animate-'],
+  .pb-rat--running .pb-rat-part,
+  .pb-rat--running .pb-rat-body,
+  .pb-rat--running .pb-rat-collar-pawn,
+  .pb-rat--running .pb-rat-vial-bottle,
+  .pb-rat--running .pb-rat-vial-dice {
+    animation: none !important;
+  }
+
+  .pb-rat-run {
+    animation-duration: 1ms !important;
+  }
+
+  /* ⚠️ Una transizione la regola qui sopra non la tocca — dice `animation`, non `transition` — e la
+     navigazione che si ritira è fatta di transizioni: senza questa riga, con «meno movimento» si
+     raccoglierebbe lo stesso. Così è uno scambio secco. */
+  .pb-dock-panel {
+    transition: none !important;
+  }
+}

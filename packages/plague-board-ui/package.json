@@ -24,24 +24,31 @@
   ],
   "files": [
     "dist",
+    "src",
     "styles",
+    "assets",
     "README.md",
     "LICENSE"
   ],
+  "main": "./dist/index.js",
+  "types": "./dist/index.d.ts",
   "exports": {
     ".": {
       "types": "./dist/index.d.ts",
       "default": "./dist/index.js"
     },
     "./theme.css": "./styles/theme.css",
-    "./animations.css": "./styles/animations.css"
+    "./animations.css": "./styles/animations.css",
+    "./assets/ludoratti.mp3": "./assets/ludoratti.mp3"
   },
   "scripts": {
-    "build": "tsc -p tsconfig.build.json",
+    "clean": "node -e \"require('node:fs').rmSync('dist', { recursive: true, force: true })\"",
+    "build": "npm run clean && tsc -p tsconfig.build.json",
     "typecheck": "tsc --noEmit",
     "test": "vitest run",
     "test:watch": "vitest",
-    "lint": "eslint ."
+    "lint": "eslint .",
+    "prepublishOnly": "npm run build && npm run typecheck && npm run lint && npm run test"
   },
   "peerDependencies": {
     "@heroui/react": "^3.2.5",

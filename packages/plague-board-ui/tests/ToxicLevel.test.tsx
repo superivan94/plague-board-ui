@@ -1,0 +1,216 @@
+import { act, fireEvent, render, renderHook, screen } from '@testing-library/react';
+import type { ReactNode } from 'react';
+import { afterEach, describe, expect, it, vi } from 'vitest';
+
+import {
+  PlagueBackground,
+  TOXIC_LEVELS,
+  TOXIC_LEVEL_LABELS,
+  TOXIC_LEVEL_SETTINGS,
+  ToxicLevelProvider,
+  ToxicLevelSwitch,
+  useToxicLevel,
+  type ToxicLevel,
+  type ToxicLevelOverrides,
+} from '../src';
+
+/** Una spia che scrive a schermo il livello che legge dal contesto. */
+function Spia() {
+  const { level } = useToxicLevel();
+  return <p data-testid="spia">{level}</p>;
+}
+
+/** Il provider attorno a un gancio, con la taratura ritoccata che si vuole provare. */
+const taratoCon = (settings?: ToxicLevelOverrides) =>
+  function Tarato({ children }: { children: ReactNode }) {
+    return <ToxicLevelProvider settings={settings}>{children}</ToxicLevelProvider>;
+  };
+
+const opzione = (etichetta: string) => screen.getByRole('radio', { name: etichetta });
+
+describe('la scala dell’atmosfera', () => {
+  it('ha i quattro livelli in ordine, dal fermo al pieno', () => {
+    expect(TOXIC_LEVELS).toStrictEqual<readonly ToxicLevel[]>(['off', 'low', 'medium', 'high']);
+  });
+
+  it('dà a ogni livello un nome e una taratura, senza buchi', () => {
+    // ⚠️ Il caso serve perché le tre tabelle sono scritte a mano e nessuna delle tre sa delle
+    // altre: un livello aggiunto in una sola verrebbe fuori come una casella vuota nel selettore
+    // o come un fondale che non cambia, cioè in silenzio.
+    for (const livello of TOXIC_LEVELS) {
+      expect(TOXIC_LEVEL_LABELS[livello]).toBeTruthy();
+      expect(TOXIC_LEVEL_SETTINGS[livello]).toBeTruthy();
+    }
+  });
+
+  it('cresce a ogni gradino, e `off` non mette in scena niente', () => {
+    const spento = TOXIC_LEVEL_SETTINGS.off;
+    expect([spento.floaters, spento.drips, spento.maxChatter, spento.maxBubbles]).toStrictEqual([0, 0, 0, 0]);
+
+    // La monotonia è il contratto che il selettore promette a chi lo guarda: spostarsi verso
+    // «alto» deve sempre aggiungere roba, mai toglierne.
+    for (let i = 1; i < TOXIC_LEVELS.length; i += 1) {
+      const prima = TOXIC_LEVEL_SETTINGS[TOXIC_LEVELS[i - 1]];
+      const dopo = TOXIC_LEVEL_SETTINGS[TOXIC_LEVELS[i]];
+
+      expect(dopo.floaters).toBeGreaterThan(prima.floaters);
+      expect(dopo.drips).toBeGreaterThan(prima.drips);
+      expect(dopo.maxChatter).toBeGreaterThan(prima.maxChatter);
+      expect(dopo.maxBubbles).toBeGreaterThan(prima.maxBubbles);
+    }
+  });
+});
+
+describe('ToxicLevelProvider e useToxicLevel', () => {
+  it('parte dal livello dichiarato', () => {
+    render(
+      <ToxicLevelProvider defaultLevel="low">
+        <Spia />
+      </ToxicLevelProvider>,
+    );
+
+    expect(screen.getByTestId('spia')).toHaveTextContent('low');
+  });
+
+  it('senza un livello dichiarato parte da `high`, come la pagina di là', () => {
+    render(
+      <ToxicLevelProvider>
+        <Spia />
+      </ToxicLevelProvider>,
+    );
+
+    expect(screen.getByTestId('spia')).toHaveTextContent('high');
+  });
+
+  it('senza `settings` la taratura è quella della tabella', () => {
+    const { result } = renderHook(() => useToxicLevel(), { wrapper: taratoCon() });
+
+    expect(result.current.settings).toStrictEqual(TOXIC_LEVEL_SETTINGS);
+  });
+
+  it('con `settings` ritocca solo le voci scritte, e solo nel livello scritto', () => {
+    // Il ritocco è per voce, non per livello: il perché sta su `resolveToxicLevelSettings`.
+    const { result } = renderHook(() => useToxicLevel(), {
+      wrapper: taratoCon({ high: { chatterEveryMs: [800, 1500] } }),
+    });
+
+    expect(result.current.settings.high).toStrictEqual({ ...TOXIC_LEVEL_SETTINGS.high, chatterEveryMs: [800, 1500] });
+    expect(result.current.settings.medium).toStrictEqual(TOXIC_LEVEL_SETTINGS.medium);
+  });
+
+  it('fuori dal provider dice che cosa manca, invece di rispondere un valore inventato', () => {
+    // ⚠️ Un valore predefinito silenzioso qui sarebbe il difetto peggiore: il selettore
+    // funzionerebbe, il fondale pure, e non si parlerebbero — ognuno col suo stato. L'errore
+    // arriva al primo render e dice il nome del pezzo che manca.
+    const errori = vi.spyOn(console, 'error').mockImplementation(() => {});
+
+    expect(() => render(<Spia />)).toThrowError(/ToxicLevelProvider/);
+
+    errori.mockRestore();
+  });
+});
+
+describe('la taratura ritoccata arriva a tutto il fondale', () => {
+  afterEach(() => {
+    vi.useRealTimers();
+  });
+
+  it('le icone e le gocce la leggono dal provider', () => {
+    const { container } = render(
+      <ToxicLevelProvider defaultLevel="high" settings={{ high: { floaters: 1, drips: 0 } }}>
+        <PlagueBackground />
+      </ToxicLevelProvider>,
+    );
+
+    expect(container.querySelectorAll('.animate-float')).toHaveLength(1);
+    expect(container.querySelectorAll('.animate-drip')).toHaveLength(0);
+  });
+
+  it('e le bolle anche', () => {
+    // In jsdom `animationend` non arriva, quindi nessuna bolla se ne va: dopo un secondo con una
+    // bolla ogni decimo, quelle in scena sono esattamente il tetto.
+    vi.useFakeTimers();
+    const { container } = render(
+      <ToxicLevelProvider defaultLevel="high" settings={{ high: { bubbleEveryMs: [100, 100], maxBubbles: 2 } }}>
+        <PlagueBackground />
+      </ToxicLevelProvider>,
+    );
+
+    act(() => void vi.advanceTimersByTime(1000));
+    expect(container.querySelectorAll('.pb-toxic-bubble')).toHaveLength(2);
+  });
+});
+
+describe('ToxicLevelSwitch', () => {
+  const montaConSpia = (livello: ToxicLevel = 'high') =>
+    render(
+      <ToxicLevelProvider defaultLevel={livello}>
+        <ToxicLevelSwitch label="Emissioni tossiche" />
+        <Spia />
+      </ToxicLevelProvider>,
+    );
+
+  it('è un gruppo di quattro opzioni che si escludono, non quattro interruttori', () => {
+    montaConSpia();
+
+    // ⚠️ `radiogroup` e non una barra di interruttori: chi legge con la voce sente «alto,
+    // selezionato, 4 di 4» e sa che ce ne sono altri tre. Con dei `toggle` sentirebbe quattro
+    // volte «non premuto», senza mai sapere quante scelte ha.
+    expect(screen.getByRole('radiogroup', { name: 'Emissioni tossiche' })).toBeInTheDocument();
+    expect(screen.getAllByRole('radio')).toHaveLength(TOXIC_LEVELS.length);
+  });
+
+  it('mostra selezionato il livello corrente', () => {
+    montaConSpia('medium');
+
+    expect(opzione(TOXIC_LEVEL_LABELS.medium)).toBeChecked();
+    expect(opzione(TOXIC_LEVEL_LABELS.high)).not.toBeChecked();
+  });
+
+  it('sceglierne un altro lo fa leggere a chiunque stia sotto il provider', () => {
+    montaConSpia('high');
+
+    fireEvent.click(opzione(TOXIC_LEVEL_LABELS.low));
+
+    expect(screen.getByTestId('spia')).toHaveTextContent('low');
+    expect(opzione(TOXIC_LEVEL_LABELS.low)).toBeChecked();
+  });
+
+  it('ripremere il livello già scelto non lo toglie', () => {
+    // ⚠️ Un gruppo a scelta singola di react-aria **può** restare senza scelta: ripremere quella
+    // corrente la toglie, e l'insieme che arriva è vuoto. Ma un livello «nessuno» non esiste —
+    // `off` è un livello, non un'assenza. Lo tengono due righe, e **ognuna basta da sola**:
+    // `disallowEmptySelection`, che non fa partire la scelta vuota, e la guardia su `undefined`,
+    // che la ignorerebbe. Misurato spegnendole: questo caso diventa rosso solo senza tutt'e due.
+    montaConSpia('medium');
+
+    fireEvent.click(opzione(TOXIC_LEVEL_LABELS.medium));
+
+    expect(screen.getByTestId('spia')).toHaveTextContent('medium');
+    expect(opzione(TOXIC_LEVEL_LABELS.medium)).toBeChecked();
+  });
+
+  it('si arriva a qualunque livello con una sola scelta, anche tornando indietro', () => {
+    // ⚠️ È il motivo per cui il comando non è più il ciclo di RattInventario: da «alto» a
+    // «basso» di là servivano tre pressioni, e la prima portava a `off`. Un comando che esiste
+    // per **abbassare** il rumore non può costringere ad alzarlo.
+    montaConSpia('high');
+
+    fireEvent.click(opzione(TOXIC_LEVEL_LABELS.off));
+    expect(screen.getByTestId('spia')).toHaveTextContent('off');
+
+    fireEvent.click(opzione(TOXIC_LEVEL_LABELS.high));
+    expect(screen.getByTestId('spia')).toHaveTextContent('high');
+  });
+
+  it('accetta altri nomi per i livelli, perché le parole non sono sue', () => {
+    render(
+      <ToxicLevelProvider defaultLevel="off">
+        <ToxicLevelSwitch label="Fog" labels={{ off: 'none', low: 'light', medium: 'thick', high: 'pea soup' }} />
+      </ToxicLevelProvider>,
+    );
+
+    expect(screen.getByRole('radio', { name: 'pea soup' })).toBeInTheDocument();
+    expect(screen.queryByRole('radio', { name: TOXIC_LEVEL_LABELS.high })).not.toBeInTheDocument();
+  });
+});

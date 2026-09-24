@@ -1,0 +1,260 @@
+import { Button } from '@heroui/react';
+import {
+  DiceIcon,
+  LUDORATTI_COPY,
+  type LudorattiTerm,
+  PoisonIcon,
+  RAT_LIVERIES,
+  Rat,
+  RatIcon,
+  type RatLivery,
+  SkullIcon,
+  TechLabel,
+  VirusIcon,
+} from 'plague-board-ui';
+
+// Le livree si leggono dalla tabella invece di riscriverle: così una quarta pelliccia compare qui
+// da sé. L'ordine è quello in cui sono dichiarate — per le chiavi stringa è garantito.
+const RAT_LIVERIES_ORDER = Object.keys(RAT_LIVERIES) as RatLivery[];
+
+// ⚠️ Questa pagina è un RIFERIMENTO, non un'implementazione: è la direzione `B · Laboratorio`
+// decisa il 2026-09-16, disegnata a mano per avere davanti il bersaglio mentre si costruiscono i
+// componenti veri. Quando `PlaguePanel`, `RatSwarm` e gli altri esistono, questa pagina si
+// riscrive con loro — e allora quello che si vede qui deve restare identico.
+//
+// Le due domande che l'hanno preceduta sono chiuse: il verde è il **lime del marchio** e il nero è
+// il `gray-950` di `ludoratti.it`.
+
+const KEYFRAMES = `
+@keyframes pb-float { 0%,100% { transform: translateY(0); } 50% { transform: translateY(-14px); } }
+@keyframes pb-drip {
+  0%   { transform: translateY(-16px) scaleY(1); opacity: 0; }
+  6%   { opacity: 1; }
+  85%  { transform: translateY(170px) scaleY(1.6); opacity: 1; }
+  100% { transform: translateY(170px) scaleY(1.6); opacity: 0; }
+}
+`;
+
+const floaters = [
+  { Icon: PoisonIcon, size: 34, top: '10%', left: '6%', delay: '0s' },
+  { Icon: SkullIcon, size: 26, top: '62%', left: '85%', delay: '1.4s' },
+  { Icon: VirusIcon, size: 22, top: '80%', left: '9%', delay: '2.6s' },
+];
+
+/**
+ * Il lessico come lo monta un'applicazione vera: le parole **di casa** arrivano dal dizionario
+ * della libreria, quelle **sue** se le tiene qui.
+ *
+ * ⚠️ «I tuoi manuali» non sta in `LUDORATTI_COPY` e non ci deve stare: i manuali sono di
+ * Rattoteca, e un dizionario di casa che nomina il dominio di una sola app smette di valere per
+ * le altre tre. È la stessa riga che tiene `RAT_PHRASES` senza frasi sull'inventario.
+ */
+const lexicon: readonly LudorattiTerm[] = [
+  LUDORATTI_COPY.signIn,
+  { plain: 'I tuoi manuali', house: 'I manuali della diffusione' },
+  LUDORATTI_COPY.catalog,
+  LUDORATTI_COPY.beta,
+  LUDORATTI_COPY.settings,
+  LUDORATTI_COPY.signOut,
+];
+
+export default function StyleReference() {
+  return (
+    <main className="mx-auto flex min-h-dvh max-w-3xl flex-col gap-10 px-4 py-12">
+      <style>{KEYFRAMES}</style>
+
+      <div className="flex flex-col gap-2">
+        <h1 className="text-2xl font-semibold">La direzione</h1>
+        <p className="text-sm text-muted">
+          <strong>Laboratorio</strong>: lime del marchio su <code>gray-950</code>, superficie
+          semitrasparente e sfocata, angoli morbidi, icone che galleggiano, gocce che colano.{' '}
+          <code>Share Tech Mono</code> sui titoli e sulle etichette, <code>Poppins</code> nel testo.
+        </p>
+        <p className="text-sm text-muted">
+          ⚠️ Il riquadro qui sotto è il <strong>bersaglio</strong>, disegnato a mano: i componenti
+          veri devono arrivarci, non partire da qui. E resta scuro nei due temi — la direzione è
+          questa.
+        </p>
+      </div>
+
+      <div className="dark relative overflow-hidden rounded-xl bg-gray-950 p-8">
+        {['30%', '57%', '72%'].map((left, i) => (
+          <span
+            key={left}
+            className="pointer-events-none absolute top-0 h-5 w-1.5 rounded-b-full bg-brand/70"
+            style={{ left, animation: `pb-drip ${7 + i}s ease-in ${i * 1.6}s infinite` }}
+          />
+        ))}
+
+        <div className="relative mx-auto max-w-sm overflow-hidden rounded-xl border border-brand/30 bg-gray-900/50 p-6 shadow-2xl backdrop-blur-sm">
+          {floaters.map(({ Icon, size, top, left, delay }) => (
+            <span
+              key={`${top}${left}`}
+              className="pointer-events-none absolute"
+              style={{ top, left, animation: `pb-float 7s ease-in-out ${delay} infinite` }}
+            >
+              <Icon size={size} color="#a3e63530" />
+            </span>
+          ))}
+
+          <div className="relative">
+            <div className="mb-4 flex items-center gap-2">
+              <span className="size-2.5 animate-pulse rounded-full bg-brand" />
+              <span className="font-mono text-[11px] uppercase tracking-[0.2em] text-brand-ink">
+                rete della peste
+              </span>
+            </div>
+
+            <h2 className="font-mono text-2xl tracking-wide text-white">Rattoteca</h2>
+            {/* Il lessico, non «Accedi per gestire i tuoi manuali». */}
+            <p className="mt-2 text-sm text-gray-400">
+              Entra nella tana per gestire i manuali della diffusione
+            </p>
+
+            {/* ⚠️ Il pulsante NON è vestito a mano: `variant="primary"` legge `--accent` e
+                `--accent-foreground`, che `theme.css` ha appena ridichiarato. È il primo pezzo di
+                HeroUI davvero vestito da Ludoratti. */}
+            <Button variant="primary" fullWidth className="mt-6 h-11">
+              Entra nella tana
+            </Button>
+
+            <div className="mt-5 flex items-center gap-3 text-gray-400">
+              <span className="h-px flex-1 bg-brand/30" />
+              <VirusIcon size={14} color="#a3e635" />
+              <span className="text-xs">oppure</span>
+              <VirusIcon size={14} color="#a3e635" />
+              <span className="h-px flex-1 bg-brand/30" />
+            </div>
+
+            <p className="mt-5 font-mono text-[11px] text-brand-ink/60">
+              {'// ceppo operativo. in attesa di istruzioni.'}
+            </p>
+          </div>
+        </div>
+      </div>
+
+      <section className="flex flex-col gap-3">
+        <h2 className="text-lg font-medium">Il dado, e i due verdi che non litigano</h2>
+        {/* ⚠️ I due segni stanno su una lastra scura anche in tema chiaro, e non è vezzo: `brand` e
+            `plague-400` sono tinte **da fondo scuro** — su una pagina chiara fanno 1,38 e 1,74 di
+            contrasto, cioè spariscono. Mostrarli così è mostrarli dove vivono; il verde con cui si
+            *scrive* in tema chiaro è un'altra cosa, ed è `brand-ink`. */}
+        <div className="dark flex flex-wrap items-center gap-6 rounded-lg border border-border bg-gray-950/90 p-4">
+          <span className="flex items-center gap-2 text-brand">
+            <DiceIcon size={36} />
+            <span className="text-xs text-muted">
+              il marchio — <code>brand</code>: il dado è il segno dei giochi da tavolo
+            </span>
+          </span>
+          <span className="flex items-center gap-2 text-plague-400">
+            <SkullIcon size={36} />
+            <span className="text-xs text-muted">
+              la malattia — <code>plague-400</code>: icone, fondali, stati
+            </span>
+          </span>
+        </div>
+      </section>
+
+      <section className="flex flex-col gap-3">
+        <h2 className="text-lg font-medium">Il segno della barra</h2>
+
+        <div className="flex flex-wrap items-center gap-x-6 gap-y-3 rounded-lg border border-border p-4">
+          <span className="dark flex shrink-0 items-center gap-2 rounded bg-gray-950/90 px-3 py-2">
+            {/* ⚠️ Niente `animate-heartbeat` addosso: dal 2026-09-20 il battito lo governa il
+                componente, e le due animazioni si moltiplicherebbero — la scala della classe
+                sull'`<svg>` per quella del gruppo dentro. */}
+            <RatIcon size={20} className="shrink-0 text-brand" />
+            <TechLabel className="text-muted">plague-board-ui</TechLabel>
+          </span>
+          <p className="max-w-lg text-sm text-muted">
+            <strong className="text-foreground">Il marchio che batte.</strong> Quel segno si legge
+            in tre modi: a prima vista un <strong>cuore</strong>, poi <strong>due figure che si
+            abbracciano</strong>, e solo per via delle orecchie il <strong>muso di un ratto</strong>.
+            Il battito dice «acceso» raccontando la prima delle tre letture, invece di aggiungerne
+            una quarta. ⚠️ Mai sotto i <strong>20px</strong>: il tratto interno scende sotto il
+            pixel e il cuore sembra un graffio.
+          </p>
+        </div>
+      </section>
+
+      <section className="flex flex-col gap-3">
+        <h2 className="text-lg font-medium">Il ratto, che è un&apos;altra cosa dal marchio</h2>
+
+        <p className="max-w-2xl text-sm text-muted">
+          Il segno qui sopra è l&apos;<strong>emblema</strong>, fatto per essere riconosciuto a
+          18px. Questo è il <strong>personaggio</strong>: di profilo, con l&apos;inchiostro e le
+          campiture piatte del topo con l&apos;ampolla, così i due sono lo stesso ratto. Un occhio
+          solo, il sopracciglio, e un allestimento che si accende a pezzi: il{' '}
+          <strong>teschio di corvo</strong> portato come elmo, l&apos;<strong>ampolla</strong> legata
+          sulle spalle. <code>Rat</code> sta fermo — chi lo fa correre è <code>RatRun</code> — e la
+          sua misura è <strong>l&apos;altezza</strong>, perché è lungo due volte e mezzo tanto.
+        </p>
+
+        {/* ⚠️ **Nessuna lastra scura**: il ratto segue il tema, apposta. Il contorno d'inchiostro è
+            quello che lo tiene su qualunque fondo — sull'albino il pelo è `#f7f7f7`, e su pagina
+            chiara sparirebbe senza. È la stessa ragione per cui la mascotte con l'ampolla regge in
+            chiaro, e la demo deve poterlo mostrare, non nasconderlo dietro un fondo scuro fisso. */}
+        <div className="flex flex-col gap-5 rounded-lg border border-border bg-surface p-4">
+          <div className="flex flex-wrap items-end gap-8">
+            {RAT_LIVERIES_ORDER.map((livery) => (
+              <span key={livery} className="flex flex-col items-center gap-2">
+                <Rat livery={livery} size={64} />
+                <TechLabel className="text-muted">{livery}</TechLabel>
+              </span>
+            ))}
+          </div>
+          {/* Tre interruttori, otto combinazioni: qui le tre reference ricomposte esatte — il bruno
+              col teschio e il collare, l'albino con l'ampolla — e due che nelle reference non
+              esistono, perché è il punto dei pezzi separati. */}
+          <div className="flex flex-wrap items-end gap-8">
+            <span className="flex flex-col items-center gap-2">
+              <Rat livery="brown" size={64} hasSkull hasCollar />
+              <TechLabel className="text-muted">hasSkull hasCollar</TechLabel>
+            </span>
+            <span className="flex flex-col items-center gap-2">
+              <Rat livery="white" size={64} hasVial />
+              <TechLabel className="text-muted">hasVial</TechLabel>
+            </span>
+            <span className="flex flex-col items-center gap-2">
+              <Rat livery="grey" size={64} hasSkull hasVial />
+              <TechLabel className="text-muted">grigio col teschio e l&apos;ampolla</TechLabel>
+            </span>
+            <span className="flex flex-col items-center gap-2">
+              <Rat livery="white" size={64} hasSkull hasCollar hasVial />
+              <TechLabel className="text-muted">tutto addosso</TechLabel>
+            </span>
+            <span className="flex flex-col items-center gap-2">
+              <Rat livery="brown" size={28} hasCollar hasVial />
+              <TechLabel className="text-muted">a 28px</TechLabel>
+            </span>
+          </div>
+        </div>
+
+        <p className="max-w-2xl text-sm text-muted">
+          ⚠️ La cornice è <strong>una sola</strong>, misurata sui pixel del ratto con tutto addosso:
+          accendere l&apos;ampolla non sposta il ratto e non gli cambia la misura. Per questo, e non
+          per pigrizia, un ratto nudo ha un po&apos; d&apos;aria sopra la testa.
+        </p>
+      </section>
+
+      <section className="flex flex-col gap-3">
+        <h2 className="text-lg font-medium">Il lessico, come dato</h2>
+        <p className="max-w-2xl text-sm text-muted">
+          Le parole di casa non stanno dentro i componenti: sono un dizionario che la libreria
+          esporta e che ogni app applica se vuole la voce.
+        </p>
+        <div className="grid gap-2 sm:grid-cols-2">
+          {lexicon.map(({ plain, house }) => (
+            <div
+              key={plain}
+              className="flex flex-col gap-1 rounded-lg border border-border bg-surface p-3"
+            >
+              <span className="text-xs text-muted line-through">{plain}</span>
+              <span className="font-mono text-sm text-brand-ink">{house}</span>
+            </div>
+          ))}
+        </div>
+      </section>
+    </main>
+  );
+}
