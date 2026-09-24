@@ -1,6 +1,6 @@
 'use client';
 
-import { Popover } from '@heroui/react';
+import { Popover, useTheme } from '@heroui/react';
 import Link from 'next/link';
 import { usePathname } from 'next/navigation';
 import {
@@ -11,6 +11,7 @@ import {
   RatIcon,
   TechLabel,
   TechRule,
+  ThemeSwitch,
 } from 'plague-board-ui';
 import { useState } from 'react';
 
@@ -23,7 +24,6 @@ import {
   type PlaygroundPage,
 } from './pages';
 import { PagesDrawer } from './PagesDrawer';
-import { ThemeToggle } from './ThemeToggle';
 
 /**
  * La barra del playground.
@@ -106,6 +106,12 @@ function FamilyMenu({
 
 export function PlaygroundNav() {
   const pathname = usePathname();
+  // ⚠️ Il tema è il collegamento che la libreria consiglia, scritto uguale: `useTheme` di HeroUI più
+  // `ThemeSwitch`, e `themeBootScript()` nel layout. Il playground non ha più un commutatore suo,
+  // così chi legge questo file vede l'esempio vero — ed è così che è saltato fuori il difetto
+  // d'idratazione che ora `ThemeSwitch` cura da sé. ⚠️ Letto nel sorgente e non misurato: il gancio
+  // chiama `localStorage` senza `try`, quindi coi dati del sito bloccati lancia e si porta via la barra.
+  const { theme, setTheme } = useTheme();
   const catalogo = PLAYGROUND_PAGES.filter((page) => page.family === 'catalogo');
   const filosofia = PLAYGROUND_PAGES.filter((page) => page.family === 'filosofia');
 
@@ -185,7 +191,7 @@ export function PlaygroundNav() {
           </span>
 
           <span className="ml-auto">
-            <ThemeToggle />
+            <ThemeSwitch value={theme} onChange={setTheme} />
           </span>
         </BarRow>
       </nav>

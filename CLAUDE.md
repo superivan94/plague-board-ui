@@ -803,7 +803,10 @@ exist in target module» che **non sono veri**. Si guarda la pagina, o si crede 
 - ⚠️ **Il tema si commuta ricaricando, non scrivendo la classe sulla radice da console.** Cambiando
   `documentElement.classList` a mano, su `/atmosfera` metà dei token di HeroUI seguivano e metà no —
   un'opzione non scelta misurava 1,16 in scuro, quando ricaricando ne fa 14,52. Si scrive
-  `pb-playground-theme` in `localStorage` e si ricarica, che è la via che usa la pagina.
+  `heroui-theme` in `localStorage` — `light`, `dark` o `system` — e si ricarica, che è la via che
+  usa la pagina: dal 2026-09-24 la barra è `ThemeSwitch` col gancio `useTheme` di HeroUI, e lo
+  script del layout è `themeBootScript()`. La chiave di prima, `pb-playground-theme`, non la legge
+  più nessuno.
 - ⚠️ **Un binario in una libreria `tsc` ha una terza via, e sopra i cento chilobyte batte il
   base64: `new URL('…', import.meta.url)`.** webpack 5 e Turbopack la riconoscono come «questo
   modulo dipende da quel file»: copiano l'asset nell'output dell'applicazione e sostituiscono
@@ -1326,6 +1329,18 @@ exist in target module» che **non sono veri**. Si guarda la pagina, o si crede 
   versione di `themeBootScript` metteva anche `style.colorScheme`: il gancio non lo aggiorna, quindi
   dopo il passaggio al chiaro sarebbe rimasto scuro — barre di scorrimento e campi del browser
   compresi. Il `color-scheme` lo dà già il CSS di HeroUI sulla classe.
+- ⚠️ **Un commutatore del tema controllato non si idrata con la scelta salvata, e React non lo
+  ripara.** `useTheme` di HeroUI — e `next-themes` allo stesso modo — legge `localStorage` già nel
+  primo render del client, mentre il server rende il valore di serie: misurato il 2026-09-24 col
+  playground che usa il suo stesso commutatore, pagina chiara e `ThemeSwitch` fermo su «del
+  sistema», con «This won't be patched up» in console. Non somiglia a un errore d'idratazione:
+  somiglia a un commutatore che non ricorda. Per questo `ThemeSwitch` mostra «del sistema» finché
+  `useIsHydrated` non dice che l'idratazione è finita, e nessuna applicazione deve ricordarsene.
+  ⚠️ **E chi riscrive il tema della radice riscrive anche `data-theme`.** Lo script lo mette accanto
+  alla classe, e `theme.css` dichiara lo scuro sotto il chiaro con la stessa specificità: le cornici
+  del catalogo, che correggevano solo la classe, con la scelta salvata scura davano alla variante
+  chiara un fondo `6,6,7`. Un'isola **dentro** la pagina non ha il problema, perché ridichiara le
+  variabili su un elemento suo.
 - ⚠️ **Un controllo che conta solo in combinazione non lo prova un test che guarda un gesto per
   volta.** Nella navigazione fissa, «col puntatore sopra non si ritira» restava verde anche
   togliendo il controllo, perché entrare col puntatore **ferma** il conto e basta. Il controllo

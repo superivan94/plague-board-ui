@@ -1,5 +1,6 @@
 import type { Metadata, Viewport } from 'next';
 import { Poppins, Share_Tech_Mono } from 'next/font/google';
+import { themeBootScript } from 'plague-board-ui';
 
 import './globals.css';
 
@@ -39,16 +40,17 @@ export const viewport: Viewport = {
 
 // ⚠️ Gira **prima** che la pagina si disegni, quindi chi torna col tema chiaro non vede un lampo
 // scuro. Non può essere un effetto di React: gli effetti partono dopo il primo disegno, ed è lì
-// che il lampo si vede.
-const THEME_BOOT = `try{var t=localStorage.getItem('pb-playground-theme')==='light'?'light':'dark';var c=document.documentElement.classList;c.toggle('dark',t==='dark');c.toggle('light',t==='light')}catch(e){}`;
+// che il lampo si vede. È lo script della libreria senza opzioni — la chiave di `useTheme` di
+// HeroUI, che è il gancio della barra, e «del sistema» come valore di serie.
+const THEME_BOOT = themeBootScript();
 
 export default function RootLayout({ children }: { children: React.ReactNode }) {
   // La classe sulla radice è il modo in cui sia HeroUI sia `theme.css` riconoscono il tema. Qui
-  // parte `dark`, e lo script qui sopra la corregge subito se l'ultima scelta era un'altra.
+  // parte `dark`, e lo script qui sopra la corregge subito se la scelta — o il sistema — dice altro.
   return (
     // ⚠️ `suppressHydrationWarning` è qui perché la differenza è **voluta**: il server scrive
-    // `dark`, lo script qui sopra la cambia prima che React idrati, e React trova una classe
-    // diversa da quella che ha reso. Senza questa riga è un avviso a ogni caricamento; con un
+    // `dark`, lo script qui sopra la cambia — e aggiunge `data-theme` — prima che React idrati, e
+    // React trova una radice diversa da quella che ha reso. Senza questa riga è un avviso a ogni caricamento; con un
     // effetto al posto dello script, sarebbe un lampo del tema sbagliato a ogni caricamento.
     <html
       lang="it"

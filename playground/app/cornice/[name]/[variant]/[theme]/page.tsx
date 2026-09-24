@@ -16,9 +16,14 @@ const isTheme = (value: string): value is FrameTheme => THEMES.some((theme) => t
  * variante leggono lo stesso `localStorage`: senza questa riga sarebbero tutti e due dello stesso
  * tema. Sulla radice e non su un contenitore, perché quello che vola vive in un portale sul
  * `body` e il tema lo legge da lì.
+ *
+ * ⚠️ **E scrive anche `data-theme`, non solo la classe.** Lo script del layout li mette tutti e due,
+ * e `theme.css` dichiara `.light, [data-theme='light']` sopra `.dark, [data-theme='dark']`: con la
+ * classe `light` e l'attributo rimasto `dark`, a parità di specificità vince il secondo blocco.
+ * Misurato il 2026-09-24 con la scelta salvata scura: la cornice chiara aveva il fondo a `6,6,7`.
  */
 const themeScript = (theme: FrameTheme) =>
-  `(function(c){c.toggle('dark',${theme === 'dark'});c.toggle('light',${theme === 'light'})})(document.documentElement.classList)`;
+  `(function(d){d.classList.toggle('dark',${theme === 'dark'});d.classList.toggle('light',${theme === 'light'});d.setAttribute('data-theme','${theme}')})(document.documentElement)`;
 
 // ⚠️ Una cornice per ogni variante di ogni storia, in tutti e due i temi, costruita al build: una
 // variante che lancia rende rosso `next build` invece di aspettare che qualcuno apra la sua pagina.
