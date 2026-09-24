@@ -1070,8 +1070,8 @@ il nome toglie tutti e due, e vale anche sul fondale della peste, che non è un 
 una lastra di `#030712` sarebbe stata un rettangolo appena più scuro della città.
 
 ⚠️ **«EVIL» sul chiaro fa 3,49**: passa la soglia del testo grande e non quella del testo normale.
-È una parola decorativa e fuori dal nome accessibile, e il colore si rifinisce nella passata finale
-sulle tinte; sotto i 24 px la leva è `revealClassName`.
+È una parola decorativa e fuori dal nome accessibile; sotto i 24 px la leva è `revealClassName`.
+Nella passata sui colori del 2026-09-24 resta `red-500` (utente, *«va già bene così»*).
 
 **Che cosa protegge:** una parola che ne sostituisce un'altra senza sapere che cosa c'è dietro — il
 modo in cui una lastra fallisce non si vede sul fondo per cui è stata scelta, e si vede solo col
@@ -1529,7 +1529,8 @@ di ogni pezzo in `/storie`. Contrasti col metodo della tela 1×1 e degli strati 
 | `PlagueAlert`, i cinque toni | titolo e segno sopra 4,5 nei due temi | minimo **5,72** (avviso in chiaro), massimo 17,72 |
 | `PlagueToastRegion`, quattro notifiche | idem, e la croce in italiano | minimo **5,72**, «Chiudi» su tutte, il marchio che batte nell'attesa |
 | `ProfileMenu` aperto | nome, email, grado, le voci, l'uscita in rosso | tutto; l'uscita rossa solo dopo averla messa in `[data-slot="label"]` |
-| Il rosso dell'uscita | ≥ 4,5 | **3,57** in chiaro e **3,97** in scuro ❌ — è `--danger` di HeroUI: va alla passata sui colori |
+| Il rosso dell'uscita | ≥ 4,5 | **3,57** in chiaro e **3,97** in scuro ❌ — è `--danger` di HeroUI; al passaggio, sul fondo `--default`, **3,00** e **3,34**. Resta così (utente, 2026-09-24): vedi la passata sui colori qui sotto |
+| Il testo bianco del bottone `danger` — «Elimina» di `PlagueConfirmDialog` | ≥ 4,5 | **3,48** in chiaro e **4,35** in scuro ❌ — lo stesso `--danger`, come fondo. Trovato nella passata, resta così |
 | `ThemeSwitch`, si sceglie «scuro» | la scelta passa, il riquadro di prova diventa scuro | `aria-checked` sul terzo, riquadro con `dark` |
 | La barra del playground con `useTheme` di HeroUI e `heroui-theme` = `light`, ricaricando | il commutatore su «chiaro» | ❌ prima: pagina chiara, commutatore su «del sistema», «This won't be patched up» in console; ✅ dopo l'attesa dell'idratazione dentro `ThemeSwitch`: «Tema chiaro», e con `dark` «Tema scuro», nessun errore nuovo |
 | «Del sistema» premuto nella barra, col sistema chiaro (ancora con `useTheme`) | salvato `system`, pagina chiara | `heroui-theme` = `system`, `data-theme="light"`, una classe sola sulla radice |
@@ -1556,3 +1557,36 @@ non la emula: lì vale il test che rilegge la riga `transition: none` nel foglio
 
 **Che cosa protegge:** che i pezzi nati dal giro delle due app sembrino **nostri** in tutti e due i
 temi — il punto d'arrivo era «c'è, e sembra dei Ludoratti», non «c'è».
+
+### La passata sui colori: «EVIL», il filo, il rosso — 2026-09-24
+
+**Esegue:** agente, con l'utente che sceglie guardando.
+**Ultima esecuzione:** agente, 2026-09-24.
+
+**Preparazione:** `npm run build`, **riavviare** il dev server (`bg-brand-ink/80` era una classe
+nuova). Una pagina di prova temporanea montava i pezzi rossi — l'uscita di `ProfileMenu`, un
+`Button` `danger` e `danger-soft`, `PlagueConfirmDialog`, `PlagueAlert` e `ThematicBadge` in
+`danger`, una notifica — con un interruttore che iniettava le righe della proposta in un `<style>`
+fuori da ogni layer, negli stessi selettori di `theme.css`. Tema dalla barra, contrasti col metodo
+della tela 1×1 e degli strati composti; la voce del menù al passaggio si compone su `--default`.
+
+| Azione | Atteso | Ottenuto |
+|---|---|---|
+| `--danger` di HeroUI, oggi: uscita · al passaggio · bottone col bianco | ≥ 4,5 | chiaro `#ff383c` **3,57 · 3,00 · 3,48**; scuro `#db3b3e` **3,97 · 3,34 · 4,35** ❌ |
+| Proposta sobria: `red-700` in chiaro, `red-400` in scuro col testo scuro sul bottone | ≥ 4,5 | chiaro 6,42 · 5,24 · 6,26; scuro 6,13 · 5,16 · 6,21 — l'utente preferisce lo stile di oggi |
+| Proposta accesa: il rosso più saturo che regge 4,5 anche al passaggio | ≥ 4,5 | chiaro `#d50000` 5,48 · 4,60 · 5,35; scuro `#ff5040` 5,46 · 4,59 · 5,53 col testo scuro — l'utente tiene quello di oggi |
+| «EVIL» `red-500`, 30 px | ≥ 3, testo grande | chiaro **3,49**, scuro 5,32 — resta |
+| Il filo di `PlagueDivider` nelle cornici di `LoginScreen`, all'80% | ≥ 3, separa | **3,42** in chiaro, **7,87** in scuro (al 50%: 2,04 e 3,83) |
+
+⚠️ **`--danger` di HeroUI fa due mestieri, e in scuro non li può fare tutti e due.** È il colore del
+testo rosso (`text-danger`, la voce `danger` dei menù) **e** il fondo del bottone `danger`, col
+bianco sopra. Un rosso più chiaro alza il primo e affonda il secondo: in scuro col `red-400` il
+bianco sul bottone scende a **2,82**. Per questo le due proposte danno al bottone il testo scuro in
+scuro, come fa il bottone lime.
+
+⚠️ **Più acceso di così non si può**: il limite lo mette la voce del menù **al passaggio**, che
+posa il rosso sul grigio di `--default` e non sul bianco. Sul bianco il `red-600` di Tailwind
+regge (4,77), al passaggio no (4,00).
+
+**Che cosa protegge:** che il giorno in cui si vorrà un rosso sopra soglia la misura sia già fatta,
+coi due limiti che la governano — il doppio mestiere di `--danger` e il fondo al passaggio.

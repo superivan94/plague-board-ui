@@ -1328,6 +1328,14 @@ exist in target module» che **non sono veri**. Si guarda la pagina, o si crede 
   versione di `themeBootScript` metteva anche `style.colorScheme`: il gancio non lo aggiorna, quindi
   dopo il passaggio al chiaro sarebbe rimasto scuro — barre di scorrimento e campi del browser
   compresi. Il `color-scheme` lo dà già il CSS di HeroUI sulla classe.
+- ⚠️ **`--danger` di HeroUI è insieme il testo rosso e il fondo del bottone rosso, e in scuro non
+  si possono accontentare tutti e due.** Il bianco sul bottone `danger` fa 3,48 in chiaro e 4,35 in
+  scuro, il rosso come testo 3,57 e 3,97: un rosso più chiaro alza il secondo e affonda il primo —
+  col `red-400` il bianco scende a 2,82 —, quindi ridichiararlo vuol dire dare al bottone il testo
+  scuro in scuro, come il bottone lime. E il limite di quanto può essere acceso non è il bianco
+  della pagina: è la voce del menù **al passaggio**, che posa il rosso sul grigio di `--default`.
+  Misurato il 2026-09-24 con due proposte; l'utente ha tenuto il rosso di HeroUI, e i numeri stanno
+  in [`COLLAUDI.md`](COLLAUDI.md).
 - ⚠️ **Un commutatore del tema controllato non si idrata con la scelta salvata, e React non lo
   ripara.** `useTheme` di HeroUI — e `next-themes` allo stesso modo — legge `localStorage` già nel
   primo render del client, mentre il server rende il valore di serie: misurato il 2026-09-24 col
