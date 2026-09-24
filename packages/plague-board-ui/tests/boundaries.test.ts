@@ -11,6 +11,15 @@ describe('il confine server/client', () => {
     expect(sorgenti.length).toBeGreaterThan(5);
   });
 
+  it('riconosce i moduli client, qualunque fine riga abbia il checkout', () => {
+    // ⚠️ Il secondo modo di essere verde per costruzione: leggere i file e non riconoscere niente.
+    // Misurato il 2026-09-25 al primo `npm publish`: Git per Windows ha `core.autocrlf=true`, il
+    // checkout di `main` ha riscritto i sorgenti con `\r\n`, e la prima riga diventava
+    // `'use client';\r`. Quattro casi qui sotto rossi, e soprattutto l'ultimo **verde su zero file**:
+    // dei 30 moduli client non ne riconosceva nessuno.
+    expect(sorgenti.filter(isClientModule).length).toBeGreaterThan(20);
+  });
+
   it.each(sorgenti.filter(({ text }) => text.includes('render={')))(
     'chi passa `render` a HeroUI dichiara `use client`: $name',
     ({ text }) => {
