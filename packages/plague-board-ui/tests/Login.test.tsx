@@ -129,6 +129,15 @@ describe('PlagueDivider', () => {
     expect(screen.getAllByRole('separator')).toHaveLength(2);
   });
 
+  it('i fili sono più marcati del bordo del pannello: separano, non decorano', () => {
+    // ⚠️ Il colore in jsdom non si misura: si tiene la classe, e il contrasto sta nel collaudo —
+    // 3,42 sul pannello chiaro. Tornare a `brand-ink/50` per «fare famiglia» col bordo è la modifica
+    // più innocua del mondo, e rimette il filo a 2,04.
+    render(<PlagueDivider>oppure</PlagueDivider>);
+
+    screen.getAllByRole('separator').forEach((filo) => expect(filo).toHaveClass('bg-brand-ink/80'));
+  });
+
   it('mette il virione ai due lati, decorativo', () => {
     const { container } = render(<PlagueDivider>oppure</PlagueDivider>);
 

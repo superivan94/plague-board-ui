@@ -39,13 +39,17 @@ export interface PlagueDividerProps {
  * `animate-glitch` e `animate-reveal` qui, e appoggiarcisi vorrebbe dire dipendere da qualcosa che
  * la prossima versione può togliere senza che niente diventi rosso.
  *
- * ⚠️ **Il filo è `brand-ink/50`, cioè lo stesso verde del bordo di {@link PlaguePanel}, e non il
- * `--separator` di HeroUI.** Quel token è tarato sulle superfici chiare del suo tema e qui non
- * regge: misurato il 2026-09-20 in tema scuro, fa **1,26** sulla pagina e **1,10** dentro il
- * pannello — cioè una riga che non c'è, e un componente che si riduce a una parola con due vuoti
- * ai lati. Il verde al 50% fa **3,83** sul pannello e **3,85** sulla pagina, ed è lo stesso
- * spessore di colore del bordo che gli sta attorno: una sola famiglia di fili per tutta la
- * superficie della peste, invece di due grigi che non si somigliano.
+ * ⚠️ **Il filo è il verde di `brand-ink` all'80%, e non il `--separator` di HeroUI.** Quel token è
+ * tarato sulle superfici chiare del suo tema e qui non regge: misurato il 2026-09-20 in tema scuro,
+ * fa **1,26** sulla pagina e **1,10** dentro il pannello — cioè una riga che non c'è, e un
+ * componente che si riduce a una parola con due vuoti ai lati.
+ *
+ * ⚠️ **E all'80%, non al 50% del bordo di {@link PlaguePanel}**, perché il filo **separa** due
+ * gruppi — due modi di entrare — e non decora: senza, lo spazio da solo non basta a dirlo (utente,
+ * 2026-09-24). Una grafica che porta un significato vuole **3**, e al 50% in chiaro il filo si
+ * fermava a **2,04** sul pannello; all'80% fa **3,42** in chiaro e **7,87** in scuro. Il bordo del
+ * pannello resta al 50%: il pannello si stacca dalla pagina col fondo e con l'ombra, e il filo più
+ * marcato di lui è la gerarchia giusta — dentro, la riga che conta.
  *
  * @example
  * ```tsx
@@ -64,13 +68,13 @@ export function PlagueDivider({
           e `bg-separator` — e vincono perché le utility di Tailwind stanno in `@layer utilities`
           e i componenti di HeroUI in `@layer components`: non dipende dall'ordine degli import.
           Misurato in pagina: `flex-grow: 1`, `flex-basis: 0%`, e i due fili larghi uguali. */}
-      <Separator className="flex-1 bg-brand-ink/50" />
+      <Separator className="flex-1 bg-brand-ink/80" />
       <span className="flex shrink-0 items-center gap-2 text-xs">
         {icon}
         {children}
         {icon}
       </span>
-      <Separator className="flex-1 bg-brand-ink/50" />
+      <Separator className="flex-1 bg-brand-ink/80" />
     </div>
   );
 }

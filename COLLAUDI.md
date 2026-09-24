@@ -1105,8 +1105,10 @@ traslucidi composti dal basso.
 | Gate | verde | build, typecheck, lint 0/0, **936 test**, 310 cornici, `/` statica |
 
 ⚠️ **Il filo di `PlagueDivider` nel pannello chiaro fa 1,98**, e `/accesso` lo dichiarava già: con
-la schermata che ora esiste anche di giorno, quel filo lì si vede davvero. Resta per la passata
-finale sui colori.
+la schermata che ora esiste anche di giorno, quel filo lì si vede davvero. ✅ **Chiuso nella passata
+sui colori, il 2026-09-24**: il filo separa due modi di entrare, quindi è una grafica che porta un
+significato e vuole 3 (utente). Passa a `brand-ink/80` — misurato nelle cornici di `LoginScreen`,
+**3,42** in chiaro e **7,87** in scuro — e il bordo del pannello resta al 50%.
 
 **Che cosa protegge:** la schermata di accesso di quattro applicazioni nel tema che la persona ha
 scelto; e i due blocchi del tema con gli stessi colori della scena, che è il modo in cui un pezzo
