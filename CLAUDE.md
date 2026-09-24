@@ -53,9 +53,9 @@ npm run playground     # il dev server, sulla 3100
 ```
 
 ⚠️ **Il playground consuma `dist/`, non `src/`**: dopo aver toccato la libreria si rilancia
-`npm run build`, o la pagina mostra ancora quella di prima. E mentre `tsc` riscrive `dist/`, il dev
-server compila contro una cartella a metà: nella console restano errori tipo «Export X doesn't
-exist in target module» che **non sono veri**. Si guarda la pagina, o si crede a `next build`.
+`npm run build`, o la pagina mostra ancora quella di prima. E mentre la build svuota `dist/` e `tsc`
+lo riscrive, il dev server compila contro una cartella vuota o a metà: nella console restano errori
+tipo «Export X doesn't exist in target module» che **non sono veri**. Si guarda la pagina, o si crede a `next build`.
 
 ⚠️ **La 3100 e non la 3000**: la 3000 è dei dev server delle applicazioni, che l'utente avvia da sé.
 
@@ -1217,6 +1217,15 @@ exist in target module» che **non sono veri**. Si guarda la pagina, o si crede 
   cima a `exports`, per chi risolve ancora alla maniera vecchia (`exports` continua a chiudere gli
   import profondi), e **`prepublishOnly`** con dentro il gate intero, perché `npm publish` spedisce
   il `dist/` che trova — anche quello di ieri.
+- ⚠️ **`tsc` scrive in `dist/` e non cancella niente, e `npm pack` spedisce la cartella intera.**
+  Un sorgente tolto lascia lì il suo `.js`, la sua dichiarazione e le sue due mappe: misurato il
+  2026-09-24 prima del primo publish, 32 file di otto moduli che non esistevano più — le icone del
+  dominio dei giochi tolte quattro giorni prima —, con 16 mappe cieche. Nessun `exports` li
+  raggiungeva, quindi funzionava tutto, e il guard delle mappe legge il manifesto e non la
+  cartella: si è visto solo **contando** il tarball contro `src/`. Per questo la build comincia con
+  `npm run clean`, che svuota `dist/`, e un caso di `publicSurface.test.ts` lo tiene. ⚠️ Il prezzo
+  è che durante una build il dev server del playground trova `dist/` vuoto per un momento, oltre
+  che a metà: gli errori «Export X doesn't exist» in quei secondi restano **non veri**.
 - ⚠️ **Ogni import relativo dei sorgenti finisce per `.js`, e non è un refuso: senza, il pacchetto
   non si importa in Node.** `tsc` **non riscrive** gli specificatori — emette quello che legge — e
   Node ESM non cerca l'estensione: `dist/index.js` con dentro `from './brand/BarRow'` muore con

@@ -36,6 +36,7 @@ const importati = new Set(relativi.map(({ module }) => module));
 const PACCHETTO: {
   readonly files: readonly string[];
   readonly exports: Readonly<Record<string, unknown>>;
+  readonly scripts: Readonly<Record<string, string>>;
 } = JSON.parse(readFileSync(join(process.cwd(), 'package.json'), 'utf8'));
 
 /** Gli indirizzi che `exports` promette, appiattiti: le voci sono una stringa o un oggetto. */
@@ -174,6 +175,18 @@ describe('la superficie pubblica', () => {
       Boolean(build.compilerOptions.sourceMap) || Boolean(build.compilerOptions.declarationMap);
 
     expect(conMappe && !PACCHETTO.files.includes('src')).toBe(false);
+  });
+
+  it('la build parte da un `dist/` vuoto', () => {
+    // ⚠️ `tsc` scrive e non cancella: un sorgente tolto lascia in `dist/` il suo `.js`, e `npm pack`
+    // spedisce la cartella intera. Misurato il 2026-09-24 prima del primo publish: 32 file di otto
+    // moduli che non esistevano più — le sette icone del dominio dei giochi tolte il 2026-09-20, e il
+    // vecchio `BacteriaIcon` —, con 16 mappe cieche e gli import senza `.js` di prima della cura.
+    // Gli `exports` non li raggiungono, ma nel tarball ci sarebbero stati proprio i segni che si era
+    // deciso di lasciare a Rattoteca. Come per gli `exports`, qui si prova la promessa: `dist/` lo
+    // fabbrica la build, e i test girano anche prima.
+    expect(PACCHETTO.scripts.build.startsWith('npm run clean && ')).toBe(true);
+    expect(PACCHETTO.scripts.clean).toContain("rmSync('dist'");
   });
 
   it.each(PACCHETTO.files)('`files` non spedisce un indirizzo che non c’è: %s', (voce) => {

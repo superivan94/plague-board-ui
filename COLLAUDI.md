@@ -1397,7 +1397,7 @@ accendere il muso dove diventa un cuore scheggiato.
 **Esegue:** agente — e **si rifà prima di ogni `npm publish`**, perché è l'unico momento in cui il
 pacchetto si guarda da fuori.
 
-**Ultima esecuzione:** agente, 2026-09-21
+**Ultima esecuzione:** agente, 2026-09-24 — la tabella in fondo; quella sopra è del 2026-09-21
 
 **Preparazione:** dalla cartella del pacchetto, `npm pack --dry-run`. Non si legge `package.json`:
 quello dice che cosa il pacchetto **promette**, e il difetto che questo scenario cerca è
@@ -1416,6 +1416,24 @@ di ieri.
 | Avvisi di npm (licenza, campi) | nessuno | nessuno: `PolyForm-Noncommercial-1.0.0` è un identificatore SPDX valido |
 | `npm view plague-board-ui` | 404, il nome è libero | 404 il 2026-09-22 — e resta libero finché non si pubblica |
 | Peso | — | **393 file, 1,7 MB compresso, 2,4 MB aperto** (era 320 / 1,5 / 2,0 prima di README, LICENSE e sorgenti) |
+
+Il 2026-09-24, prima del publish della `0.1.0`, col gate verde (1549 test) e i pezzi comuni dentro:
+
+| Azione | Atteso | Ottenuto |
+|---|---|---|
+| README, LICENSE, i due CSS, la traccia, `dist/index.js` e `.d.ts` | ci sono | sì — `theme.css` 15,2 KB, `animations.css` 51,0 KB, la traccia 1256 KB |
+| `tests/`, e file strani (`.env`, `.tsbuildinfo`, `.test.`) | non ci sono | zero |
+| Le mappe risolvono | tutte | ❌ **16 cieche** su 192: puntavano ai sorgenti di **otto moduli che non esistono più** — le sette icone del dominio dei giochi tolte il 2026-09-20 e il vecchio `BacteriaIcon`. `tsc` scrive e non cancella, quindi i loro 32 file erano ancora in `dist/`, e nel tarball |
+| Gli stessi file, dentro | — | import senza `.js`, cioè di prima della cura del 2026-09-22: rotti anche se qualcuno ci fosse arrivato |
+| Dopo `clean` nella build | `dist/` e `src/` allo stesso passo | **88** moduli e **88** sorgenti, **176** mappe su 176 risolte, zero import relativi senza file (maiuscole comprese) |
+| Avvisi di npm | nessuno | nessuno |
+| `npm view plague-board-ui` | 404 | 404 |
+| Peso | — | **446 file, 1,63 MB compresso, 2,51 MB aperto** |
+
+⚠️ **Il difetto di oggi non l'avrebbe preso nessun test, e nemmeno il guard delle mappe**: i file
+orfani non li raggiunge nessun `exports`, quindi tutto funzionava, e il guard legge il manifesto,
+non la cartella. Si vede solo **contando** il tarball contro `src/`. Da qui `clean` in testa alla
+build, e un caso di `publicSurface.test.ts` che lo tiene.
 
 ⚠️ **Il momento per guardare è prima del primo publish, e non è una formalità.** Finché il nome non
 è sul registry, la superficie pubblica e la forma del pacchetto si cambiano gratis; dopo, un cambio
@@ -1439,7 +1457,7 @@ chi ci prova, e a noi in casa funziona.
 **Esegue:** agente — **prima di ogni `npm publish`**, e ogni volta che si tocca la forma del
 pacchetto (`exports`, `files`, `tsconfig.build.json`, la build).
 
-**Ultima esecuzione:** agente, 2026-09-22
+**Ultima esecuzione:** agente, 2026-09-24 — la tabella in fondo; quella sopra è del 2026-09-22
 
 **Preparazione:** `npm pack` dentro una cartella dello scratchpad, poi un progetto vuoto con
 `"type": "module"` e `npm install ./plague-board-ui-0.1.0.tgz`. **Non si usa il playground**: quello
@@ -1458,6 +1476,21 @@ delle peer regge senza che l'applicazione le nomini.
 | `'use client'` in cima a `dist/brand/PlagueBar.js` | c'è | sì — sopravvive a `tsc` e al tarball |
 | La mappa di `PlagueBar.js` | punta a un file spedito | `../../src/brand/PlagueBar.tsx`, e il file c'è |
 | `tsc` di un file che importa componenti **e tipi**, con `skipLibCheck: false` | pulito | pulito con `moduleResolution: bundler` **e** con `nodenext` |
+
+Il 2026-09-24, dopo la build da `dist/` vuoto, con Node 22.17 e npm 10.9:
+
+| Azione | Atteso | Ottenuto |
+|---|---|---|
+| `npm install` del tarball in un progetto vuoto | le peer arrivano da sé | 57 pacchetti — React, HeroUI, `react-aria`, Tailwind —, **0** vulnerabilità |
+| `import 'plague-board-ui'` da Node | i nomi della libreria | **95** nomi a runtime |
+| Le funzioni, vecchie e nuove: `RatIcon`, `PlagueBar`, `binaryRain`, `ThemeSwitch`, `useThemePreference`, `themeBootScript`, `PlagueDock`, i dialoghi, `ProfileMenu`… | funzioni | tutte e 17 |
+| `RAT_PHRASES`, `LUDORATTI_COPY`, `THEME_PREFERENCES`, `TOXIC_LEVEL_SETTINGS` e gli altri | valori, non `undefined` | tutti e 8 |
+| `themeBootScript({ storageKey })` chiamato in Node | una stringa con la chiave dentro | 379 caratteri, la chiave c'è |
+| Le tre porte di servizio | chiuse | `ERR_PACKAGE_PATH_NOT_EXPORTED` su tutte e tre |
+| I due CSS e la traccia | risolvono a un file | sì |
+| `'use client'` in cima a `PlagueBar.js`, `ThemeSwitch.js`, `PlagueDock.js`, `useThemePreference.js` | c'è | sì; e **non** in `themePreference.js`, che si chiama da una pagina server |
+| `renderToString` di `ThemeSwitch`, `PlagueLoader`, `PlagueEmptyState` in Node | l'HTML, e il commutatore su «del sistema» | 2201, 1209 e 26667 caratteri; «Tema del sistema» con `aria-checked="true"` |
+| `tsc` di un consumatore con i tipi nuovi (`ThemePreferenceOptions`, `ThemePreferenceState`, `PlagueDockProps`), `skipLibCheck: false` | pulito | pulito con `bundler` **e** `nodenext`; il `@ts-expect-error` su `themeBootScript({})` regge, cioè la chiave è obbligatoria anche per chi installa |
 
 ⚠️ **Il difetto trovato qui non lo vedeva nessun'altra passata.** Il gate era verde, il playground
 pure, e `npm pack` mostrava un tarball perfetto: l'ingresso pubblico era irreparabile solo quando
