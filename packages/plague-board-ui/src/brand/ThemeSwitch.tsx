@@ -37,24 +37,27 @@ export interface ThemeSwitchProps {
  * del sole, della luna e dello schermo. Sopra il `ToggleButtonGroup` di HeroUI, che con la scelta
  * singola **è** un `radiogroup` — come {@link ToxicLevelSwitch}.
  *
- * ⚠️ **È controllato, e non sa dove si salva la scelta**: `value` e `onChange` e basta. Così va col
- * gancio `useTheme` di HeroUI come con `next-themes`, che Rattoteca usa oggi, senza che la libreria
- * ne scelga uno. Per non vedere il lampo del tema sbagliato al caricamento c'è
- * {@link themeBootScript}, da mettere nell'`<head>`.
+ * ⚠️ **È controllato, e non sa dove si salva la scelta**: `value` e `onChange` e basta. A salvarla
+ * è il gancio che gli sta accanto — {@link useThemePreference} della libreria, oppure `next-themes`,
+ * che Rattoteca usa oggi —, così un'applicazione non si trova con due memorie in disaccordo. Per
+ * non vedere il lampo del tema sbagliato al caricamento c'è {@link themeBootScript}, da mettere
+ * nell'`<head>` con la stessa chiave del gancio.
  *
  * ⚠️ **«Del sistema» è una scelta vera, non l'assenza di una**: chi l'ha già decisa nelle
  * impostazioni del suo dispositivo non deve ripeterla qui. Il commutatore di oggi di Rattoteca la
  * supporta sotto e la nasconde — con `system` mostra «chiaro» qualunque cosa faccia il sistema.
  *
- * ⚠️ **Fino all'idratazione mostra «del sistema», qualunque `value` riceva.** I due ganci leggono
- * `localStorage` già al primo render del client, mentre il server non ce l'ha e rende il valore di
- * serie: due scelte diverse fra l'HTML e l'idratazione, e React **non ripara** gli attributi.
- * Misurato il 2026-09-24 nella barra del playground: pagina chiara, commutatore fermo su «del
- * sistema». Aspettare qui vuol dire che nessuna applicazione deve ricordarsi di farlo.
+ * ⚠️ **Fino all'idratazione mostra «del sistema», qualunque `value` riceva.** `next-themes` e
+ * `useTheme` di HeroUI leggono `localStorage` già al primo render del client, mentre il server non
+ * ce l'ha e rende il valore di serie: due scelte diverse fra l'HTML e l'idratazione, e React **non
+ * ripara** gli attributi. Misurato il 2026-09-24 nella barra del playground, allora con `useTheme`:
+ * pagina chiara, commutatore fermo su «del sistema». Aspettare qui vuol dire che nessuna
+ * applicazione deve ricordarsi di farlo. `useThemePreference` quel difetto non l'ha, e l'attesa
+ * con lui non cambia niente.
  *
  * @example
  * ```tsx
- * const { theme, setTheme } = useTheme();   // da '@heroui/react'
+ * const { theme, setTheme } = useThemePreference({ storageKey: 'rattoteca-theme' });
  * <ThemeSwitch value={theme} onChange={setTheme} />
  * ```
  */

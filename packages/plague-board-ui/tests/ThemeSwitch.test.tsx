@@ -3,7 +3,7 @@ import { hydrateRoot } from 'react-dom/client';
 import { renderToString } from 'react-dom/server';
 import { afterEach, describe, expect, it, vi } from 'vitest';
 
-import { THEME_PREFERENCE_LABELS, ThemeSwitch, themeBootScript } from '../src';
+import { HEROUI_THEME_STORAGE_KEY, THEME_PREFERENCE_LABELS, ThemeSwitch, themeBootScript } from '../src';
 
 const opzione = (nome: string) => screen.getByRole('radio', { name: nome });
 
@@ -77,6 +77,8 @@ describe('ThemeSwitch', () => {
 });
 
 describe('themeBootScript', () => {
+  /** La chiave di `useTheme` di HeroUI: lo script deve saper leggere anche quella di un altro gancio. */
+  const HEROUI = { storageKey: HEROUI_THEME_STORAGE_KEY };
   const radice = document.documentElement;
   const matchMediaVero = window.matchMedia;
 
@@ -103,7 +105,7 @@ describe('themeBootScript', () => {
     localStorage.setItem('heroui-theme', 'dark');
     radice.classList.add('light');
 
-    esegui(themeBootScript());
+    esegui(themeBootScript(HEROUI));
 
     expect(radice.classList.contains('dark')).toBe(true);
     expect(radice.classList.contains('light')).toBe(false);
@@ -114,17 +116,17 @@ describe('themeBootScript', () => {
     localStorage.setItem('heroui-theme', 'system');
     sistema(true);
 
-    esegui(themeBootScript());
+    esegui(themeBootScript(HEROUI));
     expect(radice.getAttribute('data-theme')).toBe('dark');
   });
 
   it('senza una scelta, o con una che non conosce, vale quella di serie', () => {
     sistema(false);
-    esegui(themeBootScript());
+    esegui(themeBootScript(HEROUI));
     expect(radice.getAttribute('data-theme')).toBe('light');
 
     localStorage.setItem('heroui-theme', 'viola');
-    esegui(themeBootScript({ defaultTheme: 'dark' }));
+    esegui(themeBootScript({ ...HEROUI, defaultTheme: 'dark' }));
     expect(radice.getAttribute('data-theme')).toBe('dark');
   });
 
@@ -142,7 +144,7 @@ describe('themeBootScript', () => {
     });
     sistema(true);
 
-    expect(() => esegui(themeBootScript())).not.toThrow();
+    expect(() => esegui(themeBootScript(HEROUI))).not.toThrow();
     expect(radice.getAttribute('data-theme')).toBe('dark');
   });
 });

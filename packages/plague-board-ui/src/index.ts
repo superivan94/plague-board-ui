@@ -160,9 +160,12 @@ export {
   THEME_PREFERENCE_LABELS,
   isThemePreference,
   themeBootScript,
-  type ThemeBootOptions,
   type ThemePreference,
+  type ThemePreferenceOptions,
 } from './brand/themePreference.js';
+// ⚠️ La scelta si salva nel gancio e non nel commutatore, che resta controllato: così va anche con
+// `next-themes`. Il gancio e lo script prendono lo stesso oggetto di opzioni, con la chiave dell'app.
+export { useThemePreference, type ThemePreferenceState } from './hooks/useThemePreference.js';
 export { VersionTag, type VersionTagProps } from './brand/VersionTag.js';
 
 // Le icone. `IconProps` è pubblico perché è il contratto che deve rispettare chi sostituisce
