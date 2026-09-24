@@ -17,11 +17,17 @@ export interface Sorgente {
 }
 
 /**
- * Tutti i sorgenti di `src/`, `index.ts` compreso.
+ * Tutti i sorgenti di `src/`, `index.ts` compreso, **con le righe che finiscono in `\n`**.
  *
  * ⚠️ Sta in un file a parte perché al terzo guard che scandaglia l'albero — il confine
  * server/client, l'anello di fuoco, la superficie pubblica — tre copie della stessa lettura sono
  * la cosa che la regola sul copiare vieta.
+ *
+ * ⚠️ **Il fine riga lo decide il checkout, non il repository.** Nel repository i file sono in LF,
+ * ma Git per Windows con `core.autocrlf=true` li scrive su disco in CRLF: il 2026-09-25, al primo
+ * `npm publish`, la prima riga di ogni modulo client era `'use client';\r` e il guard del confine
+ * non ne riconosceva nessuno. I guard leggono il contenuto, e il contenuto è lo stesso nei due
+ * casi: per questo la lettura li riporta tutti a `\n`.
  */
 export const sorgenti: readonly Sorgente[] = readdirSync(SRC, {
   recursive: true,
@@ -33,7 +39,7 @@ export const sorgenti: readonly Sorgente[] = readdirSync(SRC, {
   .map((name) => ({
     name,
     module: name.replace(/\.tsx?$/, ''),
-    text: readFileSync(join(SRC, name), 'utf8'),
+    text: readFileSync(join(SRC, name), 'utf8').replace(/\r\n/g, '\n'),
   }));
 
 /** Il testo di `src/index.ts`. Vuoto vuol dire che la cartella non è quella giusta. */

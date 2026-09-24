@@ -1249,7 +1249,14 @@ tipo «Export X doesn't exist in target module» che **non sono veri**. Si guard
   un `toBeGreaterThan`. Il secondo è peggiore: un lettore di `src/index.ts` che non capisce una
   clausola non fallisce, la **salta**, e ogni caso costruito su quella lista passa perché quei nomi
   non ci sono mai arrivati. Si cura contando: le clausole riconosciute contro le righe che
-  cominciano per `export`, che oggi sono 64 e 64.
+  cominciano per `export`, che oggi sono 64 e 64. ⚠️ **E il fine riga lo decide il checkout, non il
+  repository**: i file sono salvati in LF, ma Git per Windows ha `core.autocrlf=true` nella
+  configurazione di sistema e li scrive su disco in CRLF. Il 2026-09-25 il primo `npm publish` è
+  morto nel suo `prepublishOnly`: dopo il checkout di `main` la prima riga dei moduli client era
+  `'use client';\r`, quattro casi del confine erano rossi e quello sui dati esportati era **verde su
+  zero file** — dei 30 moduli client non ne riconosceva nessuno. Sul branch non si vedeva, perché
+  lì i file li avevano scritti gli strumenti, in LF. Da allora `tests/sorgenti.ts` riporta tutto a
+  `\n` in lettura, e `boundaries.test.ts` conta i moduli client che riconosce.
 - ⚠️ **Quali contratti nessuno prova lo dice la copertura per rami, non l'elenco dei test.** Una
   prop che nessun test passa è un ramo che nessun test percorre, e scorrendo i titoli non si vede:
   il 2026-09-22 la copertura ha trovato i clic con ctrl e cmd di `SupportButton` e metà di
