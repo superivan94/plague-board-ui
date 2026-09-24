@@ -3,6 +3,7 @@ import { Poppins, Share_Tech_Mono } from 'next/font/google';
 import { themeBootScript } from 'plague-board-ui';
 
 import './globals.css';
+import { PLAYGROUND_THEME } from './theme';
 
 // I due caratteri che `ludoratti.it` usa davvero, misurati sul sito vivo: `Poppins` per il testo e
 // `Share Tech Mono` per i titoli e le etichette di servizio.
@@ -40,9 +41,9 @@ export const viewport: Viewport = {
 
 // ⚠️ Gira **prima** che la pagina si disegni, quindi chi torna col tema chiaro non vede un lampo
 // scuro. Non può essere un effetto di React: gli effetti partono dopo il primo disegno, ed è lì
-// che il lampo si vede. È lo script della libreria senza opzioni — la chiave di `useTheme` di
-// HeroUI, che è il gancio della barra, e «del sistema» come valore di serie.
-const THEME_BOOT = themeBootScript();
+// che il lampo si vede. È lo script della libreria con la chiave del playground — la stessa che il
+// commutatore della barra scrive — e «del sistema» come valore di serie.
+const THEME_BOOT = themeBootScript(PLAYGROUND_THEME);
 
 export default function RootLayout({ children }: { children: React.ReactNode }) {
   // La classe sulla radice è il modo in cui sia HeroUI sia `theme.css` riconoscono il tema. Qui

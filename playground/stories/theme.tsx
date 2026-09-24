@@ -5,7 +5,7 @@ import { defineStory } from './types';
 
 export const themeSwitchStory = defineStory(ThemeSwitch, {
   description:
-    'Il commutatore del tema: chiaro, scuro, o quello del sistema. È controllato — `value` e `onChange` — quindi va col gancio `useTheme` di HeroUI come con `next-themes`; per il lampo al caricamento c’è `themeBootScript`.',
+    'Il commutatore del tema: chiaro, scuro, o quello del sistema. È controllato — `value` e `onChange` —, e a salvare la scelta da una visita all’altra è il gancio accanto: `useThemePreference`, con la chiave dell’applicazione, oppure `next-themes`. `themeBootScript` con la stessa chiave la applica prima del primo disegno. La barra in cima a questa pagina è montata così.',
   variants: [
     {
       name: 'con un riquadro che segue la scelta',

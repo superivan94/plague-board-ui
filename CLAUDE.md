@@ -803,10 +803,9 @@ exist in target module» che **non sono veri**. Si guarda la pagina, o si crede 
 - ⚠️ **Il tema si commuta ricaricando, non scrivendo la classe sulla radice da console.** Cambiando
   `documentElement.classList` a mano, su `/atmosfera` metà dei token di HeroUI seguivano e metà no —
   un'opzione non scelta misurava 1,16 in scuro, quando ricaricando ne fa 14,52. Si scrive
-  `heroui-theme` in `localStorage` — `light`, `dark` o `system` — e si ricarica, che è la via che
-  usa la pagina: dal 2026-09-24 la barra è `ThemeSwitch` col gancio `useTheme` di HeroUI, e lo
-  script del layout è `themeBootScript()`. La chiave di prima, `pb-playground-theme`, non la legge
-  più nessuno.
+  `pb-playground-theme` in `localStorage` — `light`, `dark` o `system` — e si ricarica, che è la via
+  che usa la pagina: dal 2026-09-24 la barra è `ThemeSwitch` con `useThemePreference`, e lo script
+  del layout `themeBootScript`, tutti e due con le opzioni di `playground/app/theme.ts`.
 - ⚠️ **Un binario in una libreria `tsc` ha una terza via, e sopra i cento chilobyte batte il
   base64: `new URL('…', import.meta.url)`.** webpack 5 e Turbopack la riconoscono come «questo
   modulo dipende da quel file»: copiano l'asset nell'output dell'applicazione e sostituiscono
@@ -1336,6 +1335,15 @@ exist in target module» che **non sono veri**. Si guarda la pagina, o si crede 
   sistema», con «This won't be patched up» in console. Non somiglia a un errore d'idratazione:
   somiglia a un commutatore che non ricorda. Per questo `ThemeSwitch` mostra «del sistema» finché
   `useIsHydrated` non dice che l'idratazione è finita, e nessuna applicazione deve ricordarsene.
+  ⚠️ **E la scelta la salva un gancio della libreria, non il commutatore** (utente, 2026-09-24):
+  `useThemePreference` legge con `useSyncExternalStore`, che sul server e nell'idratazione dà il
+  valore di serie e subito dopo quello vero, quindi quel difetto non ce l'ha. Gli altri tre di
+  `useTheme` li toglie pure: la chiave è **dell'applicazione** e obbligatoria — `localStorage` è
+  già diviso per origine, ma in sviluppo sulla 3000 le app la condividono —, una lettura che lancia
+  ripiega su una memoria della pagina, e l'evento `storage` porta la scelta alle altre schede. La
+  radice la riscrivono i gesti e non un effetto, o nell'idratazione il valore di serie la farebbe
+  lampeggiare. Lo script e il gancio sono due implementazioni della stessa scrittura, e un test le
+  confronta scelta per scelta.
   ⚠️ **E chi riscrive il tema della radice riscrive anche `data-theme`.** Lo script lo mette accanto
   alla classe, e `theme.css` dichiara lo scuro sotto il chiaro con la stessa specificità: le cornici
   del catalogo, che correggevano solo la classe, con la scelta salvata scura davano alla variante

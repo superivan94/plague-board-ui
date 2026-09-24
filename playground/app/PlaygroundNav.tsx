@@ -1,6 +1,6 @@
 'use client';
 
-import { Popover, useTheme } from '@heroui/react';
+import { Popover } from '@heroui/react';
 import Link from 'next/link';
 import { usePathname } from 'next/navigation';
 import {
@@ -12,6 +12,7 @@ import {
   TechLabel,
   TechRule,
   ThemeSwitch,
+  useThemePreference,
 } from 'plague-board-ui';
 import { useState } from 'react';
 
@@ -24,6 +25,7 @@ import {
   type PlaygroundPage,
 } from './pages';
 import { PagesDrawer } from './PagesDrawer';
+import { PLAYGROUND_THEME } from './theme';
 
 /**
  * La barra del playground.
@@ -106,12 +108,11 @@ function FamilyMenu({
 
 export function PlaygroundNav() {
   const pathname = usePathname();
-  // ⚠️ Il tema è il collegamento che la libreria consiglia, scritto uguale: `useTheme` di HeroUI più
-  // `ThemeSwitch`, e `themeBootScript()` nel layout. Il playground non ha più un commutatore suo,
-  // così chi legge questo file vede l'esempio vero — ed è così che è saltato fuori il difetto
-  // d'idratazione che ora `ThemeSwitch` cura da sé. ⚠️ Letto nel sorgente e non misurato: il gancio
-  // chiama `localStorage` senza `try`, quindi coi dati del sito bloccati lancia e si porta via la barra.
-  const { theme, setTheme } = useTheme();
+  // ⚠️ Il tema è il collegamento che la libreria consiglia, scritto uguale: `useThemePreference` più
+  // `ThemeSwitch`, e `themeBootScript` nel layout, con le stesse opzioni. Il playground non ha più un
+  // commutatore suo, così chi legge questo file vede l'esempio vero. Prima del gancio della libreria
+  // qui c'era `useTheme` di HeroUI, ed è così che è saltato fuori il difetto d'idratazione.
+  const { theme, setTheme } = useThemePreference(PLAYGROUND_THEME);
   const catalogo = PLAYGROUND_PAGES.filter((page) => page.family === 'catalogo');
   const filosofia = PLAYGROUND_PAGES.filter((page) => page.family === 'filosofia');
 

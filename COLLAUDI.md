@@ -756,7 +756,7 @@ dipinge il colore su un canvas 1×1 e si legge il pixel.
 
 ⚠️ **E il tema si commuta ricaricando, non scrivendo la classe sulla radice a mano.** Cambiandola
 da console, in questa pagina metà dei token seguivano e metà no, e ne usciva un 1,16 che non esiste.
-Si scrive `heroui-theme` in `localStorage` e si ricarica, che è la via che usa la pagina.
+Si scrive `pb-playground-theme` in `localStorage` e si ricarica, che è la via che usa la pagina.
 
 ⚠️ **Dopo aver aggiunto classi ai sorgenti della libreria, il dev server va riavviato.** Tailwind
 scandaglia `dist/` per via dell'`@source` in `globals.css`, ma non lo **riscandaglia** quando `tsc`
@@ -848,7 +848,7 @@ avrebbe potuto fare.
 **Preparazione:** `npm run build --workspace packages/plague-board-ui`, poi **riavviare** il dev
 server (`npm run playground`) — i tre pezzi portano classi nuove, e Tailwind non riscandaglia
 `dist/` quando `tsc` lo riscrive. Pagina: `http://localhost:3100/profilo`. Il tema si commuta
-scrivendo `heroui-theme` in `localStorage` e **ricaricando**.
+scrivendo `pb-playground-theme` in `localStorage` e **ricaricando**.
 
 | Azione | Atteso | Ottenuto |
 |---|---|---|
@@ -894,7 +894,7 @@ rettangolo vale zero.
 
 **Preparazione:** `npm run build`, poi **riavviare** il dev server (`npm run playground`) — Tailwind
 non riscandaglia `dist/` quando `tsc` lo riscrive. Pagina: `http://localhost:3100/`, sezioni «i
-segni» e «il gioco e la cappa». Il tema si commuta scrivendo `heroui-theme` in
+segni» e «il gioco e la cappa». Il tema si commuta scrivendo `pb-playground-theme` in
 `localStorage` e **ricaricando**; la misura del riquadro di un tracciato si prende montando un
 `<path>` in un `<svg>` fuori schermo e leggendo `getBBox()`.
 
@@ -978,7 +978,7 @@ un errore di codice: è un disegno adottato per il suo **nome** e mai guardato a
 `animate-reveal` nascono da `@theme`, e Tailwind le cerca nel testo di `dist/`, che non
 riscandaglia da sé. Pagina `http://localhost:3100/atmosfera`, sezione «il nome che si disturba».
 I contrasti si misurano dipingendo il colore su una tela 1×1 e **componendolo sul fondo con la sua
-alfa**; il tema si commuta scrivendo `heroui-theme` in `localStorage` e ricaricando.
+alfa**; il tema si commuta scrivendo `pb-playground-theme` in `localStorage` e ricaricando.
 
 | Azione | Atteso | Ottenuto |
 |---|---|---|
@@ -1086,7 +1086,7 @@ chiaro accanto allo scuro, fermando l'animazione nell'istante giusto.
 e le altre sono classi nuove. Il riquadro del browser **davanti**: con `document.hidden` bolle e
 versi non nascono, per costruzione. Cornici `/cornice/LoginScreen/0/{light,dark}` col livello
 «alto», `/cornice/PlagueBackground/4/light` (la scena scura su pagina chiara), e `/atmosfera` nei due
-temi scrivendo `heroui-theme` e ricaricando. Contrasti col metodo della tela 1×1, strati
+temi scrivendo `pb-playground-theme` e ricaricando. Contrasti col metodo della tela 1×1, strati
 traslucidi composti dal basso.
 
 | Azione | Atteso | Ottenuto |
@@ -1149,7 +1149,7 @@ peggiore di prop, perché a schermo non si vede niente e chi l'ha passata crede 
 nuova nei sorgenti della libreria, e Tailwind non riscandaglia `dist/` da sé. Pagina
 `http://localhost:3100/accesso`. I contrasti si misurano dipingendo il colore su una tela 1×1 e
 **componendolo sul fondo con la sua alfa**, un livello alla volta; il tema si commuta scrivendo
-`heroui-theme` in `localStorage` e ricaricando.
+`pb-playground-theme` in `localStorage` e ricaricando.
 
 | Azione | Atteso | Ottenuto |
 |---|---|---|
@@ -1201,7 +1201,7 @@ una classe nuova nei sorgenti della libreria. Pagina `http://localhost:3100/prof
 chip che si contano». ⚠️ **L'anello di fuoco si guarda col Tab, non col mouse**: `:focus-visible`
 non corrisponde a un `focus()` da console né a un clic, quindi un anello rotto resta invisibile a
 chi prova a mano nel modo sbagliato. I contrasti si misurano dipingendo il colore su una tela 1×1
-e componendolo sul fondo con la sua alfa; il tema si commuta scrivendo `heroui-theme` in
+e componendolo sul fondo con la sua alfa; il tema si commuta scrivendo `pb-playground-theme` in
 `localStorage` e ricaricando.
 
 | Azione | Atteso | Ottenuto |
@@ -1247,7 +1247,7 @@ sorgenti; questo scenario tiene i numeri.
 **Ultima esecuzione:** agente, 2026-09-20
 
 **Preparazione:** `http://localhost:3100/profilo`, sezioni «il grado» e «i chip che si contano».
-⚠️ **Va guardato in tutt'e due i temi**, e il tema si commuta scrivendo `heroui-theme` in
+⚠️ **Va guardato in tutt'e due i temi**, e il tema si commuta scrivendo `pb-playground-theme` in
 `localStorage` e ricaricando: il difetto sta in **uno solo** dei due, quindi chi lavora in scuro
 non ha niente da notare.
 
@@ -1284,7 +1284,7 @@ quel grado è diverso dagli altri. Se il colore non arriva, resta una parola in 
 **Preparazione:** la pagina del playground che mostra il segno. Due passate, e servono tutte e due.
 La **lente**: clonare gli `<svg>` della riga più grande in un riquadro `position: fixed` e renderli
 a **168px** su fondo scuro, affiancati. La **misura vera**: guardare la riga da 16, che è quella
-dentro cui il segno vivrà davvero. Il tema si commuta scrivendo `heroui-theme` in
+dentro cui il segno vivrà davvero. Il tema si commuta scrivendo `pb-playground-theme` in
 `localStorage` e ricaricando.
 
 | Azione | Atteso | Ottenuto |
@@ -1530,7 +1530,9 @@ di ogni pezzo in `/storie`. Contrasti col metodo della tela 1×1 e degli strati 
 | Il rosso dell'uscita | ≥ 4,5 | **3,57** in chiaro e **3,97** in scuro ❌ — è `--danger` di HeroUI: va alla passata sui colori |
 | `ThemeSwitch`, si sceglie «scuro» | la scelta passa, il riquadro di prova diventa scuro | `aria-checked` sul terzo, riquadro con `dark` |
 | La barra del playground con `useTheme` di HeroUI e `heroui-theme` = `light`, ricaricando | il commutatore su «chiaro» | ❌ prima: pagina chiara, commutatore su «del sistema», «This won't be patched up» in console; ✅ dopo l'attesa dell'idratazione dentro `ThemeSwitch`: «Tema chiaro», e con `dark` «Tema scuro», nessun errore nuovo |
-| «Del sistema» premuto nella barra, col sistema chiaro | salvato `system`, pagina chiara | `heroui-theme` = `system`, `data-theme="light"`, una classe sola sulla radice |
+| «Del sistema» premuto nella barra, col sistema chiaro (ancora con `useTheme`) | salvato `system`, pagina chiara | `heroui-theme` = `system`, `data-theme="light"`, una classe sola sulla radice |
+| La barra con `useThemePreference` e la chiave del playground, `pb-playground-theme` = `light` rimasto da prima | la scelta di prima, senza rifarla | «Tema chiaro», radice `light · light`, console vuota |
+| «Scuro» scelto in una seconda scheda, `/stile` | la prima scheda segue senza ricaricare | la prima: «Tema scuro», radice `dark · dark` — è l'evento `storage`, che `useTheme` non ascoltava |
 | Le cornici del catalogo con ognuna delle tre scelte salvate | ogni variante nel suo tema | ❌ prima: con la scelta scura la cornice chiara aveva `data-theme="dark"` e il fondo `6,6,7`; ✅ dopo: **6 su 6**, fondo `245,245,245` e `6,6,7` |
 | I tre segni del commutatore nella barra | ≥ 3 | 16×16; **14,52** i non scelti, lo scelto **7,48** su pagina chiara e **9,90** su pagina scura |
 | I tre segni a 168 px | un sole, una luna, uno schermo | i raggi staccati, la falce aperta in alto a destra, la cornice col piede |
